@@ -7,7 +7,7 @@ import java.sql.JDBCType
  */
 def myQ = $DSL.insert {
 
-    TARGET Song.alias("s")
+    TARGET (Song.alias("s"))
 
     DATA (
         "id": P("id", JDBCType.INTEGER),

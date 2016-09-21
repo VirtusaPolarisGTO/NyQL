@@ -9,6 +9,8 @@ import com.virtusa.gto.insight.nyql.utils.QueryType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.util.concurrent.ConcurrentHashMap
+
 /**
  * @author Isuru Weerarathna
  */
@@ -20,6 +22,8 @@ class DSL {
     final DSLContext dslContext
 
     private DDL activeDDL
+
+    private boolean currentTransactionAutoCommit = false
 
     public DSL(QSession theSession) {
         session = theSession
@@ -33,10 +37,21 @@ class DSL {
     ///////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Enables auto commit at the end of transaction.
+     * @param autoCommit status of auto committing.
+     * @return this DSL instance.
+     */
+    DSL AUTO_COMMIT(boolean autoCommit=true) {
+        currentTransactionAutoCommit = autoCommit
+        return this
+    }
+
+    /**
      * Starts a new transaction.
      *
      * Note: No sub-transactions are allowed within a transaction
      *
+     * @param autoCommit auto commit on successful transaction.
      * @param closure transaction content.
      * @return this same DSL instance
      */
@@ -48,11 +63,17 @@ class DSL {
             code.resolveStrategy = Closure.DELEGATE_ONLY
             code()
 
-        } catch (Exception ex) {
+            if (currentTransactionAutoCommit) {
+                COMMIT()
+            }
+
+        } catch (Throwable ex) {
             LOGGER.error("Error occurred while in transaction!", ex)
-            session.executor.rollback(null)
+            ROLLBACK()
+
         } finally {
             session.executor.done()
+            currentTransactionAutoCommit = false
         }
         return this
     }
@@ -103,7 +124,7 @@ class DSL {
         return this
     }
 
-    QScript IMPORT(String scriptName) {
+    QScript $IMPORT(String scriptName) {
         return session.scriptRepo.parse(scriptName, session)
     }
 
@@ -112,11 +133,11 @@ class DSL {
     }
 
     def RUN(QResultProxy proxy) {
-        return session.executor.execute(session.scriptRepo.parse(proxy, session))
+        return RUN(session.scriptRepo.parse(proxy, session))
     }
 
     def RUN(String scriptName) {
-        return RUN(IMPORT(scriptName))
+        return RUN($IMPORT(scriptName))
     }
 
     ///////////////////////////////////////////////////////////////////////////////////

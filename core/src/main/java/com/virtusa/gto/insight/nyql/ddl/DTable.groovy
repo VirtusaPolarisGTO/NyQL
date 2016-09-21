@@ -39,6 +39,14 @@ import groovy.transform.ToString
         return this
     }
 
+    DTable PRIMARY_KEY(String... fieldNames) {
+        DKey dKey = new DKey()
+        dKey.fields = fieldNames
+        dKey.type = DKeyType.PRIMARY
+        keys.add(dKey)
+        return this
+    }
+
     DTable INDEX(String name, Map details=null) {
         DKey dKey = DKey.parseFrom(details)
         dKey.type = DKeyType.INDEX

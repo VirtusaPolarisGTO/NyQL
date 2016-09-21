@@ -12,7 +12,7 @@ $DSL.select {
     FETCH ()
 */
 
-    TARGET Country.alias("c")
+    TARGET (Country.alias("c"))
 
     JOINING {
         TARGET() INNER_JOIN City.alias("ct") ON ct.CountryCode, c.Code

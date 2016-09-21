@@ -1,5 +1,6 @@
 import com.virtusa.gto.insight.nyql.ddl.DFieldType
 import com.virtusa.gto.insight.nyql.ddl.DKey
+import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType
 
 /**
  * @author IWEERARATHNA
@@ -35,7 +36,7 @@ $DSL.script {
             //      unique:          boolean
             //      fields:          [list of field names]
             //      indexType:       {DKeyIndexType.[BTREE | HASH] }
-            INDEX ("idx_name", [fields: ["name"], indexType: DKey.DKeyIndexType.HASH])
+            INDEX ("idx_name", [fields: ["name"], indexType: DKeyIndexType.HASH])
 
             // Foreign keys
             //  parameter-0 : name of the foreign key

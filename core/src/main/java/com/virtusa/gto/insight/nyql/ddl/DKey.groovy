@@ -39,12 +39,4 @@ import java.util.stream.Stream
         return dKey
     }
 
-    static enum DKeyIndexType {
-        BTREE, HASH
-    }
-
-    static enum DReferenceOption {
-        RESTRICT, CASCADE, SET_NULL, NO_ACTION
-    }
-
 }
