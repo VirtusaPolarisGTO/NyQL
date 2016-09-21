@@ -72,12 +72,14 @@ final class Quickly {
         repository.parse(name, qSession)
     }
 
-    static def execute(File dir, String name, Map sessionVariables=null) throws Exception {
+    static def execute(File dir, String name, Map sessionVariables=null, QExecutor executor=null) throws Exception {
         Connection connection = null
         try {
             connection = create()
-            QJdbcExecutor executor = new QJdbcExecutor(connection);
-            QExecutorRegistry.getInstance().register("jdbc", executor);
+            if (executor == null) {
+                executor = new QJdbcExecutor(connection);
+                QExecutorRegistry.getInstance().register("jdbc", executor);
+            }
 
             QScript script = parse(dir, name, sessionVariables)
 
