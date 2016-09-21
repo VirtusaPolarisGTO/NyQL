@@ -1,6 +1,7 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
 import com.virtusa.gto.insight.nyql.QResultProxy
+import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.*
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
@@ -38,7 +39,7 @@ class QRepositoryImpl implements QRepository {
             throw new NyScriptNotFoundException(scriptId)
         }
 
-        if (src.doCache && cache.containsKey(scriptId)) {
+        if (Configurations.instance().cacheGeneratedQueries() && src.doCache && cache.containsKey(scriptId)) {
             LOGGER.trace("Script {} served from query cache.", scriptId)
             return cache.get(scriptId)
         }

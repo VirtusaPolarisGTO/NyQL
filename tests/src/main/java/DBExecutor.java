@@ -16,7 +16,7 @@ public class DBExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBExecutor.class);
 
     public static void main(String[] args) throws Exception {
-        Quickly.configOnce(null);
+        Quickly.configOnce();
 
         parse();
     }

@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory
  */
 class DSLContext {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DSLContext.class)
-
     static DSLContext activeDSLContext;
 
     String activeDb
@@ -27,24 +25,6 @@ class DSLContext {
         DSLContext dslContext = new DSLContext(dbName)
         activeDSLContext = dslContext
         return dslContext
-    }
-
-    static def load(Map options) {
-        def clzNames = options.get("translators")?.toString()?.split("[,]")
-        if (clzNames != null && clzNames.length > 0) {
-            clzNames.each {
-                def factory = Class.forName(it).newInstance() as QDbFactory
-
-                QDatabaseRegistry.instance.register(factory)
-            }
-        }
-
-        String activeDb = options["activate"]
-        if (activeDb != null) {
-            LOGGER.debug("Activating DB: {}", activeDb)
-            return QDatabaseRegistry.instance.load(activeDb)
-        }
-        return null
     }
 
 }

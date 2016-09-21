@@ -1,7 +1,9 @@
 package com.virtusa.gto.insight.nyql.engine
 
+import com.sun.java.swing.plaf.windows.TMSchema
 import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.QExecutor
+import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.model.QExecutorRegistry
 import com.virtusa.gto.insight.nyql.model.QRepository
 import com.virtusa.gto.insight.nyql.model.QRepositoryRegistry
@@ -26,6 +28,19 @@ final class Quickly {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Quickly.class)
 
+    static void configOnce() {
+        configOnce((Properties)null)
+    }
+
+    static void configOnce(File configFile) {
+        Properties properties = new Properties()
+        configFile.withInputStream {
+            properties.load(it)
+        }
+
+        configOnce(properties)
+    }
+
     static void configOnce(Properties properties) {
         if (properties == null) {
             InputStream inputStream = null
@@ -33,7 +48,7 @@ final class Quickly {
                 inputStream = Quickly.class.classLoader.getResourceAsStream("nyql.properties")
                 Properties config = new Properties()
                 config.load(inputStream)
-                DSLContext.load(config)
+                Configurations.instance().configure(config)
             } finally {
                 if (inputStream) {
                     inputStream.close()
@@ -41,7 +56,7 @@ final class Quickly {
             }
 
         } else {
-            DSLContext.load(properties)
+            Configurations.instance().configure(properties)
         }
 
         QExecutor executor = new QDummyExecutor();
