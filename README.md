@@ -7,8 +7,9 @@
 * QScript: Executable entity contains a QResultProxy instance with relevant data
 * Executor: Entity which executes script(s)
 
-1. Add the dependency `nyql-engine` to the maven project. _Note: Use the correct version._
-```xml
+1. Add the dependency `nyql-engine` to the maven project. _Note: Use the correct version_. 
+
+ ```xml
 <dependency>
     <groupId>com.virtusa.gto.insight.nyql</groupId>
     <artifactId>nyql-engine</artifactId>
@@ -16,13 +17,14 @@
 </dependency>
 ```
 2. Make sure to have correct driver classes in your classpath at the runtime through maven dependencies. For eg, if you are using mysql database use mysql jdbc driver.
-```xml
+ ```xml
 <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
     <version>5.1.36</version>
 </dependency>
 ```
+
 3. NyQL uses a configuration property file. See a sample here. It has below properties.
     * **translators**: a comma separated fully qualified class names of db translators. These will be loaded at the beginning and will throw exception if not found.
     * **activate**: the active database implementation name. This must be equal to a name returned by any translator.
@@ -46,10 +48,11 @@ public class Main {
         // print order of parameters according to the above query string
         System.out.println(result.getProxy().getOrderedParameters());
     }
-    
 }
 ```
+
 4. If you want to execute a script then use below code piece. (Assuming you are using default JDBC executor to get the result)
+
 ```java
 public class Main {
     
