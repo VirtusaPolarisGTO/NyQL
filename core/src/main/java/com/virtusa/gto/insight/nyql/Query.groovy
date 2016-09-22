@@ -40,7 +40,7 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
         return this
     }
 
-    def P(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName) {
+    def PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName) {
         return _ctx.addParam(new AParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName))
     }
 

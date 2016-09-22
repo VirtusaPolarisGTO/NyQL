@@ -19,4 +19,8 @@ trait DataTypeTraits {
         return new FunctionColumn(_ctx: _ctx, _setOfCols: true, _columns: [comp], _func: "like")
     }
 
+    def NOTLIKE(Object comp) {
+        return new FunctionColumn(_ctx: _ctx, _setOfCols: true, _columns: [comp], _func: "not_like")
+    }
+
 }

@@ -40,19 +40,31 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return this
     }
 
-    def P(String name, JDBCType type=null) {
+    def LIKE(Object c1, Object c2) {
+        return ON(c1, LIKE(c2))
+    }
+
+    def NOTLIKE(Object c1, Object c2) {
+        return ON(c1, NOTLIKE(c2))
+    }
+
+    def PARAM(String name, JDBCType type=null) {
         return _ctx.addParam(new AParam(__name: name, type: type))
     }
 
-    def AND(Column c1, String op="", Column c2) {
-        clauses.add(" AND ")
-        ON(c1, op, c2)
+    def AND(Closure closure) {
+        AND()
+        def code = closure.rehydrate(this, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
         return this
     }
 
-    def OR(Column c1, String op="", Column c2) {
-        clauses.add(" OR ")
-        ON(c1, op, c2)
+    def OR(closure) {
+        OR()
+        def code = closure.rehydrate(this, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
         return this
     }
 
@@ -66,17 +78,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return this
     }
 
-    def ON(Column c1, String op="", Column c2) {
-        clauses.add(new QCondition(leftOp: c1, rightOp: c2, op: op))
-        return this
-    }
-
-    def ON(String c1, String op="", String c2) {
-        clauses.add(new QCondition(leftOp: c1, rightOp: c2, op: op))
-        return this
-    }
-
-    def ON(Column c1, String op="", Object c2) {
+    def ON(Object c1, String op="", Object c2) {
         clauses.add(new QCondition(leftOp: c1, rightOp: c2, op: op))
         return this
     }
@@ -87,7 +89,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return this
     }
 
-    def NOT_NULL(Object c) {
+    def NOTNULL(Object c) {
         String str = _ctx.translator.___resolve(c, QContextType.CONDITIONAL) + " " + _ctx.translator.COMPARATOR_NULL + " NOT " + _ctx.translator.NULL
         clauses.add(str)
         return this
@@ -110,6 +112,26 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     def EQ(Column c1, String s2) {
         clauses.add(new QCondition(leftOp: c1, rightOp: s2, op: "="))
         return this
+    }
+
+    def NEQ(Object c1, Object c2) {
+        return ON(c1, "<>", c2)
+    }
+
+    def GT(Object c1, Object c2) {
+        return ON(c1, ">", c2)
+    }
+
+    def GTE(Object c1, Object c2) {
+        return ON(c1, ">=", c2)
+    }
+
+    def LT(Object c1, Object c2) {
+        return ON(c1, "<", c2)
+    }
+
+    def LTE(Object c1, Object c2) {
+        return ON(c1, "<=", c2)
     }
 
     def $IMPORT(String scriptId) {
@@ -135,6 +157,12 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def propertyMissing(String name) {
+        if ("AND" == name) {
+            return AND()
+        } else if ("OR" == name) {
+            return OR()
+        }
+
         if (_ctx.tables.containsKey(name)) {
             return _ctx.tables[name]
         } else if (Character.isUpperCase(name.charAt(0))) {

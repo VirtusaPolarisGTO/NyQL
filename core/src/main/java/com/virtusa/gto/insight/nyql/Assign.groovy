@@ -21,7 +21,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
         _ctx = context
     }
 
-    def P(String name, JDBCType type=null) {
+    def PARAM(String name, JDBCType type=null) {
         return _ctx.addParam(new AParam(__name: name, type: type))
     }
 

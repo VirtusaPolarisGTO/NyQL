@@ -91,6 +91,11 @@ trait QFunctions {
         else { return "LIKE " + ___resolve(c, QContextType.INSIDE_FUNCTION) }
     }
 
+    def not_like = { c ->
+        if (c instanceof List) { return "NOT LIKE " + ___resolve(c[0], QContextType.INSIDE_FUNCTION) }
+        else { return "NOT LIKE " + ___resolve(c, QContextType.INSIDE_FUNCTION) }
+    }
+
     def concat = {
         c -> if (c instanceof String) {
             return String.valueOf(c)
