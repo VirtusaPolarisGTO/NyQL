@@ -20,16 +20,14 @@ class QRepositoryImpl implements QRepository {
 
     private final QScriptMapper mapper
 
-    private final Map<String, QScript> cache = [:]
-
-    private final Map<String, Script> gscriptMap = [:]
+    private final Caching caching = new Caching()
 
     QRepositoryImpl(QScriptMapper scriptMapper) {
         mapper = scriptMapper
     }
 
     public void clearCache(int level) {
-        cache.clear()
+        caching.clearGeneratedCache()
         LOGGER.warn("All query repository cache cleared!")
     }
 
@@ -39,21 +37,21 @@ class QRepositoryImpl implements QRepository {
             throw new NyScriptNotFoundException(scriptId)
         }
 
-        if (Configurations.instance().cacheGeneratedQueries() && src.doCache && cache.containsKey(scriptId)) {
+        if (Configurations.instance().cacheGeneratedQueries() && src.doCache && caching.hasGeneratedQuery(scriptId)) {
             LOGGER.trace("Script {} served from query cache.", scriptId)
-            return cache.get(scriptId)
+            return caching.getGeneratedQuery(scriptId)
         }
 
         Binding binding = new Binding(session?.sessionVariables ?: new HashMap<>())
         GroovyShell shell = new GroovyShell(binding)
 
         try {
-            Script compiledScript = gscriptMap.computeIfAbsent(scriptId, { id ->
+            Script compiledScript = caching.compileIfAbsent(scriptId, { id ->
                         LOGGER.info("Compiling script {}", src.file.absolutePath)
                         return shell.parse(src.file)
                     })
 
-            if (LOGGER.isInfoEnabled()) LOGGER.info("Running script '{}'", scriptId)
+            LOGGER.info("Running script '{}'", scriptId)
             Object res = compiledScript.run()
 
             QScript script
@@ -63,7 +61,7 @@ class QRepositoryImpl implements QRepository {
                 script = new QScriptResult(qSession: session, scriptResult: res)
             }
             if (src.isDoCache()) {
-                cache.put(scriptId, script)
+                caching.addGeneratedQuery(scriptId, script)
             }
             return script
 
