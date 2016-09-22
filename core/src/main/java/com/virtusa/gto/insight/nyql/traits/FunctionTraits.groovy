@@ -11,6 +11,7 @@ trait FunctionTraits {
     def ASC(Column column)      { return fColumn(column, "asc") }
     def DESC(Column column)     { return fColumn(column, "desc") }
     def COUNT(Column column)    { return fColumn(column, "count") }
+    def COUNT_DISTINCT(Column column) { return fColumn(column, "count_distinct") }
     def MAX(Column column)      { return fColumn(column, "max") }
     def MIN(Column column)      { return fColumn(column, "min") }
     def AVG(Column column)      { return fColumn(column, "avg") }
@@ -20,6 +21,7 @@ trait FunctionTraits {
     def UCASE(Column column)    { return fColumn(column, "ucase") }
     def TRIM(Column column)     { return fColumn(column, "trim") }
     def LEN(Column column)      { return fColumn(column, "len") }
+    def ROUND(Column column, Object decimalPlaces)    { return vColumn("round", column, decimalPlaces) }
 
     def CONCAT(Object... columns) { return vColumn("concat", columns) }
 

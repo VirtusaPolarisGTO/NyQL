@@ -22,8 +22,8 @@ public class DBExecutor {
     }
 
     private static void parse() throws Exception {
-        File srcDir = new File("C:\\Projects\\insight5\\utils\\nyql\\core\\src\\examples");
-        QScript result = Quickly.parse(srcDir, "select");
+        File srcDir = new File("C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila");
+        QScript result = Quickly.parse(srcDir, "all_rentals_of_customer");
         System.out.println(result.getProxy().getQuery());
         System.out.println(result.getProxy().getOrderedParameters());
     }
@@ -34,7 +34,7 @@ public class DBExecutor {
         data.put("customerId", 2);
         data.put("filmId", 250);
 
-        File srcDir = new File("C:\\Projects\\insight5\\utils\\nyql\\core\\src\\examples\\sakila");
+        File srcDir = new File("C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila");
         Object result = Quickly.execute(srcDir, "customer_details", data);
         if (result instanceof List) {
             for (Object row : (List)result) {
