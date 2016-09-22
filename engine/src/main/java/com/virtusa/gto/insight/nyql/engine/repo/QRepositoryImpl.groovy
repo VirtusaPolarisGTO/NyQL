@@ -7,7 +7,11 @@ import com.virtusa.gto.insight.nyql.model.*
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptParseException
+import groovy.json.JsonParser
+import groovy.json.JsonSlurper
 import org.codehaus.groovy.control.CompilationFailedException
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -22,8 +26,26 @@ class QRepositoryImpl implements QRepository {
 
     private final Caching caching = new Caching()
 
+    private CompilerConfiguration compilerConfigurations
+
     QRepositoryImpl(QScriptMapper scriptMapper) {
         mapper = scriptMapper
+    }
+
+    private CompilerConfiguration makeCompilerConfigs() {
+        if (compilerConfigurations != null) {
+            return compilerConfigurations
+        }
+
+        compilerConfigurations = new CompilerConfiguration()
+
+        String[] defImports = Configurations.instance().defaultImports()
+        if (defImports != null) {
+            ImportCustomizer importCustomizer = new ImportCustomizer()
+            importCustomizer.addImports(defImports)
+            compilerConfigurations.addCompilationCustomizers(importCustomizer)
+        }
+        return compilerConfigurations
     }
 
     public void clearCache(int level) {
@@ -43,10 +65,10 @@ class QRepositoryImpl implements QRepository {
         }
 
         Binding binding = new Binding(session?.sessionVariables ?: new HashMap<>())
-        GroovyShell shell = new GroovyShell(binding)
+        GroovyShell shell = new GroovyShell(binding, makeCompilerConfigs())
 
         try {
-            Script compiledScript = caching.compileIfAbsent(scriptId, { id ->
+            Script compiledScript = caching.compileIfAbsent(scriptId, {
                         LOGGER.info("Compiling script {}", src.file.absolutePath)
                         return shell.parse(src.file)
                     })

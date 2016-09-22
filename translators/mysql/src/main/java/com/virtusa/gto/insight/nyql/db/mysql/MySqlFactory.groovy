@@ -21,4 +21,9 @@ class MySqlFactory implements QDbFactory {
     List<Class<?>> createTraits() {
         return [MySqlFunctions]
     }
+
+    @Override
+    String driverClassName() {
+        return "com.mysql.jdbc.Driver"
+    }
 }

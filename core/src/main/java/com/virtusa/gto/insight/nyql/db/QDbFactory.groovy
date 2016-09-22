@@ -10,4 +10,5 @@ trait QDbFactory {
 
     abstract List<Class<?>> createTraits();
 
+    abstract String driverClassName();
 }

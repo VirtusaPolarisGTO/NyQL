@@ -1,5 +1,3 @@
-import com.virtusa.gto.insight.nyql.QResultProxy
-
 import java.sql.JDBCType
 
 /**

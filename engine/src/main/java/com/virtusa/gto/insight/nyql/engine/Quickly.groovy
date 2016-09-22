@@ -15,6 +15,7 @@ import com.virtusa.gto.insight.nyql.engine.impl.QDummyExecutor
 import com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutor
 import com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl
 import com.virtusa.gto.insight.nyql.engine.repo.QScriptsFolder
+import groovy.json.JsonSlurper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -32,22 +33,16 @@ final class Quickly {
         configOnce((Properties)null)
     }
 
-    static void configOnce(File configFile) {
-        Properties properties = new Properties()
-        configFile.withInputStream {
-            properties.load(it)
-        }
-
-        configOnce(properties)
+    static void configOnce(File configJsonFile) {
+        configOnce(new JsonSlurper().parse(configJsonFile) as Map)
     }
 
-    static void configOnce(Properties properties) {
+    static void configOnce(Map properties) {
         if (properties == null) {
             InputStream inputStream = null
             try {
-                inputStream = Quickly.class.classLoader.getResourceAsStream("nyql.properties")
-                Properties config = new Properties()
-                config.load(inputStream)
+                inputStream = Quickly.class.classLoader.getResourceAsStream("nyql.json")
+                Map config = new JsonSlurper().parse(inputStream) as Map
                 Configurations.instance().configure(config)
             } finally {
                 if (inputStream) {

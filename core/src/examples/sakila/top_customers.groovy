@@ -1,5 +1,3 @@
-import java.sql.JDBCType
-
 /**
  * @author IWEERARATHNA
  */

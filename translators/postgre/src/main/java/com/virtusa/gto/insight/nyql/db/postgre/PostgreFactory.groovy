@@ -21,4 +21,9 @@ class PostgreFactory implements QDbFactory {
     List<Class<?>> createTraits() {
         return [PostgresFunctions]
     }
+
+    @Override
+    String driverClassName() {
+        return "org.postgresql.Driver"
+    }
 }

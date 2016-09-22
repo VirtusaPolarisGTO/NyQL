@@ -23,7 +23,7 @@ public class DBExecutor {
 
     private static void parse() throws Exception {
         File srcDir = new File("C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila");
-        QScript result = Quickly.parse(srcDir, "all_rentals_of_customer");
+        QScript result = Quickly.parse(srcDir, "top_customers");
         System.out.println(result.getProxy().getQuery());
         System.out.println(result.getProxy().getOrderedParameters());
     }

@@ -1,5 +1,4 @@
 import com.virtusa.gto.insight.nyql.ddl.DFieldType
-import com.virtusa.gto.insight.nyql.ddl.DKey
 import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType
 
 /**

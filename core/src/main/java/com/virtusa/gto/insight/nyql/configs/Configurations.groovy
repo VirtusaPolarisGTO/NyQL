@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QDatabaseRegistry
+import com.virtusa.gto.insight.nyql.utils.QUtils
 import org.apache.commons.lang3.BooleanUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,20 +16,11 @@ class Configurations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurations.class)
 
-    private Properties properties
+    private Map properties = [:]
 
     private Configurations() {}
 
-    Configurations configFrom(File propertyFile) throws NyException {
-        Properties temp = new Properties()
-
-        propertyFile.withInputStream {
-            temp.load(it)
-        }
-        return configure(temp)
-    }
-
-    Configurations configure(Properties configProps) throws NyException {
+    Configurations configure(Map configProps) throws NyException {
         properties = configProps
 
         doConfig()
@@ -36,8 +28,8 @@ class Configurations {
     }
 
     private void doConfig() throws NyException {
-        def clzNames = getAvailableTranslators()
-        if (clzNames != null && clzNames.length > 0) {
+        List<String> clzNames = getAvailableTranslators()
+        if (QUtils.notNullNorEmpty(clzNames)) {
             clzNames.each {
                 try {
                     def factory = Class.forName(it).newInstance() as QDbFactory
@@ -57,28 +49,24 @@ class Configurations {
         }
     }
 
+    String[] defaultImports() {
+        return properties.defaultImports
+    }
+
     String getActivatedDb() {
-        return properties?.getProperty("activate")
+        return properties.activate
     }
 
     boolean cacheRawScripts() {
-        return toBool(properties?.getProperty("cache.raw.scripts"), true)
+        return (boolean) properties.caching.compiledScripts
     }
 
     boolean cacheGeneratedQueries() {
-        return toBool(properties?.getProperty("cache.queries"), true)
+        return (boolean) properties.caching.generatedQueries
     }
 
-    String[] getAvailableTranslators() {
-        return properties?.getProperty("translators")?.toString()?.split("[,]")
-    }
-
-    private static boolean toBool(Object value, boolean defValue) {
-        if (value == null) {
-            return defValue
-        } else {
-            return BooleanUtils.toBoolean(String.valueOf(value))
-        }
+    List<String> getAvailableTranslators() {
+        return properties.translators
     }
 
     static Configurations instance() {
