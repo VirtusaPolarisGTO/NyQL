@@ -70,7 +70,7 @@ class Table {
         return __alias != null
     }
 
-    def propertyMissing(String name) {
+    Column COLUMN(String name) {
         Column oCol = __allColumns.get(name)
         if (oCol != null) {
             return oCol
@@ -78,6 +78,10 @@ class Table {
         Column col = new Column(__name: name, _owner: this, _ctx: _ctx)
         __allColumns.put(name, col)
         return col
+    }
+
+    def propertyMissing(String name) {
+        return COLUMN(name)
     }
 
 }

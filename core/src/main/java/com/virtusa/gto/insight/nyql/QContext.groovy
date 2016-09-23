@@ -12,10 +12,20 @@ class QContext {
     QTranslator translator;
     String translatorName;
 
-    Map<String, AParam> allParams= new HashMap<>()
+    Map<String, AParam> allParams = new HashMap<>()
 
     Tables tables = new Tables()
     Map<String, Column> columns = new HashMap<>()
+
+    Table getTheOnlyTable() {
+        if (tables.size() != 1) {
+            return null;
+        }
+        for (String k : tables.keySet()) {
+            return tables[k]
+        }
+        return null;
+    }
 
     AParam addParam(AParam param) {
         if (allParams.containsKey(param.__name)) {

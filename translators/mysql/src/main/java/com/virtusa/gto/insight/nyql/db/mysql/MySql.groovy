@@ -96,11 +96,11 @@ class MySql implements QTranslator, MySqlFunctions {
             if (tableHasAlias) {
                 return column._owner.__alias + "." + column.__name
             } else {
-                if (column._owner != null) {
-                    return ___tableName(column._owner, contextType) + "." + QUtils.quote(column.__name, BACK_TICK)
-                } else {
+                //if (column._owner != null) {
+                //    return ___tableName(column._owner, contextType) + "." + QUtils.quote(column.__name, BACK_TICK)
+                //} else {
                     return QUtils.quoteIfWS(column.__name, BACK_TICK)
-                }
+                //}
             }
         }
     }

@@ -112,6 +112,10 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
             _ctx.tables.put(name, table)
             return table
         } else {
+            def column = _ctx.getTheOnlyTable()?.COLUMN(name)
+            if (column != null) {
+                return column
+            }
             throw new Exception("No table by name '$name' found!")
         }
     }
