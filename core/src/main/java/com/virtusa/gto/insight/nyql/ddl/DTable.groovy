@@ -7,7 +7,7 @@ import groovy.transform.ToString
  * @author IWEERARATHNA
  */
 @ToString
-@PackageScope class DTable extends DAbstractEntity {
+class DTable extends DAbstractEntity {
 
     List<DField> fields = []
     List<DKey> keys = []
@@ -58,6 +58,7 @@ import groovy.transform.ToString
     DTable FOREIGN_KEY(String name, String thisTableField, Map details=null) {
         DKey dKey = DKey.parseFrom(details)
         dKey.type = DKeyType.FOREIGN
+        dKey.fields = [thisTableField]
         dKey.name = name
         keys.add(dKey)
         return this

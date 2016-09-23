@@ -10,8 +10,11 @@ import groovy.transform.ToString
 class QScript {
 
     QResultProxy proxy
-    //GroovyShell containerShell
     QSession qSession
 
 
+    @Override
+    public String toString() {
+        return proxy == null ? "" : proxy.query ?: ""
+    }
 }

@@ -40,7 +40,9 @@ class QScriptsFolder implements QScriptMapper {
                     scanDir(it)
                 } else {
                     String relPath = captureFileName(baseDir.toPath().relativize(it.toPath()).toString()).replace('\\', '/')
-                    fileMap[relPath] = new QSource(id: relPath, file: it, doCache: DEF_CACHING)
+                    def qSrc = new QSource(relPath, it)
+                    qSrc.setDoCache(DEF_CACHING)
+                    fileMap[relPath] = qSrc
                     LOGGER.debug("  > {}", relPath)
                 }
             }

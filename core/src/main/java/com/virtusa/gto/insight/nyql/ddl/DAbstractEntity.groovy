@@ -5,7 +5,7 @@ import groovy.transform.PackageScope
 /**
  * @author IWEERARATHNA
  */
-@PackageScope abstract class DAbstractEntity {
+abstract class DAbstractEntity {
 
     String name
     String comment

@@ -2,6 +2,8 @@ package com.virtusa.gto.insight.nyql.ddl
 
 import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.QResultProxy
+import com.virtusa.gto.insight.nyql.model.QScript
+import com.virtusa.gto.insight.nyql.model.QScriptList
 import com.virtusa.gto.insight.nyql.model.QSession
 import groovy.transform.ToString
 import org.slf4j.Logger
@@ -28,19 +30,18 @@ class DDL {
 
     DDL TEMP_TABLE(String name, @DelegatesTo(DTable) Closure closure) {
         DTable dTable = new DTable(name: name, temporary: true)
+
         def code = closure.rehydrate(dTable, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         DTable rTable = code()
         tables.put(rTable.name, rTable)
-
-        // invoke table creation
-        callCreateTable(rTable)
 
         return this
     }
 
     DDL TABLE(String name, @DelegatesTo(DTable) Closure closure) {
         DTable dTable = new DTable()
+
         def code = closure.rehydrate(dTable, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         DTable rTable = code()
@@ -58,7 +59,6 @@ class DDL {
         rTable.temporary = true
         tablesToDrop.add(rTable)
 
-        callDropTable(rTable)
         return this
     }
 
@@ -70,20 +70,27 @@ class DDL {
             rTable = new DTable(name: name)
         }
         tablesToDrop.add(rTable)
-
-        callDropTable(rTable)
         return this
     }
 
-    private void callCreateTable(DTable dTable) {
-        LOGGER.debug("Executing table creation command...")
-        QResultProxy proxy = session.dslContext.qTranslator.___ddls().___createTable(dTable)
-        session.executor.execute(session.scriptRepo.parse(proxy, session))
+    QScriptList createScripts() {
+        QScriptList scriptList = new QScriptList()
+        List<QScript> list = new LinkedList<>()
+        tables.each {k, t -> list.add(callCreateTable(t)) }
+        tablesToDrop.each { list.add(callDropTable(it)) }
+        scriptList.scripts = list
+        return scriptList
     }
 
-    private void callDropTable(DTable dTable) {
+    private QScript callCreateTable(DTable dTable) {
+        LOGGER.debug("Executing table creation command...")
+        QResultProxy proxy = session.dslContext.qTranslator.___ddls().___createTable(dTable)
+        return session.scriptRepo.parse(proxy, session)
+    }
+
+    private QScript callDropTable(DTable dTable) {
         LOGGER.debug("Executing table drop command...")
         QResultProxy proxy = session.dslContext.qTranslator.___ddls().___dropTable(dTable)
-        session.executor.execute(session.scriptRepo.parse(proxy, session))
+        return session.scriptRepo.parse(proxy, session)
     }
 }

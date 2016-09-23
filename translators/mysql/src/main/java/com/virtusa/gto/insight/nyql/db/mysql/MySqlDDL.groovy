@@ -6,6 +6,7 @@ import com.virtusa.gto.insight.nyql.ddl.DField
 import com.virtusa.gto.insight.nyql.ddl.DFieldType
 import com.virtusa.gto.insight.nyql.ddl.DKey
 import com.virtusa.gto.insight.nyql.ddl.DKeyType
+import com.virtusa.gto.insight.nyql.ddl.DReferenceOption
 import com.virtusa.gto.insight.nyql.ddl.DTable
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
@@ -28,11 +29,11 @@ class MySqlDDL implements QDdl {
         query.append(___ddlResolve(dTable))
 
         if (QUtils.notNullNorEmpty(dTable.fields)) {
-            query.append("(")
+            query.append("(\n\t")
             List<DField> fields = dTable.fields
             boolean added = false
             for (DField f : fields) {
-                if (added) query.append(", ")
+                if (added) query.append(",\n\t")
 
                 query.append(___ddlExpandField(f))
                 added = true
@@ -41,11 +42,11 @@ class MySqlDDL implements QDdl {
             if (QUtils.notNullNorEmpty(dTable.keys)) {
                 List<DKey> keys = dTable.keys
                 for (DKey k : keys) {
-                    query.append(", ").append(___ddlExpandKey(k))
+                    query.append(",\n\t").append(___ddlExpandKey(k))
                 }
             }
 
-            query.append(")")
+            query.append("\n)")
         }
 
         return new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
@@ -67,15 +68,15 @@ class MySqlDDL implements QDdl {
                     .collect(Collectors.joining(",", "(", ")"))
         } else if (key.type == DKeyType.INDEX) {
             return "KEY " + QUtils.quote(key.name, MySql.BACK_TICK) + " " +
-                    (key.indexType != null ? "USING " + key.indexType.name() : "") +
-                    key.fields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(",", "(", ")"))
+                    key.fields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(",", "(", ")")) +
+                    (key.indexType != null ? " USING " + key.indexType.name() : "")
         } else if (key.type == DKeyType.FOREIGN) {
             return "CONSTRAINT " + QUtils.quote(key.name) + " FOREIGN KEY " +
                     key.fields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(",", "(", ")")) +
                     " REFERENCES " + QUtils.quoteIfWS(key.refTable, MySql.BACK_TICK) +
                     key.refFields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(",", "(", ")")) +
-                    (key.onUpdate != DKey.DReferenceOption.NO_ACTION ? " ON UPDATE " + key.onUpdate.name().replace('_', ' ') : "") +
-                    (key.onDelete != DKey.DReferenceOption.NO_ACTION ? " ON DELETE " + key.onDelete.name().replace('_', ' ') : "")
+                    (key.onUpdate != DReferenceOption.NO_ACTION ? " ON UPDATE " + key.onUpdate.name().replace('_', ' ') : "") +
+                    (key.onDelete != DReferenceOption.NO_ACTION ? " ON DELETE " + key.onDelete.name().replace('_', ' ') : "")
         }
         throw new NyException("Unknown table key type! [${key.type}]")
     }
@@ -88,13 +89,13 @@ class MySqlDDL implements QDdl {
             q.append("NOT NULL ")
         }
         if (dField.sequence) {
-            q.append("AUTO_INCREMENT")
+            q.append("AUTO_INCREMENT ")
         }
         if (dField.specifiedDefault) {
             q.append("DEFAULT ").append(_describeDefaultVal(dField)).append(" ")
         }
 
-        return q.toString()
+        return q.toString().trim()
     }
 
     @Override

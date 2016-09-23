@@ -7,7 +7,7 @@ import groovy.transform.ToString
  * @author IWEERARATHNA
  */
 @ToString
-@PackageScope class DField extends DAbstractEntity {
+class DField extends DAbstractEntity {
 
     boolean sequence = false
     boolean notNull = false

@@ -19,6 +19,8 @@ class Configurations {
 
     private Map properties = [:]
 
+    private String cacheVarName
+
     private Configurations() {}
 
     Configurations configure(Map configProps) throws NyException {
@@ -51,7 +53,11 @@ class Configurations {
     }
 
     String cachingIndicatorVarName() {
-        return properties.caching.indicatorVariableName ?: Constants.DSL_CACHE_VARIABLE_NAME
+        if (cacheVarName != null) {
+            return cacheVarName
+        }
+        cacheVarName = properties.caching.indicatorVariableName ?: Constants.DSL_CACHE_VARIABLE_NAME
+        return cacheVarName
     }
 
     String[] defaultImports() {

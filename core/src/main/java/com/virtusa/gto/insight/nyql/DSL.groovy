@@ -3,6 +3,7 @@ package com.virtusa.gto.insight.nyql
 import com.virtusa.gto.insight.nyql.ddl.DDL
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScript
+import com.virtusa.gto.insight.nyql.model.QScriptList
 import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
@@ -21,93 +22,11 @@ class DSL {
     final QSession session
     final DSLContext dslContext
 
-    private DDL activeDDL
-
     private boolean currentTransactionAutoCommit = false
 
     public DSL(QSession theSession) {
         session = theSession
         dslContext = session.dslContext
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    ////
-    ////   Transaction Related Commands
-    ////
-    ///////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Enables auto commit at the end of transaction.
-     * @param autoCommit status of auto committing.
-     * @return this DSL instance.
-     */
-    DSL AUTO_COMMIT(boolean autoCommit=true) {
-        currentTransactionAutoCommit = autoCommit
-        return this
-    }
-
-    /**
-     * Starts a new transaction.
-     *
-     * Note: No sub-transactions are allowed within a transaction
-     *
-     * @param autoCommit auto commit on successful transaction.
-     * @param closure transaction content.
-     * @return this same DSL instance
-     */
-    DSL TRANSACTION(closure) {
-        try {
-            session.executor.startTransaction()
-
-            def code = closure.rehydrate(this, this, this)
-            code.resolveStrategy = Closure.DELEGATE_ONLY
-            code()
-
-            if (currentTransactionAutoCommit) {
-                COMMIT()
-            }
-
-        } catch (Throwable ex) {
-            LOGGER.error("Error occurred while in transaction!", ex)
-            ROLLBACK()
-
-        } finally {
-            session.executor.done()
-            currentTransactionAutoCommit = false
-        }
-        return this
-    }
-
-    /**
-     * Commit the changes done within this active transaction.
-     *
-     * @return this same DSL instance
-     */
-    DSL COMMIT() {
-        session.executor.commit()
-        return this
-    }
-
-    /**
-     * Creates a new checkpoint at this point. So, you will probably can rollback
-     * when an error occurred.
-     *
-     * @return a reference to the newly created checkpoint at this stage.
-     */
-    def CHECKPOINT() {
-        return session.executor.checkPoint()
-    }
-
-    /**
-     * Rollback the transaction to the given checkpoint, or to the beginning if no checkpoint
-     * has been given.
-     *
-     * @param checkPoint checkpoint reference to rollback
-     * @return this same DSL instance
-     */
-    DSL ROLLBACK(Object checkPoint=null) {
-        session.executor.rollback(checkPoint)
-        return this
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +45,10 @@ class DSL {
 
     QScript $IMPORT(String scriptName) {
         return session.scriptRepo.parse(scriptName, session)
+    }
+
+    def RUN(QScriptList scriptList) {
+        return session.executor.execute(scriptList)
     }
 
     def RUN(QScript script) {
@@ -224,12 +147,94 @@ class DSL {
     ////
     ///////////////////////////////////////////////////////////////////////////////////
 
-    DDL ddl(closure) {
-        activeDDL = activeDDL ?: new DDL(session)
+    QScriptList ddl(closure) {
+        DDL activeDDL = new DDL(session)
 
         def code = closure.rehydrate(activeDDL, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        return code()
+        activeDDL = code()
+
+        return activeDDL.createScripts()
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    ////
+    ////   Transaction Related Commands
+    ////
+    ///////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Enables auto commit at the end of transaction.
+     * @param autoCommit status of auto committing.
+     * @return this DSL instance.
+     */
+    DSL AUTO_COMMIT(boolean autoCommit=true) {
+        currentTransactionAutoCommit = autoCommit
+        return this
+    }
+
+    /**
+     * Starts a new transaction.
+     *
+     * Note: No sub-transactions are allowed within a transaction
+     *
+     * @param autoCommit auto commit on successful transaction.
+     * @param closure transaction content.
+     * @return this same DSL instance
+     */
+    DSL TRANSACTION(closure) {
+        try {
+            session.executor.startTransaction()
+
+            def code = closure.rehydrate(this, this, this)
+            code.resolveStrategy = Closure.DELEGATE_ONLY
+            code()
+
+            if (currentTransactionAutoCommit) {
+                COMMIT()
+            }
+
+        } catch (Throwable ex) {
+            LOGGER.error("Error occurred while in transaction!", ex)
+            ROLLBACK()
+
+        } finally {
+            session.executor.done()
+            currentTransactionAutoCommit = false
+        }
+        return this
+    }
+
+    /**
+     * Commit the changes done within this active transaction.
+     *
+     * @return this same DSL instance
+     */
+    DSL COMMIT() {
+        session.executor.commit()
+        return this
+    }
+
+    /**
+     * Creates a new checkpoint at this point. So, you will probably can rollback
+     * when an error occurred.
+     *
+     * @return a reference to the newly created checkpoint at this stage.
+     */
+    def CHECKPOINT() {
+        return session.executor.checkPoint()
+    }
+
+    /**
+     * Rollback the transaction to the given checkpoint, or to the beginning if no checkpoint
+     * has been given.
+     *
+     * @param checkPoint checkpoint reference to rollback
+     * @return this same DSL instance
+     */
+    DSL ROLLBACK(Object checkPoint=null) {
+        session.executor.rollback(checkPoint)
+        return this
     }
 
     ///////////////////////////////////////////////////////////////////////////////////

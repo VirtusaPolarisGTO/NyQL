@@ -18,14 +18,14 @@ public class DBExecutor {
     public static void main(String[] args) throws Exception {
         Quickly.configOnce();
 
-        execute();
+        parse();
     }
 
     private static void parse() throws Exception {
         File srcDir = new File("C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila");
-        QScript result = Quickly.parse(srcDir, "top_customers");
-        System.out.println(result.getProxy().getQuery());
-        System.out.println(result.getProxy().getOrderedParameters());
+        QScript result = Quickly.parse(srcDir, "createTemp");
+        System.out.println(result);
+        //System.out.println(result);
     }
 
     private static void execute() throws Exception {

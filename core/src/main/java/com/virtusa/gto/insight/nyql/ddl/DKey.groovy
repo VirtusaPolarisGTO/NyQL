@@ -1,14 +1,12 @@
 package com.virtusa.gto.insight.nyql.ddl
 
-import groovy.transform.PackageScope
-
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
 /**
  * @author IWEERARATHNA
  */
-@PackageScope class DKey extends DAbstractEntity {
+class DKey extends DAbstractEntity {
 
     DKeyType type
     List<String> fields
@@ -29,9 +27,9 @@ import java.util.stream.Stream
         dKey.comment = values["comment"]
         dKey.type = toEnum(values, "type", DKeyType.INDEX)
         dKey.unique = (boolean)(values["unique"] ?: false)
-        dKey.fields = Stream.of((values["fields"] ?: "").toString().split("[,]")).collect(Collectors.toList())
+        dKey.fields = (List)(values["fields"] ?: [])
         dKey.refTable = values["refTable"] ?: null
-        dKey.refFields = Stream.of((values["refFields"] ?: "").toString().split("[,]")).collect(Collectors.toList())
+        dKey.refFields = (List)(values["refFields"] ?: [])
 
         dKey.indexType = toEnum(values, "indexType", null)
         dKey.onDelete = toEnum(values, "onDelete", DReferenceOption.NO_ACTION)
