@@ -37,6 +37,10 @@ trait QTranslator extends QJoins {
     }
 
     def ___resolve(Object obj, QContextType contextType, List<AParam> paramOrder=null) {
+        if (obj == null) {
+            return NULL
+        }
+
         if (obj instanceof Join) {
             return ___tableJoinName(obj, contextType, paramOrder)
         } else if (obj instanceof Table) {
@@ -53,6 +57,8 @@ trait QTranslator extends QJoins {
             return "?" // ":" + obj.__name
         } else if (obj instanceof QResultProxy) {
             return obj.query
+        } else if (obj instanceof List) {
+            return obj.stream().map({ ___resolve(it, contextType, paramOrder) }).collect(Collectors.joining(", ", "(", ")"))
         } else {
             throw new Exception("Unsupported data object to convert! [" + obj + ", type: " + obj.class + "]")
         }
@@ -240,10 +246,11 @@ trait QTranslator extends QJoins {
             paramOrder?.addAll(resultProxy.orderedParameters ?: [])
         }
 
-        return ___resolve(c.leftOp, contextType) + " " + c.op + " " + ___resolve(c.rightOp, contextType)
+        return ___resolve(c.leftOp, contextType) + (c.op.length() > 0 ? " " + c.op + " " : " ") + ___resolve(c.rightOp, contextType)
     }
 
     String ___expandConditionGroup(QConditionGroup group, List<AParam> paramOrder, QContextType contextType) {
+        String gCon = group.condConnector.isEmpty() ? "" : " " + group.condConnector + " ";
         return group.where.clauses.stream()
                 .map({ c -> if (c instanceof QCondition) {
                             return ___expandCondition(c, paramOrder, contextType)
@@ -252,7 +259,7 @@ trait QTranslator extends QJoins {
                         } else {
                             return String.valueOf(c)
                         }
-                }).collect(Collectors.joining(" " + group.condConnector + " "))
+                }).collect(Collectors.joining(gCon))
     }
 
     String ___expandAssignments(Assign assign, List<AParam> paramOrder, QContextType contextType=QContextType.UNKNOWN) {

@@ -21,7 +21,7 @@ class MySql implements QTranslator, MySqlFunctions {
 
     @PackageScope MySql() {}
 
-    String NULL = "null"
+    String NULL = "NULL"
 
     String JOIN(QContextType contextType) { "JOIN" }
 

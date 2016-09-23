@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql
 
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.FunctionTraits
@@ -54,9 +55,12 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     def AND(Closure closure) {
         AND()
-        def code = closure.rehydrate(this, this, this)
+
+        Where inner = new Where(_ctx)
+        def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        code()
+        inner = code()
+        clauses.add(new QConditionGroup(where: inner, condConnector: ""))
         return this
     }
 
@@ -95,23 +99,11 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return this
     }
 
-    def EQ(Column c1, Column c2) {
+    def EQ(Object c1, Object c2) {
+        if (c2 == null) {
+            return ISNULL(c1)
+        }
         return ON(c1, "=", c2)
-    }
-
-    def EQ(String c1, String c2) {
-        clauses.add(new QCondition(leftOp: c1, rightOp: c2, op: "="))
-        return this
-    }
-
-    def EQ(Column c1, Object c2) {
-        clauses.add(new QCondition(leftOp: c1, rightOp: c2, op: "="))
-        return this
-    }
-
-    def EQ(Column c1, String s2) {
-        clauses.add(new QCondition(leftOp: c1, rightOp: s2, op: "="))
-        return this
     }
 
     def NEQ(Object c1, Object c2) {
@@ -132,6 +124,26 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     def LTE(Object c1, Object c2) {
         return ON(c1, "<=", c2)
+    }
+
+    def BETWEEN(Object c1, Object startValue, Object endValue) {
+        return ON(c1, BETWEEN(startValue, endValue))
+    }
+
+    def NOTBETWEEN(Object c1, Object startValue, Object endValue) {
+        return ON(c1, BETWEEN(startValue, endValue))
+    }
+
+    def IN(Object c1, Object... cs) {
+        List list = new LinkedList()
+        list.addAll(cs)
+        return ON(c1, "IN", list)
+    }
+
+    def NOTIN(Object c1, Object... cs) {
+        List list = new LinkedList()
+        list.addAll(cs)
+        return ON(c1, "NOT IN", list)
     }
 
     def $IMPORT(String scriptId) {
@@ -172,6 +184,25 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             return table
         } else {
             throw new Exception("No table by name '$name' found!")
+        }
+    }
+
+    def methodMissing(String name, def args) {
+        if (name == "AND" || name == "OR") {
+            if (args.getClass().isArray() && args[0] instanceof Where) {
+                ((Where) args[0]).appendOneLastBefore(" " + name + " ");
+                return this
+            }
+        }
+        throw new NySyntaxException("Unknown function detected! [Name: '$name', params: $args]")
+    }
+
+    private void appendOneLastBefore(Object clause) {
+        if (clauses.size() > 0) {
+            int idx = clauses.size() - 1
+            clauses.add(idx, clause)
+        } else {
+            clauses.add(clause)
         }
     }
 

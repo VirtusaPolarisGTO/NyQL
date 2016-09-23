@@ -1,25 +1,20 @@
+do_cache=true
+
 /**
  * @author IWEERARATHNA
  */
 $DSL.select {
 
-    TARGET (Rental.alias("r"))
+    TARGET (Film.alias("f"))
 
-    FETCH (r.customer_id,
-            COUNT().alias("totalRentals"))
+    FETCH (f.film_id, f.special_features)
 
     WHERE {
-        EQ (r.customer_id, 1234)
-        AND
-        NOTLIKE (r.name, STR("hello world!"))
+        EQ (f.special_features, null) AND {EQ (f.film_id, 234) AND EQ (f.special_features, STR("ssss"))}
+        OR
+        LIKE (f.film_id, STR("%isisis%"))
     }
 
-    GROUP_BY (r.customer_id)
-    HAVING {
-        GTE (COUNT(), PARAM("minRentals"))
-    }
+    ORDER_BY (f.film_id)
 
-    ORDER_BY (DESC(totalRentals))
-
-    LIMIT 5
 }

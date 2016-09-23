@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QDatabaseRegistry
+import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import org.apache.commons.lang3.BooleanUtils
 import org.slf4j.Logger
@@ -47,6 +48,10 @@ class Configurations {
         } else {
             throw new NyException("No database has been activated!")
         }
+    }
+
+    String cachingIndicatorVarName() {
+        return properties.caching.indicatorVariableName ?: Constants.DSL_CACHE_VARIABLE_NAME
     }
 
     String[] defaultImports() {

@@ -10,19 +10,19 @@ import org.apache.commons.lang3.StringUtils
  */
 class QUtils {
 
-    static def notNullNorEmpty(Collection<?> col) {
+    static boolean notNullNorEmpty(Collection<?> col) {
         return col != null && !col.isEmpty()
     }
 
-    static def quote(String text, String c="`") {
+    static String quote(String text, String c="`") {
         return "$c$text$c"
     }
 
-    static def hasWS(String text) {
+    static boolean hasWS(String text) {
         return StringUtils.containsWhitespace(text)
     }
 
-    static def quoteIfWS(String text, String c="`") {
+    static String quoteIfWS(String text, String c="`") {
         if (hasWS(text)) {
             return quote(text, c)
         } else {

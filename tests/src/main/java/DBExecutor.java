@@ -18,7 +18,7 @@ public class DBExecutor {
     public static void main(String[] args) throws Exception {
         Quickly.configOnce();
 
-        parse();
+        execute();
     }
 
     private static void parse() throws Exception {
@@ -35,7 +35,7 @@ public class DBExecutor {
         data.put("filmId", 250);
 
         File srcDir = new File("C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila");
-        Object result = Quickly.execute(srcDir, "customer_details", data);
+        Object result = Quickly.execute(srcDir, "top_customers", data);
         if (result instanceof List) {
             for (Object row : (List)result) {
                 LOGGER.debug(row.toString());

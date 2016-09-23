@@ -28,8 +28,11 @@ class QRepositoryImpl implements QRepository {
 
     private CompilerConfiguration compilerConfigurations
 
+    private Configurations configurations
+
     QRepositoryImpl(QScriptMapper scriptMapper) {
         mapper = scriptMapper
+        configurations = Configurations.instance()
     }
 
     private CompilerConfiguration makeCompilerConfigs() {
@@ -82,7 +85,10 @@ class QRepositoryImpl implements QRepository {
             } else {
                 script = new QScriptResult(qSession: session, scriptResult: res)
             }
-            if (src.isDoCache()) {
+
+            boolean doCache = (shell.getVariable(configurations.cachingIndicatorVarName()) ?: false)
+            if (doCache) {
+                LOGGER.trace("Script $scriptId cachable status: " + doCache)
                 caching.addGeneratedQuery(scriptId, script)
             }
             return script

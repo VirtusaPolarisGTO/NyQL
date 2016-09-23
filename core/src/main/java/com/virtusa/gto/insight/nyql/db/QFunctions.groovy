@@ -86,6 +86,15 @@ trait QFunctions {
             }
     }
 
+    def not_between = { c ->
+        if (c instanceof List) {
+            return "NOT BETWEEN " + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + " AND " +
+                    ___resolve(c[1], QContextType.INSIDE_FUNCTION) + " "
+        } else {
+            throw new NyException("Invalid syntax for BETWEEN function!")
+        }
+    }
+
     def like = { c ->
         if (c instanceof List) { return "LIKE " + ___resolve(c[0], QContextType.INSIDE_FUNCTION) }
         else { return "LIKE " + ___resolve(c, QContextType.INSIDE_FUNCTION) }
