@@ -12,6 +12,8 @@ class AParam {
 
     def type
 
+    int length = 0
+
     ParamScope scope
 
     String __mappingParamName

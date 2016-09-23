@@ -44,6 +44,10 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
         return _ctx.addParam(new AParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName))
     }
 
+    def PARAM(String name, int length) {
+        return _ctx.addParam(new AParam(__name: name, length: length))
+    }
+
     def CASE(closure) {
         Case aCase = new Case(_ctx: _ctx, _ownerQ: this)
 

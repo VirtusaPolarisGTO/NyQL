@@ -25,6 +25,10 @@ class Assign implements DataTypeTraits, ScriptTraits {
         return _ctx.addParam(new AParam(__name: name, type: type))
     }
 
+    def PARAM(String name, int length) {
+        return _ctx.addParam(new AParam(__name: name, length: length))
+    }
+
     def EQ(Column c1, Object val) {
         assignments.add(new AnAssign(leftOp: c1, rightOp: val))
         return this

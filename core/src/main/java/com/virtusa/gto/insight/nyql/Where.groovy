@@ -53,6 +53,10 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return _ctx.addParam(new AParam(__name: name, type: type))
     }
 
+    def PARAM(String name, int length) {
+        return _ctx.addParam(new AParam(__name: name, length: length))
+    }
+
     def AND(Closure closure) {
         AND()
 

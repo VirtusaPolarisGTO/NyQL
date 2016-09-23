@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +23,18 @@ public class DBExecutor {
     }
 
     private static void parse() throws Exception {
+        Map<String, Object> data = new HashMap<>();
+        List<Integer> teams = new LinkedList<>();
+        teams.add(1410); teams.add(1411);
+        List<Integer> modules = new LinkedList<>();
+        modules.add(97389); modules.add(97390); modules.add(97391);
+
+        data.put("teamIDs", teams);
+        data.put("moduleIDs", modules);
+        data.put("filmId", 250);
+
         File srcDir = new File("C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila");
-        QScript result = Quickly.parse(srcDir, "createTemp");
+        QScript result = Quickly.parse(srcDir, "insight", data);
         System.out.println(result);
         //System.out.println(result);
     }

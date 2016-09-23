@@ -8,6 +8,7 @@ import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
 import java.util.stream.Collectors
+import java.util.stream.Stream
 
 /**
  * @author Isuru Weerarathna
@@ -54,7 +55,15 @@ trait QTranslator extends QJoins {
         } else if (obj instanceof Number) {
             return ___convertNumeric(obj)
         } else if (obj instanceof AParam) {
-            return "?" // ":" + obj.__name
+            if (obj.length > 0) {
+                StringBuilder stringBuilder = new StringBuilder()
+                for (int i = 0; i < obj.length; i++) {
+                    if (i > 0) stringBuilder.append(", ")
+                    stringBuilder.append("?")
+                }
+                return stringBuilder.toString()
+            }
+            return "?"
         } else if (obj instanceof QResultProxy) {
             return obj.query
         } else if (obj instanceof List) {
