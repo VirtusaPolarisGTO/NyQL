@@ -58,31 +58,23 @@ final class Quickly {
         QExecutorRegistry.getInstance().register("default", executor);
     }
 
-    static QScript parse(File file, Map sessionVariables=null) {
-        QScriptMapper scriptFile = new QScriptFile(oneFile: file)
-        QRepository repository = new QRepositoryImpl(scriptFile)
-        QRepositoryRegistry.getInstance().register("default", repository);
-
+    static QScript parse(Map sessionVariables=null) {
         QSession qSession = QSession.create()
         if (sessionVariables) {
             qSession.getSessionVariables().putAll(sessionVariables)
         }
-        repository.parse("any", qSession)
+        QRepositoryRegistry.instance.defaultRepository().parse("any", qSession)
     }
 
-    static QScript parse(File dir, String name, Map sessionVariables=null) {
-        QScriptMapper scriptFile = new QScriptsFolder(dir)
-        QRepository repository = new QRepositoryImpl(scriptFile)
-        QRepositoryRegistry.getInstance().register("default", repository);
-
+    static QScript parse(String name, Map sessionVariables=null) {
         QSession qSession = QSession.create()
         if (sessionVariables) {
             qSession.sessionVariables.putAll(sessionVariables)
         }
-        repository.parse(name, qSession)
+        QRepositoryRegistry.instance.defaultRepository().parse(name, qSession)
     }
 
-    static def execute(File dir, String name, Map sessionVariables=null, QExecutor executor=null) throws Exception {
+    static def execute(String name, Map sessionVariables=null, QExecutor executor=null) throws Exception {
         Connection connection = null
         try {
             connection = create()
@@ -91,7 +83,7 @@ final class Quickly {
                 QExecutorRegistry.getInstance().register("jdbc", executor);
             }
 
-            QScript script = parse(dir, name, sessionVariables)
+            QScript script = parse(name, sessionVariables)
 
             long s = System.currentTimeMillis()
             def result = executor.execute(script);
@@ -105,17 +97,17 @@ final class Quickly {
         }
     }
 
-    static def execute(File file, Map sessionVariables=null) throws Exception {
+    static def execute(Map sessionVariables=null) throws Exception {
         Connection connection = null
         try {
             connection = create()
             QJdbcExecutor executor = new QJdbcExecutor(connection);
             QExecutorRegistry.getInstance().register("jdbc", executor);
 
-            QScript script = parse(file, sessionVariables)
+            QScript script = parse(sessionVariables)
 
             long s = System.currentTimeMillis()
-            def result = (List<Map<String,Object>>) executor.execute(script);
+            def result = executor.execute(script);
             LOGGER.debug("Query execution took time: {} ms", (System.currentTimeMillis() - s))
             return result
 
@@ -134,10 +126,10 @@ final class Quickly {
             config.load(inputStream)
 
             // load jdbc
-            Class.forName(config.getProperty("jdbc.driver"));
-            return DriverManager.getConnection(config.getProperty("jdbc.url"),
-                    config.getProperty("jdbc.username"),
-                    config.getProperty("jdbc.password"));
+            Class.forName(config.getProperty("driver"));
+            return DriverManager.getConnection(config.getProperty("url"),
+                    config.getProperty("username"),
+                    config.getProperty("password"));
 
         } finally {
             if (inputStream) {

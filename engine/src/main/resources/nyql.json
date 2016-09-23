@@ -20,13 +20,24 @@
   ],
 
   "defaultExecutor": "jdbc",
-
   "executors": [
       {
           "name": "jdbc",
           "url": "jdbc:mysql://localhost/sakila",
           "username": "root",
           "password": ""
+      }
+  ],
+
+  "defaultRepository": "default",
+  "repositories": [
+      {
+          "name": "default",
+          "repo": "com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl",
+          "mapper": "com.virtusa.gto.insight.nyql.engine.repo.QScriptsFolder",
+          "mapperArgs": {
+              "baseDir": "C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila"
+          }
       }
   ]
 

@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
+import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
 import org.slf4j.Logger
@@ -56,6 +57,19 @@ class QScriptsFolder implements QScriptMapper {
             return path.substring(0, lp)
         }
         return path
+    }
+
+    static QScriptsFolder createNew(Map args) throws NyException {
+        if (args == null || args.size() == 0 || !args.baseDir) {
+            throw new NyException("To create a new QScriptsFolder requires at least one parameter with specifying base directory!")
+        }
+
+        String path = args.baseDir;
+        File dir = new File(path);
+        if (!dir.exists()) {
+            throw new NyException("Given script folder does not exist! [" + args[0] + "]")
+        }
+        return new QScriptsFolder(dir);
     }
 
     @Override

@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author IWEERARATHNA
@@ -24,19 +21,15 @@ public class DBExecutor {
 
     private static void parse() throws Exception {
         Map<String, Object> data = new HashMap<>();
-        List<Integer> teams = new LinkedList<>();
-        teams.add(1410); teams.add(1411);
-        List<Integer> modules = new LinkedList<>();
-        modules.add(97389); modules.add(97390); modules.add(97391);
+        List<Integer> teams = asList(1410, 1411);
+        List<Integer> modules = asList(97389, 97390, 97391);
 
         data.put("teamIDs", teams);
         data.put("moduleIDs", modules);
         data.put("filmId", 250);
 
-        File srcDir = new File("C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila");
-        QScript result = Quickly.parse(srcDir, "insight", data);
+        QScript result = Quickly.parse("insight", data);
         System.out.println(result);
-        //System.out.println(result);
     }
 
     private static void execute() throws Exception {
@@ -45,8 +38,7 @@ public class DBExecutor {
         data.put("customerId", 2);
         data.put("filmId", 250);
 
-        File srcDir = new File("C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila");
-        Object result = Quickly.execute(srcDir, "top_customers", data);
+        Object result = Quickly.execute("top_customers", data);
         if (result instanceof List) {
             for (Object row : (List)result) {
                 LOGGER.debug(row.toString());
@@ -54,5 +46,10 @@ public class DBExecutor {
         }
     }
 
+    private static <T> List<T> asList(T... items) {
+        List<T> list = new LinkedList<T>();
+        Collections.addAll(list, items);
+        return list;
+    }
 
 }

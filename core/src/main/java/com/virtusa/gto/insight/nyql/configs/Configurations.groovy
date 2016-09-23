@@ -4,6 +4,9 @@ import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QDatabaseRegistry
+import com.virtusa.gto.insight.nyql.model.QRepository
+import com.virtusa.gto.insight.nyql.model.QRepositoryRegistry
+import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import org.apache.commons.lang3.BooleanUtils
@@ -43,12 +46,26 @@ class Configurations {
             }
         }
 
+        // mark active database
         String activeDb = getActivatedDb()
         if (activeDb != null) {
             LOGGER.debug("Activating DB: {}", activeDb)
             QDatabaseRegistry.instance.load(activeDb)
         } else {
             throw new NyException("No database has been activated!")
+        }
+
+
+        // load repositories
+        String defRepo = properties.defaultRepository ?: "default"
+        List repos = properties.repositories ?: []
+        for (Map r : repos) {
+            Map args = r.mapperArgs ?: [:]
+            boolean thisDef = r.name == defRepo
+            QScriptMapper scriptMapper = Class.forName(r.mapper).createNew(args)
+            QRepository qRepository = (QRepository) Class.forName(r.repo).newInstance([scriptMapper].toArray())
+
+            QRepositoryRegistry.getInstance().register(r.name, qRepository, thisDef)
         }
     }
 
