@@ -36,7 +36,7 @@
           "repo": "com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl",
           "mapper": "com.virtusa.gto.insight.nyql.engine.repo.QScriptsFolder",
           "mapperArgs": {
-              "baseDir": "C:\\Projects\\insight5\\nyql\\core\\src\\examples\\sakila"
+              "baseDir": "C:\\Projects\\insight5\\nyql\\core\\src\\examples"
           }
       }
   ]

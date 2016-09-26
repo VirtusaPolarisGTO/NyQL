@@ -11,7 +11,7 @@ $DSL.$q {
         OR()
         ON (alb.genre, LIKE(STR("%hello%")))
         AND()
-        ON (alb.title, "=", P("insideP"))
+        ON (alb.title, "=", PARAM("insideP"))
     }
 
 

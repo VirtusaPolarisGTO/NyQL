@@ -5,6 +5,7 @@ import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.FunctionTraits
 import com.virtusa.gto.insight.nyql.traits.ScriptTraits
+import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
@@ -49,11 +50,11 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return ON(c1, NOTLIKE(c2))
     }
 
-    def PARAM(String name, JDBCType type=null) {
-        return _ctx.addParam(new AParam(__name: name, type: type))
+    AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
+        return _ctx.addParam(new AParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName))
     }
 
-    def PARAM(String name, int length) {
+    AParam PARAM(String name, int length) {
         return _ctx.addParam(new AParam(__name: name, length: length))
     }
 
@@ -177,6 +178,8 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             return AND()
         } else if ("OR" == name) {
             return OR()
+        } else if (name == Constants.DSL_SESSION_WORD) {
+            return _ctx.ownerSession.sessionVariables
         }
 
         if (_ctx.tables.containsKey(name)) {

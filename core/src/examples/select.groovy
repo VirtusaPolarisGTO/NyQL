@@ -3,8 +3,6 @@ import java.sql.JDBCType
 /**
  * @author Isuru Weerarathna
  */
-def vals = $SESSION
-
 $DSL.select {
 
     TARGET (Album.alias("alb"))
@@ -38,17 +36,17 @@ $DSL.select {
         }
 
         OR()
-        ON (alb.name, "=", P("xxx"))
+        ON (alb.name, "=", PARAM("xxx"))
         AND()
         $IMPORT "partials/where"
         AND()
         $IMPORT "partials/where"
         AND()
-        NOT_NULL (alb.genre)
+        NOTNULL (alb.genre)
         AND()
-        EQ (alb.x, P("abc", JDBCType.INTEGER))
+        EQ (alb.x, PARAM("abc"))
         AND()
-        EQ (alb.y, 1023)
+        EQ (alb.y, $SESSION.filmId)
     }
 
 

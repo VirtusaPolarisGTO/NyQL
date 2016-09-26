@@ -28,7 +28,7 @@ public class DBExecutor {
         data.put("moduleIDs", modules);
         data.put("filmId", 250);
 
-        QScript result = Quickly.parse("insight", data);
+        QScript result = Quickly.parse("select", data);
         System.out.println(result);
     }
 

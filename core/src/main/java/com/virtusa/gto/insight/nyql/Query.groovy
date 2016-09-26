@@ -5,6 +5,7 @@ import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.FunctionTraits
 import com.virtusa.gto.insight.nyql.traits.ScriptTraits
+import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
 import java.sql.JDBCType
@@ -24,7 +25,7 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
         _ctx = contextParam
     }
 
-    Table $IMPORT(String scriptId) {
+    def $IMPORT(String scriptId) {
         QScript script = _ctx.ownerSession.scriptRepo.parse(scriptId, _ctx.ownerSession)
         def proxy = script.proxy
         if (proxy.queryType == QueryType.PART) {
@@ -40,11 +41,11 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
         return this
     }
 
-    def PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName) {
+    AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName) {
         return _ctx.addParam(new AParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName))
     }
 
-    def PARAM(String name, int length) {
+    AParam PARAM(String name, int length) {
         return _ctx.addParam(new AParam(__name: name, length: length))
     }
 
@@ -99,6 +100,10 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
     }
 
     def propertyMissing(String name) {
+        if (name == Constants.DSL_SESSION_WORD) {
+            return _ctx.ownerSession.sessionVariables
+        }
+
         Column col = _ctx.getColumnIfExist(name)
         if (col != null) {
             return col
