@@ -1,4 +1,7 @@
 package com.virtusa.gto.insight.nyql.utils
+
+import org.omg.CORBA.UNKNOWN
+
 /**
  * @author IWEERARATHNA
  */
@@ -7,6 +10,7 @@ enum QueryType {
     SELECT,
 
     INSERT,
+    BULK_INSERT,
 
     UPDATE,
 

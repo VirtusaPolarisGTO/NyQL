@@ -2,6 +2,7 @@ package com.virtusa.gto.insight.nyql.engine.impl
 
 import com.virtusa.gto.insight.nyql.AParam
 import com.virtusa.gto.insight.nyql.StoredFunction
+import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptResult
 import com.virtusa.gto.insight.nyql.model.QSession
@@ -83,6 +84,11 @@ class QJdbcExecutor implements QExecutor {
             LOGGER.trace("------------------------------------------------------------")
         }
 
+        if (script.proxy.queryType == QueryType.BULK_INSERT) {
+            LOGGER.debug("Executing as batch...")
+            return batchExecute(script);
+        }
+
         boolean autoClose = !returnRaw
         PreparedStatement statement = connection.prepareStatement(script.proxy.query)
         Map<String, Object> data = mergeVariablesWithParams(script.qSession)
@@ -111,6 +117,45 @@ class QJdbcExecutor implements QExecutor {
             } else {
                 return statement.executeLargeUpdate()
             }
+
+        } finally {
+            if (autoClose) {
+                statement.close()
+            }
+        }
+    }
+
+    private def batchExecute(QScript script) throws Exception {
+        PreparedStatement statement = connection.prepareStatement(script.proxy.query)
+        connection.setAutoCommit(false);
+
+        List<AParam> parameters = script.proxy.orderedParameters
+        Object batchData = script.qSession.sessionVariables["batch"];
+        if (batchData == null) {
+            throw new NyScriptExecutionException("No batch data has been specified through session variables 'batch'!");
+        } else if (!(batchData instanceof List)) {
+            throw new NyScriptExecutionException("Batch data expected to be a list of hashmaps!");
+        }
+
+        List<Map> records = batchData as List<Map>
+        for (Map record : records) {
+            for (int i = 0; i < parameters.size(); i++) {
+                AParam param = parameters[i]
+                Object itemValue = record.get(param.__name)
+                if (itemValue == null) {
+                    throw new NyException("Data for parameter '$param.__name' cannot be found!")
+                }
+
+                invokeCorrectInput(statement, param, itemValue, i + 1)
+            }
+            statement.addBatch()
+        }
+
+        boolean autoClose = !returnRaw
+        try {
+            long[] counts = statement.executeLargeBatch()
+            connection.commit()
+            return counts;
 
         } finally {
             if (autoClose) {

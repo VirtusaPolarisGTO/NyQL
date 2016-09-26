@@ -91,6 +91,19 @@ class DSL {
                 orderedParameters: orderedParams)
     }
 
+    def bulkInsert(closure) {
+        QueryInsert queryInsert = new QueryInsert(createContext())
+        Object qs = assignTraits(queryInsert)
+
+        def code = closure.rehydrate(qs, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        QueryInsert q = code()
+
+        QResultProxy proxy = q._ctx.translator.___insertQuery(q)
+        proxy.setQueryType(QueryType.BULK_INSERT)
+        return RUN(proxy)
+    }
+
     QResultProxy delete(closure) {
         QueryDelete queryDelete = new QueryDelete(createContext())
         Object qs = assignTraits(queryDelete)
