@@ -62,7 +62,7 @@ class QRepositoryImpl implements QRepository {
             throw new NyScriptNotFoundException(scriptId)
         }
 
-        if (Configurations.instance().cacheGeneratedQueries() && src.getDoCache() && caching.hasGeneratedQuery(scriptId)) {
+        if (Configurations.instance().cacheGeneratedQueries() && caching.hasGeneratedQuery(scriptId)) {
             LOGGER.trace("Script {} served from query cache.", scriptId)
             return caching.getGeneratedQuery(scriptId)
         }
@@ -90,7 +90,6 @@ class QRepositoryImpl implements QRepository {
 
             boolean doCache = (shell.getVariable(configurations.cachingIndicatorVarName()) ?: false)
             if (doCache) {
-                src.setDoCache(doCache)
                 LOGGER.trace("Script $scriptId cachable status: " + doCache)
                 caching.addGeneratedQuery(scriptId, script)
             }

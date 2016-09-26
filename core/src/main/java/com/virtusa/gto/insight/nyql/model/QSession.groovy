@@ -39,24 +39,5 @@ class QSession {
         session.sessionVariables[Constants.DSL_SESSION_WORD] = session.sessionVariables
         return session
     }
-
-    QSession addSessionVariable(String name, Object value) {
-        sessionVariables.put(name, value)
-        return this
-    }
-
-    QSession addSessionVariables(Map<String, Object> sessionVars) {
-        sessionVariables.putAll(sessionVars)
-        return this
-    }
-
-    QSession addParameterValues(Map<String, Object> pValues) {
-        paramValues.putAll(pValues)
-        return this
-    }
-
-    QContext newQueryContext() {
-        return new QContext(ownerSession: this, translator: dslContext.qTranslator, translatorName: dslContext.activeDb)
-    }
-
+    
 }

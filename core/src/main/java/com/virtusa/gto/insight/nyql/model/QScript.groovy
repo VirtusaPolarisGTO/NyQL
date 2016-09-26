@@ -12,7 +12,6 @@ class QScript {
     QResultProxy proxy
     QSession qSession
 
-
     @Override
     public String toString() {
         return proxy == null ? "" : proxy.query ?: ""

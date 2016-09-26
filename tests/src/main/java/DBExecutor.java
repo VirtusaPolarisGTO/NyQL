@@ -46,6 +46,7 @@ public class DBExecutor {
         }
     }
 
+    @SafeVarargs
     private static <T> List<T> asList(T... items) {
         List<T> list = new LinkedList<T>();
         Collections.addAll(list, items);
