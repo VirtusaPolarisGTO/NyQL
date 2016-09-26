@@ -91,6 +91,17 @@ class DSL {
                 orderedParameters: orderedParams)
     }
 
+    QResultProxy delete(closure) {
+        QueryDelete queryDelete = new QueryDelete(createContext())
+        Object qs = assignTraits(queryDelete)
+
+        def code = closure.rehydrate(qs, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        QueryDelete q = code()
+
+        return q._ctx.translator.___deleteQuery(q)
+    }
+
     QResultProxy insert(closure) {
         QueryInsert queryInsert = new QueryInsert(createContext())
         Object qs = assignTraits(queryInsert)

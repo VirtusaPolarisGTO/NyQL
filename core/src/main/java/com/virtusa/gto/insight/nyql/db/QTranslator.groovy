@@ -109,6 +109,16 @@ trait QTranslator extends QJoins {
         throw new NyException("Parts are no longer supports to reuse other than WHERE and JOINING!")
     }
 
+    QResultProxy ___deleteQuery(QueryDelete q) {
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+        query.append("DELETE FROM ").append(___deriveSource(q._targetTable, paramList, QContextType.FROM)).append(" \n")
+        if (q.whereObj != null && q.whereObj.__hasClauses()) {
+            query.append(" WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append("\n")
+        }
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
+    }
+
     QResultProxy ___selectQuery(QuerySelect q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
