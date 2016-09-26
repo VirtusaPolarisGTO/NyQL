@@ -19,7 +19,7 @@ $DSL.update {
 
     TARGET (Album.alias("alb"))
 
-    JOINING {
+    JOIN {
         TABLE("alb") JOIN Song.alias("s") ON alb.id, s.id JOIN Artist.alias("art") ON art.id, s.id
     }
 

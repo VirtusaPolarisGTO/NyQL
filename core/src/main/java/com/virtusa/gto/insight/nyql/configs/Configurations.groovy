@@ -24,13 +24,25 @@ class Configurations {
 
     private String cacheVarName
 
+    private final Object lock = new Object();
+    private boolean configured = false
+
     private Configurations() {}
 
     Configurations configure(Map configProps) throws NyException {
         properties = configProps
 
-        doConfig()
+        synchronized (lock) {
+            doConfig()
+            configured = true
+        }
         return this
+    }
+
+    boolean isConfigured() {
+        synchronized (lock) {
+            return configured;
+        }
     }
 
     private void doConfig() throws NyException {

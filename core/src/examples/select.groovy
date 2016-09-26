@@ -7,7 +7,7 @@ $DSL.select {
 
     TARGET (Album.alias("alb"))
 
-    JOINING {
+    JOIN {
         $IMPORT("partials/joining")
     }
 

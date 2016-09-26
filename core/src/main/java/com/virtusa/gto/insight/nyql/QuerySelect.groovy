@@ -30,7 +30,7 @@ class QuerySelect extends Query {
         return this
     }
 
-    def JOINING(closure) {
+    def JOIN(closure) {
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         _joiningTable = code()

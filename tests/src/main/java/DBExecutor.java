@@ -1,3 +1,4 @@
+import com.virtusa.gto.insight.nyql.engine.NyQL;
 import com.virtusa.gto.insight.nyql.engine.Quickly;
 import com.virtusa.gto.insight.nyql.model.QScript;
 import org.slf4j.Logger;
@@ -14,9 +15,20 @@ public class DBExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBExecutor.class);
 
     public static void main(String[] args) throws Exception {
-        Quickly.configOnce();
+        Map<String, Object> data = new HashMap<>();
+        List<Integer> teams = asList(1410, 1411);
+        List<Integer> modules = asList(97389, 97390, 97391);
 
-        parse();
+        data.put("teamIDs", teams);
+        data.put("moduleIDs", modules);
+        data.put("filmId", 250);
+
+        QScript result = NyQL.parse("select", data);
+        System.out.println(result);
+
+        //NyQL.execute("")
+        //Quickly.configOnce();
+        //parse();
     }
 
     private static void parse() throws Exception {
