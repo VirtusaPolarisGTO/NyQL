@@ -13,7 +13,11 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.update.Update;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
@@ -34,7 +38,26 @@ public class SqlToDSL {
         }
     }
 
-    private static void visit(Insert insertStmt) {
+    public static String convert(File inputSQL, File destinationFile) throws Exception {
+        try (InputStream inputStream = new FileInputStream(inputSQL)) {
+            Statement stmt = CCJSqlParserUtil.parse(inputStream);
+            StringBuilder dsl;
+            if (stmt instanceof Select) {
+                dsl = visit((Select)stmt);
+            } else if (stmt instanceof Update) {
+                dsl = visit((Update)stmt);
+            } else if (stmt instanceof Insert) {
+                dsl = visit((Insert)stmt);
+            } else {
+                throw new Exception("Unknown sql!");
+            }
+
+            FileUtils.write(destinationFile, dsl.toString());
+            return dsl.toString();
+        }
+    }
+
+    private static StringBuilder visit(Insert insertStmt) {
         StringBuilder dsl = new StringBuilder();
         dsl.append("$DSL.insert {\n");
 
@@ -58,10 +81,10 @@ public class SqlToDSL {
         }
 
         dsl.append("\n}\n");
-        System.out.println(dsl);
+        return dsl;
     }
 
-    private static void visit(Update updateStmt) {
+    private static StringBuilder visit(Update updateStmt) {
         StringBuilder dsl = new StringBuilder();
         dsl.append("$DSL.update {\n");
 
@@ -89,10 +112,10 @@ public class SqlToDSL {
         }
 
         dsl.append("\n}\n");
-        System.out.println(dsl);
+        return dsl;
     }
 
-    private static void visit(Select selectStmt) {
+    private static StringBuilder visit(Select selectStmt) {
         StringBuilder dsl = new StringBuilder();
         dsl.append("$DSL.select {\n");
         PlainSelect plainSelect = (PlainSelect) selectStmt.getSelectBody();
@@ -168,8 +191,7 @@ public class SqlToDSL {
         }
 
         dsl.append("\n}\n");
-        //System.out.println(selectStmt);
-        System.out.println(dsl);
+        return dsl;
     }
 
     private static void handleTarget(Table table, StringBuilder dsl) {
