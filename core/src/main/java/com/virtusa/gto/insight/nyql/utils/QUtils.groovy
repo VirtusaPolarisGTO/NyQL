@@ -30,12 +30,35 @@ class QUtils {
         }
     }
 
-    static def findLeftMostTable(Table table) {
+    static Table findLeftMostTable(Table table) {
         if (table instanceof Join) {
             Join j = (Join)table
             return findLeftMostTable(j.table1)
         } else {
             return table
+        }
+    }
+
+    static Table findRightMostTable(Table table) {
+        if (table instanceof Join) {
+            Join j = (Join)table
+            return findLeftMostTable(j.table2)
+        } else {
+            return table
+        }
+    }
+
+    static Table replaceLeftMostTable(Table search, Table withWhat) {
+        if (search instanceof Join) {
+            Join j = (Join)search
+            Table t2 = findLeftMostTable(j.table1)
+            if (t2 == j.table1) {
+                j.table1 = withWhat
+                return search
+            }
+            return t2
+        } else {
+            return search
         }
     }
 

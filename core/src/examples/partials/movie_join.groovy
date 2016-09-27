@@ -10,7 +10,7 @@ $DSL.$q {
     EXPECT (TABLE("Category").alias("c"))
 
     JOIN {
-        f INNER_JOIN fc ON (f.film_id, fc.film_id) INNER_JOIN c ON c.category_id, fc.category_id
+        TABLE("f") INNER_JOIN fc ON (f.film_id, fc.film_id) INNER_JOIN c ON c.category_id, fc.category_id
     }
 
 }
