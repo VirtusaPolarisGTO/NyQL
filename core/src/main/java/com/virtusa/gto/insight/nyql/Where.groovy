@@ -141,21 +141,21 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     def IN(Object c1, Object... cs) {
         if (cs == null || cs.length == 1) {
-            return ON(c1, "IN", cs == null ? null : cs[0])
+            return ON(c1, _ctx.translator.OP_IN(), cs == null ? null : cs[0])
         } else {
             List list = new LinkedList()
             list.addAll(cs)
-            return ON(c1, "IN", list)
+            return ON(c1, _ctx.translator.OP_IN(), list)
         }
     }
 
     def NOTIN(Object c1, Object... cs) {
         if (cs == null || cs.length == 1) {
-            return ON(c1, "NOT IN", cs == null ? null : cs[0])
+            return ON(c1, _ctx.translator.OP_NOTIN(), cs == null ? null : cs[0])
         } else {
             List list = new LinkedList()
             list.addAll(cs)
-            return ON(c1, "NOT IN", list)
+            return ON(c1, _ctx.translator.OP_NOTIN(), list)
         }
     }
 

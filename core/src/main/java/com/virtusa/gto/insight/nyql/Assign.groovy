@@ -36,7 +36,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
     }
 
     def SET_NULL(Column c1) {
-        assignments.add(new AnAssign(leftOp: c1, rightOp: _ctx.translator.NULL))
+        assignments.add(new AnAssign(leftOp: c1, rightOp: _ctx.translator.NULL()))
         return this
     }
 

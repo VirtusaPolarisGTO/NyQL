@@ -15,4 +15,8 @@ trait QJoins {
     String FULL_OUTER_JOIN(QContextType contextType) { "FULL OUTER JOIN" }
     String INNER_JOIN(QContextType contextType) { "INNER JOIN" }
 
+    String OP_EQUAL() { "=" }
+    String OP_IN() { "IN" }
+    String OP_NOTIN() { "NOT IN" }
+
 }

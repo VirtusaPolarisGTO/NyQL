@@ -257,6 +257,7 @@ trait QTranslator extends QJoins {
     }
 
     String ___expandCondition(QCondition c, List<AParam> paramOrder, QContextType contextType) {
+        boolean parenthesis = false
         if (c.leftOp instanceof AParam) {
             paramOrder?.add((AParam)c.leftOp)
         }
@@ -264,11 +265,14 @@ trait QTranslator extends QJoins {
             paramOrder?.add((AParam)c.rightOp)
         }
         if (c.rightOp instanceof QResultProxy) {
+            parenthesis = true
             QResultProxy resultProxy = c.rightOp
             paramOrder?.addAll(resultProxy.orderedParameters ?: [])
         }
 
-        return ___resolve(c.leftOp, contextType) + (c.op.length() > 0 ? " " + c.op + " " : " ") + ___resolve(c.rightOp, contextType)
+        return ___resolve(c.leftOp, contextType) +
+                (c.op.length() > 0 ? " " + c.op + " " : " ") +
+                (!parenthesis ? ___resolve(c.rightOp, contextType) : "(" + ___resolve(c.rightOp, contextType) + ")")
     }
 
     String ___expandConditionGroup(QConditionGroup group, List<AParam> paramOrder, QContextType contextType) {
