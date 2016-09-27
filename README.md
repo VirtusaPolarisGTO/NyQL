@@ -8,7 +8,7 @@
 * Executor: Entity which executes script(s)
 
 #### How to Use Through Java
-* Add the dependency `nyql-engine` to the maven project.
+* Add the dependency `nyql-engine` to the maven project, and also corresponding nyql database translator.
 
 ```xml
 <dependency>
@@ -17,6 +17,17 @@
     <version>${nyql.version}</version>
 </dependency>
 ```
+
+If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the classpath.
+
+```xml
+<dependency>
+    <groupId>com.virtusa.gto.insight.nyql</groupId>
+    <artifactId>nyql-impl-mysql</artifactId>
+    <version>${nyql.version}</version>
+</dependency>
+```
+
 * Make sure to have correct driver classes in your classpath at the runtime through maven dependencies. For eg, if you are using mysql database use mysql jdbc driver.
  ```xml
 <dependency>
@@ -26,65 +37,35 @@
 </dependency>
 ```
 
-* NyQL uses a configuration property file. See a sample here. It has below properties.
-    * **translators**: a comma separated fully qualified class names of db translators. These will be loaded at the beginning and will throw exception if not found.
+* NyQL uses a configuration json file in the classpath to configure automatically. See a sample [nyql.json](nyql.json). It has below properties.
+    * **translators**: an array of fully qualified class names of db factories. These will be loaded at the beginning and will throw exception if not found. So make sure you specify only you needed.
     * **activate**: the active database implementation name. This must be equal to a name returned by any translator.
-    * **cache.raw.scripts**: Whether to cache compiled dsl scripts in memory. Default value is `yes`.
-    * **cache.queries**: Indicates to cache generated db specific query strings to prevent redundant translation of same query again and again. Default value is `yes`.
+    * **caching**: 
+      * **compiledScripts**: Whether to cache the groovy compiled scripts or not. Recommended to set this `true`.
+      * **generatedQueries**: Whether to cache generated queries by NyQL. Then you can have fine tune by specifying a cache status for each script using `do_cache=true` declaration in very top of scripts you want to cache. Recommended to set this `true`.
+    * **executors**: List of executors for query execution. Each executor should declare below properties.
+      * **name**: name of the executor. Should be unique.
+      * **factory**: factory class which creates executors at runtime for each session.
+      * **url**: JDBC url
+      * **username**: database username
+      * **password**: database password
+      * **pooling**: NyQL uses HikariCP for JDBC connection pooling. And you can specify those configurations here as a JSON object. See their [https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby](site) for available configurations
+
+
 3. If you want to see the db specific query, then use below code piece.
 
 ```java 
 public class Main {
     
     public static void main(String[] args) throws Exception {
-        // call this once in application lifecycle to configure
-        Properties configs = ... // load nyql property file
-        Quickly.configOnce(configs);
-        
-        // load the scripts directory
-        File srcDir = new File("path_to_query_directory");
-        QScript result = Quickly.parse(srcDir, "<script-id>");
-        
-        // print db specific query to the console
-        System.out.println(result.getProxy().getQuery());
-        // print order of parameters according to the above query string
-        System.out.println(result.getProxy().getOrderedParameters());
-    }
-}
-```
-
-* If you want to execute a script then use below code piece. (Assuming you are using default JDBC executor to get the result)
-
-```java
-public class Main {
-    
-    public static void main(String[] args) throws Exception {
-        // call this once in application lifecycle to configure
-        Properties configs = ... // load nyql property file
-        Quickly.configOnce(configs);
-        
-        // prepare a map containing parameter data for the running script
+        // your session variables or parameter values...
         Map<String, Object> data = new HashMap<>();
-        data.put("minRentals", 25);
-        data.put("customerId", 2);
-        data.put("filmId", 250);
         
-        // create script executor using a JDBC connection instance
-        QExecutor executor = new QJdbcExecutor(connection);
+        // to parse and see the query
+        NyQL.parse("<script-name>", data);
         
-        // load the scripts directory
-        File srcDir = new File("path_to_query_directory");
-        QScript result = Quickly.execute(srcDir, "<script-id>", data, executor);
-        
-        // print results. By default it returns a list of hashmaps
-        if (result instanceof List) {
-            for (Object row : (List)result) {
-                System.out.println(row.toString());
-            }
-        }
+        // to execute and get results
+        NyQL.execute("<script-name>", data);
     }
-    
 }
 ```
-
- * If you did not specify an executor, then it will try to load a `jdbc.properties` file from classpath to create a connection.
