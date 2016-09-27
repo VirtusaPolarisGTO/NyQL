@@ -77,6 +77,10 @@ trait QFunctions {
         else throw new NyException("ROUND function requires two parameters!")
     }
 
+    def distinct   = { c ->
+        return "DISTINCT " + ___resolve(c, QContextType.INSIDE_FUNCTION)
+    }
+
     def between = { c ->
             if (c instanceof List) {
                 return "BETWEEN " + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + " AND " +

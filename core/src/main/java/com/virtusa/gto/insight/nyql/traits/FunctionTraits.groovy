@@ -11,7 +11,7 @@ trait FunctionTraits {
     def ASC(Column column)      { return fColumn(column, "asc") }
     def DESC(Column column)     { return fColumn(column, "desc") }
     def COUNT(Column column)    { return fColumn(column, "count") }
-    def COUNT_DISTINCT(Column column) { return fColumn(column, "count_distinct") }
+    def DISTINCT(Column column) { return fColumn(column, "distinct") }
     def MAX(Column column)      { return fColumn(column, "max") }
     def MIN(Column column)      { return fColumn(column, "min") }
     def AVG(Column column)      { return fColumn(column, "avg") }

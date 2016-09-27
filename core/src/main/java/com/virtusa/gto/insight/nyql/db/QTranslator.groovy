@@ -127,7 +127,11 @@ trait QTranslator extends QJoins {
             query.append("INSERT INTO ").append(___deriveSource(q._intoTable, paramList, QContextType.FROM)).append(" \n")
         }
 
-        query.append("SELECT ").append(___expandProjection(q.projection)).append("\n")
+        query.append("SELECT ");
+        if (q._distinct) {
+            query.append("DISTINCT ")
+        }
+        query.append(___expandProjection(q.projection)).append("\n")
         query.append(" FROM ").append(___deriveSource(q._joiningTable ?: q.sourceTbl, paramList, QContextType.FROM)).append("\n")
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {

@@ -10,10 +10,16 @@ class QuerySelect extends Query {
     List<Object> projection = null
     Table _intoTable = null
     Table _joiningTable = null
+    boolean _distinct = false
     def offset
 
     QuerySelect(QContext contextParam) {
         super(contextParam)
+    }
+
+    QuerySelect DISTINCT_FETCH(Object... columns) {
+        _distinct = true
+        return FETCH(columns)
     }
 
     def TARGET(Table table) {
