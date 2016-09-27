@@ -23,9 +23,19 @@
   "executors": [
       {
           "name": "jdbc",
+          "factory": "com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutorFactory",
+
           "url": "jdbc:mysql://localhost/sakila",
           "username": "root",
-          "password": ""
+          "password": "",
+
+          "pooling": {
+              "enabled": true,
+
+              "prepStmtCacheSize": 300,
+              "prepStmtCacheSqlLimit": 2048,
+              "useServerPrepStmts": true
+          }
       }
   ],
 

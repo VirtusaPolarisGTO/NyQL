@@ -1,10 +1,6 @@
 package com.virtusa.gto.insight.nyql
 
-import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.db.QTranslator
-import com.virtusa.gto.insight.nyql.model.QDatabaseRegistry
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /**
  * @author IWEERARATHNA

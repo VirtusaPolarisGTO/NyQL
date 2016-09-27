@@ -8,13 +8,6 @@ import java.sql.ResultSetMetaData
  */
 class JdbcResultTransformer implements QJdbcResultTransformer<List<Map<String, Object>>> {
 
-    private boolean doAutoClose
-
-    JdbcResultTransformer(boolean autoClose=true) {
-        doAutoClose = autoClose
-    }
-
-    @Override
     List<Map<String, Object>> apply(ResultSet resultSet) {
         try {
             ResultSetMetaData metaData = resultSet.getMetaData()
@@ -35,10 +28,12 @@ class JdbcResultTransformer implements QJdbcResultTransformer<List<Map<String, O
             return result
 
         } finally {
-            if (doAutoClose) {
-                resultSet.close()
-            }
+            resultSet.close()
         }
     }
 
+    @Override
+    long convertUpdateResult(long val) {
+        return val
+    }
 }

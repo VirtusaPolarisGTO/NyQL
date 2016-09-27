@@ -23,7 +23,7 @@ public class DBExecutor {
         data.put("moduleIDs", modules);
         data.put("filmId", 250);
 
-        QScript result = NyQL.parse("select", data);
+        Object result = NyQL.parse("sakila/movie_info", data);
         System.out.println(result);
 
         //NyQL.execute("")

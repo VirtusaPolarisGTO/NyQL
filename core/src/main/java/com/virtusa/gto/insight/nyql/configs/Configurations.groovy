@@ -1,15 +1,15 @@
 package com.virtusa.gto.insight.nyql.configs
 
-import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QDatabaseRegistry
+import com.virtusa.gto.insight.nyql.model.QExecutorFactory
+import com.virtusa.gto.insight.nyql.model.QExecutorRegistry
 import com.virtusa.gto.insight.nyql.model.QRepository
 import com.virtusa.gto.insight.nyql.model.QRepositoryRegistry
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
-import org.apache.commons.lang3.BooleanUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -69,16 +69,33 @@ class Configurations {
 
 
         // load repositories
-        String defRepo = properties.defaultRepository ?: "default"
+        String defRepo = properties.defaultRepository ?: Constants.DEFAULT_REPOSITORY_NAME
         List repos = properties.repositories ?: []
         for (Map r : repos) {
             Map args = r.mapperArgs ?: [:]
             boolean thisDef = r.name == defRepo
-            QScriptMapper scriptMapper = Class.forName(r.mapper).createNew(args)
-            QRepository qRepository = (QRepository) Class.forName(r.repo).newInstance([scriptMapper].toArray())
+            QScriptMapper scriptMapper = Class.forName(String.valueOf(r.mapper)).createNew(args)
+            QRepository qRepository = (QRepository) Class.forName(String.valueOf(r.repo)).newInstance([scriptMapper].toArray())
 
-            QRepositoryRegistry.getInstance().register(r.name, qRepository, thisDef)
+            QRepositoryRegistry.getInstance().register(String.valueOf(r.name), qRepository, thisDef)
         }
+
+        // load executors
+        QDbFactory activeFactory = QDatabaseRegistry.instance.getDbFactory(activeDb);
+        String defExec = properties.defaultExecutor ?: Constants.DEFAULT_EXECUTOR_NAME
+        List execs = properties.executors ?: []
+        for (Map r : execs) {
+            boolean thisDef = r.name == defExec
+            QExecutorFactory executorFactory = (QExecutorFactory) Class.forName(String.valueOf(r.factory)).newInstance()
+            r.put("dataSourceClassName", activeFactory.dataSourceClassName())
+            executorFactory.init(r)
+
+            QExecutorRegistry.getInstance().register(String.valueOf(r.name), executorFactory, thisDef)
+        }
+    }
+
+    void shutdown() {
+        QExecutorRegistry.instance.shutdown()
     }
 
     String cachingIndicatorVarName() {

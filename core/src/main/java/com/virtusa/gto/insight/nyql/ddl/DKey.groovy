@@ -1,8 +1,4 @@
 package com.virtusa.gto.insight.nyql.ddl
-
-import java.util.stream.Collectors
-import java.util.stream.Stream
-
 /**
  * @author IWEERARATHNA
  */

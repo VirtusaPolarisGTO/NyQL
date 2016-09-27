@@ -20,8 +20,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
-
 /**
  * @author IWEERARATHNA
  */

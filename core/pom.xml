@@ -36,7 +36,7 @@
                 <configuration>
                     <sources>
                         <source>
-                            <directory>${project.basedir}/src/main/groovy</directory>
+                            <directory>${project.basedir}/src/main/java</directory>
                             <includes>
                                 <include>**/*.groovy</include>
                             </includes>

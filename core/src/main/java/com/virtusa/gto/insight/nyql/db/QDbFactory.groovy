@@ -11,4 +11,6 @@ trait QDbFactory {
     abstract List<Class<?>> createTraits();
 
     abstract String driverClassName();
+
+    abstract String dataSourceClassName();
 }

@@ -1,7 +1,4 @@
 package com.virtusa.gto.insight.nyql.ddl
-
-import groovy.transform.PackageScope
-
 /**
  * @author IWEERARATHNA
  */

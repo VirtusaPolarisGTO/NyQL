@@ -44,7 +44,7 @@ class Postgres implements QTranslator, PostgresFunctions {
     }
 
     @Override
-    def ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder=null) {
+    def ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
         // @TODO consider join type
         StringBuilder qstr = new StringBuilder();
         String jtype = invokeMethod(join.type, null)

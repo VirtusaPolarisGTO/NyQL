@@ -22,6 +22,13 @@ class NyQL {
 
     static {
         configure()
+
+        Runtime.runtime.addShutdownHook(new Thread(new Runnable() {
+            @Override
+            void run() {
+                shutdown()
+            }
+        }));
     }
 
     private static void configure() {
@@ -49,8 +56,12 @@ class NyQL {
         return QRepositoryRegistry.instance.defaultRepository().parse(scriptName, qSession)
     }
 
+    public static void shutdown() {
+        Configurations.instance().shutdown()
+    }
+
     public static Object execute(String scriptName, Map<String, Object> data) throws NyException {
-        return QExecutorRegistry.instance.defaultExecutor().execute(parse(scriptName, data));
+        return QExecutorRegistry.instance.defaultExecutorFactory().create().execute(parse(scriptName, data))
     }
 
     public static String executeToJSON(String scriptName, Map<String, Object> data) throws NyException {

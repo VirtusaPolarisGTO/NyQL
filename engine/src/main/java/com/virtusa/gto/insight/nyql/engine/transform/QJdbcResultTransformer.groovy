@@ -5,6 +5,6 @@ import java.sql.ResultSet
 /**
  * @author IWEERARATHNA
  */
-trait QJdbcResultTransformer<R> extends QResultTransformer<ResultSet, R> {
+interface QJdbcResultTransformer<R> extends QResultTransformer<ResultSet, R> {
 
 }

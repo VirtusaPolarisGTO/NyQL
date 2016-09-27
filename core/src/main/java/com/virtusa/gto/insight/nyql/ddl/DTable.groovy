@@ -1,6 +1,5 @@
 package com.virtusa.gto.insight.nyql.ddl
 
-import groovy.transform.PackageScope
 import groovy.transform.ToString
 
 /**

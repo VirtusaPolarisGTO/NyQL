@@ -10,8 +10,6 @@ import com.virtusa.gto.insight.nyql.utils.QueryType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.util.concurrent.ConcurrentHashMap
-
 /**
  * @author Isuru Weerarathna
  */

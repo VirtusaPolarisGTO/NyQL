@@ -12,10 +12,19 @@ class QueryPart extends Query {
     }
 
     QueryPart EXPECT(Table table) {
+        if (table.__aliasDefined()) {
+            if (!_ctx.tables.containsKey(table.__alias)) {
+                _ctx.tables.put(table.__alias, table)
+            }
+        } else {
+            if (!_ctx.tables.containsKey(table.__name)) {
+                _ctx.tables.containsKey(table.__name)
+            }
+        }
         return this
     }
 
-    QueryPart JOINING(closure) {
+    QueryPart JOIN(closure) {
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         sourceTbl = code()

@@ -9,7 +9,7 @@ import java.sql.ResultSet
  */
 class JdbcCallResultTransformer implements QResultTransformer<JdbcCallTransformInput, Map> {
 
-    private final JdbcResultTransformer rsTransformer = new JdbcResultTransformer(false)
+    private final JdbcResultTransformer rsTransformer = new JdbcResultTransformer()
 
     @Override
     Map apply(JdbcCallTransformInput input) {
@@ -39,5 +39,10 @@ class JdbcCallResultTransformer implements QResultTransformer<JdbcCallTransformI
         } else {
             return [outs: op, r: rsList]
         }
+    }
+
+    @Override
+    long convertUpdateResult(long val) {
+        return val
     }
 }

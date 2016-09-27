@@ -1,4 +1,4 @@
-package com.virtusa.gto.insight.nyql.db.postgre
+package com.virtusa.gto.insight.nyql.db.mysql
 
 import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.db.QTranslator
@@ -6,24 +6,29 @@ import com.virtusa.gto.insight.nyql.db.QTranslator
 /**
  * @author IWEERARATHNA
  */
-class PostgreFactory implements QDbFactory {
+class MySqlFactory implements QDbFactory {
     @Override
     String dbName() {
-        return "pg"
+        return "mysql"
+    }
+
+    @Override
+    String dataSourceClassName() {
+        return "com.mysql.jdbc.jdbc2.optional.MysqlDataSource"
     }
 
     @Override
     QTranslator createTranslator() {
-        return new Postgres()
+        return new MySql()
     }
 
     @Override
     List<Class<?>> createTraits() {
-        return [PostgresFunctions]
+        return [MySqlFunctions]
     }
 
     @Override
     String driverClassName() {
-        return "org.postgresql.Driver"
+        return "com.mysql.jdbc.Driver"
     }
 }

@@ -21,6 +21,10 @@ final class QDatabaseRegistry {
         return Holder.INSTANCE
     }
 
+    public QDbFactory getDbFactory(String dbName) {
+        return factoryRegistry.get(dbName);
+    }
+
     public DSLContext load(String dbName) throws NyException {
         if (dslContextMap.containsKey(dbName)) {
             return dslContextMap[dbName]

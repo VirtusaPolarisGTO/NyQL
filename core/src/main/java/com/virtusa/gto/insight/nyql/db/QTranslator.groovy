@@ -8,15 +8,14 @@ import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
 import java.util.stream.Collectors
-import java.util.stream.Stream
 
 /**
  * @author Isuru Weerarathna
  */
 trait QTranslator extends QJoins {
 
-    String NULL = "NULL"
-    String COMPARATOR_NULL = "IS"
+    String NULL() { "NULL" }
+    String COMPARATOR_NULL() { "IS" }
 
     def ___ifColumn(Case aCaseCol, List<AParam> paramOrder=null) {
         StringBuilder query = new StringBuilder("CASE")
