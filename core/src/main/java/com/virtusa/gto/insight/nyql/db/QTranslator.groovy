@@ -38,7 +38,7 @@ trait QTranslator extends QJoins {
 
     def ___resolve(Object obj, QContextType contextType, List<AParam> paramOrder=null) {
         if (obj == null) {
-            return NULL
+            return NULL()
         }
 
         if (obj instanceof Join) {
@@ -64,7 +64,7 @@ trait QTranslator extends QJoins {
             }
             return "?"
         } else if (obj instanceof QResultProxy) {
-            return obj.query
+            return (obj.query ?: "").trim()
         } else if (obj instanceof List) {
             return obj.stream().map({ ___resolve(it, contextType, paramOrder) }).collect(Collectors.joining(", ", "(", ")"))
         } else {
@@ -232,6 +232,10 @@ trait QTranslator extends QJoins {
         if (table instanceof Join) {
             return ___tableJoinName(table, contextType, paramOrder)
         } else {
+            if (table.__isResultOf()) {
+                QResultProxy proxy = table.__resultOf as QResultProxy
+                paramOrder.addAll(proxy.orderedParameters ?: [])
+            }
             return ___tableName(table, contextType)
         }
     }

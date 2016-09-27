@@ -65,6 +65,14 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
         })
     }
 
+    def IFNOTNULL(Column column, Object val) {
+        return CASE({
+            WHEN { NOTNULL(column) }
+            THEN { val }
+            ELSE { column }
+        })
+    }
+
     def WHERE(closure) {
         Where whr = new Where(_ctx)
 

@@ -23,7 +23,7 @@ public class DBExecutor {
         data.put("moduleIDs", modules);
         data.put("filmId", 250);
 
-        Object result = NyQL.execute("insight/codebranch", data);
+        Object result = NyQL.parse("insight/unmapped_users", data);
         System.out.println(result);
 
         //NyQL.execute("")

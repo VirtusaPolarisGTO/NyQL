@@ -26,13 +26,22 @@ import java.util.List;
 public class SqlToDSL {
 
     public static void main(String[] args) throws JSQLParserException {
-        Statement stmt = CCJSqlParserUtil.parse("select sum(release_open_tech_s1) as techS1,sum(release_open_tech_s2) as techS2,sum(release_open_tech_s3) as techS3 ,sum(release_open_security_s1) as securityS1, sum(release_open_security_s2) as securityS2, sum(release_open_security_s3) as securityS3 from release_module_summary where org_unit_id=\"123\" and release_id=\"11739\" and team_id in (1410,1411) and module_id in (97389,97390);");
+        Statement stmt = CCJSqlParserUtil.parse("SELECT \n" +
+                "    COUNT(CASE\n" +
+                "        WHEN (dev.scmUserId IS NOT NULL) THEN 1\n" +
+                "        ELSE 0\n" +
+                "    END) AS mappedUserCount,\n" +
+                "    SUM(CASE\n" +
+                "        WHEN (dev.scmUserId IS NULL) THEN 1\n" +
+                "        ELSE 0\n" +
+                "    END) AS unmappedUserCount\n" +
+                "FROM Dev dev\n");
         if (stmt instanceof Select) {
-            visit((Select)stmt);
+            System.out.println(visit((Select)stmt));
         } else if (stmt instanceof Update) {
-            visit((Update)stmt);
+            System.out.println(visit((Update)stmt));
         } else if (stmt instanceof Insert) {
-            visit((Insert)stmt);
+            System.out.println(visit((Insert)stmt));
         }
     }
 
@@ -234,7 +243,7 @@ public class SqlToDSL {
             return;
         }
 
-        dsl.append("\nJOINING {\n").append(" TARGET() ");
+        dsl.append("\nJOIN {\n").append(" TARGET() ");
         int count = 0;
         for (Join j : joins) {
             if (count > 0) dsl.append(" ");

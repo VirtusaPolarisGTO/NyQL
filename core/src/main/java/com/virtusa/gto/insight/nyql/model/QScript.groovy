@@ -14,6 +14,10 @@ class QScript {
 
     @Override
     public String toString() {
-        return proxy == null ? "" : proxy.query ?: ""
+        String params = "";
+        if (proxy != null) {
+            params = proxy.orderedParameters.toString()
+        }
+        return proxy == null ? "" : (proxy.query ?: "").trim() + "\n" + params
     }
 }

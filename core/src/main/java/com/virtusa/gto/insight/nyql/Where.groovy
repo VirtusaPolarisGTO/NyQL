@@ -140,15 +140,23 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def IN(Object c1, Object... cs) {
-        List list = new LinkedList()
-        list.addAll(cs)
-        return ON(c1, "IN", list)
+        if (cs == null || cs.length == 1) {
+            return ON(c1, "IN", cs == null ? null : cs[0])
+        } else {
+            List list = new LinkedList()
+            list.addAll(cs)
+            return ON(c1, "IN", list)
+        }
     }
 
     def NOTIN(Object c1, Object... cs) {
-        List list = new LinkedList()
-        list.addAll(cs)
-        return ON(c1, "NOT IN", list)
+        if (cs == null || cs.length == 1) {
+            return ON(c1, "NOT IN", cs == null ? null : cs[0])
+        } else {
+            List list = new LinkedList()
+            list.addAll(cs)
+            return ON(c1, "NOT IN", list)
+        }
     }
 
     def $IMPORT(String scriptId) {
