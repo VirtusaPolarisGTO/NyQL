@@ -87,7 +87,7 @@ class Configurations {
         for (Map r : execs) {
             boolean thisDef = r.name == defExec
             QExecutorFactory executorFactory = (QExecutorFactory) Class.forName(String.valueOf(r.factory)).newInstance()
-            r.put("dataSourceClassName", activeFactory.dataSourceClassName())
+            //r.put("dataSourceClassName", activeFactory.dataSourceClassName())
             executorFactory.init(r)
 
             QExecutorRegistry.getInstance().register(String.valueOf(r.name), executorFactory, thisDef)

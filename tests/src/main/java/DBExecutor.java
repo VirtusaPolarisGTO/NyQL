@@ -23,7 +23,7 @@ public class DBExecutor {
         data.put("moduleIDs", modules);
         data.put("filmId", 250);
 
-        Object result = NyQL.parse("sakila/movie_info", data);
+        Object result = NyQL.execute("insight/codebranch", data);
         System.out.println(result);
 
         //NyQL.execute("")

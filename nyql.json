@@ -25,9 +25,9 @@
       "name": "jdbc",
       "factory": "com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutorFactory",
 
-      "url": "jdbc:mysql://localhost/sakila",
-      "username": "root",
-      "password": "",
+      "url": "jdbc:mysql://cmdlaweerasingh/insight5manual",
+      "username": "gtotest",
+      "password": "1234qwer$",
 
       "pooling": {
         "maximumPoolSize": 1,

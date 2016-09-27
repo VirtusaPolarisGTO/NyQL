@@ -25,7 +25,7 @@ class QHikariPool implements QJdbcPool {
     @Override
     synchronized void init(Map options) throws NyException {
         HikariConfig config = new HikariConfig();
-        config.setDataSourceClassName(String.valueOf(options.dataSourceClassName))
+        //config.setDataSourceClassName(String.valueOf(options.dataSourceClassName))
         config.setJdbcUrl(String.valueOf(options.url))
         config.setUsername(String.valueOf(options.username))
         config.setPassword(String.valueOf(options.password))
