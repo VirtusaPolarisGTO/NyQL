@@ -49,7 +49,7 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
       * **url**: JDBC url
       * **username**: database username
       * **password**: database password
-      * **pooling**: NyQL uses HikariCP for JDBC connection pooling. And you can specify those configurations here as a JSON object. See their [https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby](site) for available configurations
+      * **pooling**: NyQL uses HikariCP for JDBC connection pooling. And you can specify those configurations here as a JSON object. See their [site](https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby) for available configurations
 
 
 3. If you want to see the db specific query, then use below code piece.
