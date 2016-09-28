@@ -16,8 +16,6 @@ def innQ = $DSL.select {
         AND
         EQ (rmdm.release_id, PARAM("releaseId"))
         AND
-        EQ (m.is_removed, 0)
-        AND
         EQ (rmdm.org_unit_id, 1)
         AND
         GTE (sut.date, 1474684200000)
@@ -25,6 +23,10 @@ def innQ = $DSL.select {
         LTE (sut.date, 1474684201000)
         AND
         EQ (sut.team_id, 1)
+        if ($SESSION.hello.abc == null) {
+            AND
+            EQ(m.is_removed, PARAM("memem"))
+        }
     }
 
     GROUP_BY (su.scm_user_id)

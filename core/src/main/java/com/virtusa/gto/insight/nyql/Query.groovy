@@ -78,8 +78,9 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
 
         def code = closure.rehydrate(whr, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        whereObj = code()
+        code()
 
+        whereObj = whr
         return this
     }
 
