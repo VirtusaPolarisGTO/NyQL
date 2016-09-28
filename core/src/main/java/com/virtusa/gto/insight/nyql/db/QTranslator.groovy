@@ -87,6 +87,12 @@ trait QTranslator extends QJoins {
         StringBuilder query = new StringBuilder()
         QueryType queryType = QueryType.PART
 
+        if (q._allProjections != null) {
+            query.append(___expandProjection(q._allProjections, paramList))
+            return new QResultProxy(query: query.toString(), queryType: queryType,
+                    orderedParameters: paramList, rawObject: q._allProjections, qObject: q)
+        }
+
         if (q.sourceTbl != null) {
             query.append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM))
             return new QResultProxy(query: query.toString(), queryType: queryType,
@@ -131,7 +137,7 @@ trait QTranslator extends QJoins {
         if (q._distinct) {
             query.append("DISTINCT ")
         }
-        query.append(___expandProjection(q.projection)).append("\n")
+        query.append(___expandProjection(q.projection, paramList)).append("\n")
         query.append(" FROM ").append(___deriveSource(q._joiningTable ?: q.sourceTbl, paramList, QContextType.FROM)).append("\n")
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
@@ -174,7 +180,7 @@ trait QTranslator extends QJoins {
             }
         }
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: queryType)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: queryType, qObject: q)
     }
 
     QResultProxy ___insertQuery(QueryInsert q) {
@@ -197,7 +203,7 @@ trait QTranslator extends QJoins {
                 .append(valList.stream().collect(Collectors.joining(", ")))
                 .append(")")
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT, qObject: q)
     }
 
     abstract QResultProxy ___storedFunction(StoredFunction sp)
@@ -212,13 +218,26 @@ trait QTranslator extends QJoins {
         return String.valueOf(number)
     }
 
-    def ___expandProjection(List<Object> columns) {
+    String ___expandProjection(List<Object> columns, List<AParam> paramList) {
         List<String> cols = new ArrayList<>()
         if (columns == null || columns.isEmpty()) {
             return "*"
         }
 
+        List<Object> finalCols = new LinkedList<>()
         for (c in columns) {
+            if (c instanceof QResultProxy) {
+                if (c.queryType != QueryType.PART) {
+                    throw new NyException("Only query parts allowed to import within sql projection!")
+                }
+                List otherColumns = c.rawObject as List
+                finalCols.addAll(otherColumns)
+            } else {
+                finalCols.add(c)
+            }
+        }
+
+        for (c in finalCols) {
             if (c instanceof String) {
                 cols.add(c)
             } else if (c instanceof Table) {

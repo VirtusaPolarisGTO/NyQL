@@ -25,6 +25,10 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
         _ctx = contextParam
     }
 
+    def IMPORT(String scriptId) {
+        return $IMPORT(scriptId)
+    }
+
     def $IMPORT(String scriptId) {
         QScript script = _ctx.ownerSession.scriptRepo.parse(scriptId, _ctx.ownerSession)
         def proxy = script.proxy
@@ -135,6 +139,11 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
     }
 
     def methodMissing(String name, def args) {
+        if (name == '$IMPORT') {
+            return this.invokeMethod(name, args)
+            //return
+        }
+
         try {
             return _ctx.translator.invokeMethod(name, args)
         } catch (Exception ignored) {

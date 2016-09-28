@@ -6,6 +6,7 @@ package com.virtusa.gto.insight.nyql
 class QueryPart extends Query {
 
     Assign _assigns
+    List<Object> _allProjections
 
     QueryPart(QContext contextParam) {
         super(contextParam)
@@ -21,6 +22,14 @@ class QueryPart extends Query {
                 _ctx.tables.containsKey(table.__name)
             }
         }
+        return this
+    }
+
+    QueryPart FETCH(Object... columns) {
+        if (_allProjections == null) {
+            _allProjections = new LinkedList<>()
+        }
+        _allProjections.addAll(columns)
         return this
     }
 
