@@ -1,6 +1,6 @@
 package com.virtusa.gto.insight.nyql.engine.impl
 
-import com.virtusa.gto.insight.nyql.QExecutor
+import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QHikariPool
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QJdbcPool
 import com.virtusa.gto.insight.nyql.model.QExecutorFactory
@@ -22,6 +22,11 @@ class QJdbcExecutorFactory implements QExecutorFactory {
     @Override
     QExecutor create() {
         return new QJdbcExecutor(jdbcPool)
+    }
+
+    @Override
+    QExecutor createReusable() {
+        return new QJdbcExecutor(jdbcPool, true)
     }
 
     @Override

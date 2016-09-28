@@ -34,9 +34,16 @@ class DSL {
     ///////////////////////////////////////////////////////////////////////////////////
 
     DSL script(@DelegatesTo(DSL) closure) {
-        def code = closure.rehydrate(this, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
-        code()
+        try {
+            session.beingScript()
+
+            def code = closure.rehydrate(this, this, this)
+            code.resolveStrategy = Closure.DELEGATE_ONLY
+            code()
+
+        } finally {
+            session.closeScript()
+        }
 
         return this
     }
@@ -46,11 +53,11 @@ class DSL {
     }
 
     def RUN(QScriptList scriptList) {
-        return session.executor.execute(scriptList)
+        return session.execute(scriptList)
     }
 
     def RUN(QScript script) {
-        return session.executor.execute(script)
+        return session.execute(script)
     }
 
     def RUN(QResultProxy proxy) {

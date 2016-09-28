@@ -2,7 +2,6 @@ package com.virtusa.gto.insight.nyql.model
 
 import com.virtusa.gto.insight.nyql.DSL
 import com.virtusa.gto.insight.nyql.DSLContext
-import com.virtusa.gto.insight.nyql.QExecutor
 import com.virtusa.gto.insight.nyql.utils.Constants
 
 import java.util.concurrent.ConcurrentHashMap
@@ -41,5 +40,31 @@ class QSession {
         session.sessionVariables[Constants.DSL_SESSION_WORD] = session.sessionVariables
         return session
     }
-    
+
+    QExecutor beingScript() {
+        executor = executorFactory.createReusable();
+        return executor
+    }
+
+    void closeScript() {
+        if (executor != null) {
+            executor.close()
+        }
+    }
+
+    def execute(QScript script) {
+        if (executor != null) {
+            return executor.execute(script)
+        } else {
+            return executorFactory.create().execute(script)
+        }
+    }
+
+    def execute(QScriptList scriptList) {
+        if (executor != null) {
+            return executor.execute(scriptList)
+        } else {
+            return executorFactory.create().execute(scriptList)
+        }
+    }
 }

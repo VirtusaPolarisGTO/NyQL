@@ -2,7 +2,7 @@ package com.virtusa.gto.insight.nyql.engine.impl
 
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.utils.QUtils
-import com.virtusa.gto.insight.nyql.QExecutor
+import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
 
 /**
@@ -55,5 +55,10 @@ class QDummyExecutor implements QExecutor {
     @Override
     void done() throws NyException {
         println "Script is done!"
+    }
+
+    @Override
+    void close() throws IOException {
+        println("Closing executor!")
     }
 }

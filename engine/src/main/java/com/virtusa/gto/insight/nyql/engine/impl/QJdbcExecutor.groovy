@@ -6,9 +6,8 @@ import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QJdbcPoolFetcher
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptResult
-import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.utils.QueryType
-import com.virtusa.gto.insight.nyql.QExecutor
+import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallResultTransformer
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallTransformInput
@@ -20,7 +19,6 @@ import java.sql.CallableStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Savepoint
-import java.sql.Types
 
 /**
  * @author IWEERARATHNA
@@ -35,9 +33,15 @@ class QJdbcExecutor implements QExecutor {
     private QJdbcPoolFetcher poolFetcher
     private Connection connection
     private boolean returnRaw = false
+    private boolean reusable = false
 
     QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher) {
+        this(jdbcPoolFetcher, false)
+    }
+
+    QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher, boolean canReusable) {
         poolFetcher = jdbcPoolFetcher
+        reusable = canReusable
     }
 
     private Connection getConnection() {
@@ -195,7 +199,7 @@ class QJdbcExecutor implements QExecutor {
     }
 
     private void closeConnection() {
-        if (connection == null) {
+        if (connection == null || reusable) {
             return
         }
         connection.close()
@@ -236,5 +240,10 @@ class QJdbcExecutor implements QExecutor {
         statement.setObject(index, data)
     }
 
-
+    @Override
+    void close() throws IOException {
+        if (connection != null) {
+            connection.close()
+        }
+    }
 }

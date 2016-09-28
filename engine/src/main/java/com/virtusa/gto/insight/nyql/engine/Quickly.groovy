@@ -1,11 +1,8 @@
 package com.virtusa.gto.insight.nyql.engine
 
-import com.sun.java.swing.plaf.windows.TMSchema
-import com.virtusa.gto.insight.nyql.DSLContext
-import com.virtusa.gto.insight.nyql.QExecutor
+import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.model.QExecutorRegistry
-import com.virtusa.gto.insight.nyql.model.QRepository
 import com.virtusa.gto.insight.nyql.model.QRepositoryRegistry
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
@@ -13,8 +10,6 @@ import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.model.QSource
 import com.virtusa.gto.insight.nyql.engine.impl.QDummyExecutor
 import com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutor
-import com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl
-import com.virtusa.gto.insight.nyql.engine.repo.QScriptsFolder
 import groovy.json.JsonSlurper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
