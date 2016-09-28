@@ -40,13 +40,11 @@ class DSL {
 
             def code = closure.rehydrate(this, this, this)
             code.resolveStrategy = Closure.DELEGATE_ONLY
-            code()
+            return code()
 
         } finally {
             session.closeScript()
         }
-
-        return this
     }
 
     QScript $IMPORT(String scriptName) {

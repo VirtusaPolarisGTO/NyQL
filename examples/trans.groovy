@@ -18,7 +18,7 @@ $DSL.script {
 
     def result = RUN("update")
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < result.size(); i++) {
         result = RUN "native"
         println(i + " = " + result)
     }

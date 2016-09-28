@@ -6,7 +6,9 @@ def innQ = $DSL.select {
     TARGET (TABLE("Release_Module_Dev_Metric").alias("rmdm"))
 
     JOIN {
-        TARGET() INNER_JOIN TABLE("scm_user").alias("su") ON rmdm.scm_user_id, su.scm_user_id INNER_JOIN TABLE("Scm_User_Team").alias("sut") ON rmdm.scm_user_id, sut.scm_user_id INNER_JOIN TABLE("Module").alias("m") ON rmdm.module_id, m.module_id
+        TARGET() INNER_JOIN TABLE("scm_user").alias("su") ON rmdm.scm_user_id, su.scm_user_id \
+            INNER_JOIN TABLE("Scm_User_Team").alias("sut") ON rmdm.scm_user_id, sut.scm_user_id \
+            INNER_JOIN TABLE("Module").alias("m") ON rmdm.module_id, m.module_id
     }
 
     FETCH ($IMPORT("partials/selectprojection"))
@@ -18,15 +20,18 @@ def innQ = $DSL.select {
             EQ(rmdm.org_unit_id, 1)
             GTE(sut.date, 1474684200000)
             LTE(sut.date, 1474684201000)
-            EQ(sut.team_id, 1)
-            if ($SESSION.hello.abc == null) {
+
+            if ($SESSION.hello.abc != null) {
                 EQ(m.is_removed, PARAM("memem"))
             }
+            //EQ(sut.team_id, 1)
+
         }
     }
 
     GROUP_BY (su.scm_user_id)
 
+    TOP 1
 }
 
 $DSL.select {

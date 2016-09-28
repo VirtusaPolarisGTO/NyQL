@@ -1,4 +1,5 @@
 import com.virtusa.gto.insight.nyql.utils.QUtils;
+import groovy.lang.GroovyClassLoader;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
@@ -113,10 +114,42 @@ public class SqlToDSL {
         return dsl;
     }
 
-    private static StringBuilder visit(Select selectStmt) {
+    private static StringBuilder visitBody(SelectBody selectBody, StringBuilder dsl) {
+        if (selectBody instanceof PlainSelect) {
+            StringBuilder innerDsl = visit((PlainSelect)selectBody);
+            dsl.append(innerDsl.toString());
+            return dsl;
+        } else if (selectBody instanceof SetOperationList) {
+            List<PlainSelect> plainSelects = ((SetOperationList) selectBody).getPlainSelects();
+            List<SetOperation> operations = ((SetOperationList) selectBody).getOperations();
+            for (int i = 0; i < plainSelects.size(); i++) {
+                visitBody(plainSelects.get(i), dsl);
+            }
+            SetOperation setOperation = operations.get(0);
+            if (setOperation instanceof UnionOp) {
+                UnionOp unionOp = (UnionOp)setOperation;
+                if (unionOp.isDistinct()) {
+                    dsl.append("\n$DSL.unionDistinct ( , )");
+                } else {
+                    dsl.append("\n$DSL.union (above_first_query, above_second_query)");
+                }
+            }
+
+            return dsl;
+        }
+        return null;
+    }
+
+    private static StringBuilder visit(Select select) {
         StringBuilder dsl = new StringBuilder();
-        dsl.append("$DSL.select {\n");
-        PlainSelect plainSelect = (PlainSelect) selectStmt.getSelectBody();
+        SelectBody body = select.getSelectBody();
+        return visitBody(body, dsl);
+    }
+
+    private static StringBuilder visit(PlainSelect plainSelect) {
+        StringBuilder dsl = new StringBuilder();
+        dsl.append("\n$DSL.select {\n");
+        //PlainSelect plainSelect = (PlainSelect) selectStmt.getSelectBody();
 
         Table table = (Table) plainSelect.getFromItem();
         handleTarget(table, dsl);

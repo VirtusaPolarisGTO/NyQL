@@ -65,7 +65,7 @@ class Table {
     Table mergeJoinClauses(Table table1, Table table2, String type) {
         Table rmost = QUtils.findRightMostTable(table1)
         Table lmost = QUtils.findLeftMostTable(table2)
-        if (rmost.__name == lmost.__name) {
+        if (rmost.__name == lmost.__name && rmost.__alias == lmost.__alias) {
             if (table1 instanceof Join) {
                 if (table2 instanceof Join) {
                     return new Join(table1: table1, table2: table2.table2, _ctx: _ctx, type: type)

@@ -145,7 +145,8 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
     def methodMissing(String name, def args) {
         if (name == '$IMPORT') {
             return this.invokeMethod(name, args)
-            //return
+        } else if (_ctx.tables.containsKey(name)) {
+            return _ctx.tables[name]
         }
 
         try {
