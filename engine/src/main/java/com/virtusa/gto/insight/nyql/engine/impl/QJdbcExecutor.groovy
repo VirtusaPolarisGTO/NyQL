@@ -55,7 +55,7 @@ class QJdbcExecutor implements QExecutor {
     @Override
     def execute(QScript script) throws Exception {
         if (script instanceof QScriptResult) {
-            return script
+            return script.scriptResult
         }
 
         if (script.proxy != null && script.proxy.queryType == QueryType.DB_FUNCTION) {
@@ -257,6 +257,7 @@ class QJdbcExecutor implements QExecutor {
                 for (int i = 0; i < param.length; i++) {
                     statement.setObject(index + i, data.get(i))
                 }
+                return index + param.length
             }
             throw new NyException("Expected a List for the parameter '${param.__name}' having length greater than zero!")
         } else {
