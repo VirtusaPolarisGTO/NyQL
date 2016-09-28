@@ -104,6 +104,10 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
         return table
     }
 
+    def TABLE(QScript qScript) {
+        return TABLE(qScript.proxy)
+    }
+
     def COLUMN(String colName) {
         if (_ctx.columns.containsKey(colName)) {
             return _ctx.columns.get(colName)

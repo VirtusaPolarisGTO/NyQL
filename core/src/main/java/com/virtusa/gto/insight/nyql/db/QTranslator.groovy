@@ -5,9 +5,11 @@ import com.virtusa.gto.insight.nyql.Where.QCondition
 import com.virtusa.gto.insight.nyql.Where.QConditionGroup
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.utils.QUtils
+import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
 import java.util.stream.Collectors
+import java.util.stream.Stream
 
 /**
  * @author Isuru Weerarathna
@@ -122,6 +124,28 @@ trait QTranslator extends QJoins {
             query.append(" WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append("\n")
         }
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
+    }
+
+    QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) {
+        List<AParam> paramList = new LinkedList<>()
+        Stream<Object> stream = queries.stream().map({ q ->
+            if (q instanceof QResultProxy) {
+                paramList.addAll(q.orderedParameters ?: [])
+                return "(" + ___resolve(q, QContextType.UNKNOWN) + ")"
+            } else {
+                return ___resolve(q, QContextType.UNKNOWN, paramList)
+            }
+        });
+
+        String qStr;
+        if (combineType == QueryCombineType.UNION) {
+            qStr = stream.collect(Collectors.joining("\nUNION ALL\n"))
+        } else if (combineType == QueryCombineType.UNION_DISTINCT) {
+            qStr = stream.collect(Collectors.joining("\nUNION\n"))
+        } else {
+            qStr = stream.collect(Collectors.joining("; "))
+        }
+        return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT, qObject: queries)
     }
 
     QResultProxy ___selectQuery(QuerySelect q) {

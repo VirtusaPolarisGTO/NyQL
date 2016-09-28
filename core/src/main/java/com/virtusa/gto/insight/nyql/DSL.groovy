@@ -6,6 +6,7 @@ import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptList
 import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.utils.QUtils
+import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -73,6 +74,30 @@ class DSL {
     ////   Query Related Commands
     ////
     ///////////////////////////////////////////////////////////////////////////////////
+
+    QResultProxy union(Object... qResultProxies) {
+        List list = []
+        for (def q : qResultProxies) {
+            if (q instanceof QResultProxy) {
+                list.add((QResultProxy) q)
+            } else if (q instanceof QScript) {
+                list.add(q.proxy)
+            }
+        }
+        return session.dslContext.qTranslator.___combinationQuery(QueryCombineType.UNION, list);
+    }
+
+    QResultProxy unionDistinct(Object... qResultProxies) {
+        List list = []
+        for (def q : qResultProxies) {
+            if (q instanceof QResultProxy) {
+                list.add((QResultProxy) q)
+            } else if (q instanceof QScript) {
+                list.add(q.proxy)
+            }
+        }
+        return session.dslContext.qTranslator.___combinationQuery(QueryCombineType.UNION_DISTINCT, list);
+    }
 
     QResultProxy dbFunction(String name, List<AParam> paramList) {
         StoredFunction sp = new StoredFunction(name: name, paramList: new ArrayList<AParam>(paramList))

@@ -26,16 +26,7 @@ import java.util.List;
 public class SqlToDSL {
 
     public static void main(String[] args) throws JSQLParserException {
-        Statement stmt = CCJSqlParserUtil.parse("SELECT \n" +
-                "    COUNT(CASE\n" +
-                "        WHEN (dev.scmUserId IS NOT NULL) THEN 1\n" +
-                "        ELSE 0\n" +
-                "    END) AS mappedUserCount,\n" +
-                "    SUM(CASE\n" +
-                "        WHEN (dev.scmUserId IS NULL) THEN 1\n" +
-                "        ELSE 0\n" +
-                "    END) AS unmappedUserCount\n" +
-                "FROM Dev dev\n");
+        Statement stmt = CCJSqlParserUtil.parse("SELECT * FROM Song UNION SELECT * FROM Album");
         if (stmt instanceof Select) {
             System.out.println(visit((Select)stmt));
         } else if (stmt instanceof Update) {

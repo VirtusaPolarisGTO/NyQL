@@ -19,11 +19,15 @@ public class DBExecutor {
         List<Integer> teams = asList(1410, 1411);
         List<Integer> modules = asList(97389, 97390, 97391);
 
+        Map<String, Object> inners = new HashMap<>();
+        //inners.put("abc", "Dsadsads");
+
         data.put("teamIDs", teams);
         data.put("moduleIDs", modules);
         data.put("filmId", 250);
+        data.put("hello", inners);
 
-        Object result = NyQL.parse("insight/unmapped_users", data);
+        Object result = NyQL.parse("insight/test_union", data);
         System.out.println(result);
 
         //NyQL.execute("")
