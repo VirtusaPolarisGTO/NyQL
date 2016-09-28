@@ -1,6 +1,6 @@
 
 
-import com.virtusa.gto.insight.nyql.DSL
+import DSL
 
 import java.sql.JDBCType
 

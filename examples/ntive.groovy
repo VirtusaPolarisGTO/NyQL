@@ -1,4 +1,4 @@
-import com.virtusa.gto.insight.nyql.utils.QueryType
+import QueryType
 
 /**
  * @author IWEERARATHNA
