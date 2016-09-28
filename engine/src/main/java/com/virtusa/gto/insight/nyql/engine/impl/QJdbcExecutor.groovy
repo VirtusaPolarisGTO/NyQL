@@ -19,6 +19,7 @@ import java.sql.CallableStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Savepoint
+import java.sql.Statement
 
 /**
  * @author IWEERARATHNA
@@ -77,16 +78,7 @@ class QJdbcExecutor implements QExecutor {
             Map<String, Object> data = script.qSession.sessionVariables
 
             List<AParam> parameters = script.proxy.orderedParameters
-            for (int i = 0; i < parameters.size(); i++) {
-                AParam param = parameters[i]
-                Object itemValue = data.get(param.__name)
-                if (itemValue == null) {
-                    throw new NyException("Data for parameter '$param.__name' cannot be found!")
-                }
-
-                LOGGER.trace(" Parameter #{} : {} [{}]", (i+1), itemValue, itemValue.class.simpleName)
-                invokeCorrectInput(statement, param, itemValue, i + 1)
-            }
+            assignParameters(statement, parameters, data)
 
             if (script.proxy.queryType == QueryType.SELECT) {
                 if (returnRaw) {
@@ -123,15 +115,7 @@ class QJdbcExecutor implements QExecutor {
 
             List<Map> records = batchData as List<Map>
             for (Map record : records) {
-                for (int i = 0; i < parameters.size(); i++) {
-                    AParam param = parameters[i]
-                    Object itemValue = record.get(param.__name)
-                    if (itemValue == null) {
-                        throw new NyException("Data for parameter '$param.__name' cannot be found!")
-                    }
-
-                    invokeCorrectInput(statement, param, itemValue, i + 1)
-                }
+                assignParameters(statement, parameters, record)
                 statement.addBatch()
             }
 
@@ -205,6 +189,37 @@ class QJdbcExecutor implements QExecutor {
         connection.close()
     }
 
+    private static void assignParameters(PreparedStatement statement, List<AParam> parameters, Map data) {
+        int cp = 1
+        for (int i = 0; i < parameters.size(); i++) {
+            AParam param = parameters[i]
+            Object itemValue = deriveValue(data, param.__name)
+            if (itemValue == null) {
+                throw new NyException("Data for parameter '$param.__name' cannot be found!")
+            }
+
+            LOGGER.trace(" Parameter #{} : {} [{}]", (cp), itemValue, itemValue.class.simpleName)
+            cp = invokeCorrectInput(statement, param, itemValue, cp)
+        }
+    }
+
+    private static Object deriveValue(Map dataMap, String name) {
+        if (name.indexOf('.') > 0) {
+            String[] parts = name.split("[.]");
+            Object res = dataMap;
+            for (String p : parts) {
+                res = res."$p"
+            }
+            if (res == dataMap) {
+                return null
+            }
+            return res
+
+        } else {
+            return dataMap[name];
+        }
+    }
+
     @Override
     void startTransaction() throws NyException {
         getConnection().setAutoCommit(false)
@@ -236,8 +251,18 @@ class QJdbcExecutor implements QExecutor {
         LOGGER.info("Transaction completed.")
     }
 
-    private static void invokeCorrectInput(PreparedStatement statement, AParam param, Object data, int index) {
-        statement.setObject(index, data)
+    private static int invokeCorrectInput(PreparedStatement statement, AParam param, Object data, int index) {
+        if (param.length > 0) {
+            if (data instanceof List) {
+                for (int i = 0; i < param.length; i++) {
+                    statement.setObject(index + i, data.get(i))
+                }
+            }
+            throw new NyException("Expected a List for the parameter '${param.__name}' having length greater than zero!")
+        } else {
+            statement.setObject(index, data)
+            return index + 1
+        }
     }
 
     @Override
