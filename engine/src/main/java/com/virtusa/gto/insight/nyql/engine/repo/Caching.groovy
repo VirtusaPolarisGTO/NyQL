@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
+import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.model.QScript
 
 import java.util.concurrent.ConcurrentHashMap
@@ -32,7 +33,11 @@ class Caching {
     }
 
     Script compileIfAbsent(String scriptId, Function<? extends String, ? extends Script> generator) {
-        return compiledCache.computeIfAbsent(scriptId, generator)
+        if (Configurations.instance().cacheRawScripts()) {
+            return compiledCache.computeIfAbsent(scriptId, generator)
+        } else {
+            return generator.apply(scriptId);
+        }
     }
 
     void clearGeneratedCache() {
