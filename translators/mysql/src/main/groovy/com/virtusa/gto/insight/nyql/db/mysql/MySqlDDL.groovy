@@ -57,7 +57,7 @@ class MySqlDDL implements QDdl {
         StringBuilder query = new StringBuilder("DROP ")
         if (dTable.temporary) query.append("TEMPORARY ")
         query.append("TABLE ")
-        query.append("IF EXIST ")
+        //query.append("IF EXIST ")
         query.append(___ddlResolve(dTable))
         return new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
     }
