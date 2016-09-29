@@ -43,6 +43,15 @@ class QuerySelect extends Query {
         return this
     }
 
+    def JOINING(closure) {
+        JoinClosure joinClosure = new JoinClosure(_ctx, sourceTbl)
+
+        def code = closure.rehydrate(joinClosure, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+    }
+
     def ORDER_BY(Object... columns) {
         orderBy = new ArrayList<>()
         orderBy.addAll(columns)
@@ -60,8 +69,9 @@ class QuerySelect extends Query {
 
         def code = closure.rehydrate(whr, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        groupHaving = code()
+        code()
 
+        groupHaving = whr
         return this
     }
 
