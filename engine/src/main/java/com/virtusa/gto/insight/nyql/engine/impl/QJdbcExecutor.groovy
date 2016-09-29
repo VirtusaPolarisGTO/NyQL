@@ -89,7 +89,7 @@ class QJdbcExecutor implements QExecutor {
                     return transformer.apply(statement.executeQuery())
                 }
             } else {
-                return statement.executeLargeUpdate()
+                return statement.executeUpdate()
             }
 
         } finally {
@@ -119,7 +119,7 @@ class QJdbcExecutor implements QExecutor {
                 statement.addBatch()
             }
 
-            long[] counts = statement.executeLargeBatch()
+            int[] counts = statement.executeBatch()
             connection.commit()
             return counts;
 

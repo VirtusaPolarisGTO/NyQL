@@ -34,7 +34,7 @@ class DSL {
     ////
     ///////////////////////////////////////////////////////////////////////////////////
 
-    DSL script(@DelegatesTo(DSL) closure) {
+    def script(@DelegatesTo(DSL) closure) {
         try {
             session.beingScript()
 

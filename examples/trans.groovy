@@ -8,27 +8,17 @@ def myQ = $DSL.insert {
     TARGET (Song.alias("s"))
 
     DATA (
-        "id": P("id", JDBCType.INTEGER),
-        "name": P("str", JDBCType.VARCHAR)
+        "id": PARAM("id"),
+        "name": PARAM("str")
     )
 
 }
 
 $DSL.script {
 
-    def result = RUN("update")
-
-    for (int i = 0; i < result.size(); i++) {
-        result = RUN "native"
-        println(i + " = " + result)
-    }
-
-    TRANSACTION {
-
-        // do your thing...
-
-        COMMIT()
-    }
+    def result = RUN("sakila/top_customers")
+    $LOG result
 
     return result
+
 }
