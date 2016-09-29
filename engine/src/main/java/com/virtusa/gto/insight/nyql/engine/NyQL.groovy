@@ -20,6 +20,8 @@ class NyQL {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NyQL.class);
 
+    private static final Map<String, Object> EMPTY_MAP = new HashMap<>();
+
     static {
         configure()
 
@@ -48,6 +50,10 @@ class NyQL {
         }
     }
 
+    public static QScript parse(String scriptName) throws NyException {
+        return parse(scriptName, EMPTY_MAP)
+    }
+
     public static QScript parse(String scriptName, Map<String, Object> data) throws NyException {
         QSession qSession = QSession.create()
         if (data) {
@@ -58,6 +64,10 @@ class NyQL {
 
     public static void shutdown() {
         Configurations.instance().shutdown()
+    }
+
+    public static Object execute(String scriptName) throws NyException {
+        return execute(scriptName, EMPTY_MAP);
     }
 
     public static Object execute(String scriptName, Map<String, Object> data) throws NyException {
