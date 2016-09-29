@@ -94,6 +94,10 @@ class Configurations {
         }
     }
 
+    boolean addShutdownHook() {
+        return properties.addAutoShutdownHook ?: false
+    }
+
     void shutdown() {
         QExecutorRegistry.instance.shutdown()
     }

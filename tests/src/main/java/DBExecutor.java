@@ -15,21 +15,25 @@ public class DBExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBExecutor.class);
 
     public static void main(String[] args) throws Exception {
-        Map<String, Object> data = new HashMap<>();
-        List<Integer> teams = asList(1410, 1411);
-        List<Integer> modules = asList(97389, 97390, 97391);
+        try {
+            Map<String, Object> data = new HashMap<>();
+            List<Integer> teams = asList(1410, 1411);
+            List<Integer> modules = asList(97389, 97390, 97391);
 
-        Map<String, Object> inners = new HashMap<>();
-        inners.put("abc", "Dsadsads");
+            Map<String, Object> inners = new HashMap<>();
+            inners.put("abc", "Dsadsads");
 
-        data.put("teamIDs", teams);
-        data.put("moduleIDs", modules);
-        data.put("filmId", 250);
-        data.put("hello", inners);
+            data.put("teamIDs", teams);
+            data.put("moduleIDs", modules);
+            data.put("filmId", 250);
+            data.put("hello", inners);
 
-        QScript result = NyQL.parse("insight/unmapped_users", data);
-        System.out.println(result);
+            QScript result = NyQL.parse("insight/unmapped_users", data);
+            System.out.println(result);
 
+        } finally {
+            NyQL.shutdown();
+        }
         //NyQL.execute("")
         //Quickly.configOnce();
         //parse();

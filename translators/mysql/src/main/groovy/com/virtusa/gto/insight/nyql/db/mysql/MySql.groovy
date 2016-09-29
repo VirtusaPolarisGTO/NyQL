@@ -93,10 +93,10 @@ class MySql implements QTranslator, MySqlFunctions {
             boolean tableHasAlias = column._owner != null && column._owner.__aliasDefined()
             if (tableHasAlias) {
                 return column._owner.__alias + "." + column.__name +
-                        (column.__aliasDefined() ? " AS " + QUtils.quoteIfWS(column.__alias, BACK_TICK) : "")
+                        (column.__aliasDefined() && QContextType.SELECT ? " AS " + QUtils.quoteIfWS(column.__alias, BACK_TICK) : "")
             } else {
                 return QUtils.quoteIfWS(column.__name, BACK_TICK) +
-                        (column.__aliasDefined() ? " AS " + QUtils.quoteIfWS(column.__alias, BACK_TICK) : "")
+                        (column.__aliasDefined() && QContextType.SELECT ? " AS " + QUtils.quoteIfWS(column.__alias, BACK_TICK) : "")
             }
         }
     }

@@ -6,6 +6,7 @@ import com.virtusa.gto.insight.nyql.model.QExecutorRegistry
 import com.virtusa.gto.insight.nyql.model.QRepositoryRegistry
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QSession
+import com.virtusa.gto.insight.nyql.utils.Constants
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.slf4j.Logger
@@ -22,24 +23,37 @@ class NyQL {
 
     private static final Map<String, Object> EMPTY_MAP = new HashMap<>();
 
+    private static final String JSON_CONFIG_FILENAME = "nyql.json";
+
     static {
         configure()
 
-        Runtime.runtime.addShutdownHook(new Thread(new Runnable() {
-            @Override
-            void run() {
-                shutdown()
-            }
-        }));
+        if (Configurations.instance().addShutdownHook()) {
+            LOGGER.warn("Automatically adding a NyQL shutdown hook...")
+            Runtime.runtime.addShutdownHook(new Thread(new Runnable() {
+                @Override
+                void run() {
+                    shutdown()
+                }
+            }));
+        } else {
+            LOGGER.warn("*"*100)
+            LOGGER.warn("You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!")
+            LOGGER.warn("*"*100)
+        }
     }
 
-    private static void configure() {
+    public static void configure(File inputJson=null) {
         if (!Configurations.instance().isConfigured()) {
             LOGGER.warn("NyQL is going to configure with default configurations using classpath...")
-            File nyConfig = new File("nyql.json");
+            File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME);
             if (!nyConfig.exists()) {
+                LOGGER.error("*"*100)
                 LOGGER.error("No nyql.json file is found on classpath! [" + nyConfig.absolutePath + "]")
-                throw new RuntimeException("No nyql.json file is found on classpath! [" + nyConfig.absolutePath + "]");
+                LOGGER.error(" "*50)
+                LOGGER.error("Explicitly call the configure method with configuration input file!")
+                LOGGER.error("*"*100)
+                //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
             } else {
                 LOGGER.debug("Loading configurations from " + nyConfig.absolutePath + "...")
                 Configurations.instance().configure(new JsonSlurper().parse(nyConfig) as Map)
