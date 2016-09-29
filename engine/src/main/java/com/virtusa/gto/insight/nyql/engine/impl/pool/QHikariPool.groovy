@@ -26,6 +26,9 @@ class QHikariPool implements QJdbcPool {
     synchronized void init(Map options) throws NyException {
         HikariConfig config = new HikariConfig();
         //config.setDataSourceClassName(String.valueOf(options.dataSourceClassName))
+        if (options.containsKey("jdbcDriverClass")) {
+            config.setDriverClassName(String.valueOf(options.jdbcDriverClass))
+        }
         config.setJdbcUrl(String.valueOf(options.url))
         config.setUsername(String.valueOf(options.username))
         config.setPassword(String.valueOf(options.password))
