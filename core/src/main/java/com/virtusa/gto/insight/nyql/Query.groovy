@@ -45,7 +45,7 @@ class Query implements FunctionTraits, DataTypeTraits, ScriptTraits {
         return this
     }
 
-    AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName) {
+    AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
         return _ctx.addParam(new AParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName))
     }
 

@@ -13,6 +13,7 @@ trait FunctionTraits {
     def MULTIPLY(Object op1, Object op2)     { return vColumn("op_multiply", op1, op2) }
     def DIVIDE(Object op1, Object op2)     { return vColumn("op_divide", op1, op2) }
     def MODULUS(Object op1, Object op2)     { return vColumn("op_modulus", op1, op2) }
+    def INVERSE(Object op1)     { return DIVIDE(1, op1) }
 
 
     def ASC(Column column)      { return fColumn(column, "asc") }
