@@ -40,6 +40,17 @@ class QueryPart extends Query {
         return this
     }
 
+    QueryPart JOIN(Table startTable, closure) {
+        JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
+
+        def code = closure.rehydrate(joinClosure, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        sourceTbl = joinClosure.activeTable
+        return this
+    }
+
     QueryPart SET(closure) {
         Assign ass = new Assign(_ctx)
 

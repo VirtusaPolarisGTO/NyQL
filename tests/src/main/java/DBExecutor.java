@@ -26,7 +26,7 @@ public class DBExecutor {
             data.put("teamIDs", teams);
             data.put("moduleIDs", modules);
             data.put("filmId", 250);
-            data.put("hello", inners);
+            //data.put("hello", inners);
 
             QScript result = NyQL.parse("insight/unmapped_users", data);
             System.out.println(result);

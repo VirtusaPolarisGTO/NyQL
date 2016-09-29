@@ -34,6 +34,8 @@ def innQ = $DSL.select {
     TOP 1
 }
 
+def innVal = [1, 2, 3]
+
 $DSL.select {
 
     TARGET (TABLE("Devs").alias("dev"))
@@ -41,7 +43,7 @@ $DSL.select {
 //    JOIN {
 //        TARGET() INNER_JOIN TABLE("Hello").alias("he") ON (dev.all, he.id)
 //    }
-    JOINING {
+    JOIN (TARGET()) {
         INNER_JOIN (TABLE("Hello").alias("he")) ON (dev.all, he.id)
         if ($SESSION.hello) {
             INNER_JOIN(TABLE("User").alias("us")) ON(he.id, us.id)
@@ -55,7 +57,8 @@ $DSL.select {
 
 
     WHERE {
-        //IN (dev.users, innQ)
+        IN (dev.users, innVal)
+        AND
         EQ (dev.all, 1)
         AND (EQ (1,1))
     }

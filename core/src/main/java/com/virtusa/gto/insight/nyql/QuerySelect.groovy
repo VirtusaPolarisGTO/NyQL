@@ -43,8 +43,8 @@ class QuerySelect extends Query {
         return this
     }
 
-    def JOINING(closure) {
-        JoinClosure joinClosure = new JoinClosure(_ctx, sourceTbl)
+    def JOIN(Table startTable, closure) {
+        JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
         def code = closure.rehydrate(joinClosure, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY

@@ -12,7 +12,7 @@ class DTable extends DAbstractEntity {
     List<DKey> keys = []
 
     boolean temporary = false
-    boolean ifNotExist = true
+    boolean ifNotExist = false
 
     DTable FIELD(String name, DFieldType type, Map details=null) {
         DField dField = DField.parseFrom(details)
