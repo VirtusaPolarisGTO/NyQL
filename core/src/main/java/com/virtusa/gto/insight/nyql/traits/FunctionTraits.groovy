@@ -8,6 +8,13 @@ import com.virtusa.gto.insight.nyql.FunctionColumn
  */
 trait FunctionTraits {
 
+    def ADD(Object... cols)     { return vColumn("op_add", cols) }
+    def MINUS(Object op1, Object op2)     { return vColumn("op_minus", op1, op2) }
+    def MULTIPLY(Object op1, Object op2)     { return vColumn("op_multiply", op1, op2) }
+    def DIVIDE(Object op1, Object op2)     { return vColumn("op_divide", op1, op2) }
+    def MODULUS(Object op1, Object op2)     { return vColumn("op_modulus", op1, op2) }
+
+
     def ASC(Column column)      { return fColumn(column, "asc") }
     def DESC(Column column)     { return fColumn(column, "desc") }
     def COUNT(Column column)    { return fColumn(column, "count") }

@@ -38,7 +38,8 @@ $DSL.select {
 
     TARGET (TABLE("Devs").alias("dev"))
 
-    FETCH (COUNT(CASE {WHEN {NOTNULL (dev.scmUserId) } THEN {1} ELSE {0}} ).alias("mappedUserCount"),
+    FETCH (ADD(dev.id, MINUS(dev.x, dev.no)),
+            COUNT(CASE {WHEN {NOTNULL (dev.scmUserId) } THEN {1} ELSE {0}} ).alias("mappedUserCount"),
             SUM(CASE {WHEN {ISNULL (dev.scmUserId) } THEN {1} ELSE {0}} ).alias("unmappedUserCount"))
 
     WHERE {

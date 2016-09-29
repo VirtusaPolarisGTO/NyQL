@@ -3,6 +3,7 @@ package com.virtusa.gto.insight.nyql.db
 import com.virtusa.gto.insight.nyql.FunctionColumn
 import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 
 import java.util.stream.Collectors
 
@@ -176,4 +177,48 @@ trait QFunctions {
         else return "MAX(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")"
     }
 
+    def op_add = {
+        if (it instanceof List) {
+            it.stream().map({ op -> return ___resolve(op, QContextType.INSIDE_FUNCTION) })
+                    .collect(Collectors.joining(" + ", "(", ")"))
+        } else {
+            throw new NySyntaxException("Add operation requires at least two operands!")
+        }
+    }
+
+    def op_minus = {
+        if (it instanceof List) {
+            return "(" + ___resolve(it[0], QContextType.INSIDE_FUNCTION) +
+                    " - " + ___resolve(it[1], QContextType.INSIDE_FUNCTION) + ")"
+        } else {
+            throw new NySyntaxException("Add operation requires at least two operands!")
+        }
+    }
+
+    def op_multiply = {
+        if (it instanceof List) {
+            return "(" + ___resolve(it[0], QContextType.INSIDE_FUNCTION) +
+                    " * " + ___resolve(it[1], QContextType.INSIDE_FUNCTION) + ")"
+        } else {
+            throw new NySyntaxException("Add operation requires at least two operands!")
+        }
+    }
+
+    def op_divide = {
+        if (it instanceof List) {
+            return "(" + ___resolve(it[0], QContextType.INSIDE_FUNCTION) +
+                    " / " + ___resolve(it[1], QContextType.INSIDE_FUNCTION) + ")"
+        } else {
+            throw new NySyntaxException("Add operation requires at least two operands!")
+        }
+    }
+
+    def op_modulus = {
+        if (it instanceof List) {
+            return "(" + ___resolve(it[0], QContextType.INSIDE_FUNCTION) +
+                    " % " + ___resolve(it[0], QContextType.INSIDE_FUNCTION) + ")"
+        } else {
+            throw new NySyntaxException("Add operation requires at least two operands!")
+        }
+    }
 }
