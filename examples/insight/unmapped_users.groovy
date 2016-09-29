@@ -38,13 +38,19 @@ $DSL.select {
 
     TARGET (TABLE("Devs").alias("dev"))
 
-    FETCH (dev.all, INVERSE(dev.x).alias("xxx"),
+    JOIN {
+        TARGET() INNER_JOIN TABLE("Hello").alias("he") ON (dev.all, he.id)
+    }
+
+    FETCH (dev.all.alias("xxx"),
             IFNULL(dev.a, PARAM("threshold")),
             COUNT(CASE {WHEN {NOTNULL (dev.scmUserId) } THEN {1} ELSE {0}} ).alias("mappedUserCount"),
             SUM(CASE {WHEN {ISNULL (dev.scmUserId) } THEN {1} ELSE {0}} ).alias("unmappedUserCount"))
 
+
     WHERE {
-        IN (dev.users, innQ)
+        //IN (dev.users, innQ)
+        EQ (dev.all, 1)
         AND (EQ (1,1))
     }
 }
