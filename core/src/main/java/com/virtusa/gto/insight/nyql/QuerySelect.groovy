@@ -50,6 +50,8 @@ class QuerySelect extends Query {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
+        _joiningTable = joinClosure.activeTable
+        return this
     }
 
     def ORDER_BY(Object... columns) {

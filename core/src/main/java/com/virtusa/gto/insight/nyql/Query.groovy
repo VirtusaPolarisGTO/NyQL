@@ -43,44 +43,6 @@ class Query extends AbstractClause {
         return this
     }
 
-    def propertyMissing(String name) {
-        if (name == Constants.DSL_SESSION_WORD) {
-            return _ctx.ownerSession.sessionVariables
-        }
 
-        Column col = _ctx.getColumnIfExist(name)
-        if (col != null) {
-            return col
-        }
-
-        if (_ctx.tables.containsKey(name)) {
-            return _ctx.tables[name]
-        } else if (Character.isUpperCase(name.charAt(0))) {
-            // table name
-            Table table = new Table(__name: name, _ctx: _ctx)
-            _ctx.tables.put(name, table)
-            return table
-        } else {
-            def column = _ctx.getTheOnlyTable()?.COLUMN(name)
-            if (column != null) {
-                return column
-            }
-            throw new Exception("No table by name '$name' found!")
-        }
-    }
-
-    def methodMissing(String name, def args) {
-        if (name == '$IMPORT') {
-            return this.invokeMethod(name, args)
-        } else if (_ctx.tables.containsKey(name)) {
-            return _ctx.tables[name]
-        }
-
-        try {
-            return _ctx.translator.invokeMethod(name, args)
-        } catch (Exception ignored) {
-            throw new Exception("Unsupported function for $_ctx.translatorName is found! (Function: '$name')")
-        }
-    }
 
 }

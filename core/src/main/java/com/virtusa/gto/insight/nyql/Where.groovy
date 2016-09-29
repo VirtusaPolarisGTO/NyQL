@@ -28,7 +28,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         Where inner = new Where(_ctx)
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        inner = code()
+        code()
         clauses.add(new QConditionGroup(where: inner, condConnector: "AND"))
         return this
     }
@@ -37,7 +37,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         Where inner = new Where(_ctx)
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        inner = code()
+        code()
         clauses.add(new QConditionGroup(where: inner, condConnector: "OR"))
         return this
     }

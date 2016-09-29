@@ -21,7 +21,7 @@ def innQ = $DSL.select {
             GTE(sut.date, 1474684200000)
             LTE(sut.date, 1474684201000)
 
-            if ($SESSION.hello.abc != null) {
+            if ($SESSION.hello?.abc != null) {
                 EQ(m.is_removed, PARAM("memem"))
             }
             //EQ(sut.team_id, 1)
@@ -38,8 +38,14 @@ $DSL.select {
 
     TARGET (TABLE("Devs").alias("dev"))
 
-    JOIN {
-        TARGET() INNER_JOIN TABLE("Hello").alias("he") ON (dev.all, he.id)
+//    JOIN {
+//        TARGET() INNER_JOIN TABLE("Hello").alias("he") ON (dev.all, he.id)
+//    }
+    JOINING {
+        INNER_JOIN (TABLE("Hello").alias("he")) ON (dev.all, he.id)
+        if ($SESSION.hello) {
+            INNER_JOIN(TABLE("User").alias("us")) ON(he.id, us.id)
+        }
     }
 
     FETCH (dev.all.alias("xxx"),
