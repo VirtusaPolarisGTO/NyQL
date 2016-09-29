@@ -35,52 +35,23 @@ class Table {
      * @return new join instance
      */
     def INNER_JOIN(Table t) {
-        return mergeJoinClauses(this, t, "INNER_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, "INNER_JOIN")
     }
 
     def LEFT_OUTER_JOIN(Table t) {
-        return mergeJoinClauses(this, t, "LEFT_OUTER_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, "LEFT_OUTER_JOIN")
     }
 
     def RIGHT_OUTER_JOIN(Table t) {
-        return mergeJoinClauses(this, t, "RIGHT_OUTER_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, "RIGHT_OUTER_JOIN")
     }
 
     def RIGHT_JOIN(Table t) {
-        return mergeJoinClauses(this, t, "RIGHT_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, "RIGHT_JOIN")
     }
 
     def LEFT_JOIN(Table t) {
-        return mergeJoinClauses(this, t, "LEFT_JOIN")
-    }
-
-    def FULL_OUTER_JOIN(Table t) {
-        return mergeJoinClauses(this, t, "FULL_OUTER_JOIN")
-    }
-
-    def FULL_JOIN(Table t) {
-        return mergeJoinClauses(this, t, "FULL_JOIN")
-    }
-
-    Table mergeJoinClauses(Table table1, Table table2, String type) {
-        Table rmost = QUtils.findRightMostTable(table1)
-        Table lmost = QUtils.findLeftMostTable(table2)
-        if (rmost.__name == lmost.__name && rmost.__alias == lmost.__alias) {
-            if (table1 instanceof Join) {
-                if (table2 instanceof Join) {
-                    return new Join(table1: table1, table2: table2.table2, _ctx: _ctx, type: type)
-                } else {
-                    return table1
-                }
-            } else {
-                if (table2 instanceof Join) {
-                    return table2
-                } else {
-                    throw new NySyntaxException("Merging same table!")
-                }
-            }
-        }
-        return new Join(table1: table1, table2: table2, _ctx: _ctx, type: type)
+        return QUtils.mergeJoinClauses(_ctx, this, t, "LEFT_JOIN")
     }
 
     def alias(String newName) {

@@ -1,8 +1,10 @@
 package com.virtusa.gto.insight.nyql.utils
 
 import com.virtusa.gto.insight.nyql.Join
+import com.virtusa.gto.insight.nyql.QContext
 import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.Table
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import org.apache.commons.lang3.StringUtils
 
 /**
@@ -28,6 +30,27 @@ class QUtils {
         } else {
             return text
         }
+    }
+
+    static Table mergeJoinClauses(QContext ctx, Table table1, Table table2, String type) {
+        Table rmost = findRightMostTable(table1)
+        Table lmost = findLeftMostTable(table2)
+        if (rmost.__name == lmost.__name && rmost.__alias == lmost.__alias) {
+            if (table1 instanceof Join) {
+                if (table2 instanceof Join) {
+                    return new Join(table1: table1, table2: table2.table2, _ctx: ctx, type: type)
+                } else {
+                    return table1
+                }
+            } else {
+                if (table2 instanceof Join) {
+                    return table2
+                } else {
+                    throw new NySyntaxException("Merging same table!")
+                }
+            }
+        }
+        return new Join(table1: table1, table2: table2, _ctx: ctx, type: type)
     }
 
     static Table findLeftMostTable(Table table) {
