@@ -9,7 +9,7 @@ def myQ = $DSL.select {
 
     WHERE {
 
-        BETWEEN (r.customer_id, PARAM("start"), PARAM("end"))
+        LIKE (r.customer_id, PARAM("start"))
 
     }
 

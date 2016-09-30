@@ -140,7 +140,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def IN(Object c1, Object... cs) {
-        if (cs == null || cs.length == 1) {
+        if (cs == null) {
             return ON(c1, _ctx.translator.OP_IN(), cs == null ? null : cs[0])
         } else {
             List list = new LinkedList()
@@ -150,7 +150,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def NOTIN(Object c1, Object... cs) {
-        if (cs == null || cs.length == 1) {
+        if (cs == null) {
             return ON(c1, _ctx.translator.OP_NOTIN(), cs == null ? null : cs[0])
         } else {
             List list = new LinkedList()

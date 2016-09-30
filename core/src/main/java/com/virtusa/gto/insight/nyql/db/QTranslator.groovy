@@ -300,6 +300,22 @@ trait QTranslator extends QJoins {
         }
     }
 
+    void ___scanForParameters(def expression, List<AParam> paramOrder) {
+        if (expression instanceof AParam) {
+            paramOrder?.add((AParam)expression)
+        }
+        if (expression instanceof QResultProxy) {
+            QResultProxy resultProxy = expression
+            paramOrder?.addAll(resultProxy.orderedParameters ?: [])
+        }
+        if (expression instanceof FunctionColumn) {
+            ___expandColumn((FunctionColumn)expression, paramOrder)
+        }
+        if (expression instanceof List) {
+            expression.each { ___scanForParameters(it, paramOrder) }
+        }
+    }
+
     String ___expandConditions(Where where, List<AParam> paramOrder, QContextType contextType=QContextType.UNKNOWN) {
         StringBuilder builder = new StringBuilder()
         List<Object> clauses = where.clauses
@@ -317,21 +333,11 @@ trait QTranslator extends QJoins {
     }
 
     String ___expandCondition(QCondition c, List<AParam> paramOrder, QContextType contextType) {
-        boolean parenthesis = false
         if (c.leftOp instanceof AParam) {
             paramOrder?.add((AParam)c.leftOp)
         }
-        if (c.rightOp instanceof AParam) {
-            paramOrder?.add((AParam)c.rightOp)
-        }
-        if (c.rightOp instanceof QResultProxy) {
-            parenthesis = true
-            QResultProxy resultProxy = c.rightOp
-            paramOrder?.addAll(resultProxy.orderedParameters ?: [])
-        }
-        if (c.rightOp instanceof FunctionColumn) {
-            ___expandColumn((FunctionColumn)c.rightOp, paramOrder)
-        }
+        ___scanForParameters(c.rightOp, paramOrder)
+        boolean parenthesis = (c.rightOp instanceof QResultProxy)
 
         return ___resolve(c.leftOp, contextType) +
                 (c.op.length() > 0 ? " " + c.op + " " : " ") +
@@ -352,7 +358,6 @@ trait QTranslator extends QJoins {
     }
 
     String ___expandAssignments(Assign assign, List<AParam> paramOrder, QContextType contextType=QContextType.UNKNOWN) {
-        //StringBuilder builder = new StringBuilder()
         List<Object> clauses = assign.assignments
         List<String> derived = new ArrayList<>()
         for (c in clauses) {
@@ -362,16 +367,7 @@ trait QTranslator extends QJoins {
                 if (c.leftOp instanceof AParam) {
                     paramOrder.add((AParam)c.leftOp)
                 }
-                if (c.rightOp instanceof AParam) {
-                    paramOrder.add((AParam)c.rightOp)
-                }
-                if (c.rightOp instanceof QResultProxy) {
-                    QResultProxy resultProxy = c.rightOp
-                    paramOrder?.addAll(resultProxy.orderedParameters ?: [])
-                }
-                if (c.rightOp instanceof FunctionColumn) {
-                    ___expandColumn((FunctionColumn)c.rightOp, paramOrder)
-                }
+                ___scanForParameters(c.rightOp, paramOrder)
 
                 derived.add(___resolve(c.leftOp, QContextType.CONDITIONAL, paramOrder) + " " + c.op + " " + ___resolve(c.rightOp, QContextType.CONDITIONAL, paramOrder))
              }
