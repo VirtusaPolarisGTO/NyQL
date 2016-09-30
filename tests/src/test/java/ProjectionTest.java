@@ -9,7 +9,7 @@ import org.junit.Test;
 public class ProjectionTest extends AbstractTest {
 
     @Test
-    public void testFirst() throws NyException {
+    public void testBasic() throws NyException {
         Object result = NyQL.parse("projection/basic_projection");
         assertQueries(result);
     }
@@ -17,6 +17,11 @@ public class ProjectionTest extends AbstractTest {
     @Test
     public void testImports() throws NyException {
         assertQueries(NyQL.parse("projection/import_projection"));
+    }
+
+    @Test
+    public void testFuncs() throws NyException {
+        assertQueries(NyQL.parse("projection/func_projection"));
     }
 
 
