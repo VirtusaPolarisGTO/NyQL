@@ -26,6 +26,13 @@ class NyQL {
     private static final String JSON_CONFIG_FILENAME = "nyql.json";
 
     static {
+        if (!Boolean.parseBoolean(System.getProperty("nyql.autoConfig", "true"))) {
+            LOGGER.warn("*"*100)
+            LOGGER.warn("You MUST EXPLICITLY Call Configure with nyql configuration json file!")
+            LOGGER.warn("*"*100)
+            return;
+        }
+
         configure()
 
         if (Configurations.instance().addShutdownHook()) {
@@ -56,7 +63,9 @@ class NyQL {
                 //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
             } else {
                 LOGGER.debug("Loading configurations from " + nyConfig.absolutePath + "...")
-                Configurations.instance().configure(new JsonSlurper().parse(nyConfig) as Map)
+                Map configData = new JsonSlurper().parse(nyConfig) as Map
+                configData.put("_location", new File(".").absolutePath)
+                Configurations.instance().configure(configData)
             }
 
         } else {

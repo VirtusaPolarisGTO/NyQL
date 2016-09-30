@@ -66,6 +66,13 @@ class QScriptsFolder implements QScriptMapper {
         String path = args.baseDir;
         File dir = new File(path);
         if (!dir.exists()) {
+            String configFilePath = args._location;
+            if (configFilePath != null) {
+                File activeDir = new File(configFilePath).canonicalFile.getParentFile()
+                if (activeDir.exists() && !dir.isAbsolute()) {
+                    return new QScriptsFolder(activeDir.toPath().resolve(path).toFile())
+                }
+            }
             throw new NyException("Given script folder does not exist! [" + args[0] + "]")
         }
         return new QScriptsFolder(dir);

@@ -15,17 +15,23 @@ public class DBExecutor {
     public static void main(String[] args) throws Exception {
         try {
             Map<String, Object> data = new HashMap<>();
-            List<Integer> teams = asList(1410, 1411);
+            List<Integer> teams = asList(1410);
             List<Integer> modules = asList(97389, 97390, 97391);
+
+            Map<String, Object> deeper = new HashMap<>();
+            deeper.put("cid", 100);
 
             Map<String, Object> inners = new HashMap<>();
             inners.put("abc", "Dsadsads");
+            inners.put("cids", deeper);
 
             data.put("teamIDs", teams);
             data.put("moduleIDs", modules);
             data.put("filmId", 250);
             data.put("start", 100);
             data.put("cost", 200);
+
+            data.put("amap", inners);
 
             //data.put("hello", inners);
 

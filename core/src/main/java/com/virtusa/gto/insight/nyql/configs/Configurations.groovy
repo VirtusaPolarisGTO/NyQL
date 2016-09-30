@@ -73,6 +73,8 @@ class Configurations {
         List repos = properties.repositories ?: []
         for (Map r : repos) {
             Map args = r.mapperArgs ?: [:]
+            args.put("_location", properties._location)
+
             boolean thisDef = r.name == defRepo
             QScriptMapper scriptMapper = Class.forName(String.valueOf(r.mapper)).createNew(args)
             QRepository qRepository = (QRepository) Class.forName(String.valueOf(r.repo)).newInstance([scriptMapper].toArray())

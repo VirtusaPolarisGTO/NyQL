@@ -36,6 +36,10 @@ class QJdbcExecutor implements QExecutor {
     private boolean returnRaw = false
     private boolean reusable = false
 
+    QJdbcExecutor(Connection yourConnection) {
+        connection = yourConnection
+    }
+
     QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher) {
         this(jdbcPoolFetcher, false)
     }

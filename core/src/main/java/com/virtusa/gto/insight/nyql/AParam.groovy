@@ -17,7 +17,6 @@ class AParam {
     int length = 0
 
     ParamScope scope
-
     String __mappingParamName
 
     AParam alias(String theAlias) {

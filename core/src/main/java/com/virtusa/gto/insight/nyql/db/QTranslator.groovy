@@ -257,6 +257,8 @@ trait QTranslator extends QJoins {
                 }
                 List otherColumns = c.rawObject as List
                 finalCols.addAll(otherColumns)
+            } else if (c instanceof List) {
+                finalCols.addAll(c);
             } else {
                 finalCols.add(c)
             }
