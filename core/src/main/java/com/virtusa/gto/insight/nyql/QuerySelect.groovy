@@ -78,7 +78,10 @@ class QuerySelect extends Query {
     }
 
     def FETCH(Object... columns) {
-        projection = new ArrayList<>()
+        if (projection == null) {
+            projection = new LinkedList<>()
+        }
+
         if (columns != null) {
             projection.addAll(columns)
         }
