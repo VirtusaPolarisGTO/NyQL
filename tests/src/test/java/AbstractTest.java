@@ -2,9 +2,7 @@ import com.virtusa.gto.insight.nyql.QResultProxy;
 import com.virtusa.gto.insight.nyql.engine.NyQL;
 import com.virtusa.gto.insight.nyql.model.QScript;
 import com.virtusa.gto.insight.nyql.model.QScriptResult;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.*;
 
 import java.io.File;
 import java.util.List;
@@ -51,6 +49,20 @@ public class AbstractTest {
         } else {
             throw new RuntimeException("Unknown result type from test script!");
         }
+    }
+
+    @Before
+    public void doBefore() {
+        System.out.println("***********************************************************************************************");
+        System.out.println("  Running Tests @ " + this.getClass().getSimpleName());
+        System.out.println("***********************************************************************************************");
+    }
+
+    @After
+    public void doAfter() {
+        System.out.println("-----------------------------------------------------------------------------------------------");
+        System.out.println("  Test Run Completed @ " + this.getClass().getSimpleName());
+        System.out.println("-----------------------------------------------------------------------------------------------");
     }
 
     @BeforeClass
