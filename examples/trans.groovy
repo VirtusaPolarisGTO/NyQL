@@ -3,20 +3,21 @@ import java.sql.JDBCType
 /**
  * @author IWEERARATHNA
  */
-def myQ = $DSL.insert {
+def myQ = $DSL.select {
 
-    TARGET (Song.alias("s"))
+    TARGET (Rental.alias("r"))
 
-    DATA (
-        "id": PARAM("id"),
-        "name": PARAM("str")
-    )
+    WHERE {
+
+        BETWEEN (r.customer_id, PARAM("start"), PARAM("end"))
+
+    }
 
 }
 
 $DSL.script {
 
-    def result = RUN("sakila/top_customers")
+    def result = RUN(myQ)
     $LOG result
 
     return result

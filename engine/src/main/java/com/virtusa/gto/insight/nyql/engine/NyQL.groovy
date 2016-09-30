@@ -69,7 +69,7 @@ class NyQL {
     }
 
     public static QScript parse(String scriptName, Map<String, Object> data) throws NyException {
-        QSession qSession = QSession.create()
+        QSession qSession = QSession.create(scriptName)
         if (data) {
             qSession.sessionVariables.putAll(data)
         }

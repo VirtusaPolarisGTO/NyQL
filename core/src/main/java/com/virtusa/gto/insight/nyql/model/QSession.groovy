@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class QSession {
 
+    String scriptId
     Map<String, Object> sessionVariables = [:] as ConcurrentHashMap
 
     QRepository scriptRepo
@@ -22,14 +23,16 @@ class QSession {
 
     private QSession() {}
 
-    static QSession create() {
-        return create(DSLContext.getActiveDSLContext(),
+    static QSession create(String theScriptId) {
+        QSession qSession = createSession(DSLContext.getActiveDSLContext(),
                 QRepositoryRegistry.instance.defaultRepository(),
                 null,
                 QExecutorRegistry.instance.defaultExecutorFactory())
+        qSession.scriptId = theScriptId
+        return qSession
     }
 
-    static QSession create(DSLContext context, QRepository repository, QExecutor executor, QExecutorFactory executorFactory) {
+    private static QSession createSession(DSLContext context, QRepository repository, QExecutor executor, QExecutorFactory executorFactory) {
         QSession session = new QSession()
 
         session.dslContext = context

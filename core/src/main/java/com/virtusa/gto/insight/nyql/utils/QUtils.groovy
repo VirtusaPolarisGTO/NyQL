@@ -24,6 +24,10 @@ class QUtils {
         return StringUtils.containsWhitespace(text)
     }
 
+    static String classNameFromScriptId(String scriptId) {
+        return StringUtils.substringAfterLast(scriptId, "/");
+    }
+
     static String quoteIfWS(String text, String c="`") {
         if (hasWS(text)) {
             return quote(text, c)

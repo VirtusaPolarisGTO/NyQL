@@ -288,6 +288,18 @@ trait QTranslator extends QJoins {
         }
     }
 
+    void ___expandColumn(Column column, List<AParam> paramList) {
+        if (column instanceof FunctionColumn && column._columns != null) {
+            column._columns.each {
+                if (it instanceof FunctionColumn) {
+                    ___expandColumn(it, paramList)
+                } else if (it instanceof AParam) {
+                    paramList.add(it)
+                }
+            }
+        }
+    }
+
     String ___expandConditions(Where where, List<AParam> paramOrder, QContextType contextType=QContextType.UNKNOWN) {
         StringBuilder builder = new StringBuilder()
         List<Object> clauses = where.clauses
@@ -316,6 +328,9 @@ trait QTranslator extends QJoins {
             parenthesis = true
             QResultProxy resultProxy = c.rightOp
             paramOrder?.addAll(resultProxy.orderedParameters ?: [])
+        }
+        if (c.rightOp instanceof FunctionColumn) {
+            ___expandColumn((FunctionColumn)c.rightOp, paramOrder)
         }
 
         return ___resolve(c.leftOp, contextType) +
@@ -354,6 +369,10 @@ trait QTranslator extends QJoins {
                     QResultProxy resultProxy = c.rightOp
                     paramOrder?.addAll(resultProxy.orderedParameters ?: [])
                 }
+                if (c.rightOp instanceof FunctionColumn) {
+                    ___expandColumn((FunctionColumn)c.rightOp, paramOrder)
+                }
+
                 derived.add(___resolve(c.leftOp, QContextType.CONDITIONAL, paramOrder) + " " + c.op + " " + ___resolve(c.rightOp, QContextType.CONDITIONAL, paramOrder))
              }
         }

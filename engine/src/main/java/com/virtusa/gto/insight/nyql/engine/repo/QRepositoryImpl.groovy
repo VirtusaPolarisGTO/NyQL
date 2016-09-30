@@ -2,13 +2,11 @@ package com.virtusa.gto.insight.nyql.engine.repo
 
 import com.virtusa.gto.insight.nyql.QResultProxy
 import com.virtusa.gto.insight.nyql.configs.Configurations
-import com.virtusa.gto.insight.nyql.exceptions.NyException
-import com.virtusa.gto.insight.nyql.model.*
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptParseException
-import groovy.json.JsonParser
-import groovy.json.JsonSlurper
+import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.model.*
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer

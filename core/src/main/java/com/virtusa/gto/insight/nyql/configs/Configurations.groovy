@@ -118,6 +118,10 @@ class Configurations {
         return properties.activate
     }
 
+    boolean compileAtStartup() {
+        return (boolean) (properties.caching.compileAtStartUp ?: false)
+    }
+
     boolean cacheRawScripts() {
         return (boolean) properties.caching.compiledScripts
     }

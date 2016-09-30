@@ -1,10 +1,8 @@
 import com.virtusa.gto.insight.nyql.engine.NyQL;
-import com.virtusa.gto.insight.nyql.engine.Quickly;
 import com.virtusa.gto.insight.nyql.model.QScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -26,6 +24,9 @@ public class DBExecutor {
             data.put("teamIDs", teams);
             data.put("moduleIDs", modules);
             data.put("filmId", 250);
+            data.put("start", 100);
+            data.put("end", 200);
+
             //data.put("hello", inners);
 
             //QScript result = NyQL.parse("insight/unmapped_users", data);
@@ -49,7 +50,7 @@ public class DBExecutor {
         data.put("moduleIDs", modules);
         data.put("filmId", 250);
 
-        QScript result = Quickly.parse("select", data);
+        QScript result = NyQL.parse("select", data);
         System.out.println(result);
     }
 
@@ -59,7 +60,7 @@ public class DBExecutor {
         data.put("customerId", 2);
         data.put("filmId", 250);
 
-        Object result = Quickly.execute("top_customers", data);
+        Object result = NyQL.execute("top_customers", data);
         if (result instanceof List) {
             for (Object row : (List)result) {
                 LOGGER.debug(row.toString());

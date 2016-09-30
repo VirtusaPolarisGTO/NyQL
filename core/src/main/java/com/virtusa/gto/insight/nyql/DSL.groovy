@@ -296,12 +296,12 @@ class DSL {
     ///////////////////////////////////////////////////////////////////////////////////
 
     DSL $LOG(Object msg) {
-        LOGGER.debug(String.valueOf(msg))
+        LOGGER.debug("[@ " + session.scriptId + " @]" + String.valueOf(msg))
         return this
     }
 
     DSL $LOG(String message) {
-        LOGGER.debug(message)
+        LOGGER.debug("[@ " + session.scriptId.toUpperCase() + " @]" + message)
         return this
     }
 
