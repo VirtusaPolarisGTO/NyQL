@@ -115,6 +115,19 @@ class QUtils {
         }
     }
 
+    static void expandToList(List list, Object... items) {
+        if (items == null) {
+            return
+        }
+        for (def item : items) {
+            if (item instanceof List) {
+                item.each { expandToList(list, it) }
+            } else {
+                list.add(item)
+            }
+        }
+    }
+
     private String __wrapF(def c, String funcName) {
         if (c instanceof String)
             return funcName + "($c)"

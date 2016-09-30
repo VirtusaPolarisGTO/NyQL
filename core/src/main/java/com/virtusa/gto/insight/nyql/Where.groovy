@@ -61,16 +61,15 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     def AND(Closure closure) {
         AND()
 
-        Where inner = new Where(_ctx)
-        def code = closure.rehydrate(inner, this, this)
+        def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        inner = code()
-        clauses.add(new QConditionGroup(where: inner, condConnector: ""))
+        code()
         return this
     }
 
-    def OR(closure) {
+    def OR(Closure closure) {
         OR()
+
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
@@ -112,6 +111,9 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def NEQ(Object c1, Object c2) {
+        if (c2 == null) {
+            return NOTNULL(c1)
+        }
         return ON(c1, "<>", c2)
     }
 
@@ -140,21 +142,23 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def IN(Object c1, Object... cs) {
-        if (cs == null) {
-            return ON(c1, _ctx.translator.OP_IN(), cs == null ? null : cs[0])
-        } else {
+        if (cs != null) {
             List list = new LinkedList()
-            list.addAll(cs)
+            QUtils.expandToList(list, cs)
+            if (list.size() == 0) {
+                list.add(null)
+            }
             return ON(c1, _ctx.translator.OP_IN(), list)
         }
     }
 
     def NOTIN(Object c1, Object... cs) {
-        if (cs == null) {
-            return ON(c1, _ctx.translator.OP_NOTIN(), cs == null ? null : cs[0])
-        } else {
+        if (cs != null) {
             List list = new LinkedList()
-            list.addAll(cs)
+            QUtils.expandToList(list, cs)
+            if (list.size() == 0) {
+                list.add(null)
+            }
             return ON(c1, _ctx.translator.OP_NOTIN(), list)
         }
     }
@@ -210,7 +214,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         if (name == "AND" || name == "OR") {
             if (args.getClass().isArray() && args[0] instanceof Where) {
                 ((Where) args[0]).appendOneLastBefore(" " + name + " ");
-                return this
+                return
             }
         }
         throw new NySyntaxException("Unknown function detected! [Name: '$name', params: $args]")

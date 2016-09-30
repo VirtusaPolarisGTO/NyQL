@@ -49,8 +49,9 @@ class Case extends Column implements DataTypeTraits {
 
         def code = closure.rehydrate(whr, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        __lastWhere = code()
+        code()
 
+        __lastWhere = whr
         return this
     }
 

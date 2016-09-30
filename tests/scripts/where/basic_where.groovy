@@ -45,8 +45,9 @@
             }
             AND
             LT (f.release_year, 2015)
-            OR
-            LTE (f.length, PARAM("y2017"))
+            OR {
+                LTE(f.length, PARAM("y2017"))
+            }
         }
     },
     "SELECT * FROM `Film` f " +
@@ -81,8 +82,9 @@
                 EQ (f.film_id, 123)
                 NEQ (f.title, STR("MOULIN WAKE"))
             }
-            AND
-            LIKE (f.description, STR("%Dragon%"))
+            AND {
+                LIKE(f.description, STR("%Dragon%"))
+            }
             AND
             NOTLIKE (f.title, STR("%Fairy"))
         }
@@ -118,11 +120,11 @@
         FETCH ()
         WHERE {
             NOTBETWEEN (f.rental_rate, 2.99, 5.0)
-            AND (IN (f.language_id, PARAM("singleList", $SESSION.singleList.size())))
+            OR (IN (f.language_id, PARAM("singleList", $SESSION.singleList.size())))
         }
     },
     "SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id IN (?)",
+            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 OR f.language_id IN (?)",
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -134,4 +136,28 @@
     },
     "SELECT * FROM `Film` f " +
             "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id IN (?, ?)",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            EQ (f.language_id, null)
+            AND
+            NEQ (f.language_id, null)
+        }
+    },
+    "SELECT * FROM `Film` f " +
+            "WHERE f.language_id IS NULL AND f.language_id IS NOT NULL",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            NEQ (f.title, STR("ACE GOLDFINDER"))
+            AND
+            IN (f.release_year, $SESSION.emptyList)
+        }
+    },
+    "SELECT * FROM `Film` f " +
+            "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (NULL)",
 ]
