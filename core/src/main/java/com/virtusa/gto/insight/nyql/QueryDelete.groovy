@@ -5,11 +5,17 @@ package com.virtusa.gto.insight.nyql
  */
 class QueryDelete extends Query {
 
-    Table _targetTable
-
     QueryDelete(QContext contextParam) {
         super(contextParam)
     }
 
+    def TARGET(Table table) {
+        sourceTbl = table
+        return this
+    }
+
+    def TARGET() {
+        return sourceTbl
+    }
 
 }

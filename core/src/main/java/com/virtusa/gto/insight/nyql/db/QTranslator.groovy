@@ -120,7 +120,7 @@ trait QTranslator extends QJoins {
     QResultProxy ___deleteQuery(QueryDelete q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
-        query.append("DELETE FROM ").append(___deriveSource(q._targetTable, paramList, QContextType.FROM)).append(" \n")
+        query.append("DELETE FROM ").append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append(" \n")
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
             query.append(" WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append("\n")
         }
