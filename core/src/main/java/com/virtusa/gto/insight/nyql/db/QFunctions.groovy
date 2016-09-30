@@ -85,7 +85,7 @@ trait QFunctions {
     def between = { c ->
             if (c instanceof List) {
                 return "BETWEEN " + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + " AND " +
-                        ___resolve(c[1], QContextType.INSIDE_FUNCTION) + " "
+                        ___resolve(c[1], QContextType.INSIDE_FUNCTION)
             } else {
                 throw new NyException("Invalid syntax for BETWEEN function!")
             }
@@ -94,7 +94,7 @@ trait QFunctions {
     def not_between = { c ->
         if (c instanceof List) {
             return "NOT BETWEEN " + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + " AND " +
-                    ___resolve(c[1], QContextType.INSIDE_FUNCTION) + " "
+                    ___resolve(c[1], QContextType.INSIDE_FUNCTION)
         } else {
             throw new NyException("Invalid syntax for BETWEEN function!")
         }

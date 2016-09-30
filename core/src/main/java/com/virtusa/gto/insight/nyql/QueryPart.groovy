@@ -29,7 +29,14 @@ class QueryPart extends Query {
         if (_allProjections == null) {
             _allProjections = new LinkedList<>()
         }
-        _allProjections.addAll(columns)
+        for (Object col : columns) {
+            if (col instanceof List) {
+                _allProjections.addAll(col)
+            } else {
+                _allProjections.add(col)
+            }
+        }
+
         return this
     }
 

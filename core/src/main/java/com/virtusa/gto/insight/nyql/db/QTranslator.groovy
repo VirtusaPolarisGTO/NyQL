@@ -58,12 +58,12 @@ trait QTranslator extends QJoins {
         } else if (obj instanceof AParam) {
             if (obj.length > 0) {
                 StringBuilder stringBuilder = new StringBuilder()
-                stringBuilder.append("(")
+                stringBuilder.append("")
                 for (int i = 0; i < obj.length; i++) {
                     if (i > 0) stringBuilder.append(", ")
                     stringBuilder.append("?")
                 }
-                return stringBuilder.append(")").toString()
+                return stringBuilder.append("").toString()
             }
             return "?" + (obj.__aliasDefined() && contextType == QContextType.SELECT ? " AS " + obj.__alias : "")
         } else if (obj instanceof QResultProxy) {

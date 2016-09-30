@@ -7,7 +7,19 @@ def innerImportPart = $DSL.$q {
     FETCH (ac.id, ac.title)
 }
 
+def innerImportImport = $DSL.$q {
+    EXPECT (Actor.alias("ac"))
+
+    FETCH ($IMPORT("projection/import_part"))
+}
+
 [
+        $DSL.select {
+            TARGET (Actor.alias("ac"))
+            FETCH (innerImportImport)
+        },
+        "SELECT ac.id, ac.title FROM `Actor` ac",
+
         $DSL.select {
             TARGET (Actor.alias("ac"))
             FETCH ($IMPORT("projection/import_part"))
@@ -43,4 +55,6 @@ def innerImportPart = $DSL.$q {
             FETCH (ac.year, innerImportPart)
         },
         "SELECT ac.year, ac.id, ac.title FROM `Actor` ac",
+
+
 ]

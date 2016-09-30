@@ -33,13 +33,13 @@ public class AbstractTest {
             QResultProxy proxy = deriveProxy(objects.get(i));
             String query = String.valueOf(objects.get(i + 1));
 
-            String q1 = proxy.getQuery().replace("\n", "");
-            String q2 = query.replace("\n", "");
+            String q1 = proxy.getQuery().replace("\n", "").trim();
+            String q2 = query.replace("\n", "").trim();
             System.out.println("Generated Query:");
             System.out.println(q1);
-            System.out.println("Expected:");
-            System.out.println(q2);
-            Assert.assertEquals(q1, q2);
+            //System.out.println("Expected:");
+            //System.out.println(q2);
+            Assert.assertEquals(q2, q1);
         }
     }
 

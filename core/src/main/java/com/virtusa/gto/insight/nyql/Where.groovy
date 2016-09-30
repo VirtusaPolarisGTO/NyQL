@@ -136,7 +136,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def NOTBETWEEN(Object c1, Object startValue, Object endValue) {
-        return ON(c1, BETWEEN(startValue, endValue))
+        return ON(c1, NOT_BETWEEN(startValue, endValue))
     }
 
     def IN(Object c1, Object... cs) {
