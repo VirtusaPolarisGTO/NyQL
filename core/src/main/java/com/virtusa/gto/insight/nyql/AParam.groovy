@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql
 
+import com.virtusa.gto.insight.nyql.utils.QUtils
 import groovy.transform.ToString
 
 /**
@@ -9,6 +10,7 @@ import groovy.transform.ToString
 class AParam {
 
     String __name
+    String __alias
 
     def type
 
@@ -17,6 +19,15 @@ class AParam {
     ParamScope scope
 
     String __mappingParamName
+
+    AParam alias(String theAlias) {
+        __alias = theAlias
+        return this
+    }
+
+    boolean __aliasDefined() {
+        return __alias != null && !__alias.isEmpty()
+    }
 
     static enum ParamScope {
         IN, OUT, INOUT

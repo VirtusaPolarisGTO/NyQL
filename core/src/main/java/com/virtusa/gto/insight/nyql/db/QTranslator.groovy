@@ -65,7 +65,7 @@ trait QTranslator extends QJoins {
                 }
                 return stringBuilder.append(")").toString()
             }
-            return "?"
+            return "?" + (obj.__aliasDefined() && contextType == QContextType.SELECT ? " AS " + obj.__alias : "")
         } else if (obj instanceof QResultProxy) {
             return (obj.query ?: "").trim()
         } else if (obj instanceof List) {
@@ -263,6 +263,8 @@ trait QTranslator extends QJoins {
         }
 
         for (c in finalCols) {
+            ___scanForParameters(c, paramList)
+
             if (c instanceof String) {
                 cols.add(c)
             } else if (c instanceof Table) {
@@ -271,6 +273,8 @@ trait QTranslator extends QJoins {
             } else if (c instanceof Column) {
                 String cName = ___columnName(c, QContextType.SELECT)
                 cols.add("$cName");
+            } else {
+                cols.add(String.valueOf(___resolve(c, QContextType.SELECT, paramList)))
             }
         }
         return cols.stream().collect(Collectors.joining(", "))
