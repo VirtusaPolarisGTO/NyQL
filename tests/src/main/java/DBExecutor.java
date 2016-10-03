@@ -36,7 +36,7 @@ public class DBExecutor {
             //data.put("hello", inners);
 
             //QScript result = NyQL.parse("insight/unmapped_users", data);
-            Object result = NyQL.execute("trans", data);
+            Object result = NyQL.execute("update", data);
             System.out.println(result);
 
         } finally {

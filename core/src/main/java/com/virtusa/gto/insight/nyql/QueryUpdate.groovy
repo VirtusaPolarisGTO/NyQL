@@ -11,12 +11,16 @@ class QueryUpdate extends Query {
         super(contextParam)
     }
 
+    def TARGET() {
+        return sourceTbl
+    }
+
     def TARGET(Table table) {
         sourceTbl = table
         return this
     }
 
-    def JOIN(closure) {
+    def JOIN(Closure closure) {
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         _joiningTable = code()

@@ -1,40 +1,29 @@
-import java.sql.JDBCType
 
 /**
  * @author IWEERARATHNA
  */
 
-def insQ = $DSL.insert {
-
-    TARGET (Song.alias("s"))
-
-    DATA (
-            "id": P("id", JDBCType.INTEGER),
-            "name": P("str", JDBCType.VARCHAR)
-    )
-
-}
-
 $DSL.update {
 
     TARGET (Album.alias("alb"))
 
-    JOIN {
-        TABLE("alb") JOIN Song.alias("s") ON alb.id, s.id JOIN Artist.alias("art") ON art.id, s.id
+    JOIN (TARGET()) {
+        INNER_JOIN (Song.alias("s")) ON alb.id, s.id
+        INNER_JOIN (Artist.alias("art")) ON art.id, s.id
     }
 
 
     SET {
         EQ (alb.name, STR("isuru"))
-        EQ (alb.year, P("year", JDBCType.INTEGER))
-        EQ (alb.ryear, P("year", JDBCType.INTEGER))
+        EQ (alb.year, PARAM("year"))
+        EQ (alb.ryear, PARAM("year"))
         SET_NULL (alb.details)
-        EQ (alb.sellers, IMPORT("insert"))
+        EQ (alb.sellers, $IMPORT("insert"))
     }
 
     WHERE {
         ALL {
-            EQ (alb.id, P("albid", JDBCType.INTEGER))
+            EQ (alb.id, PARAM("albid"))
         }
     }
 
