@@ -214,7 +214,7 @@ trait QTranslator extends QJoins {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
 
-        query.append("INSERT INTO ").append(___resolve(q._targetTable, QContextType.FROM, paramList)).append(" (")
+        query.append("INSERT INTO ").append(___resolve(q._targetTable, QContextType.INTO, paramList)).append(" (")
         List<String> colList = new LinkedList<>()
         List<String> valList = new LinkedList<>()
         q._data.each { k, v ->
