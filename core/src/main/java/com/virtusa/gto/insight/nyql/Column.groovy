@@ -37,6 +37,6 @@ class Column {
     }
 
     Column mod(Object other) {
-        return new FunctionColumn(_columns: [this, other], _func: "op_mod", _setOfCols: true, _ctx: _ctx)
+        return new FunctionColumn(_columns: [this, other], _func: "op_modulus", _setOfCols: true, _ctx: _ctx)
     }
 }
