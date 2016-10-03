@@ -40,13 +40,6 @@ class QueryPart extends Query {
         return this
     }
 
-    QueryPart JOIN(closure) {
-        def code = closure.rehydrate(this, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
-        sourceTbl = code()
-        return this
-    }
-
     QueryPart JOIN(Table startTable, closure) {
         JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
