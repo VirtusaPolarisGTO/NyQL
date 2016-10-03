@@ -1,5 +1,7 @@
 package com.virtusa.gto.insight.nyql
 
+import com.virtusa.gto.insight.nyql.model.params.AParam
+
 /**
  * @author IWEERARATHNA
  */

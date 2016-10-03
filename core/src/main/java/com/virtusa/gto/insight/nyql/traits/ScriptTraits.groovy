@@ -1,6 +1,6 @@
 package com.virtusa.gto.insight.nyql.traits
 
-import com.virtusa.gto.insight.nyql.AParam
+import com.virtusa.gto.insight.nyql.model.params.AParam
 
 import java.sql.JDBCType
 
@@ -13,5 +13,5 @@ trait ScriptTraits {
 
     abstract AParam PARAM(String name, JDBCType type, AParam.ParamScope scope, String mappingName);
 
-    abstract AParam PARAM(String name, int length);
+    abstract AParam PARAMLIST(String name);
 }

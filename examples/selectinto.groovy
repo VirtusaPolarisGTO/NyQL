@@ -7,6 +7,7 @@ $DSL.select {
 
     INTO (MyOtherTable.alias("mo"),
             mo.col1,
-            mo.col2)
+            mo.col2,
+            mo.col3)
 
 }

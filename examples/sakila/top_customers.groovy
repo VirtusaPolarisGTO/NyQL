@@ -17,6 +17,10 @@ $DSL.select {
     }
     */
 
+    WHERE {
+        IN (f.film_id, PARAMLIST("teamIDs"))
+    }
+
     ORDER_BY (f.film_id)
 
 }

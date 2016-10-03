@@ -4,6 +4,8 @@ import com.virtusa.gto.insight.nyql.*
 import com.virtusa.gto.insight.nyql.Where.QCondition
 import com.virtusa.gto.insight.nyql.Where.QConditionGroup
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.model.params.AParam
+import com.virtusa.gto.insight.nyql.model.params.ParamList
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
@@ -56,14 +58,8 @@ trait QTranslator extends QJoins {
         } else if (obj instanceof Number) {
             return ___convertNumeric(obj)
         } else if (obj instanceof AParam) {
-            if (obj.length > 0) {
-                StringBuilder stringBuilder = new StringBuilder()
-                stringBuilder.append("")
-                for (int i = 0; i < obj.length; i++) {
-                    if (i > 0) stringBuilder.append(", ")
-                    stringBuilder.append("?")
-                }
-                return stringBuilder.append("").toString()
+            if (obj instanceof ParamList) {
+                return "::" + obj.__name + "::"
             }
             return "?" + (obj.__aliasDefined() && contextType == QContextType.SELECT ? " AS " + obj.__alias : "")
         } else if (obj instanceof QResultProxy) {

@@ -2,6 +2,7 @@ package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.db.QTranslator
 import com.virtusa.gto.insight.nyql.model.QSession
+import com.virtusa.gto.insight.nyql.model.params.AParam
 
 /**
  * @author Isuru Weerarathna

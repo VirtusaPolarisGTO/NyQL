@@ -2,6 +2,8 @@ package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.QScript
+import com.virtusa.gto.insight.nyql.model.params.AParam
+import com.virtusa.gto.insight.nyql.model.params.ParamList
 import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.FunctionTraits
 import com.virtusa.gto.insight.nyql.traits.ScriptTraits
@@ -51,11 +53,11 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
-        return _ctx.addParam(new AParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName))
+        return _ctx.addParam(new AParam(__name: name, type: type))
     }
 
-    AParam PARAM(String name, int length) {
-        return _ctx.addParam(new AParam(__name: name, length: length))
+    AParam PARAMLIST(String name) {
+        return _ctx.addParam(new ParamList(__name: name))
     }
 
     def AND(Closure closure) {

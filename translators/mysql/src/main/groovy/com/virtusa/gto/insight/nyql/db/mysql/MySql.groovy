@@ -3,9 +3,9 @@ package com.virtusa.gto.insight.nyql.db.mysql
 import com.virtusa.gto.insight.nyql.*
 import com.virtusa.gto.insight.nyql.db.QDdl
 import com.virtusa.gto.insight.nyql.db.QTranslator
+import com.virtusa.gto.insight.nyql.model.params.AParam
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
-import groovy.transform.PackageScope
 
 import java.util.stream.Collectors
 

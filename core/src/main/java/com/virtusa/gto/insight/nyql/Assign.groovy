@@ -1,6 +1,8 @@
 package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.model.QScript
+import com.virtusa.gto.insight.nyql.model.params.AParam
+import com.virtusa.gto.insight.nyql.model.params.ParamList
 import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.ScriptTraits
 import com.virtusa.gto.insight.nyql.utils.Constants
@@ -26,8 +28,8 @@ class Assign implements DataTypeTraits, ScriptTraits {
         return _ctx.addParam(new AParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName))
     }
 
-    AParam PARAM(String name, int length) {
-        return _ctx.addParam(new AParam(__name: name, length: length))
+    AParam PARAMLIST(String name) {
+        return _ctx.addParam(new ParamList(__name: name))
     }
 
     def EQ(Column c1, Object val) {

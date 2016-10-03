@@ -120,22 +120,22 @@
         FETCH ()
         WHERE {
             NOTBETWEEN (f.rental_rate, 2.99, 5.0)
-            OR (IN (f.language_id, PARAM("singleList", $SESSION.singleList.size())))
+            OR (IN (f.language_id, PARAMLIST("singleList")))
         }
     },
     "SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 OR f.language_id IN (?)",
+            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 OR f.language_id IN (::singleList::)",
 
     $DSL.select {
         TARGET (Film.alias("f"))
         FETCH ()
         WHERE {
             NOTBETWEEN (f.rental_rate, 2.99, 5.0)
-            AND (IN (f.language_id, PARAM("doubleList", $SESSION.doubleList.size())))
+            AND (IN (f.language_id, PARAMLIST("doubleList")))
         }
     },
     "SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id IN (?, ?)",
+            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id IN (::doubleList::)",
 
     $DSL.select {
         TARGET (Film.alias("f"))

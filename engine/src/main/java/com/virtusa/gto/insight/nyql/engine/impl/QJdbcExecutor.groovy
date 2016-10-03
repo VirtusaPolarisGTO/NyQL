@@ -1,17 +1,20 @@
 package com.virtusa.gto.insight.nyql.engine.impl
 
-import com.virtusa.gto.insight.nyql.AParam
+import com.virtusa.gto.insight.nyql.model.params.AParam
 import com.virtusa.gto.insight.nyql.StoredFunction
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QJdbcPoolFetcher
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptResult
+import com.virtusa.gto.insight.nyql.model.params.NamedParam
+import com.virtusa.gto.insight.nyql.model.params.ParamList
 import com.virtusa.gto.insight.nyql.utils.QueryType
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallResultTransformer
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallTransformInput
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcResultTransformer
+import org.apache.commons.lang3.tuple.Pair
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -20,6 +23,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Savepoint
 import java.sql.Statement
+import java.util.stream.Collectors
 
 /**
  * @author IWEERARATHNA
@@ -78,11 +82,9 @@ class QJdbcExecutor implements QExecutor {
 
         PreparedStatement statement = null
         try {
-            statement = getConnection().prepareStatement(script.proxy.query)
             Map<String, Object> data = script.qSession.sessionVariables
-
             List<AParam> parameters = script.proxy.orderedParameters
-            assignParameters(statement, parameters, data)
+            statement = prepareStatement(script, parameters, data)
 
             if (script.proxy.queryType == QueryType.SELECT) {
                 if (returnRaw) {
@@ -145,17 +147,21 @@ class QJdbcExecutor implements QExecutor {
             // register out parameters
             for (int i = 0; i < parameters.size(); i++) {
                 AParam param = parameters[i]
-                if (param.scope == null || param.scope == AParam.ParamScope.IN) {
+                if (!(param instanceof NamedParam)) {
+                    throw new NyScriptExecutionException("Stored functions required to have named parameters!")
+                }
+                NamedParam namedParam = param as NamedParam
+                if (namedParam.scope == null || namedParam.scope == AParam.ParamScope.IN) {
                     continue
                 }
 
-                LOGGER.trace("  <- Registering output: {}", param.__mappingParamName)
-                statement.registerOutParameter(param.__mappingParamName, param.type)
+                LOGGER.trace("  <- Registering output: {}", namedParam.__mappingParamName)
+                statement.registerOutParameter(namedParam.__mappingParamName, param.type)
             }
 
             // set parameter values
             for (int i = 0; i < parameters.size(); i++) {
-                AParam param = parameters[i]
+                AParam param = parameters[i] as NamedParam
                 Object itemValue = data.get(param.__name)
                 if (itemValue == null) {
                     throw new NyException("Data for parameter '$param.__name' cannot be found!")
@@ -202,9 +208,47 @@ class QJdbcExecutor implements QExecutor {
                 throw new NyException("Data for parameter '$param.__name' cannot be found!")
             }
 
-            LOGGER.trace(" Parameter #{} : {} [{}]", (cp), itemValue, itemValue.class.simpleName)
+
             cp = invokeCorrectInput(statement, param, itemValue, cp)
         }
+    }
+
+    private PreparedStatement prepareStatement(QScript script, List<AParam> paramList, Map data) {
+        List orderedParams = [] as LinkedList
+        String query = script.proxy.query
+        int cp = 1
+
+        for (AParam param : paramList) {
+            Object itemValue = deriveValue(data, param.__name)
+            if (itemValue == null) {
+                throw new NyScriptExecutionException("Data for parameter '$param.__name' cannot be found!")
+            }
+
+            LOGGER.trace(" Parameter #{} : {} [{}]", (cp), itemValue, itemValue.class.simpleName)
+            if (param instanceof ParamList) {
+                if (itemValue instanceof List) {
+                    List itemList = itemValue
+                    itemList.each { orderedParams.add(it) }
+                    String pStr = itemList.stream().map({ return "?" }).collect(Collectors.joining(", "))
+                    query = query.replaceAll("::" + param.__name + "::", pStr)
+                    println query
+                    cp += itemList.size()
+
+                } else {
+                    throw new NyScriptExecutionException("Parameter value of '$param.__name' expected to be a list but given " + itemValue.class.simpleName + "!");
+                }
+            } else {
+                orderedParams.add(itemValue)
+                cp++
+            }
+        }
+
+        Statement statement = getConnection().prepareStatement(query)
+        cp = 1
+        for (Object pValue : orderedParams) {
+            statement.setObject(cp++, pValue)
+        }
+        return statement
     }
 
     private static Object deriveValue(Map dataMap, String name) {

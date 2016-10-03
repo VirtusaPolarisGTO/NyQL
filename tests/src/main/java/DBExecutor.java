@@ -15,7 +15,7 @@ public class DBExecutor {
     public static void main(String[] args) throws Exception {
         try {
             Map<String, Object> data = new HashMap<>();
-            List<Integer> teams = asList(1410);
+            List<Integer> teams = asList(1410, 1234);
             List<Integer> modules = asList(97389, 97390, 97391);
 
             Map<String, Object> deeper = new HashMap<>();
@@ -36,7 +36,7 @@ public class DBExecutor {
             //data.put("hello", inners);
 
             //QScript result = NyQL.parse("insight/unmapped_users", data);
-            Object result = NyQL.parse("selectinto", data);
+            Object result = NyQL.execute("sakila/top_customers", data);
             System.out.println(result);
 
         } finally {
