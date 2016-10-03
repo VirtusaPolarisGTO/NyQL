@@ -216,7 +216,7 @@ trait QFunctions {
     def op_modulus = {
         if (it instanceof List) {
             return "(" + ___resolve(it[0], QContextType.INSIDE_FUNCTION) +
-                    " % " + ___resolve(it[0], QContextType.INSIDE_FUNCTION) + ")"
+                    " % " + ___resolve(it[1], QContextType.INSIDE_FUNCTION) + ")"
         } else {
             throw new NySyntaxException("Add operation requires at least two operands!")
         }
