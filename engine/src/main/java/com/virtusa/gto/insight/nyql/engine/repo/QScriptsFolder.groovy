@@ -3,8 +3,12 @@ package com.virtusa.gto.insight.nyql.engine.repo
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import java.nio.charset.StandardCharsets
 
 /**
  * @author IWEERARATHNA
@@ -41,13 +45,21 @@ class QScriptsFolder implements QScriptMapper {
                     scanDir(it)
                 } else {
                     String relPath = captureFileName(baseDir.toPath().relativize(it.toPath()).toString()).replace('\\', '/')
-                    def qSrc = new QSource(id: relPath, file: it, doCache: DEF_CACHING)
+
+                    String content = readAll(it)
+                    GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, relPath, GroovyShell.DEFAULT_CODE_BASE)
+                    groovyCodeSource.setCachable(true)
+
+                    def qSrc = new QSource(id: relPath, file: it, doCache: DEF_CACHING, codeSource: groovyCodeSource)
                     fileMap[relPath] = qSrc
-                    LOGGER.debug("  > {}", relPath)
+                    LOGGER.debug("  > {}\t\t\t{}", relPath, it.length())
                 }
             }
         }
+    }
 
+    private static String readAll(File file) {
+        return FileUtils.readFileToString(file, StandardCharsets.UTF_8)
     }
 
     private static String captureFileName(String path) {

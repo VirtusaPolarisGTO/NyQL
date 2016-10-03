@@ -11,5 +11,5 @@ class QSource {
     private final String id
     private final File file
     private boolean doCache = false
-
+    private GroovyCodeSource codeSource
 }

@@ -6,7 +6,7 @@ import com.virtusa.gto.insight.nyql.exceptions.NyException
 /**
  * @author IWEERARATHNA
  */
-trait QRepository {
+trait QRepository implements Closeable {
 
     abstract void clearCache(int level)
 

@@ -22,31 +22,20 @@ class QRepositoryImpl implements QRepository {
 
     private final QScriptMapper mapper
 
-    private final Caching caching = new Caching()
-
-    private CompilerConfiguration compilerConfigurations
+    private final Caching caching
 
     private Configurations configurations
 
     QRepositoryImpl(QScriptMapper scriptMapper) {
+        caching = new Caching()
         mapper = scriptMapper
         configurations = Configurations.instance()
+
+        initCache()
     }
 
-    private CompilerConfiguration makeCompilerConfigs() {
-        if (compilerConfigurations != null) {
-            return compilerConfigurations
-        }
-
-        compilerConfigurations = new CompilerConfiguration()
-
-        String[] defImports = Configurations.instance().defaultImports()
-        if (defImports != null) {
-            ImportCustomizer importCustomizer = new ImportCustomizer()
-            importCustomizer.addImports(defImports)
-            compilerConfigurations.addCompilationCustomizers(importCustomizer)
-        }
-        return compilerConfigurations
+    private void initCache() {
+        caching.compileAllScripts(mapper.allSources())
     }
 
     public void clearCache(int level) {
@@ -62,35 +51,17 @@ class QRepositoryImpl implements QRepository {
 
         if (Configurations.instance().cacheGeneratedQueries() && caching.hasGeneratedQuery(scriptId)) {
             LOGGER.trace("Script {} served from query cache.", scriptId)
-            return caching.getGeneratedQuery(scriptId)
+            return caching.getGeneratedQuery(scriptId, session)
         }
 
-        Binding binding = new Binding(session?.sessionVariables ?: new HashMap<>())
-        GroovyShell shell = new GroovyShell(binding, makeCompilerConfigs())
-
         try {
-            Script compiledScript = caching.compileIfAbsent(scriptId, {
-                        LOGGER.info("Compiling script {}", src.file.absolutePath)
-                        return shell.parse(src.file)
-                    })
+            Script compiledScript = caching.getCompiledScript(src, session)
 
             LOGGER.info("Running script '{}'", scriptId)
             Object res = compiledScript.run()
 
-            QScript script
-            if (res instanceof QResultProxy) {
-                script = new QScript(proxy: (QResultProxy) res, qSession: session)
-            } else if (res instanceof QScriptList) {
-                script = res
-            } else {
-                script = new QScriptResult(qSession: session, scriptResult: res)
-            }
-
-            boolean doCache = (shell.getVariable(configurations.cachingIndicatorVarName()) ?: false)
-            if (doCache) {
-                LOGGER.trace("Script $scriptId cachable status: " + doCache)
-                caching.addGeneratedQuery(scriptId, script)
-            }
+            QScript script = convertResult(res, session)
+            cacheIfSpecified(compiledScript, scriptId, script)
             return script
 
         } catch (CompilationFailedException ex) {
@@ -100,4 +71,30 @@ class QRepositoryImpl implements QRepository {
         }
     }
 
+    private void cacheIfSpecified(Script compiledScript, String scriptId, QScript script) {
+        if (compiledScript.getBinding().hasVariable(configurations.cachingIndicatorVarName())) {
+            boolean doCache = (compiledScript.getBinding().variables.get(configurations.cachingIndicatorVarName()) ?: false)
+            if (doCache) {
+                LOGGER.trace("Script $scriptId cachable status: " + doCache)
+                caching.addGeneratedQuery(scriptId, script)
+            }
+        }
+    }
+
+    private static QScript convertResult(Object res, QSession session) {
+        if (res instanceof QResultProxy) {
+            return new QScript(proxy: (QResultProxy) res, qSession: session)
+        } else if (res instanceof QScriptList) {
+            return res
+        } else {
+            return new QScriptResult(qSession: session, scriptResult: res)
+        }
+    }
+
+    @Override
+    void close() throws IOException {
+        if (caching != null) {
+            caching.close()
+        }
+    }
 }

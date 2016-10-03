@@ -102,6 +102,7 @@ class Configurations {
 
     void shutdown() {
         QExecutorRegistry.instance.shutdown()
+        QRepositoryRegistry.instance.shutdown()
     }
 
     String cachingIndicatorVarName() {

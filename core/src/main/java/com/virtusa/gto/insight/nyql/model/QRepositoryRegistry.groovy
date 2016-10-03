@@ -24,6 +24,12 @@ final class QRepositoryRegistry {
         return repository
     }
 
+    public void shutdown() {
+        registry.values().each {
+            it.close()
+        }
+    }
+
     public QRepository defaultRepository() {
         return defRepo
     }
