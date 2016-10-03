@@ -9,6 +9,7 @@ class QuerySelect extends Query {
     Where groupHaving = null
     List<Object> projection = null
     Table _intoTable = null
+    List<Object> _intoColumns = null
     Table _joiningTable = null
     boolean _distinct = false
     def offset
@@ -33,6 +34,12 @@ class QuerySelect extends Query {
 
     def INTO(Table table) {
         _intoTable = table
+        return this
+    }
+
+    def INTO(Table table, Object... columns) {
+        INTO(table)
+        _intoColumns = Arrays.asList(columns)
         return this
     }
 

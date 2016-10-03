@@ -15,6 +15,8 @@ enum QContextType {
 
     DDL,
 
+    INTO,
+
     UNKNOWN
 
 }

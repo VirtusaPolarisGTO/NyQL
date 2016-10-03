@@ -35,7 +35,9 @@ class MySql implements QTranslator, MySqlFunctions {
 
     @Override
     def ___tableName(final Table table, final QContextType contextType) {
-        if (contextType == QContextType.FROM) {
+        if (contextType == QContextType.INTO) {
+            return QUtils.quote(table.__name)
+        } else if (contextType == QContextType.FROM) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
                 return "(" + proxy.query.trim() + ")" + (table.__aliasDefined() ? " " + table.__alias : "")
@@ -85,6 +87,10 @@ class MySql implements QTranslator, MySqlFunctions {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, BACK_TICK)
             }
+        }
+
+        if (contextType == QContextType.INTO) {
+            return column.__name
         }
 
         if (column instanceof FunctionColumn) {

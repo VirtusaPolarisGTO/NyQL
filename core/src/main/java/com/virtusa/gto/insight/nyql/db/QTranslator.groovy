@@ -155,7 +155,13 @@ trait QTranslator extends QJoins {
         QueryType queryType = QueryType.SELECT
         if (q._intoTable != null) {
             queryType = QueryType.INSERT
-            query.append("INSERT INTO ").append(___deriveSource(q._intoTable, paramList, QContextType.FROM)).append(" \n")
+            query.append("INSERT INTO ").append(___tableName(q._intoTable, QContextType.INTO)).append(" ")
+            if (QUtils.notNullNorEmpty(q._intoColumns)) {
+                query.append(q._intoColumns.stream().map({
+                        return ___columnName(it, QContextType.INTO)
+                    }).collect(Collectors.joining(", ", "(", ")")))
+            }
+            query.append("\n")
         }
 
         query.append("SELECT ");

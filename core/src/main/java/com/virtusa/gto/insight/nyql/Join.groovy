@@ -27,7 +27,9 @@ class Join extends Table {
 
         def code = closure.rehydrate(whr, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        onConditions = code()
+        code()
+
+        onConditions = whr
         return this
     }
 
