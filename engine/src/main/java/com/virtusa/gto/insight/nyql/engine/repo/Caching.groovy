@@ -1,6 +1,7 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
 import com.virtusa.gto.insight.nyql.configs.Configurations
+import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.model.QSource
@@ -28,10 +29,14 @@ class Caching implements Closeable {
         gcl = new GroovyClassLoader(Thread.currentThread().contextClassLoader, makeCompilerConfigs())
     }
 
-    void compileAllScripts(Collection<QSource> sources) {
+    void compileAllScripts(Collection<QSource> sources) throws NyException {
         LOGGER.debug("Compiling all dsl scripts...")
         for (QSource qSource : sources) {
-            gcl.parseClass(qSource.codeSource, true)
+            try {
+                gcl.parseClass(qSource.codeSource, true)
+            } catch (Throwable ex) {
+                throw new NyException("Compilation error in script ${qSource.id}!", ex)
+            }
         }
         LOGGER.debug("Done.")
     }

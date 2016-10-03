@@ -68,7 +68,7 @@ public class AbstractTest {
     @BeforeClass
     public static void setupTests() {
         System.setProperty("nyql.autoConfig", "false");
-        NyQL.configure(new File("./nyql.json"));
+        NyQL.configure(new File("./nyql.json"), true);
     }
 
     @AfterClass

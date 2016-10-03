@@ -50,8 +50,8 @@ class NyQL {
         }
     }
 
-    public static void configure(File inputJson=null) {
-        if (!Configurations.instance().isConfigured()) {
+    public static void configure(File inputJson=null, boolean force=false) {
+        if (!Configurations.instance().isConfigured() || force) {
             LOGGER.warn("NyQL is going to configure with default configurations using classpath...")
             File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME);
             if (!nyConfig.exists()) {
