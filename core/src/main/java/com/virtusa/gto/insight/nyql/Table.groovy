@@ -9,6 +9,11 @@ import com.virtusa.gto.insight.nyql.utils.QUtils
 
 class Table {
 
+    /**
+     * Represents any table replaceable with any table in joins.
+     */
+    static final Table ANY_TABLE = new Table()
+
     private Map<String, Column> __allColumns = new HashMap<>()
 
     QContext _ctx = null

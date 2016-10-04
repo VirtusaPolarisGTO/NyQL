@@ -59,4 +59,10 @@
         FETCH (FLOOR(p.amount).alias("roundDown"), CEIL(p.amount).alias("roundUp"), ABS(p.amount))
     },
     "SELECT FLOOR(p.amount) AS roundDown, CEILING(p.amount) AS roundUp, ABS(p.amount) FROM `Payment` p",
+
+    $DSL.select {
+        TARGET (Payment.alias("p"))
+        FETCH (SUM("p.amount + p.id"))
+    },
+    "SELECT SUM(p.amount + p.id) FROM `Payment` p",
 ]

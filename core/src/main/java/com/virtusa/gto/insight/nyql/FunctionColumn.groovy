@@ -5,7 +5,7 @@ package com.virtusa.gto.insight.nyql
  */
 class FunctionColumn extends Column {
 
-    Column _wrapper
+    def _wrapper
 
     String _func
 

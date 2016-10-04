@@ -18,12 +18,12 @@ trait FunctionTraits {
 
     def ASC(Column column)      { return fColumn(column, "asc") }
     def DESC(Column column)     { return fColumn(column, "desc") }
-    def COUNT(Column column)    { return fColumn(column, "count") }
+    def COUNT(Object column)    { return fColumn(column, "count") }
     def DISTINCT(Column column) { return fColumn(column, "distinct") }
-    def MAX(Column column)      { return fColumn(column, "max") }
-    def MIN(Column column)      { return fColumn(column, "min") }
-    def AVG(Column column)      { return fColumn(column, "avg") }
-    def SUM(Column column)      { return fColumn(column, "sum") }
+    def MAX(Object column)      { return fColumn(column, "max") }
+    def MIN(Object column)      { return fColumn(column, "min") }
+    def AVG(Object column)      { return fColumn(column, "avg") }
+    def SUM(Object column)      { return fColumn(column, "sum") }
 
     def LCASE(Column column)    { return fColumn(column, "lcase") }
     def UCASE(Column column)    { return fColumn(column, "ucase") }
@@ -51,7 +51,7 @@ trait FunctionTraits {
         return new FunctionColumn(_columns: vals, _func: fName, _setOfCols: true, _ctx: _ctx)
     }
 
-    private FunctionColumn fColumn(Column column, String fName) {
+    private FunctionColumn fColumn(Object column, String fName) {
         return new FunctionColumn(_wrapper: column, _func: fName, _ctx: _ctx)
     }
 }

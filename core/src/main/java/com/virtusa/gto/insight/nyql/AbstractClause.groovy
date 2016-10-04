@@ -52,6 +52,10 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         }
     }
 
+    def ANY_TABLE() {
+        return Table.ANY_TABLE
+    }
+
     def TABLE(QResultProxy resultProxy) {
         Table table = new Table(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx, __resultOf: resultProxy)
         _ctx.tables.putIfAbsent(table.__name, table)

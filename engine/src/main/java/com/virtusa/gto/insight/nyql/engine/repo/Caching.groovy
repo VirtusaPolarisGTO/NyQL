@@ -30,8 +30,8 @@ class Caching implements Closeable {
     }
 
     void compileAllScripts(Collection<QSource> sources) throws NyException {
-        LOGGER.debug("Compiling all dsl scripts...")
         if (Configurations.instance().cacheRawScripts()) {
+            LOGGER.debug("Compiling all dsl scripts...")
             for (QSource qSource : sources) {
                 try {
                     gcl.parseClass(qSource.codeSource, true)
@@ -39,8 +39,8 @@ class Caching implements Closeable {
                     throw new NyException("Compilation error in script ${qSource.id}!", ex)
                 }
             }
+            LOGGER.debug("Done.")
         }
-        LOGGER.debug("Done.")
     }
 
     boolean hasGeneratedQuery(String scriptId) {
@@ -61,15 +61,16 @@ class Caching implements Closeable {
     }
 
     Script getCompiledScript(QSource sourceScript, QSession session) {
-        def clazz
+        Binding binding = new Binding(session?.sessionVariables ?: [:])
         if (Configurations.instance().cacheRawScripts()) {
-            clazz = gcl.parseClass(sourceScript.codeSource, true)
+            def clazz = gcl.parseClass(sourceScript.codeSource, true)
+            Script scr = clazz.newInstance() as Script
+            scr.setBinding(binding)
+            return scr
         } else {
-            clazz = gcl.parseClass((File)sourceScript.file)
+            GroovyShell shell = new GroovyShell(binding, makeCompilerConfigs())
+            return shell.parse(sourceScript.file)
         }
-        Script scr = clazz.newInstance() as Script
-        scr.setBinding(new Binding(session?.sessionVariables ?: [:]))
-        return scr
     }
 
     void clearGeneratedCache() {
