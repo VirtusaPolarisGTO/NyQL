@@ -32,7 +32,7 @@ class QSession {
         return qSession
     }
 
-    private static QSession createSession(DSLContext context, QRepository repository, QExecutor executor, QExecutorFactory executorFactory) {
+    static QSession createSession(DSLContext context, QRepository repository, QExecutor executor, QExecutorFactory executorFactory) {
         QSession session = new QSession()
 
         session.dslContext = context

@@ -81,7 +81,7 @@ class Caching implements Closeable {
         cache.remove(scriptId)
     }
 
-    private CompilerConfiguration makeCompilerConfigs() {
+    CompilerConfiguration makeCompilerConfigs() {
         if (compilerConfigurations != null) {
             return compilerConfigurations
         }

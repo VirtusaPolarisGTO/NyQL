@@ -20,11 +20,11 @@ class QRepositoryImpl implements QRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QRepositoryImpl.class)
 
-    private final QScriptMapper mapper
+    protected final QScriptMapper mapper
 
-    private final Caching caching
+    protected final Caching caching
 
-    private Configurations configurations
+    protected Configurations configurations
 
     QRepositoryImpl(QScriptMapper scriptMapper) {
         caching = new Caching()
@@ -71,7 +71,7 @@ class QRepositoryImpl implements QRepository {
         }
     }
 
-    private void cacheIfSpecified(Script compiledScript, String scriptId, QScript script) {
+    protected void cacheIfSpecified(Script compiledScript, String scriptId, QScript script) {
         if (compiledScript.getBinding().hasVariable(configurations.cachingIndicatorVarName())) {
             boolean doCache = (compiledScript.getBinding().variables.get(configurations.cachingIndicatorVarName()) ?: false)
             if (doCache) {
@@ -81,7 +81,7 @@ class QRepositoryImpl implements QRepository {
         }
     }
 
-    private static QScript convertResult(Object res, QSession session) {
+    protected static QScript convertResult(Object res, QSession session) {
         if (res instanceof QResultProxy) {
             return new QScript(proxy: (QResultProxy) res, qSession: session)
         } else if (res instanceof QScriptList) {
