@@ -31,11 +31,13 @@ class Caching implements Closeable {
 
     void compileAllScripts(Collection<QSource> sources) throws NyException {
         LOGGER.debug("Compiling all dsl scripts...")
-        for (QSource qSource : sources) {
-            try {
-                gcl.parseClass(qSource.codeSource, true)
-            } catch (Throwable ex) {
-                throw new NyException("Compilation error in script ${qSource.id}!", ex)
+        if (Configurations.instance().cacheRawScripts()) {
+            for (QSource qSource : sources) {
+                try {
+                    gcl.parseClass(qSource.codeSource, true)
+                } catch (Throwable ex) {
+                    throw new NyException("Compilation error in script ${qSource.id}!", ex)
+                }
             }
         }
         LOGGER.debug("Done.")
@@ -63,7 +65,7 @@ class Caching implements Closeable {
         if (Configurations.instance().cacheRawScripts()) {
             clazz = gcl.parseClass(sourceScript.codeSource, true)
         } else {
-            clazz = gcl.parseClass(sourceScript.file)
+            clazz = gcl.parseClass((File)sourceScript.file)
         }
         Script scr = clazz.newInstance() as Script
         scr.setBinding(new Binding(session?.sessionVariables ?: [:]))

@@ -1,20 +1,19 @@
 package com.virtusa.gto.insight.nyql.engine.impl
 
-import com.virtusa.gto.insight.nyql.model.params.AParam
+import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.StoredFunction
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QJdbcPoolFetcher
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptResult
-import com.virtusa.gto.insight.nyql.model.params.NamedParam
-import com.virtusa.gto.insight.nyql.model.params.ParamList
+import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
+import com.virtusa.gto.insight.nyql.model.blocks.ParamList
 import com.virtusa.gto.insight.nyql.utils.QueryType
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallResultTransformer
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallTransformInput
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcResultTransformer
-import org.apache.commons.lang3.tuple.Pair
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

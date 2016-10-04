@@ -4,8 +4,10 @@ import com.virtusa.gto.insight.nyql.*
 import com.virtusa.gto.insight.nyql.Where.QCondition
 import com.virtusa.gto.insight.nyql.Where.QConditionGroup
 import com.virtusa.gto.insight.nyql.exceptions.NyException
-import com.virtusa.gto.insight.nyql.model.params.AParam
-import com.virtusa.gto.insight.nyql.model.params.ParamList
+import com.virtusa.gto.insight.nyql.model.blocks.AParam
+import com.virtusa.gto.insight.nyql.model.blocks.ParamList
+import com.virtusa.gto.insight.nyql.model.blocks.QNumber
+import com.virtusa.gto.insight.nyql.model.blocks.QString
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
@@ -45,7 +47,11 @@ trait QTranslator extends QJoins {
             return NULL()
         }
 
-        if (obj instanceof Join) {
+        if (obj instanceof QString) {
+            return ___quoteString(obj.text) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? " AS " + obj.__alias : "")
+        } else if (obj instanceof QNumber) {
+            return ___convertNumeric(obj.number) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? " AS " + obj.__alias : "")
+        } else if (obj instanceof Join) {
             return ___tableJoinName(obj, contextType, paramOrder)
         } else if (obj instanceof Table) {
             return ___tableName(obj, contextType)

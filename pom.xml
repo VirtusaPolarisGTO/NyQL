@@ -62,14 +62,37 @@
 
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>insight-public</id>
-            <url>http://172.22.128.195:9090/nexus/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>insight-public-snapshots</id>
-            <url>http://172.22.128.195:9090/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>insight</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>insight-public</id>
+                    <url>http://172.22.128.195:9090/nexus/content/repositories/releases</url>
+                </repository>
+                <snapshotRepository>
+                    <id>insight-public-snapshots</id>
+                    <url>http://172.22.128.195:9090/nexus/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+
+        <profile>
+            <id>speed</id>
+            <distributionManagement>
+                <repository>
+                    <id>speed-public</id>
+                    <url>http://172.22.128.195:9090/nexus/content/repositories/speed-releases</url>
+                </repository>
+                <snapshotRepository>
+                    <id>speed-public-snapshots</id>
+                    <url>http://172.22.128.195:9090/nexus/content/repositories/speed-snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
 </project>

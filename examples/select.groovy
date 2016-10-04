@@ -20,7 +20,7 @@ $DSL.select {
             CONCAT(alb.artist, STR(" - "), alb.year),
             COUNT(alb.songs).alias("total"),
             CASE {
-                WHEN { EQ alb.id, "0" } THEN { "(s.intr - s.fixed) / v.churn * 100" }
+                WHEN { EQ alb.id, "0" } THEN { STR("(s.intr - s.fixed) / v.churn * 100") }
                 WHEN { EQ alb.id, "2040" } THEN { "axx" }
                 ELSE { "aaa" }
             }.alias("yeah")

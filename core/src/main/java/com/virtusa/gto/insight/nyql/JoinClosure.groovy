@@ -1,6 +1,9 @@
 package com.virtusa.gto.insight.nyql
 
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.utils.QUtils
+import com.virtusa.gto.insight.nyql.utils.QueryType
 
 /**
  * @author IWEERARATHNA
@@ -15,6 +18,19 @@ class JoinClosure extends AbstractClause {
         super(contextParam)
         startingTable = targetTable
         activeTable = startingTable
+    }
+
+    @Override
+    def $IMPORT(String scriptId) {
+        QScript script = _ctx.ownerSession.scriptRepo.parse(scriptId, _ctx.ownerSession)
+        def proxy = script.proxy
+        if (proxy.queryType == QueryType.PART) {
+            Query q = proxy.qObject as Query
+            _ctx.mergeFrom(q._ctx)
+            activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, (Table)proxy.rawObject, "INNER_JOIN")
+            return proxy.rawObject
+        }
+        throw new NySyntaxException("You can only import a query part having a Table reference!")
     }
 
     def JOIN(Table t) {

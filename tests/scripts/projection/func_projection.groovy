@@ -47,4 +47,10 @@
         )
     },
     "SELECT CASE WHEN ac.middleName = \"Kosala\" AND ac.birthYear = 1985 THEN \"replaced\" ELSE \"deleted\" END FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (SUM(ac.actings) % 100)
+    },
+    "SELECT (SUM(ac.actings) % 100) FROM `Actor` ac",
 ]

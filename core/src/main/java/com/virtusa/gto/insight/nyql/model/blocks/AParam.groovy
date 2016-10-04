@@ -1,4 +1,4 @@
-package com.virtusa.gto.insight.nyql.model.params
+package com.virtusa.gto.insight.nyql.model.blocks
 
 import groovy.transform.ToString
 

@@ -1,6 +1,8 @@
 package com.virtusa.gto.insight.nyql.traits
 
 import com.virtusa.gto.insight.nyql.FunctionColumn
+import com.virtusa.gto.insight.nyql.model.blocks.QNumber
+import com.virtusa.gto.insight.nyql.model.blocks.QString
 
 /**
  * @author IWEERARATHNA
@@ -8,7 +10,11 @@ import com.virtusa.gto.insight.nyql.FunctionColumn
 trait DataTypeTraits {
 
     def STR(String text) {
-        return _ctx.translator.___quoteString(text)
+        return new QString(text: text)
+    }
+
+    def NUM(Number number) {
+        return new QNumber(number: number)
     }
 
     def BETWEEN(Object c1, Object c2) {

@@ -1,6 +1,6 @@
 package com.virtusa.gto.insight.nyql.traits
 
-import com.virtusa.gto.insight.nyql.model.params.AParam
+import com.virtusa.gto.insight.nyql.model.blocks.AParam
 
 import java.sql.JDBCType
 

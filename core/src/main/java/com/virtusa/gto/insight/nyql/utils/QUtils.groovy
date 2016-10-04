@@ -50,7 +50,7 @@ class QUtils {
                 if (table2 instanceof Join) {
                     return table2
                 } else {
-                    throw new NySyntaxException("Merging same table!")
+                    throw new NySyntaxException("You are trying to join same tables consecutively! At least table alias must be different!")
                 }
             }
         }
