@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 class QSession {
 
     String scriptId
-    Map<String, Object> sessionVariables = [:] as ConcurrentHashMap
+    Map<String, Object> sessionVariables = Collections.synchronizedMap([:])
 
     QRepository scriptRepo
 
