@@ -12,5 +12,10 @@ def innQ = $DSL.select {
         TARGET (TABLE(innQ).alias("ac"))
         FETCH ()
     },
-    "SELECT * FROM (SELECT f.id, f.year FROM `Film` f) ac"
+    "SELECT * FROM (SELECT f.id, f.year FROM `Film` f) ac",
+
+    $DSL.select {
+        TARGET (TABLE($IMPORT("innerquery/other_query")).alias("iq"))
+    },
+    "SELECT * FROM (SELECT * FROM `Film` f) iq"
 ]

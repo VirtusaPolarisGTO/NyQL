@@ -34,8 +34,10 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
             Query q = proxy.qObject as Query
             _ctx.mergeFrom(q._ctx)
             return proxy.rawObject
+        } else {
+            return script.proxy
         }
-        throw new NySyntaxException("You can only import a query part having a Table reference!")
+        //throw new NySyntaxException("You can only import a query part having a Table reference!")
     }
 
     AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
