@@ -1,3 +1,5 @@
+import com.sun.org.apache.bcel.internal.generic.IFNULL
+
 /**
  * @author IWEERARATHNA
  */
@@ -26,6 +28,16 @@
         FETCH (IFNULL(ac.middleName, STR("")))
     },
     "SELECT IFNULL(ac.middleName, \"\") FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH ((CASE {
+            WHEN {
+                NEQ (IFNULL(ac.income, 0) + IFNULL(ac.income2, 0), 9)
+            } THEN { IFNULL(ac.income, 0) }
+        }).alias("myCol"))
+    },
+    "SELECT CASE WHEN (IFNULL(ac.income, 0) + IFNULL(ac.income2, 0)) <> 9 THEN IFNULL(ac.income, 0) END AS myCol FROM `Actor` ac",
 
     $DSL.select {
         TARGET (Actor.alias("ac"))

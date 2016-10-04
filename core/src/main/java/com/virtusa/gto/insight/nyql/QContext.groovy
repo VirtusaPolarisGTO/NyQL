@@ -17,6 +17,7 @@ class QContext {
 
     Tables tables = new Tables()
     Map<String, Column> columns = new HashMap<>()
+    Query ownQuery
 
     Table getTheOnlyTable() {
         if (tables.size() != 1) {

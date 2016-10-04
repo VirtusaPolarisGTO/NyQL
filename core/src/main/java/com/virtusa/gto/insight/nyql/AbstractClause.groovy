@@ -21,6 +21,9 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
 
     protected AbstractClause(QContext contextParam) {
         _ctx = contextParam
+        if (this instanceof Query) {
+            _ctx.ownQuery = this
+        }
     }
 
     def $IMPORT(String scriptId) {

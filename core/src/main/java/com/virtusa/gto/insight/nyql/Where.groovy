@@ -181,6 +181,34 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         }
     }
 
+    def CASE(closure) {
+        Case aCase = new Case(_ctx: _ctx, _ownerQ: _ctx.ownQuery)
+
+        def code = closure.rehydrate(aCase, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        return aCase
+    }
+
+    def IFNULL(Column column, Object val) {
+        Case aCase = CASE({
+            WHEN { ISNULL(column) }
+            THEN { val }
+            ELSE { column }
+        })
+        aCase.setCaseType(Case.CaseType.IFNULL)
+        return aCase
+    }
+
+    def IFNOTNULL(Column column, Object val) {
+        return CASE({
+            WHEN { NOTNULL(column) }
+            THEN { val }
+            ELSE { column }
+        })
+    }
+
     def RAW(String cla) {
         clauses.add(cla)
     }
