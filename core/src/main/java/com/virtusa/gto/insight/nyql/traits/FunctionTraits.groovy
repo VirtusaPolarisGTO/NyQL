@@ -2,13 +2,18 @@ package com.virtusa.gto.insight.nyql.traits
 
 import com.virtusa.gto.insight.nyql.Column
 import com.virtusa.gto.insight.nyql.FunctionColumn
+import com.virtusa.gto.insight.nyql.utils.QUtils
 
 /**
  * @author IWEERARATHNA
  */
 trait FunctionTraits {
 
-    def ADD(Object... cols)     { return vColumn("op_add", cols) }
+    def ADD(Object... cols)     {
+        List list = []
+        QUtils.expandToList(list, cols)
+        return vColumn("op_add", list)
+    }
     def MINUS(Object op1, Object op2)     { return vColumn("op_minus", op1, op2) }
     def MULTIPLY(Object op1, Object op2)     { return vColumn("op_multiply", op1, op2) }
     def DIVIDE(Object op1, Object op2)     { return vColumn("op_divide", op1, op2) }
