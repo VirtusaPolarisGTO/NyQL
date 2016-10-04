@@ -3,11 +3,14 @@ package com.virtusa.gto.insight.nyql.db.mysql
 import com.virtusa.gto.insight.nyql.*
 import com.virtusa.gto.insight.nyql.db.QDdl
 import com.virtusa.gto.insight.nyql.db.QTranslator
+import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.utils.QUtils
+import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
 import java.util.stream.Collectors
+import java.util.stream.Stream
 
 /**
  * @author Isuru Weerarathna
@@ -119,7 +122,7 @@ class MySql implements QTranslator, MySqlFunctions {
             return ___ifColumn(column, null)
         }
 
-        if (contextType == QContextType.ORDER_BY) {
+        if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY) {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, BACK_TICK)
             }
@@ -179,8 +182,300 @@ class MySql implements QTranslator, MySqlFunctions {
                 rawObject: sp, queryType: QueryType.DB_FUNCTION)
     }
 
+    QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) {
+        List<AParam> paramList = new LinkedList<>()
+        Stream<Object> stream = queries.stream().map({ q ->
+            if (q instanceof QResultProxy) {
+                paramList.addAll(q.orderedParameters ?: [])
+                return "(" + ___resolve(q, QContextType.UNKNOWN) + ")"
+            } else {
+                return ___resolve(q, QContextType.UNKNOWN, paramList)
+            }
+        });
+
+        String qStr;
+        if (combineType == QueryCombineType.UNION) {
+            qStr = stream.collect(Collectors.joining("\nUNION ALL\n"))
+        } else if (combineType == QueryCombineType.UNION_DISTINCT) {
+            qStr = stream.collect(Collectors.joining("\nUNION\n"))
+        } else {
+            qStr = stream.collect(Collectors.joining("; "))
+        }
+        return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT, qObject: queries)
+    }
+
+    QResultProxy ___deleteQuery(QueryDelete q) {
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+        query.append("DELETE FROM ").append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append("\n")
+        if (q.whereObj != null && q.whereObj.__hasClauses()) {
+            query.append(" WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append("\n")
+        }
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
+    }
+
+    QResultProxy ___partQuery(QueryPart q) {
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+        QueryType queryType = QueryType.PART
+
+        if (q._allProjections != null) {
+            query.append(___expandProjection(q._allProjections, paramList))
+            return new QResultProxy(query: query.toString(), queryType: queryType,
+                    orderedParameters: paramList, rawObject: q._allProjections, qObject: q)
+        }
+
+        if (q.sourceTbl != null) {
+            query.append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM))
+            return new QResultProxy(query: query.toString(), queryType: queryType,
+                    orderedParameters: paramList, rawObject: q.sourceTbl, qObject: q)
+        }
+
+        if (q.whereObj != null) {
+            query.append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL))
+            return new QResultProxy(query: query.toString(), queryType: queryType,
+                    orderedParameters: paramList, rawObject: q.whereObj, qObject: q)
+        }
+
+        if (q._assigns != null) {
+            query.append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET))
+            return new QResultProxy(query: query.toString(), queryType: queryType,
+                    orderedParameters: paramList, rawObject: q._assigns, qObject: q)
+        }
+
+        throw new NyException("Parts are no longer supports to reuse other than WHERE and JOINING!")
+    }
+
+    QResultProxy ___selectQuery(QuerySelect q) {
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+        QueryType queryType = QueryType.SELECT
+        if (q._intoTable != null) {
+            queryType = QueryType.INSERT
+            query.append("INSERT INTO ").append(___tableName(q._intoTable, QContextType.INTO)).append(" ")
+            if (QUtils.notNullNorEmpty(q._intoColumns)) {
+                query.append(q._intoColumns.stream().map({
+                    return ___columnName(it, QContextType.INTO)
+                }).collect(Collectors.joining(", ", "(", ")")))
+            }
+            query.append("\n")
+        }
+
+        query.append("SELECT ");
+        if (q._distinct) {
+            query.append("DISTINCT ")
+        }
+        query.append(___expandProjection(q.projection, paramList)).append("\n")
+        query.append(" FROM ").append(___deriveSource(q._joiningTable ?: q.sourceTbl, paramList, QContextType.FROM)).append("\n")
+
+        if (q.whereObj != null && q.whereObj.__hasClauses()) {
+            query.append(" WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append("\n")
+        }
+
+        if (QUtils.notNullNorEmpty(q.groupBy)) {
+            query.append(" GROUP BY ").append(q.groupBy.stream()
+                    .map({ Object t -> return ___columnName(t, QContextType.GROUP_BY) })
+                    .collect(Collectors.joining(", ")))
+
+            if (q.groupHaving != null) {
+                query.append("\n").append(" HAVING ").append(___expandConditions(q.groupHaving, paramList, QContextType.GROUP_BY))
+            }
+            query.append("\n")
+        }
+
+        if (QUtils.notNullNorEmpty(q.orderBy)) {
+            query.append(" ORDER BY ").append(q.orderBy.stream()
+                    .map({ t -> return ___columnName(t, QContextType.ORDER_BY) })
+                    .collect(Collectors.joining(", ")))
+                    .append("\n")
+        }
+
+        if (q._limit != null) {
+            if (q._limit instanceof Integer && ((Integer) q._limit) > 0) {
+                query.append(" LIMIT ").append(String.valueOf(q._limit)).append("\n")
+            } else if (q._limit instanceof AParam) {
+                paramList.add((AParam) q._limit)
+                query.append(" LIMIT ").append(___resolve(q._limit, QContextType.ORDER_BY)).append("\n")
+            }
+        }
+
+        if (q.offset != null) {
+            if (q.offset instanceof Integer && ((Integer) q.offset) >= 0) {
+                query.append(" OFFSET ").append(String.valueOf(q.offset)).append("\n")
+            } else if (q.offset instanceof AParam) {
+                paramList.add((AParam) q.offset)
+                query.append(" OFFSET ").append(___resolve(q.offset, QContextType.ORDER_BY)).append("\n")
+            }
+        }
+
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: queryType, qObject: q)
+    }
+
+    QResultProxy ___insertQuery(QueryInsert q) {
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+
+        query.append("INSERT INTO ").append(___resolve(q._targetTable, QContextType.INTO, paramList)).append(" (")
+        List<String> colList = new LinkedList<>()
+        List<String> valList = new LinkedList<>()
+        q._data.each { k, v ->
+            colList.add(k)
+
+            if (v instanceof AParam) {
+                paramList.add((AParam)v)
+            }
+            valList.add(String.valueOf(___resolve(v, QContextType.CONDITIONAL)))
+        }
+        query.append(colList.stream().collect(Collectors.joining(", ")))
+                .append(") VALUES (")
+                .append(valList.stream().collect(Collectors.joining(", ")))
+                .append(")")
+
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT, qObject: q)
+    }
+
     @Override
     QDdl ___ddls() {
         return DDL
     }
+
+    String ___expandProjection(List<Object> columns, List<AParam> paramList) {
+        List<String> cols = new ArrayList<>()
+        if (columns == null || columns.isEmpty()) {
+            return "*"
+        }
+
+        List<Object> finalCols = new LinkedList<>()
+        for (c in columns) {
+            if (c instanceof QResultProxy) {
+                if (c.queryType != QueryType.PART) {
+                    throw new NyException("Only query parts allowed to import within sql projection!")
+                }
+                List otherColumns = c.rawObject as List
+                finalCols.addAll(otherColumns)
+            } else if (c instanceof List) {
+                finalCols.addAll(c);
+            } else {
+                finalCols.add(c)
+            }
+        }
+
+        for (c in finalCols) {
+            ___scanForParameters(c, paramList)
+
+            if (c instanceof String) {
+                cols.add(c)
+            } else if (c instanceof Table) {
+                String tbName = ___tableName((Table)c, QContextType.SELECT)
+                cols.add("$tbName.*")
+            } else if (c instanceof Column) {
+                String cName = ___columnName(c, QContextType.SELECT)
+                cols.add("$cName");
+            } else {
+                cols.add(String.valueOf(___resolve(c, QContextType.SELECT, paramList)))
+            }
+        }
+        return cols.stream().collect(Collectors.joining(", "))
+    }
+
+    def ___deriveSource(Table table, List<AParam> paramOrder, QContextType contextType) {
+        if (table instanceof Join) {
+            return ___tableJoinName(table, contextType, paramOrder)
+        } else {
+            if (table.__isResultOf()) {
+                QResultProxy proxy = table.__resultOf as QResultProxy
+                paramOrder.addAll(proxy.orderedParameters ?: [])
+            }
+            return ___tableName(table, contextType)
+        }
+    }
+
+    void ___expandColumn(Column column, List<AParam> paramList) {
+        if (column instanceof FunctionColumn && column._columns != null) {
+            column._columns.each {
+                if (it instanceof FunctionColumn) {
+                    ___expandColumn(it, paramList)
+                } else if (it instanceof AParam) {
+                    paramList.add(it)
+                }
+            }
+        }
+    }
+
+    void ___scanForParameters(def expression, List<AParam> paramOrder) {
+        if (expression instanceof AParam) {
+            paramOrder?.add((AParam)expression)
+        }
+        if (expression instanceof QResultProxy) {
+            QResultProxy resultProxy = expression
+            paramOrder?.addAll(resultProxy.orderedParameters ?: [])
+        }
+        if (expression instanceof FunctionColumn) {
+            ___expandColumn((FunctionColumn)expression, paramOrder)
+        }
+        if (expression instanceof List) {
+            expression.each { ___scanForParameters(it, paramOrder) }
+        }
+    }
+
+    String ___expandConditions(Where where, List<AParam> paramOrder, QContextType contextType=QContextType.UNKNOWN) {
+        StringBuilder builder = new StringBuilder()
+        List<Object> clauses = where.clauses
+        for (c in clauses) {
+            if (c instanceof String) {
+                builder.append(c)
+            } else if (c instanceof Where.QCondition) {
+                builder.append(___expandCondition(c, paramOrder, contextType))
+            } else if (c instanceof Where.QConditionGroup) {
+                builder.append("(").append(___expandConditionGroup(c, paramOrder, contextType)).append(")")
+            }
+        }
+
+        return builder.toString()
+    }
+
+    String ___expandCondition(Where.QCondition c, List<AParam> paramOrder, QContextType contextType) {
+        if (c.leftOp instanceof AParam) {
+            paramOrder?.add((AParam)c.leftOp)
+        }
+        ___scanForParameters(c.rightOp, paramOrder)
+        boolean parenthesis = (c.rightOp instanceof QResultProxy)
+
+        return ___resolve(c.leftOp, contextType) +
+                (c.op.length() > 0 ? " " + c.op + " " : " ") +
+                (!parenthesis ? ___resolve(c.rightOp, contextType) : "(" + ___resolve(c.rightOp, contextType) + ")")
+    }
+
+    String ___expandConditionGroup(Where.QConditionGroup group, List<AParam> paramOrder, QContextType contextType) {
+        String gCon = group.condConnector.isEmpty() ? "" : " " + group.condConnector + " ";
+        return group.where.clauses.stream()
+                .map({ c -> if (c instanceof Where.QCondition) {
+            return ___expandCondition(c, paramOrder, contextType)
+        } else if (c instanceof Where.QConditionGroup) {
+            return "(" + ___expandConditionGroup(c, paramOrder, contextType) + ")"
+        } else {
+            return String.valueOf(c)
+        }
+        }).collect(Collectors.joining(gCon))
+    }
+
+    String ___expandAssignments(Assign assign, List<AParam> paramOrder, QContextType contextType=QContextType.UNKNOWN) {
+        List<Object> clauses = assign.assignments
+        List<String> derived = new ArrayList<>()
+        for (c in clauses) {
+            if (c instanceof String) {
+                derived.add(c)
+            } else if (c instanceof Assign.AnAssign) {
+                if (c.leftOp instanceof AParam) {
+                    paramOrder.add((AParam)c.leftOp)
+                }
+                ___scanForParameters(c.rightOp, paramOrder)
+
+                derived.add(___resolve(c.leftOp, QContextType.CONDITIONAL, paramOrder) + " " + c.op + " " + ___resolve(c.rightOp, QContextType.CONDITIONAL, paramOrder))
+            }
+        }
+
+        return derived.stream().collect(Collectors.joining(", "))
+    }
+
 }

@@ -5,13 +5,19 @@ package com.virtusa.gto.insight.nyql
 enum QContextType {
 
     SELECT,
-    FROM,
+
+    SELECT_PROJECTION,
+    SELECT_FROM,
     CONDITIONAL,
     ORDER_BY,
     GROUP_BY,
     INSIDE_FUNCTION,
 
-    UPDATE,
+    UPDATE_FROM,
+    UPDATE_JOIN,
+    UPDATE_SET,
+
+    FROM,
 
     DDL,
 

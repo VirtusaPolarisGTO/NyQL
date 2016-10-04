@@ -6,6 +6,7 @@ import com.virtusa.gto.insight.nyql.db.QTranslator
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.utils.QUtils
+import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
 import groovy.transform.PackageScope
 
@@ -86,6 +87,31 @@ class Postgres implements QTranslator, PostgresFunctions {
                 return ___tableName(column._owner, contextType) + "." + QUtils.quote(column.__name, DOUBLE_QUOTE)
             }
         }
+    }
+
+    @Override
+    QResultProxy ___partQuery(QueryPart q) {
+        return null
+    }
+
+    @Override
+    QResultProxy ___deleteQuery(QueryDelete q) {
+        return null
+    }
+
+    @Override
+    QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) {
+        return null
+    }
+
+    @Override
+    QResultProxy ___selectQuery(QuerySelect q) {
+        return null
+    }
+
+    @Override
+    QResultProxy ___insertQuery(QueryInsert q) {
+        return null
     }
 
     @Override
