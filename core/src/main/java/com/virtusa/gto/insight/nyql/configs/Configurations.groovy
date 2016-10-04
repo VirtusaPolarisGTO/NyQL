@@ -84,10 +84,16 @@ class Configurations {
 
         // load executors
         QDbFactory activeFactory = QDatabaseRegistry.instance.getDbFactory(activeDb);
+        boolean loadDefOnly = properties.loadDefaultExecutorOnly ?: false
         String defExec = properties.defaultExecutor ?: Constants.DEFAULT_EXECUTOR_NAME
         List execs = properties.executors ?: []
         for (Map r : execs) {
             boolean thisDef = r.name == defExec
+            if (loadDefOnly && !thisDef) {
+                LOGGER.warn("Executor '{}' will not load since it is not the default executor!", r.name)
+                continue
+            }
+
             QExecutorFactory executorFactory = (QExecutorFactory) Class.forName(String.valueOf(r.factory)).newInstance()
             r.put("jdbcDriverClass", activeFactory.driverClassName())
             executorFactory.init(r)

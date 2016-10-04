@@ -18,13 +18,14 @@
     "java.sql.JDBCType"
   ],
 
-  "defaultExecutor": "jdbc",
+  "defaultExecutor": "dummy",
+  "loadDefaultExecutorOnly": true,
   "executors": [
     {
       "name": "jdbc",
       "factory": "com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutorFactory",
 
-      "url": "jdbc:mysql://cmliweerarathna/sakila",
+      "url": "jdbc:mysql://localhost/sakila",
       "username": "root",
       "password": "",
 
@@ -34,6 +35,10 @@
         "prepStmtCacheSqlLimit": 2048,
         "useServerPrepStmts": true
       }
+    },
+    {
+      "name": "dummy",
+      "factory": "com.virtusa.gto.insight.nyql.engine.impl.QDummyExecFactory"
     }
   ],
 

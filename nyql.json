@@ -25,7 +25,7 @@
       "name": "jdbc",
       "factory": "com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutorFactory",
 
-      "url": "jdbc:mysql://cmliweerarathna/sakila",
+      "url": "jdbc:mysql://localhost/sakila",
       "username": "root",
       "password": "",
 
