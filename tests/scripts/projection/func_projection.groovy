@@ -90,4 +90,10 @@ import com.sun.org.apache.bcel.internal.generic.IFNULL
         FETCH (SUM("p.amount + p.id"))
     },
     "SELECT SUM(p.amount + p.id) FROM `Payment` p",
+
+    $DSL.select {
+        TARGET (Payment.alias("p"))
+        FETCH (ADD($SESSION.listOfInt))
+    },
+    "SELECT (1 + 2 + 3) FROM `Payment` p",
 ]

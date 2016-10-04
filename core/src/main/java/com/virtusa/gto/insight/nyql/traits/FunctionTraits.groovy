@@ -10,9 +10,9 @@ import com.virtusa.gto.insight.nyql.utils.QUtils
 trait FunctionTraits {
 
     def ADD(Object... cols)     {
-        List list = []
-        QUtils.expandToList(list, cols)
-        return vColumn("op_add", list)
+        //List list = []
+        //QUtils.expandToList(list, cols)
+        return vColumn("op_add", cols)
     }
     def MINUS(Object op1, Object op2)     { return vColumn("op_minus", op1, op2) }
     def MULTIPLY(Object op1, Object op2)     { return vColumn("op_multiply", op1, op2) }

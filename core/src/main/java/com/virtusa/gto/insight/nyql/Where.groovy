@@ -94,15 +94,11 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def ISNULL(Object c) {
-        //String str = _ctx.translator.___resolve(c, QContextType.CONDITIONAL) + " " + _ctx.translator.COMPARATOR_NULL() + " " + _ctx.translator.NULL()
-        //clauses.add(str)
         clauses.add(new QCondition(leftOp: c, rightOp: null, op: "IS"))
         return this
     }
 
     def NOTNULL(Object c) {
-        //String str = _ctx.translator.___resolve(c, QContextType.CONDITIONAL) + " " + _ctx.translator.COMPARATOR_NULL() + " NOT " + _ctx.translator.NULL()
-        //clauses.add(str)
         clauses.add(new QCondition(leftOp: c, rightOp: null, op: "IS NOT"))
         return this
     }

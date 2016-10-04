@@ -23,8 +23,6 @@ trait QTranslator extends QJoins {
     String NULL() { "NULL" }
     String COMPARATOR_NULL() { "IS" }
 
-    abstract def ___ifColumn(Case aCaseCol, List<AParam> paramOrder)
-
     def ___resolve(Object obj, QContextType contextType, List<AParam> paramOrder=null) {
         if (obj == null) {
             return NULL()
@@ -59,6 +57,8 @@ trait QTranslator extends QJoins {
             throw new Exception("Unsupported data object to convert! [" + obj + ", type: " + obj.class + "]")
         }
     }
+
+    abstract def ___ifColumn(Case aCaseCol, List<AParam> paramOrder)
 
     abstract def ___quoteString(String text)
 

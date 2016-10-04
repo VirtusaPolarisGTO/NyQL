@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.FunctionColumn
 import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.insight.nyql.utils.QUtils
 
 import java.util.stream.Collectors
 
@@ -175,7 +176,9 @@ trait QFunctions {
 
     def op_add = {
         if (it instanceof List) {
-            it.stream().map({ op -> return ___resolve(op, QContextType.INSIDE_FUNCTION) })
+            List items = []
+            QUtils.expandToList(items, it)
+            items.stream().map({ op -> return ___resolve(op, QContextType.INSIDE_FUNCTION) })
                     .collect(Collectors.joining(" + ", "(", ")"))
         } else {
             throw new NySyntaxException("Add operation requires at least two operands!")
