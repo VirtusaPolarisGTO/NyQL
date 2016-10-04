@@ -8,8 +8,8 @@ import groovy.transform.Immutable
 @Immutable
 class QSource {
 
-    private final String id
-    private final File file
+    private String id
+    private File file
     private boolean doCache = false
     private GroovyCodeSource codeSource
 }

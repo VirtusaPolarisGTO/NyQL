@@ -27,7 +27,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
     }
 
     AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
-        return _ctx.addParam(new AParam(__name: name, type: type))
+        return _ctx.addParam(QUtils.createParam(name, type, scope, mappingName))
     }
 
     AParam PARAMLIST(String name) {

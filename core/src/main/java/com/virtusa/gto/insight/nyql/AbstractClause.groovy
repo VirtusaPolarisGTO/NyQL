@@ -8,6 +8,7 @@ import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.FunctionTraits
 import com.virtusa.gto.insight.nyql.traits.ScriptTraits
 import com.virtusa.gto.insight.nyql.utils.Constants
+import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
 import java.sql.JDBCType
@@ -38,7 +39,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
     }
 
     AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
-        return _ctx.addParam(new AParam(__name: name, type: type))
+        return _ctx.addParam(QUtils.createParam(name, type, scope, mappingName))
     }
 
     AParam PARAMLIST(String name) {

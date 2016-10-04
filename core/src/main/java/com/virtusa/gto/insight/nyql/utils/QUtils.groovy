@@ -5,7 +5,11 @@ import com.virtusa.gto.insight.nyql.QContext
 import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.Table
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.insight.nyql.model.blocks.AParam
+import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
 import org.apache.commons.lang3.StringUtils
+
+import java.sql.JDBCType
 
 /**
  * @author Isuru Weerarathna
@@ -125,6 +129,14 @@ class QUtils {
             } else {
                 list.add(item)
             }
+        }
+    }
+
+    static AParam createParam(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
+        if (scope == null && mappingName == null) {
+            return new AParam(__name: name, type: type)
+        } else {
+            return new NamedParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName)
         }
     }
 
