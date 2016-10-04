@@ -2,6 +2,7 @@ package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.ddl.DDL
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptList
 import com.virtusa.gto.insight.nyql.model.QSession
@@ -322,4 +323,15 @@ class DSL {
         return query
     }
 
+    def propertyMissing(String name) {
+        if (name == '$SESSION') {
+            return session.sessionVariables
+        } else {
+            throw new NySyntaxException("Unknown syntax in DSL! ('$name')")
+        }
+    }
+
+    def propertyMissing(String name, def arg) {
+
+    }
 }
