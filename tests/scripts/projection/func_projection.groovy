@@ -18,7 +18,7 @@
         TARGET (Actor.alias("ac"))
         FETCH (IFNULL(ac.middleName, STR("")))
     },
-    "SELECT CASE WHEN ac.middleName IS NULL THEN \"\" ELSE ac.middleName END FROM `Actor` ac",
+    "SELECT IFNULL(ac.middleName, \"\") FROM `Actor` ac",
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
@@ -30,7 +30,7 @@
         TARGET (Actor.alias("ac"))
         FETCH (IFNULL(ac.middleName, STR("")).alias("correctMiddleName"))
     },
-    "SELECT CASE WHEN ac.middleName IS NULL THEN \"\" ELSE ac.middleName END AS correctMiddleName FROM `Actor` ac",
+    "SELECT IFNULL(ac.middleName, \"\") AS correctMiddleName FROM `Actor` ac",
 
     $DSL.select {
         TARGET (Actor.alias("ac"))

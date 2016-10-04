@@ -21,4 +21,9 @@ public class UpdateTest extends AbstractTest {
         assertQueries(NyQL.parse("updates/basic", data));
     }
 
+    @Test
+    public void testSpecials() throws Exception {
+        assertQueries(NyQL.parse("updates/specials"));
+    }
+
 }

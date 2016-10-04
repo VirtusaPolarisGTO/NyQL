@@ -21,6 +21,42 @@ class MySql implements QTranslator, MySqlFunctions {
 
     MySql() {}
 
+    @Override
+    def ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
+        if (aCaseCol.caseType == Case.CaseType.IFNULL) {
+            StringBuilder query = new StringBuilder("IFNULL(")
+            def whenCondition = aCaseCol.allConditions.get(0)
+            Where.QCondition qCondition = (Where.QCondition) whenCondition._theCondition.clauses.get(0)
+            query.append(___resolve(qCondition.leftOp, QContextType.SELECT, paramOrder))
+            query.append(", ")
+            query.append(___resolve(whenCondition._theResult, QContextType.SELECT, paramOrder))
+            query.append(")")
+
+            if (aCaseCol.__aliasDefined()) {
+                query.append(" AS ").append(aCaseCol.__alias)
+            }
+            return query.toString()
+
+        } else {
+            StringBuilder query = new StringBuilder("CASE")
+            List<Case.CaseCondition> conditions = aCaseCol.allConditions
+            for (Case.CaseCondition cc : conditions) {
+                query.append(" WHEN ").append(___expandConditions(cc._theCondition, paramOrder, QContextType.CONDITIONAL))
+                query.append(" THEN ").append(___resolve(cc._theResult, QContextType.SELECT))
+            }
+
+            if (aCaseCol.getElse() != null) {
+                query.append(" ELSE ").append(___resolve(aCaseCol.getElse(), QContextType.SELECT))
+            }
+            query.append(" END")
+
+            if (aCaseCol.__aliasDefined()) {
+                query.append(" AS ").append(aCaseCol.__alias)
+            }
+            return query.toString()
+        }
+    }
+
     String JOIN(QContextType contextType) { "JOIN" }
 
     @Override
@@ -80,7 +116,7 @@ class MySql implements QTranslator, MySqlFunctions {
     @Override
     def ___columnName(final Column column, final QContextType contextType) {
         if (column instanceof Case) {
-            return ___ifColumn(column)
+            return ___ifColumn(column, null)
         }
 
         if (contextType == QContextType.ORDER_BY) {

@@ -32,7 +32,7 @@ class QueryUpdate extends Query {
     }
 
     def SET(closure) {
-        Assign ass = new Assign(_ctx)
+        Assign ass = new Assign(_ctx, this)
 
         def code = closure.rehydrate(ass, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY

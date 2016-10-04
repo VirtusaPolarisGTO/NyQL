@@ -326,6 +326,8 @@ class DSL {
     def propertyMissing(String name) {
         if (name == '$SESSION') {
             return session.sessionVariables
+        } else if (name == '$DSL') {
+            return this
         } else {
             throw new NySyntaxException("Unknown syntax in DSL! ('$name')")
         }

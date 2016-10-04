@@ -17,11 +17,13 @@ import java.sql.JDBCType
 class Assign implements DataTypeTraits, ScriptTraits {
 
     QContext _ctx = null
+    Query pQuery
 
     List<Object> assignments = new ArrayList<>()
 
-    public Assign(QContext context) {
+    public Assign(QContext context, Query parentQuery) {
         _ctx = context
+        pQuery = parentQuery
     }
 
     AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
@@ -30,6 +32,32 @@ class Assign implements DataTypeTraits, ScriptTraits {
 
     AParam PARAMLIST(String name) {
         return _ctx.addParam(new ParamList(__name: name))
+    }
+
+    def CASE(closure) {
+        Case aCase = new Case(_ctx: _ctx, _ownerQ: pQuery)
+
+        def code = closure.rehydrate(aCase, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        return code()
+    }
+
+    def IFNULL(Column column, Object val) {
+        Case aCase = CASE({
+            WHEN { ISNULL(column) }
+            THEN { val }
+            ELSE { column }
+        })
+        aCase.setCaseType(Case.CaseType.IFNULL)
+        return aCase
+    }
+
+    def IFNOTNULL(Column column, Object val) {
+        return CASE({
+            WHEN { NOTNULL(column) }
+            THEN { val }
+            ELSE { column }
+        })
     }
 
     def EQ(Column c1, Object val) {

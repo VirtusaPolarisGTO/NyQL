@@ -10,6 +10,7 @@ class Case extends Column implements DataTypeTraits {
     QContext _ctx = null
     Query _ownerQ = null
 
+    CaseType caseType = CaseType.OTHER
     private List<CaseCondition> allConditions = new ArrayList<>()
     private def __else = null
     private Where __lastWhere = null
@@ -60,5 +61,9 @@ class Case extends Column implements DataTypeTraits {
         def _theResult
     }
 
+    static enum CaseType {
+        IFNULL,
+        OTHER
+    }
 }
 

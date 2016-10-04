@@ -23,24 +23,7 @@ trait QTranslator extends QJoins {
     String NULL() { "NULL" }
     String COMPARATOR_NULL() { "IS" }
 
-    def ___ifColumn(Case aCaseCol, List<AParam> paramOrder=null) {
-        StringBuilder query = new StringBuilder("CASE")
-        List<Case.CaseCondition> conditions = aCaseCol.allConditions
-        for (Case.CaseCondition cc : conditions) {
-            query.append(" WHEN ").append(___expandConditions(cc._theCondition, paramOrder, QContextType.CONDITIONAL))
-            query.append(" THEN ").append(___resolve(cc._theResult, QContextType.SELECT))
-        }
-
-        if (aCaseCol.getElse() != null) {
-            query.append(" ELSE ").append(___resolve(aCaseCol.getElse(), QContextType.SELECT))
-        }
-        query.append(" END")
-
-        if (aCaseCol.__aliasDefined()) {
-            query.append(" AS ").append(aCaseCol.__alias)
-        }
-        return query.toString()
-    }
+    abstract def ___ifColumn(Case aCaseCol, List<AParam> paramOrder)
 
     def ___resolve(Object obj, QContextType contextType, List<AParam> paramOrder=null) {
         if (obj == null) {

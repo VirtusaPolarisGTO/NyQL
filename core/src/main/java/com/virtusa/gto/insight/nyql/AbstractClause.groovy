@@ -79,15 +79,19 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
 
         def code = closure.rehydrate(aCase, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        return code()
+        code()
+
+        return aCase
     }
 
     def IFNULL(Column column, Object val) {
-        return CASE({
+        Case aCase = CASE({
             WHEN { ISNULL(column) }
             THEN { val }
             ELSE { column }
         })
+        aCase.setCaseType(Case.CaseType.IFNULL)
+        return aCase
     }
 
     def IFNOTNULL(Column column, Object val) {
