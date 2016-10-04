@@ -22,6 +22,11 @@ class Postgres implements QTranslator, PostgresFunctions {
     @PackageScope Postgres() {}
 
     @Override
+    def ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
+        return null
+    }
+
+    @Override
     def ___quoteString(final String text) {
         return QUtils.quote(text, STR_QUOTE)
     }

@@ -10,6 +10,13 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (ac.id, MAX(ac.income), MIN(ac.performances), AVG(ac.income))
+        GROUP_BY (ac.id)
+    },
+    "SELECT ac.id, MAX(ac.income), MIN(ac.performances), AVG(ac.income) FROM `Actor` ac GROUP BY ac.id",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (ac.id, SUM(ac.income).alias("actorIncome"), COUNT(ac.performances))
     },
     "SELECT ac.id, SUM(ac.income) AS actorIncome, COUNT(ac.performances) FROM `Actor` ac",
@@ -59,6 +66,12 @@
         FETCH (FLOOR(p.amount).alias("roundDown"), CEIL(p.amount).alias("roundUp"), ABS(p.amount))
     },
     "SELECT FLOOR(p.amount) AS roundDown, CEILING(p.amount) AS roundUp, ABS(p.amount) FROM `Payment` p",
+
+    $DSL.select {
+        TARGET (Payment.alias("p"))
+        FETCH (ROUND(p.amount, 3).alias("priceOf"))
+    },
+    "SELECT ROUND(p.amount, 3) AS priceOf FROM `Payment` p",
 
     $DSL.select {
         TARGET (Payment.alias("p"))

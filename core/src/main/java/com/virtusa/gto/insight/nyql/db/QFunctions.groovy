@@ -45,14 +45,6 @@ trait QFunctions {
             }
     }
 
-    def timestamp_add = {
-
-    }
-
-    def timestamp_sub = {
-
-    }
-
     def lcase   = { c ->
         if (c instanceof String) return "LOWER($c)"
         else return "LOWER(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")"

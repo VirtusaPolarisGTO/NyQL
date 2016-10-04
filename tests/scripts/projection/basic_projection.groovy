@@ -28,9 +28,9 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
-        FETCH (ac.id + 4, (ac.total / 3).alias("expColumn"))
+        FETCH (ac.id - 4, (ac.total / 3).alias("expColumn"))
     },
-    "SELECT (ac.id + 4), (ac.total / 3) AS expColumn FROM `Actor` ac",
+    "SELECT (ac.id - 4), (ac.total / 3) AS expColumn FROM `Actor` ac",
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
@@ -49,4 +49,17 @@
         FETCH (STR("hello").alias("constantColumn"), STR("yeah"))
     },
     "SELECT \"hello\" AS constantColumn, \"yeah\" FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Film)
+        FETCH (film_id, title)
+    },
+    "SELECT film_id, title FROM `Film`",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH ()
+        ORDER_BY (ASC(ac.joinYear), DESC(ac.totalPerformances))
+    },
+    "SELECT * FROM `Actor` ac ORDER BY ac.joinYear ASC, ac.totalPerformances DESC",
 ]
