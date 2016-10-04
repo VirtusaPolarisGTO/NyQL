@@ -36,8 +36,9 @@ class QueryUpdate extends Query {
 
         def code = closure.rehydrate(ass, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        _assigns = code()
+        code()
 
+        _assigns = ass
         return this
     }
 

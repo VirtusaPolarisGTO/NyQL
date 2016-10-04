@@ -114,17 +114,17 @@ class MySql implements QTranslator, MySqlFunctions {
 
         if (q._joiningTable != null) {
             // has joining tables
-            query.append("UPDATE ").append(___deriveSource(q._joiningTable, paramList, QContextType.FROM)).append("\n")
+            query.append("UPDATE ").append(___deriveSource(q._joiningTable, paramList, QContextType.FROM)).append(" \n")
         } else {
-            query.append("UPDATE ").append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append("\n")
+            query.append("UPDATE ").append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append(" \n")
         }
 
         if (q._assigns.__hasAssignments()) {
-            query.append("SET ").append(___expandAssignments(q._assigns, paramList, QContextType.CONDITIONAL)).append("\n")
+            query.append("SET ").append(___expandAssignments(q._assigns, paramList, QContextType.CONDITIONAL)).append(" \n")
         }
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
-            query.append("WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append("\n")
+            query.append("WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append(" \n")
         }
 
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
