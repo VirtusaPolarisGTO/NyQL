@@ -39,8 +39,15 @@ class QJdbcExecutor implements QExecutor {
     private boolean returnRaw = false
     private boolean reusable = false
 
+    /**
+     * Creates an executor with custom connection.
+     * In here we won't close the connection at the end of execution.
+     *
+     * @param yourConnection sql connection
+     */
     QJdbcExecutor(Connection yourConnection) {
         connection = yourConnection
+        reusable = true
     }
 
     QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher) {

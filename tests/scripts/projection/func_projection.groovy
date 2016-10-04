@@ -53,4 +53,10 @@
         FETCH (SUM(ac.actings) % 100)
     },
     "SELECT (SUM(ac.actings) % 100) FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Payment.alias("p"))
+        FETCH (FLOOR(p.amount).alias("roundDown"), CEIL(p.amount).alias("roundUp"), ABS(p.amount))
+    },
+    "SELECT FLOOR(p.amount) AS roundDown, CEILING(p.amount) AS roundUp, ABS(p.amount) FROM `Payment` p",
 ]

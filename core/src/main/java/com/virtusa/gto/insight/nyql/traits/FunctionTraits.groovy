@@ -29,7 +29,11 @@ trait FunctionTraits {
     def UCASE(Column column)    { return fColumn(column, "ucase") }
     def TRIM(Column column)     { return fColumn(column, "trim") }
     def LEN(Column column)      { return fColumn(column, "len") }
+
     def ROUND(Column column, Object decimalPlaces)    { return vColumn("round", column, decimalPlaces) }
+    def FLOOR(Column column) { return fColumn(column, "floor") }
+    def CEIL(Column column) { return fColumn(column, "ceil") }
+    def ABS(Column column) { return fColumn(column, "abs") }
 
     def CONCAT(Object... columns) { return vColumn("concat", columns) }
 

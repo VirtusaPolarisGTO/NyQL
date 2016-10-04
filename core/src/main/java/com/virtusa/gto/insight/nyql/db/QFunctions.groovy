@@ -78,6 +78,10 @@ trait QFunctions {
         else throw new NyException("ROUND function requires two parameters!")
     }
 
+    def floor   = { c -> return "FLOOR(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")" }
+    def ceil   = { c -> return "CEILING(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")" }
+    def abs   = { c -> return "ABS(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")" }
+
     def distinct   = { c ->
         return "DISTINCT " + ___resolve(c, QContextType.INSIDE_FUNCTION)
     }
