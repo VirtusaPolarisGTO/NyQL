@@ -1,4 +1,7 @@
 package com.virtusa.gto.insight.nyql
+
+import com.virtusa.gto.insight.nyql.utils.QReturnType
+
 /**
  * @author Isuru Weerarathna
  */
@@ -18,6 +21,11 @@ class QueryInsert extends Query {
 
     def DATA(Map args) {
         args.each { k, v -> _data.put(String.valueOf(k), v) }
+        return this
+    }
+
+    def RETURN_KEYS() {
+        returnType = QReturnType.KEYS
         return this
     }
 

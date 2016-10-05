@@ -8,6 +8,8 @@ import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptResult
 import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
 import com.virtusa.gto.insight.nyql.model.blocks.ParamList
+import com.virtusa.gto.insight.nyql.utils.QReturnType
+import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory
 import java.sql.CallableStatement
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.Savepoint
 import java.sql.Statement
 import java.util.stream.Collectors
@@ -101,7 +104,23 @@ class QJdbcExecutor implements QExecutor {
                     return transformer.apply(statement.executeQuery())
                 }
             } else {
-                return statement.executeUpdate()
+                int count = statement.executeUpdate()
+                List keys = [] as LinkedList
+                if (count > 0 && isReturnKeys(script)) {
+                    ResultSet genKeys
+                    try {
+                        genKeys = statement.getGeneratedKeys()
+                        while (genKeys.next()) {
+                            keys.add(genKeys.getObject(1))
+                        }
+                    } finally {
+                        if (genKeys != null) {
+                            genKeys.close()
+                        }
+                    }
+                }
+                return toMap(count, keys)
+
             }
 
         } finally {
@@ -113,8 +132,9 @@ class QJdbcExecutor implements QExecutor {
     }
 
     private def batchExecute(QScript script) throws Exception {
+        PreparedStatement statement = null
         try {
-            PreparedStatement statement = getConnection().prepareStatement(script.proxy.query)
+            statement = getConnection().prepareStatement(script.proxy.query)
             connection.setAutoCommit(false);
 
             List<AParam> parameters = script.proxy.orderedParameters
@@ -136,6 +156,9 @@ class QJdbcExecutor implements QExecutor {
             return counts;
 
         } finally {
+            if (statement != null) {
+                statement.close()
+            }
             closeConnection()
         }
     }
@@ -249,12 +272,21 @@ class QJdbcExecutor implements QExecutor {
             }
         }
 
-        Statement statement = getConnection().prepareStatement(query)
+        PreparedStatement statement;
+        if (isReturnKeys(script)) {
+            statement = getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
+        } else {
+            statement = getConnection().prepareStatement(query)
+        }
         cp = 1
         for (Object pValue : orderedParams) {
             statement.setObject(cp++, pValue)
         }
         return statement
+    }
+
+    private static boolean isReturnKeys(QScript script) {
+        script.proxy != null && script.proxy.qObject != null && script.proxy.qObject.returnType == QReturnType.KEYS
     }
 
     private static Object deriveValue(Map dataMap, String name) {
@@ -318,6 +350,15 @@ class QJdbcExecutor implements QExecutor {
             statement.setObject(index, data)
             return index + 1
         }
+    }
+
+    private static List<Map> toMap(int count, List keys = null) {
+        List<Map> res = []
+        res.add([count: count])
+        if (QUtils.notNullNorEmpty(keys)) {
+            res.add([keys: keys])
+        }
+        return res
     }
 
     @Override

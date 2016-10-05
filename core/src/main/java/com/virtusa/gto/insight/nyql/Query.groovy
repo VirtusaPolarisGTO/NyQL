@@ -6,6 +6,7 @@ import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.FunctionTraits
 import com.virtusa.gto.insight.nyql.traits.ScriptTraits
 import com.virtusa.gto.insight.nyql.utils.Constants
+import com.virtusa.gto.insight.nyql.utils.QReturnType
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
 import java.sql.JDBCType
@@ -14,6 +15,8 @@ import java.sql.JDBCType
  * @author Isuru Weerarathna
  */
 class Query extends AbstractClause {
+
+    QReturnType returnType = QReturnType.RESULT
 
     Where whereObj = null
     Table sourceTbl = null

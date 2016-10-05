@@ -166,7 +166,7 @@ class MySql implements QTranslator, MySqlFunctions {
             query.append("WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append(" \n")
         }
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE, qObject: q)
     }
 
     @Override

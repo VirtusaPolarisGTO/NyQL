@@ -1,4 +1,7 @@
 package com.virtusa.gto.insight.nyql
+
+import com.virtusa.gto.insight.nyql.utils.QReturnType
+
 /**
  * @author Isuru Weerarathna
  */
@@ -39,6 +42,11 @@ class QueryUpdate extends Query {
         code()
 
         _assigns = ass
+        return this
+    }
+
+    def RETURN_KEYS() {
+        returnType = QReturnType.KEYS
         return this
     }
 
