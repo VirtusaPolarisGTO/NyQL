@@ -9,6 +9,8 @@ import groovy.transform.ToString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.util.stream.Collectors
+
 /**
  * @author IWEERARATHNA
  */
@@ -76,21 +78,21 @@ class DDL {
     QScriptList createScripts() {
         QScriptList scriptList = new QScriptList()
         List<QScript> list = new LinkedList<>()
-        tables.each {k, t -> list.add(callCreateTable(t)) }
-        tablesToDrop.each { list.add(callDropTable(it)) }
+        tables.each {k, t -> list.addAll(callCreateTable(t)) }
+        tablesToDrop.each { list.addAll(callDropTable(it)) }
         scriptList.scripts = list
         return scriptList
     }
 
-    private QScript callCreateTable(DTable dTable) {
+    private List<QScript> callCreateTable(DTable dTable) {
         LOGGER.debug("Executing table creation command...")
-        QResultProxy proxy = session.dslContext.qTranslator.___ddls().___createTable(dTable)
-        return session.scriptRepo.parse(proxy, session)
+        List<QResultProxy> proxies = session.dslContext.qTranslator.___ddls().___createTable(dTable)
+        return proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
     }
 
-    private QScript callDropTable(DTable dTable) {
+    private List<QScript> callDropTable(DTable dTable) {
         LOGGER.debug("Executing table drop command...")
-        QResultProxy proxy = session.dslContext.qTranslator.___ddls().___dropTable(dTable)
-        return session.scriptRepo.parse(proxy, session)
+        List<QResultProxy> proxies = session.dslContext.qTranslator.___ddls().___dropTable(dTable)
+        return proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
     }
 }

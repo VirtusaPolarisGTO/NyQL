@@ -21,11 +21,11 @@ import java.util.stream.Collectors
 class MySqlDDL implements QDdl {
 
     @Override
-    QResultProxy ___createTable(DTable dTable) {
+    List<QResultProxy> ___createTable(DTable dTable) {
         StringBuilder query = new StringBuilder("CREATE ")
         if (dTable.temporary) query.append("TEMPORARY ")
         query.append("TABLE ")
-        if (dTable.ifNotExist) query.append("IF NOT EXIST ")
+        if (dTable.ifNotExist) query.append("IF NOT EXISTS ")
         query.append(___ddlResolve(dTable))
 
         if (QUtils.notNullNorEmpty(dTable.fields)) {
@@ -49,17 +49,19 @@ class MySqlDDL implements QDdl {
             query.append("\n)")
         }
 
-        return new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
+        QResultProxy resultProxy = new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
+        return Arrays.asList(resultProxy)
     }
 
     @Override
-    QResultProxy ___dropTable(DTable dTable) {
+    List<QResultProxy> ___dropTable(DTable dTable) {
         StringBuilder query = new StringBuilder("DROP ")
         if (dTable.temporary) query.append("TEMPORARY ")
         query.append("TABLE ")
-        //query.append("IF EXIST ")
+        //query.append("IF EXISTS ")
         query.append(___ddlResolve(dTable))
-        return new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
+        def rProxy = new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
+        return Arrays.asList(rProxy)
     }
 
     private static String ___ddlExpandKey(DKey key) {

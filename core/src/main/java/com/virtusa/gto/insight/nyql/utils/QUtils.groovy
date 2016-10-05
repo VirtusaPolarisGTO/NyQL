@@ -40,7 +40,9 @@ class QUtils {
         }
     }
 
-    static Table mergeJoinClauses(QContext ctx, Table table1, Table table2, String type) {
+    static Table mergeJoinClauses(QContext ctx, Table tableLeft, Table tableRight, String type) {
+        Table table1 = tableLeft
+        Table table2 = tableRight
         Table rmost = findRightMostTable(table1)
         Table lmost = findLeftMostTable(table2)
         if (rmost.__name == lmost.__name && rmost.__alias == lmost.__alias) {
@@ -58,6 +60,22 @@ class QUtils {
                 }
             }
         }
+
+        if (rmost == Table.ANY_TABLE) {
+            if (table1 instanceof Join) {
+                table1 = table1.table1
+            } else {
+                return tableRight
+            }
+        }
+        if (lmost == Table.ANY_TABLE) {
+            if (table2 instanceof Join) {
+                table2 = table2.table2
+            } else {
+                return table1
+            }
+        }
+
         return new Join(table1: table1, table2: table2, _ctx: ctx, type: type)
     }
 

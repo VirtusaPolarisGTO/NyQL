@@ -23,4 +23,15 @@
         },
         "SELECT * FROM `Film` f " +
                 "INNER JOIN `Actor` ac ON f.actor_id = ac.actor_id",
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (OTHER()) {
+                $IMPORT ("joins/import_anyjoin")
+            }
+            FETCH ()
+        },
+        "SELECT * FROM `Film` f " +
+                "INNER JOIN `Actor` ac ON f.actor_id = ac.actor_id " +
+                "RIGHT JOIN `Payment` p ON p.actor_id = ac.actor_id",
 ]

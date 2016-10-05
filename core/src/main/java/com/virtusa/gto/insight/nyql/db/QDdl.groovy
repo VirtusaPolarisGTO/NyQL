@@ -8,9 +8,9 @@ import com.virtusa.gto.insight.nyql.ddl.DTable
  */
 trait QDdl {
 
-    abstract QResultProxy ___createTable(DTable dTable)
+    abstract List<QResultProxy> ___createTable(DTable dTable)
 
-    abstract QResultProxy ___dropTable(DTable dTable)
+    abstract List<QResultProxy> ___dropTable(DTable dTable)
 
     abstract def ___ddlResolve(Object obj)
 

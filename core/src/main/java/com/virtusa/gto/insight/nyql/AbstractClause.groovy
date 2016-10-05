@@ -58,7 +58,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         }
     }
 
-    def ANY_TABLE() {
+    def OTHER() {
         return Table.ANY_TABLE
     }
 
