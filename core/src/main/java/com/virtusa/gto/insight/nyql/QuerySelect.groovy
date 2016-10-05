@@ -55,13 +55,17 @@ class QuerySelect extends Query {
     }
 
     def ORDER_BY(Object... columns) {
-        orderBy = new ArrayList<>()
+        if (orderBy == null) {
+            orderBy = new ArrayList<>()
+        }
         orderBy.addAll(columns)
         return this
     }
 
     def GROUP_BY(Object... columns) {
-        groupBy = new ArrayList<>()
+        if (groupBy == null) {
+            groupBy = new ArrayList<>()
+        }
         groupBy.addAll(columns)
         return this
     }
