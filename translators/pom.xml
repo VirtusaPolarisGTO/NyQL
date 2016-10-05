@@ -18,6 +18,7 @@
         <module>mysql</module>
         <module>postgre</module>
         <module>mssql</module>
+        <module>oracle</module>
     </modules>
 
     <dependencies>
