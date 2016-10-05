@@ -27,7 +27,10 @@ import java.util.List;
 public class SqlToDSL {
 
     public static void main(String[] args) throws JSQLParserException {
-        Statement stmt = CCJSqlParserUtil.parse("SELECT * FROM Song UNION SELECT * FROM Album");
+        Statement stmt = CCJSqlParserUtil.parse("SELECT o.OrderID, c.CustomerName, o.OrderDate\n" +
+                "FROM Orders o\n" +
+                "INNER JOIN Customers c ON o.CustomerID=c.CustomerID " +
+                "INNER JOIN Department d ON d.id = c.id");
         if (stmt instanceof Select) {
             System.out.println(visit((Select)stmt));
         } else if (stmt instanceof Update) {
@@ -228,7 +231,7 @@ public class SqlToDSL {
     private static void handleTarget(Table table, StringBuilder dsl) {
         dsl.append("\nTARGET (TABLE(").append(quote(table.getName())).append(")");
         if (table.getAlias() != null) {
-            dsl.append(".alias(").append(quote(table.getAlias().getName())).append(")\n");
+            dsl.append(".alias(").append(quote(table.getAlias().getName())).append(")");
         }
         dsl.append(")\n");
     }
@@ -267,11 +270,9 @@ public class SqlToDSL {
             return;
         }
 
-        dsl.append("\nJOIN {\n").append(" TARGET() ");
+        dsl.append("\nJOIN (TARGET()) {\n\t");
         int count = 0;
         for (Join j : joins) {
-            if (count > 0) dsl.append(" ");
-
             if (j.isLeft()) dsl.append("LEFT_");
             else if (j.isRight()) dsl.append("RIGHT_");
             else if (j.isFull()) dsl.append("FULL_");
@@ -281,7 +282,7 @@ public class SqlToDSL {
             dsl.append("JOIN ");
 
             if (j.getRightItem() instanceof Table) {
-                dsl.append(toTable((Table)j.getRightItem(), true)).append(" ");
+                dsl.append("(").append(toTable((Table)j.getRightItem(), true)).append(") ");
             }
 
             if (j.getOnExpression() != null) {
@@ -298,6 +299,7 @@ public class SqlToDSL {
 
             }
             count++;
+            dsl.append("\n\t");
         }
 
 
