@@ -160,4 +160,13 @@
     },
     "SELECT * FROM `Film` f " +
             "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (NULL)",
+
+    $DSL.select {
+        TARGET (Address.alias("ad"))
+        FETCH ()
+        WHERE {
+            EQ (ad.city_id, ad.city_id + 1)
+        }
+    },
+    "SELECT * FROM `Address` ad WHERE ad.city_id = (ad.city_id + 1)",
 ]
