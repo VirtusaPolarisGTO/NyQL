@@ -76,6 +76,12 @@ trait QTranslator extends QJoins {
 
     abstract QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries)
 
+    /**
+     * Generates a select query using given query block instance.
+     *
+     * @param q input model of query.
+     * @return generated select query.
+     */
     abstract QResultProxy ___selectQuery(QuerySelect q)
 
     abstract QResultProxy ___insertQuery(QueryInsert q)

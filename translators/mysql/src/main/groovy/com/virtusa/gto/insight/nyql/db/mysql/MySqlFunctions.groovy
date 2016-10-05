@@ -5,26 +5,105 @@ import com.virtusa.gto.insight.nyql.FunctionColumn
 import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.db.QFunctions
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 
 /**
  * @author Isuru Weerarathna
  */
 trait MySqlFunctions implements QFunctions {
 
-    def from_unixtime(it) {
-            if (it instanceof String)
-                return "FROM_UNIXTIME($it)"
-            else
-                return "FROM_UNIXTIME(" + ___resolve(it, QContextType.SELECT) + ")"
+    def date_diff_years             = { c ->
+        if (c instanceof List) return "TIMESTAMPDIFF(YEAR, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
+        else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
-    def unix_timestamp(it) {
-            if (it == null) {
-                return "UNIX_TIMESTAMP()"
-            } else if (it instanceof String)
-                return "UNIX_TIMESTAMP($it)"
-            else
-                return "UNIX_TIMESTAMP(" + ___resolve(it, QContextType.SELECT) + ")"
+    def date_diff_months            = { c ->
+        if (c instanceof List) return "TIMESTAMPDIFF(MONTH, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
+        else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
+    def date_diff_days              = { c ->
+        if (c instanceof List) return "TIMESTAMPDIFF(DAY, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
+        else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
+    }
+    def date_diff_weeks              = { c ->
+        if (c instanceof List) return "TIMESTAMPDIFF(WEEK, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
+        else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
+    }
+    def date_diff_hours              = { c ->
+        if (c instanceof List) return "TIMESTAMPDIFF(HOUR, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
+        else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
+    }
+    def date_diff_minutes              = { c ->
+        if (c instanceof List) return "TIMESTAMPDIFF(MINUTE, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
+        else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
+    }
+    def date_diff_seconds              = { c ->
+        if (c instanceof List) return "TIMESTAMPDIFF(SECOND, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
+        else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
+    }
+
+    def date_add_days           = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL " + ___resolveIn(c[1]) + " DAY)"
+        else throw new NyException("Invalid syntax for DATE_ADD function!")
+    }
+    def date_add_months         = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL " + ___resolveIn(c[1]) + " MONTH)"
+        else throw new NyException("Invalid syntax for DATE_ADD function!")
+    }
+    def date_add_years          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL " + ___resolveIn(c[1]) + " YEAR)"
+        else throw new NyException("Invalid syntax for DATE_ADD function!")
+    }
+    def date_add_weeks          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL " + ___resolveIn(c[1]) + " WEEK)"
+        else throw new NyException("Invalid syntax for DATE_ADD function!")
+    }
+    def date_add_hours          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL " + ___resolveIn(c[1]) + " HOUR)"
+        else throw new NyException("Invalid syntax for DATE_ADD function!")
+    }
+    def date_add_minutes          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL " + ___resolveIn(c[1]) + " MINUTE)"
+        else throw new NyException("Invalid syntax for DATE_ADD function!")
+    }
+    def date_add_seconds          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL " + ___resolveIn(c[1]) + " SECOND)"
+        else throw new NyException("Invalid syntax for DATE_ADD function!")
+    }
+
+    def date_sub_days           = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL " + ___resolveIn(c[1]) + " DAY)"
+        else throw new NyException("Invalid syntax for DATE_SUB function!")
+    }
+    def date_sub_months         = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL " + ___resolveIn(c[1]) + " MONTH)"
+        else throw new NyException("Invalid syntax for DATE_SUB function!")
+    }
+    def date_sub_years          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL " + ___resolveIn(c[1]) + " YEAR)"
+        else throw new NyException("Invalid syntax for DATE_SUB function!")
+    }
+    def date_sub_weeks          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL " + ___resolveIn(c[1]) + " WEEK)"
+        else throw new NyException("Invalid syntax for DATE_SUB function!")
+    }
+    def date_sub_hours          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL " + ___resolveIn(c[1]) + " HOUR)"
+        else throw new NyException("Invalid syntax for DATE_SUB function!")
+    }
+    def date_sub_minutes          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL " + ___resolveIn(c[1]) + " MINUTE)"
+        else throw new NyException("Invalid syntax for DATE_SUB function!")
+    }
+    def date_sub_seconds          = { c ->
+        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL " + ___resolveIn(c[1]) + " SECOND)"
+        else throw new NyException("Invalid syntax for DATE_SUB function!")
+    }
+
+    def current_epoch(it) { return "UNIX_TIMESTAMP()" }
+    def current_epoch() { current_epoch(null) }
+
+    def epoch_to_date(it) { return "DATE(FROM_UNIXTIME(" + ___resolveIn(it) + "))" }
+    def epoch_to_datetime(it) { return "FROM_UNIXTIME(" + ___resolveIn(it) + ")" }
 
     String mysql_cast(it) {
             if (it instanceof List)
@@ -32,10 +111,6 @@ trait MySqlFunctions implements QFunctions {
             else
                 throw new NyException("CAST function expects two parameters!")
     }
-
-    def FROM_EPOCH(Column column)     { return fColumn(column, "from_unixtime") }
-    def EPOCH_TIMESTAMP(Column column=null) { return fColumn(column, "unix_timestamp") }
-    def EPOCH_DATE(Column column) { return CAST(FROM_EPOCH(column), "Date") }
 
     def CAST(Column source, Object toType) {
         return vColumn("mysql_cast", source, toType)

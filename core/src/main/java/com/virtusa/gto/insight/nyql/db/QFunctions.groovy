@@ -13,39 +13,22 @@ import java.util.stream.Collectors
  */
 trait QFunctions {
 
+    def ___resolveIn(def obj) {
+        return ___resolve(obj, QContextType.INSIDE_FUNCTION)
+    }
+
+    /**
+     * Date and Time functions
+     */
     def current_timestamp   = { c -> return "NOW()" }
     def current_date        = { c -> return "CURDATE()" }
     def current_time        = { c -> return "CURTIME()" }
 
-    def datediff            = { c ->
-            if (c instanceof List) {
-                return "DATEDIFF(" + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + ", " +
-                        ___resolve(c[1], QContextType.INSIDE_FUNCTION) + ")"
-            } else {
-                throw new NyException("Invalid syntax for DATEDIFF function!")
-            }
-    }
+    def date_trunc          = { "DATE(" + ___resolveIn(it) + ")" }
 
-    def date_trunc          = { c -> return "DATE(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")" }
-
-    def date_add    = { c ->
-            if (c instanceof List) {
-                return "(" + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + " + INTERVAL " +
-                        ___resolve(c[1], QContextType.INSIDE_FUNCTION) + " " + String.valueOf(c[2]) + ")"
-            } else {
-                throw new NyException("Invalid syntax for DATE_ADD function!")
-            }
-    }
-
-    def date_sub    = { c ->
-            if (c instanceof List) {
-                return "(" + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + " - INTERVAL " +
-                        ___resolve(c[1], QContextType.INSIDE_FUNCTION) + " " + String.valueOf(c[2]) + ")"
-            } else {
-                throw new NyException("Invalid syntax for DATE_ADD function!")
-            }
-    }
-
+    /**
+     * String functions.
+     */
     def lcase   = { c ->
         if (c instanceof String) return "LOWER($c)"
         else return "LOWER(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")"
