@@ -17,6 +17,7 @@
     <modules>
         <module>mysql</module>
         <module>postgre</module>
+        <module>mssql</module>
     </modules>
 
     <dependencies>
