@@ -111,7 +111,8 @@ class QJdbcExecutor implements QExecutor {
                     try {
                         genKeys = statement.getGeneratedKeys()
                         while (genKeys.next()) {
-                            keys.add(genKeys.getObject(1))
+                            Object val = genKeys.getObject(1)
+                            keys.add(val)
                         }
                     } finally {
                         if (genKeys != null) {

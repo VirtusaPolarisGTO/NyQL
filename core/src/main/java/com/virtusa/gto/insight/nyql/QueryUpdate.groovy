@@ -45,9 +45,4 @@ class QueryUpdate extends Query {
         return this
     }
 
-    def RETURN_KEYS() {
-        returnType = QReturnType.KEYS
-        return this
-    }
-
 }
