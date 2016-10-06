@@ -35,6 +35,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <!--
                     <sources>
                         <source>
                             <directory>${project.basedir}/src/main/groovy</directory>
@@ -43,6 +44,7 @@
                             </includes>
                         </source>
                     </sources>
+                    -->
                     <invokeDynamic>${groovy.invoke.dynamic}</invokeDynamic>
                 </configuration>
                 <dependencies>

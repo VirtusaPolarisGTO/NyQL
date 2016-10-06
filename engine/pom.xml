@@ -62,14 +62,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <sources>
-                        <source>
-                            <directory>${project.basedir}/src/main/java</directory>
-                            <includes>
-                                <include>**/*.groovy</include>
-                            </includes>
-                        </source>
-                    </sources>
                     <invokeDynamic>${groovy.invoke.dynamic}</invokeDynamic>
                 </configuration>
                 <dependencies>

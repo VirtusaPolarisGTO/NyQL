@@ -18,6 +18,7 @@ class QScriptsFolder implements QScriptMapper {
     private static final boolean DEF_CACHING = false
 
     final File baseDir
+    private int maxLen = 1
 
     private final Map<String, QSource> fileMap = [:]
 
@@ -27,6 +28,7 @@ class QScriptsFolder implements QScriptMapper {
         // scans the given directory
         LOGGER.debug("Loading script files from directory '{}'", baseDir.absolutePath)
         scanDir(baseDir)
+        prettyPrintFiles()
     }
 
     private void scanDir(File dir) {
@@ -50,7 +52,7 @@ class QScriptsFolder implements QScriptMapper {
 
                     def qSrc = new QSource(id: relPath, file: it, doCache: DEF_CACHING, codeSource: groovyCodeSource)
                     fileMap[relPath] = qSrc
-                    LOGGER.debug("  > {}\t\t\t{}", relPath, it.length())
+                    maxLen = Math.max(relPath.length(), maxLen)
                 }
             }
         }
@@ -96,5 +98,17 @@ class QScriptsFolder implements QScriptMapper {
     @Override
     Collection<QSource> allSources() {
         return fileMap.values()
+    }
+
+    private void prettyPrintFiles() {
+        fileMap.keySet().sort().each {
+            String kb = toKB(fileMap[it].file.length())
+            LOGGER.debug(" > " + it.padRight(maxLen + 5) + "${kb.padLeft(6)}")
+        }
+        LOGGER.debug("Found ${fileMap.size()} script(s).")
+    }
+
+    private static String toKB(long length) {
+        return ((int)Math.ceil(length / 1024.0)) + " KB"
     }
 }
