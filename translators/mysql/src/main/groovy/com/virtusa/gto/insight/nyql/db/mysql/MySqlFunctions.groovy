@@ -99,11 +99,11 @@ trait MySqlFunctions implements QFunctions {
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
 
-    def current_epoch(it) { return "UNIX_TIMESTAMP()" }
+    def current_epoch(it) { return "UNIX_TIMESTAMP() * 1000" }
     def current_epoch() { current_epoch(null) }
 
-    def epoch_to_date(it) { return "DATE(FROM_UNIXTIME(" + ___resolveIn(it) + "))" }
-    def epoch_to_datetime(it) { return "FROM_UNIXTIME(" + ___resolveIn(it) + ")" }
+    def epoch_to_date(it) { return "DATE(FROM_UNIXTIME(" + ___resolveIn(it) + " / 1000))" }
+    def epoch_to_datetime(it) { return "FROM_UNIXTIME(" + ___resolveIn(it) + " / 1000)" }
 
     String mysql_cast(it) {
             if (it instanceof List)

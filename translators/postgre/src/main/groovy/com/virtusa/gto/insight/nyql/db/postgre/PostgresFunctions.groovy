@@ -5,6 +5,7 @@ import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.db.QFunctions
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.insight.nyql.model.blocks.QNumber
 
 import java.util.stream.Collectors
 
@@ -15,8 +16,6 @@ trait PostgresFunctions implements QFunctions {
 
     def current_date(c) { return "CURRENT_TIME" }
     def current_time(c) { return "CURRENT_DATE" }
-    def current_epoch(it) { return "trunc(extract(epoch from now()))" }
-    def current_epoch() { current_epoch(null) }
 
     def date_trunc(c) { return "DATE_TRUNC('day', " + ___resolveIn(c) + ")" }
 
@@ -107,8 +106,17 @@ trait PostgresFunctions implements QFunctions {
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
 
+    def current_epoch(it) { return "extract(epoch from now()) * 1000" }
+    def current_epoch() { current_epoch(null) }
+
     def epoch_to_date(it) { return epoch_to_datetime(it) + "::date" }
-    def epoch_to_datetime(it) { return "to_timestamp(extract(epoch from " + ___resolveIn(it) + "))" }
+    def epoch_to_datetime(it) {
+        if (it instanceof QNumber || it instanceof Number) {
+            return "to_timestamp(" + ___resolveIn(it) + " / 1000)"
+        } else {
+            return "to_timestamp(extract(epoch from " + ___resolveIn(it) + "))"
+        }
+    }
 
     def concat(c) {
         if (c instanceof String) {
