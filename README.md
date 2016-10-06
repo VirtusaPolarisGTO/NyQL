@@ -1,5 +1,7 @@
 # NyQL
 
+A common query DSL for popular relational databases.
+
 #### Terminology:
 * Query Repository: A folder containing all your query scripts.
 * Mapper: An instance responsible of mapping an identifier to a valid source which is consumable by any repository.
@@ -58,14 +60,24 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
 public class Main {
     
     public static void main(String[] args) throws Exception {
-        // your session variables or parameter values...
-        Map<String, Object> data = new HashMap<>();
+        // configure NyQL somewhere in starting point
+        // of your application lifecycle.
+        NyQL.configure(jsonFile);
         
-        // to parse and see the query
-        NyQL.parse("<script-name>", data);
-        
-        // to execute and get results
-        NyQL.execute("<script-name>", data);
+        try {
+            // your session variables or parameter values...
+            Map<String, Object> data = new HashMap<>();
+            
+            // to parse and see the query
+            NyQL.parse("<script-name>", data);
+            
+            // to execute and get results
+            NyQL.execute("<script-name>", data);
+            
+        } finally {
+            // call shutdown at the end of your application.
+            NyQL.shutdown();
+        }
     }
 }
 ```

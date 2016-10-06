@@ -40,7 +40,7 @@ class QRepositoryImpl implements QRepository {
 
     public void clearCache(int level) {
         caching.clearGeneratedCache()
-        LOGGER.warn("All query repository cache cleared!")
+        LOGGER.warn("All caches cleared in query repository!")
     }
 
     QScript parse(String scriptId, QSession session) throws NyException {
