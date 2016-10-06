@@ -2,21 +2,13 @@
  * @author IWEERARATHNA
  */
 def myQ = $DSL.select {
-
     TARGET (Rental.alias("r"))
-
-    FETCH (PARAM("cost").alias("cost"), r.rental_id)
-
-    WHERE {
-
-        EQ (r.customer_id, PARAM("amap.cids.cid"))
-
-    }
-
+    LIMIT 10
 }
 
 $DSL.script {
 
+    RUN("temp_table_test")
     def result = RUN(myQ)
     $LOG result
 

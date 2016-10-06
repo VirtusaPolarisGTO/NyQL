@@ -3,6 +3,8 @@ package com.virtusa.gto.insight.nyql.model
 import com.virtusa.gto.insight.nyql.DSL
 import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.utils.Constants
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.util.concurrent.ConcurrentHashMap
 
@@ -10,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap
  * @author IWEERARATHNA
  */
 class QSession {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(QSession.class)
 
     String scriptId
     Map<String, Object> sessionVariables = Collections.synchronizedMap([:])
@@ -20,6 +24,8 @@ class QSession {
     QExecutor executor
 
     DSLContext dslContext
+
+    private int execDepth = 0
 
     private QSession() {}
 
@@ -46,12 +52,18 @@ class QSession {
 
     QExecutor beingScript() {
         executor = executorFactory.createReusable();
+        def stack = incrStack()
+        LOGGER.debug("Session {} starting script at execution depth {}", this, stack)
         return executor
     }
 
     void closeScript() {
-        if (executor != null) {
+        def stack = decrStack()
+        if (executor != null && stack <= 0) {
+            LOGGER.debug("Closing executor since script has completed running.")
             executor.close()
+        } else if (stack > 0) {
+            LOGGER.debug("Session {} ended script at execution depth {}", this, stack)
         }
     }
 
@@ -69,5 +81,13 @@ class QSession {
         } else {
             return executorFactory.create().execute(scriptList)
         }
+    }
+
+    private synchronized int incrStack() {
+        ++execDepth
+    }
+
+    private synchronized int decrStack() {
+        --execDepth
     }
 }
