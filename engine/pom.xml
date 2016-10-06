@@ -46,7 +46,7 @@
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.5</version>
+                <version>${gmavenplus.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -70,7 +70,7 @@
                             </includes>
                         </source>
                     </sources>
-                    <invokeDynamic>true</invokeDynamic>
+                    <invokeDynamic>${groovy.invoke.dynamic}</invokeDynamic>
                 </configuration>
                 <dependencies>
                     <dependency>

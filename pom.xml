@@ -13,6 +13,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jdk.version>1.8</jdk.version>
+        <groovy.invoke.dynamic>true</groovy.invoke.dynamic>
+        <gmavenplus.version>1.5</gmavenplus.version>
 
         <groovy.version>2.4.7</groovy.version>
         <slf4j.version>1.7.21</slf4j.version>
