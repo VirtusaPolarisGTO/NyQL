@@ -239,4 +239,18 @@ class NyQL {
         return JsonOutput.toJson(result);
     }
 
+    /**
+     * Executes the given script and returns the result as a json string.
+     * <p>
+     *     If you still want to parse the json again, use the other execute method
+     *     <code>execute(String, Map)</code>.
+     * </p>
+     *
+     * @param scriptName name of the script to run.
+     * @return result as json string.
+     * @throws NyException any exception thrown while executing and parsing.
+     */
+    public static String executeToJSON(String scriptName) throws NyException {
+        return executeToJSON(scriptName, [:])
+    }
 }
