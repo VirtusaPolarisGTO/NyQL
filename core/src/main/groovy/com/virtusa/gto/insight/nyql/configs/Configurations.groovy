@@ -2,12 +2,7 @@ package com.virtusa.gto.insight.nyql.configs
 
 import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.exceptions.NyException
-import com.virtusa.gto.insight.nyql.model.QDatabaseRegistry
-import com.virtusa.gto.insight.nyql.model.QExecutorFactory
-import com.virtusa.gto.insight.nyql.model.QExecutorRegistry
-import com.virtusa.gto.insight.nyql.model.QRepository
-import com.virtusa.gto.insight.nyql.model.QRepositoryRegistry
-import com.virtusa.gto.insight.nyql.model.QScriptMapper
+import com.virtusa.gto.insight.nyql.model.*
 import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import org.slf4j.Logger
@@ -46,11 +41,12 @@ class Configurations {
     }
 
     private void doConfig() throws NyException {
+        def classLoader = Thread.currentThread().contextClassLoader
         List<String> clzNames = getAvailableTranslators()
         if (QUtils.notNullNorEmpty(clzNames)) {
             clzNames.each {
                 try {
-                    def factory = Class.forName(it).newInstance() as QDbFactory
+                    def factory = classLoader.loadClass(it).newInstance() as QDbFactory
                     QDatabaseRegistry.instance.register(factory)
                 } catch (ClassNotFoundException ex) {
                     throw new NyException("No database implementation class found by name '$it'!", ex)
@@ -76,8 +72,8 @@ class Configurations {
             args.put("_location", properties._location)
 
             boolean thisDef = r.name == defRepo
-            QScriptMapper scriptMapper = Class.forName(String.valueOf(r.mapper)).createNew(args)
-            QRepository qRepository = (QRepository) Class.forName(String.valueOf(r.repo)).newInstance([scriptMapper].toArray())
+            QScriptMapper scriptMapper = classLoader.loadClass(String.valueOf(r.mapper)).createNew(args)
+            QRepository qRepository = (QRepository) classLoader.loadClass(String.valueOf(r.repo)).newInstance([scriptMapper].toArray())
 
             QRepositoryRegistry.getInstance().register(String.valueOf(r.name), qRepository, thisDef)
         }
@@ -94,7 +90,7 @@ class Configurations {
                 continue
             }
 
-            QExecutorFactory executorFactory = (QExecutorFactory) Class.forName(String.valueOf(r.factory)).newInstance()
+            QExecutorFactory executorFactory = (QExecutorFactory) classLoader.loadClass(String.valueOf(r.factory)).newInstance()
             r.put("jdbcDriverClass", activeFactory.driverClassName())
             executorFactory.init(r)
 

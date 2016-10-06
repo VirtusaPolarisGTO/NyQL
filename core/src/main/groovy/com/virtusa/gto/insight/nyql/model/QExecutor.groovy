@@ -1,8 +1,6 @@
 package com.virtusa.gto.insight.nyql.model
 
 import com.virtusa.gto.insight.nyql.exceptions.NyException
-import com.virtusa.gto.insight.nyql.model.QScript
-import com.virtusa.gto.insight.nyql.model.QScriptList
 
 /**
  * @author IWEERARATHNA

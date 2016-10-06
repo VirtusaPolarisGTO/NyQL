@@ -2,7 +2,6 @@ package com.virtusa.gto.insight.nyql.traits
 
 import com.virtusa.gto.insight.nyql.Column
 import com.virtusa.gto.insight.nyql.FunctionColumn
-import com.virtusa.gto.insight.nyql.utils.QUtils
 
 /**
  * @author IWEERARATHNA

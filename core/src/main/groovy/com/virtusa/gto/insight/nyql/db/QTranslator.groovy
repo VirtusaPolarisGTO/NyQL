@@ -1,19 +1,14 @@
 package com.virtusa.gto.insight.nyql.db
 
 import com.virtusa.gto.insight.nyql.*
-import com.virtusa.gto.insight.nyql.Where.QCondition
-import com.virtusa.gto.insight.nyql.Where.QConditionGroup
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.ParamList
 import com.virtusa.gto.insight.nyql.model.blocks.QNumber
 import com.virtusa.gto.insight.nyql.model.blocks.QString
-import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
-import com.virtusa.gto.insight.nyql.utils.QueryType
 
 import java.util.stream.Collectors
-import java.util.stream.Stream
 
 /**
  * @author Isuru Weerarathna
@@ -54,7 +49,7 @@ trait QTranslator extends QJoins {
         } else if (obj instanceof List) {
             return obj.stream().map({ ___resolve(it, contextType, paramOrder) }).collect(Collectors.joining(", ", "(", ")"))
         } else {
-            throw new Exception("Unsupported data object to convert! [" + obj + ", type: " + obj.class + "]")
+            throw new NyException("Unsupported data object to convert! [" + obj + ", type: " + obj.class + "]")
         }
     }
 

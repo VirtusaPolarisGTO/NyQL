@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql
 
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 
 /**
@@ -34,7 +35,7 @@ class Case extends Column implements DataTypeTraits {
 
     def THEN(closure) {
         if (__lastWhere == null) {
-            throw new RuntimeException("No associated WHEN condition found for this THEN!")
+            throw new NySyntaxException("No associated WHEN condition found for this THEN!")
         }
 
         def code = closure.rehydrate(_ownerQ ?: this, this, this)

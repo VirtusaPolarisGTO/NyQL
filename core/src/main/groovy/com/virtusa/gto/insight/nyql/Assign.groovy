@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql
 
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.ParamList
@@ -101,7 +102,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
             _ctx.tables.put(name, table)
             return table
         } else {
-            throw new Exception("No table by name $name found!")
+            throw new NySyntaxException("No table by name $name found!")
         }
     }
 

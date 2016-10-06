@@ -1,6 +1,5 @@
 package com.virtusa.gto.insight.nyql
 
-import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.utils.QUtils
 
 /**

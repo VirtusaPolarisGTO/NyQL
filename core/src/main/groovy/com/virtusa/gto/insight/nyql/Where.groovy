@@ -234,7 +234,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             if (column != null) {
                 return column
             }
-            throw new Exception("No table by name '$name' found!")
+            throw new NySyntaxException("No table by name '$name' found!")
         }
     }
 
@@ -246,15 +246,6 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             }
         }
         throw new NySyntaxException("Unknown function detected! [Name: '$name', params: $args]")
-    }
-
-    private void appendOneLastBefore(Object clause) {
-        if (clauses.size() > 0) {
-            int idx = clauses.size() - 1
-            clauses.add(idx, clause)
-        } else {
-            clauses.add(clause)
-        }
     }
 
     static class QConditionGroup {

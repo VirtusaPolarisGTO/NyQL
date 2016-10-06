@@ -63,10 +63,4 @@ class DTable extends DAbstractEntity {
         return this
     }
 
-    private <T> T invokeIn(T obj, closure) {
-        def code = closure.rehydrate(obj, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
-        return code()
-    }
-
 }

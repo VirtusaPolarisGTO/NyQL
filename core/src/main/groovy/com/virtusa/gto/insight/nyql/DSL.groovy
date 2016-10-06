@@ -333,7 +333,4 @@ class DSL {
         }
     }
 
-    def propertyMissing(String name, def arg) {
-
-    }
 }

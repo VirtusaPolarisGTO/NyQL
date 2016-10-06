@@ -76,7 +76,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         if (_ctx.columns.containsKey(colName)) {
             return _ctx.columns.get(colName)
         } else {
-            throw new Exception("No column is found by name '$colName'!")
+            throw new NySyntaxException("No column is found by name '$colName'!")
         }
     }
 
@@ -130,7 +130,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
             if (column != null) {
                 return column
             }
-            throw new Exception("No table by name '$name' found!")
+            throw new NySyntaxException("No table by name '$name' found!")
         }
     }
 
@@ -144,7 +144,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         try {
             return _ctx.translator.invokeMethod(name, args)
         } catch (Exception ignored) {
-            throw new Exception("Unsupported function for $_ctx.translatorName is found! (Function: '$name')")
+            throw new NySyntaxException("Unsupported function for $_ctx.translatorName is found! (Function: '$name')")
         }
     }
 }

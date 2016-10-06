@@ -1,7 +1,4 @@
 package com.virtusa.gto.insight.nyql
-
-import com.virtusa.gto.insight.nyql.utils.QReturnType
-
 /**
  * @author Isuru Weerarathna
  */

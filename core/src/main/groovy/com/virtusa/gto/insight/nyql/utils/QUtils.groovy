@@ -2,7 +2,6 @@ package com.virtusa.gto.insight.nyql.utils
 
 import com.virtusa.gto.insight.nyql.Join
 import com.virtusa.gto.insight.nyql.QContext
-import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.Table
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
@@ -156,13 +155,6 @@ class QUtils {
         } else {
             return new NamedParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName)
         }
-    }
-
-    private String __wrapF(def c, String funcName) {
-        if (c instanceof String)
-            return funcName + "($c)"
-        else
-            return funcName + "(" + ___columnName(c, QContextType.INSIDE_FUNCTION) + ")"
     }
 
 }
