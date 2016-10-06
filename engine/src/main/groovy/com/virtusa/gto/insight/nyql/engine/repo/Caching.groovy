@@ -11,7 +11,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.util.concurrent.ConcurrentHashMap
-import java.util.function.Function
 
 /**
  * @author IWEERARATHNA
@@ -36,7 +35,8 @@ class Caching implements Closeable {
                 try {
                     LOGGER.debug("  Compiling: " + qSource.id)
                     gcl.parseClass(qSource.codeSource, true)
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
+                    LOGGER.error("Compilation error in script ${qSource.id}", ex)
                     throw new NyException("Compilation error in script ${qSource.id}!", ex)
                 }
             }
@@ -74,8 +74,10 @@ class Caching implements Closeable {
         }
     }
 
-    void clearGeneratedCache() {
-        cache.clear()
+    void clearGeneratedCache(int level) {
+        if (level >= 0) {
+            cache.clear()
+        }
     }
 
     void invalidateGeneratedCache(String scriptId) {

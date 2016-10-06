@@ -8,9 +8,9 @@ import com.virtusa.gto.insight.nyql.model.QSource
  */
 class QSingleScript implements QScriptMapper {
 
-    private GroovyCodeSource codeSource
-    private QSource qSource
-    private List<QSource> allSources
+    private final GroovyCodeSource codeSource
+    private final QSource qSource
+    private final List<QSource> allSources
 
     QSingleScript(String id, String content) {
         codeSource = new GroovyCodeSource(content, id, GroovyShell.DEFAULT_CODE_BASE)

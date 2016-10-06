@@ -1,8 +1,8 @@
 package com.virtusa.gto.insight.nyql.engine.impl
 
-import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QHikariPool
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QJdbcPool
+import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QExecutorFactory
 
 /**
@@ -12,7 +12,7 @@ import com.virtusa.gto.insight.nyql.model.QExecutorFactory
  */
 class QJdbcExecutorFactory implements QExecutorFactory {
 
-    private QJdbcPool jdbcPool = new QHikariPool()
+    private final QJdbcPool jdbcPool = new QHikariPool()
 
     @Override
     void init(Map options) {

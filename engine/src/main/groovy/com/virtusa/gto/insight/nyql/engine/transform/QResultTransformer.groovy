@@ -7,6 +7,6 @@ import java.util.function.Function
  */
 interface QResultTransformer<T, R> extends Function<T, R> {
 
-    long convertUpdateResult(long val);
+    long convertUpdateResult(long val)
 
 }

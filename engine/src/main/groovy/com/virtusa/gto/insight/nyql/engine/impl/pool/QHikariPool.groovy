@@ -16,6 +16,7 @@ import java.sql.Connection
 class QHikariPool implements QJdbcPool {
 
     private HikariDataSource hikari = null
+    private final Object hikariLock = new Object()
 
     @Override
     Connection getConnection() throws NyException {
@@ -23,7 +24,7 @@ class QHikariPool implements QJdbcPool {
     }
 
     @Override
-    synchronized void init(Map options) throws NyException {
+    void init(Map options) throws NyException {
         HikariConfig config = new HikariConfig();
         //config.setDataSourceClassName(String.valueOf(options.dataSourceClassName))
         if (options.containsKey("jdbcDriverClass")) {
@@ -49,11 +50,15 @@ class QHikariPool implements QJdbcPool {
             config.setDataSourceProperties(properties)
         }
 
-        hikari = new HikariDataSource(config)
+        synchronized (hikariLock) {
+            hikari = new HikariDataSource(config)
+        }
     }
 
     @Override
     void shutdown() throws NyException {
-        hikari.close()
+        synchronized (hikariLock) {
+            hikari.close()
+        }
     }
 }

@@ -1,30 +1,25 @@
 package com.virtusa.gto.insight.nyql.engine.impl
 
-import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.StoredFunction
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QJdbcPoolFetcher
+import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallResultTransformer
+import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallTransformInput
+import com.virtusa.gto.insight.nyql.engine.transform.JdbcResultTransformer
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.model.QExecutor
+import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptResult
+import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
 import com.virtusa.gto.insight.nyql.model.blocks.ParamList
 import com.virtusa.gto.insight.nyql.utils.QReturnType
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
-import com.virtusa.gto.insight.nyql.model.QExecutor
-import com.virtusa.gto.insight.nyql.model.QScript
-import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallResultTransformer
-import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallTransformInput
-import com.virtusa.gto.insight.nyql.engine.transform.JdbcResultTransformer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.sql.CallableStatement
-import java.sql.Connection
-import java.sql.PreparedStatement
-import java.sql.ResultSet
-import java.sql.Savepoint
-import java.sql.Statement
+import java.sql.*
 import java.util.stream.Collectors
 
 /**
@@ -37,10 +32,10 @@ class QJdbcExecutor implements QExecutor {
     private static final JdbcResultTransformer transformer = new JdbcResultTransformer()
     private static final JdbcCallResultTransformer callResultTransformer = new JdbcCallResultTransformer()
 
-    private QJdbcPoolFetcher poolFetcher
+    private final QJdbcPoolFetcher poolFetcher
     private Connection connection
-    private boolean returnRaw = false
-    private boolean reusable = false
+    private final boolean returnRaw
+    private final boolean reusable
 
     /**
      * Creates an executor with custom connection.
@@ -49,8 +44,10 @@ class QJdbcExecutor implements QExecutor {
      * @param yourConnection sql connection
      */
     QJdbcExecutor(Connection yourConnection) {
+        poolFetcher = null
         connection = yourConnection
         reusable = true
+        returnRaw = false
     }
 
     QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher) {
@@ -60,10 +57,11 @@ class QJdbcExecutor implements QExecutor {
     QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher, boolean canReusable) {
         poolFetcher = jdbcPoolFetcher
         reusable = canReusable
+        returnRaw = false
     }
 
     private Connection getConnection() {
-        if (connection == null) {
+        if (connection == null && poolFetcher != null) {
             connection = poolFetcher.getConnection()
         }
         return connection
@@ -259,7 +257,7 @@ class QJdbcExecutor implements QExecutor {
                 if (itemValue instanceof List) {
                     List itemList = itemValue
                     itemList.each { orderedParams.add(it) }
-                    String pStr = itemList.stream().map({ return "?" }).collect(Collectors.joining(", "))
+                    String pStr = itemList.stream().map { return "?" }.collect(Collectors.joining(", "))
                     query = query.replaceAll("::" + param.__name + "::", pStr)
                     cp += itemList.size()
 

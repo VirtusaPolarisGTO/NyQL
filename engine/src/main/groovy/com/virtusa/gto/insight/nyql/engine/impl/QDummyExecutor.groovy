@@ -1,64 +1,68 @@
 package com.virtusa.gto.insight.nyql.engine.impl
 
 import com.virtusa.gto.insight.nyql.exceptions.NyException
-import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
+import com.virtusa.gto.insight.nyql.utils.QUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * @author IWEERARATHNA
  */
 class QDummyExecutor implements QExecutor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(QDummyExecutor.class)
+
     @Override
     def execute(QScript script) throws Exception {
-        println "====================================================================="
-        println "Executing query:"
-        println "\t${script.proxy.query.trim()}"
+        LOGGER.debug("=====================================================================")
+        LOGGER.debug("Executing query:")
+        LOGGER.debug("\t${script.proxy.query.trim()}")
         if (QUtils.notNullNorEmpty(script.proxy.orderedParameters)) {
-            println "-------------------------------------------------"
-            println("  with ")
-            script.proxy.orderedParameters.each {println("    $it")}
+            LOGGER.debug("-------------------------------------------------")
+            LOGGER.debug("  with ")
+            script.proxy.orderedParameters.each {LOGGER.debug("    $it")}
         }
 
         int p = new Random(System.currentTimeMillis()).nextInt(10)
         if (p % 2 == 0) {
-            println "  Returning list"
+            LOGGER.debug("  Returning list")
             return ["isuru", "wee"]
         } else {
-            println "  Returning numeric"
+            LOGGER.debug("  Returning numeric")
             return p
         }
     }
 
     @Override
     void startTransaction() throws NyException {
-        println "Starting a new transaction..."
+        LOGGER.debug("Starting a new transaction...")
     }
 
     @Override
     void commit() throws NyException {
-        println("Committed.")
+        LOGGER.debug("Committed.")
     }
 
     @Override
     def checkPoint() throws NyException {
-        println("Adding checkpoint here. . .")
+        LOGGER.debug("Adding checkpoint here. . .")
         return null
     }
 
     @Override
     void rollback(Object checkpoint) throws NyException {
-        println "Rollback to the checkpoint: " + checkpoint ?: "<>"
+        LOGGER.debug("Rollback to the checkpoint: " + checkpoint ?: "<>")
     }
 
     @Override
     void done() throws NyException {
-        println "Script is done!"
+        LOGGER.debug("Script is done!")
     }
 
     @Override
     void close() throws IOException {
-        println("Closing executor!")
+        LOGGER.debug("Closing executor!")
     }
 }

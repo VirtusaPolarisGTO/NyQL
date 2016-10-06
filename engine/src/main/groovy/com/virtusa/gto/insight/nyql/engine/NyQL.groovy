@@ -4,16 +4,10 @@ import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.engine.impl.QExternalJdbcFactory
 import com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutor
-import com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl
 import com.virtusa.gto.insight.nyql.engine.repo.QSingleScript
 import com.virtusa.gto.insight.nyql.engine.repo.QSingleScriptRepository
 import com.virtusa.gto.insight.nyql.exceptions.NyException
-import com.virtusa.gto.insight.nyql.model.QExecutorRegistry
-import com.virtusa.gto.insight.nyql.model.QRepository
-import com.virtusa.gto.insight.nyql.model.QRepositoryRegistry
-import com.virtusa.gto.insight.nyql.model.QScript
-import com.virtusa.gto.insight.nyql.model.QSession
-import com.virtusa.gto.insight.nyql.utils.Constants
+import com.virtusa.gto.insight.nyql.model.*
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.slf4j.Logger
@@ -30,7 +24,7 @@ class NyQL {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NyQL.class);
 
-    private static final Map<String, Object> EMPTY_MAP = new HashMap<>();
+    private static final Map<String, Object> EMPTY_MAP = [:];
 
     private static final String JSON_CONFIG_FILENAME = "nyql.json";
 

@@ -10,7 +10,7 @@ import java.sql.Connection
  */
 class QExternalJdbcFactory implements QExecutorFactory {
 
-    private Connection connection
+    private final Connection connection
 
     QExternalJdbcFactory(Connection connection) {
         this.connection = connection
@@ -33,6 +33,8 @@ class QExternalJdbcFactory implements QExecutorFactory {
 
     @Override
     void shutdown() {
-
+        if (connection != null && !connection.isClosed()) {
+            connection.close()
+        }
     }
 }

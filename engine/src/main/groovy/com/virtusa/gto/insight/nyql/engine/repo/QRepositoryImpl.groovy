@@ -8,8 +8,6 @@ import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptParseException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.*
 import org.codehaus.groovy.control.CompilationFailedException
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -39,7 +37,7 @@ class QRepositoryImpl implements QRepository {
     }
 
     public void clearCache(int level) {
-        caching.clearGeneratedCache()
+        caching.clearGeneratedCache(level)
         LOGGER.warn("All caches cleared in query repository!")
     }
 
