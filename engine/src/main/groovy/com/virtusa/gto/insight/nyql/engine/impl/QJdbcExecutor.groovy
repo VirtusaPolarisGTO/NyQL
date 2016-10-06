@@ -261,7 +261,6 @@ class QJdbcExecutor implements QExecutor {
                     itemList.each { orderedParams.add(it) }
                     String pStr = itemList.stream().map({ return "?" }).collect(Collectors.joining(", "))
                     query = query.replaceAll("::" + param.__name + "::", pStr)
-                    println query
                     cp += itemList.size()
 
                 } else {
