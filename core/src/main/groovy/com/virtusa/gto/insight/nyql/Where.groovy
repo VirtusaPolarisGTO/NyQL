@@ -248,6 +248,15 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         throw new NySyntaxException("Unknown function detected! [Name: '$name', params: $args]")
     }
 
+    protected void appendOneLastBefore(Object clause) {
+        if (clauses.size() > 0) {
+            int idx = clauses.size() - 1
+            clauses.add(idx, clause)
+        } else {
+            clauses.add(clause)
+        }
+    }
+
     static class QConditionGroup {
         Where where
         String condConnector = "AND"

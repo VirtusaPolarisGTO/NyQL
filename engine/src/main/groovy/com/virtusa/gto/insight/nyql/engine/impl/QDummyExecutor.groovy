@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
  */
 class QDummyExecutor implements QExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(QDummyExecutor.class)
+    private static final Logger LOGGER = LoggerFactory.getLogger(QDummyExecutor)
 
     @Override
     def execute(QScript script) throws Exception {
