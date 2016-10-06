@@ -29,5 +29,4 @@ $DSL.update {
         EQ (ac.first_name, STR("IsuruX"))
     }
 
-    RETURN_KEYS()
 }

@@ -3,8 +3,6 @@ package com.virtusa.gto.insight.nyql.engine.repo
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -59,7 +57,7 @@ class QScriptsFolder implements QScriptMapper {
     }
 
     private static String readAll(File file) {
-        return FileUtils.readFileToString(file, StandardCharsets.UTF_8)
+        return file.getText(StandardCharsets.UTF_8.displayName());
     }
 
     private static String captureFileName(String path) {
