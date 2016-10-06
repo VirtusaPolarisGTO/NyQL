@@ -4,7 +4,7 @@
 
 $DSL.select {
 
-    def gQ = IMPORT("top_customers")
+    def gQ = IMPORT("sakila/top_customers")
 
     TARGET (Rental.alias("rx"))
 

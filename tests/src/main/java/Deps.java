@@ -25,15 +25,84 @@ public class Deps {
 //        scan(dir, dir, calls);
 //
 //        System.out.println(calls);
-        printDependenciesOf(dir, "");
+        whoAreMyCallers(dir, "sakila/top_customers");
     }
 
-    public static void printDependenciesOf(File scriptDir, String scriptId) throws Exception {
+    public static void whoAreMyCallers(File scriptDir, String scriptId) throws Exception {
         Map<String, Set<String>> calls = new HashMap<>();
         scan(scriptDir, scriptDir, calls);
 
-        Graph g = createGraph(calls);
-        g.display();
+        Map<String, Set<String>> inMap = createInMap(calls);
+        Map<Integer, Set<String>> callees = findCallees(inMap, scriptId);
+
+        if (callees.size() == 0) {
+            System.out.println("No script calls this script '" + scriptId + "'.");
+        } else {
+            callees.keySet().stream().sorted().forEach(key -> {
+                if (key == 0) {
+                    System.out.println("Direct callers:");
+                } else {
+                    System.out.println("Callers in level " + key + ":");
+                }
+
+                callees.get(key).forEach(val -> System.out.println("  > " + val));
+            });
+        }
+        //Graph g = createGraph(calls);
+        //g.display();
+    }
+
+    private static Map<Integer, Set<String>> findCallees(Map<String, Set<String>> inMap, String scriptId) {
+        Map<String, Integer> lvlMap = new HashMap<>();
+        if (!inMap.containsKey(scriptId)) {
+            return new HashMap<>();
+        }
+
+        Set<String> visited = new HashSet<>();
+        bfs(scriptId, 0, inMap, visited, lvlMap);
+
+        Map<Integer, Set<String>> aggr = new HashMap<>();
+        lvlMap.forEach((s, integer) -> {
+            if (!aggr.containsKey(integer)) {
+                aggr.put(integer, new HashSet<>());
+            }
+            aggr.get(integer).add(s);
+        });
+
+        return aggr;
+    }
+
+    private static void bfs(String scrId, int level, Map<String, Set<String>> inMap, Set<String> visited, Map<String, Integer> lvlMap) {
+        if (!inMap.containsKey(scrId)) {
+            return;
+        }
+
+        Set<String> cls = inMap.get(scrId);
+        cls.removeAll(visited);
+
+        cls.forEach(it -> lvlMap.put(it, level));
+
+        cls.forEach(it -> {
+            visited.add(it);
+
+            bfs(it, level + 1, inMap, visited, lvlMap);
+        });
+    }
+
+    private static Map<String, Set<String>> createInMap(Map<String, Set<String>> map) {
+        Map<String, Set<String>> inns = new HashMap<>();
+
+        map.forEach((s, strings) -> {
+            if (strings.size() > 0) {
+                strings.forEach(other -> {
+                    if (!inns.containsKey(other)) {
+                        inns.put(other, new HashSet<>());
+                    }
+                    inns.get(other).add(s);
+                });
+            }
+        });
+        return inns;
     }
 
     private static Graph createGraph(Map<String, Set<String>> map) throws Exception {
@@ -69,8 +138,8 @@ public class Deps {
             String relPath = baseDir.toPath().relativize(src.toPath()).toString().replace("\\", "/");
             relPath = StringUtils.substringBeforeLast(relPath, ".");
 
-            System.out.println("Scanning: " + relPath);
-            System.out.println("   Called: " + toCalls);
+            //System.out.println("Scanning: " + relPath);
+            //System.out.println("   Called: " + toCalls);
             calls.put(relPath, toCalls);
         }
     }

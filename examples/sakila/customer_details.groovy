@@ -6,7 +6,7 @@ def s = $SESSION
 
 $DSL.script {
 
-    def topCustomers = RUN($IMPORT("top_customers"))
+    def topCustomers = RUN($IMPORT("sakila/top_customers"))
 
     for (def customer in topCustomers) {
         def cid = customer["customer_id"]
