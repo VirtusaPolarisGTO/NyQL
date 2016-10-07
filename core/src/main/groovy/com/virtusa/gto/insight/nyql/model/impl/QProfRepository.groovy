@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QRepository
 import com.virtusa.gto.insight.nyql.model.QScript
+import com.virtusa.gto.insight.nyql.model.QScriptResult
 import com.virtusa.gto.insight.nyql.model.QSession
 
 /**
@@ -25,9 +26,14 @@ class QProfRepository implements QRepository {
     @Override
     QScript parse(String scriptId, QSession session) throws NyException {
         long s = System.currentTimeMillis()
-        QScript result = repository.parse(scriptId, session)
+        def result = repository.parse(scriptId, session)
         long e = System.currentTimeMillis()
-        Configurations.instance().getProfiler().doneParsing(scriptId, (e - s), session)
+
+        if (result instanceof QScriptResult) {
+            Configurations.instance().getProfiler().doneExecuting(result, (e - s))
+        } else {
+            Configurations.instance().getProfiler().doneParsing(scriptId, (e - s), session)
+        }
         return result
     }
 

@@ -13,7 +13,7 @@ trait QRepository implements Closeable {
     abstract QScript parse(String scriptId, QSession session) throws NyException
 
     QScript parse(QResultProxy resultProxy, QSession session = null) throws NyException {
-        return new QScript(proxy: resultProxy, qSession: session)
+        return new QScript(id: session?.currentActiveScript() + '@' + resultProxy.hashCode(), proxy: resultProxy, qSession: session)
     }
 
 }

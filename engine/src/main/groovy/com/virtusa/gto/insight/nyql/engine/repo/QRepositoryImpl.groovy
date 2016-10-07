@@ -60,7 +60,7 @@ class QRepositoryImpl implements QRepository {
             LOGGER.info("Running script '{}'", scriptId)
             Object res = compiledScript.run()
 
-            QScript script = convertResult(res, session)
+            QScript script = convertResult(scriptId, res, session)
             cacheIfSpecified(compiledScript, scriptId, script)
             return script
 
@@ -81,13 +81,14 @@ class QRepositoryImpl implements QRepository {
         }
     }
 
-    protected static QScript convertResult(Object res, QSession session) {
+    protected static QScript convertResult(String scriptId, Object res, QSession session) {
         if (res instanceof QResultProxy) {
-            return new QScript(proxy: (QResultProxy) res, qSession: session)
+            return new QScript(id: scriptId, proxy: (QResultProxy) res, qSession: session)
         } else if (res instanceof QScriptList) {
+            res.id = scriptId
             return res
         } else {
-            return new QScriptResult(qSession: session, scriptResult: res)
+            return new QScriptResult(id: scriptId, qSession: session, scriptResult: res)
         }
     }
 

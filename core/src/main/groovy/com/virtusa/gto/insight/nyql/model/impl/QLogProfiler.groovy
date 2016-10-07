@@ -25,7 +25,7 @@ class QLogProfiler implements QProfiling {
 
     @Override
     void doneExecuting(QScript script, long elapsed) {
-        LOGGER.info("$TAG Script execution '${script.qSession.scriptId}' took ($elapsed ms) time.")
+        LOGGER.info("$TAG Script execution '${script.id}' took ($elapsed ms) time.")
     }
 
     @Override

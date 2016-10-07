@@ -13,7 +13,9 @@ class QSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QSession.class)
 
-    String scriptId
+    String rootScriptId
+    final Stack<String> scriptStack = new Stack<>()
+    private final Object stackLock = new Object()
     Map<String, Object> sessionVariables = Collections.synchronizedMap([:])
 
     QRepository scriptRepo
@@ -32,7 +34,8 @@ class QSession {
                 QRepositoryRegistry.instance.defaultRepository(),
                 null,
                 QExecutorRegistry.instance.defaultExecutorFactory())
-        qSession.scriptId = theScriptId
+        qSession.rootScriptId = theScriptId
+        qSession.scriptStack.push(theScriptId)
         return qSession
     }
 
@@ -46,6 +49,24 @@ class QSession {
         session.sessionVariables[Constants.DSL_ENTRY_WORD] = new DSL(session)
         session.sessionVariables[Constants.DSL_SESSION_WORD] = session.sessionVariables
         return session
+    }
+
+    void intoScript(String scriptId) {
+        synchronized (stackLock) {
+            scriptStack.push(scriptId)
+        }
+    }
+
+    void outFromScript(String scriptId) {
+        synchronized (stackLock) {
+            scriptStack.pop()
+        }
+    }
+
+    String currentActiveScript() {
+        synchronized (stackLock) {
+            scriptStack.peek()
+        }
     }
 
     QExecutor beingScript() {
@@ -87,5 +108,11 @@ class QSession {
 
     private synchronized int decrStack() {
         --execDepth
+    }
+
+
+    @Override
+    public String toString() {
+        return 'QSession@' + Integer.toHexString(hashCode());
     }
 }

@@ -50,7 +50,10 @@ class DSL {
     }
 
     QScript $IMPORT(String scriptName) {
-        return session.scriptRepo.parse(scriptName, session)
+        session.intoScript(scriptName)
+        QScript res = session.scriptRepo.parse(scriptName, session)
+        session.outFromScript(scriptName)
+        return res
     }
 
     def RUN(QScriptList scriptList) {
@@ -298,12 +301,11 @@ class DSL {
     ///////////////////////////////////////////////////////////////////////////////////
 
     DSL $LOG(Object msg) {
-        LOGGER.debug("[@ " + session.scriptId + " @]" + String.valueOf(msg))
-        return this
+        return $LOG(String.valueOf(msg))
     }
 
     DSL $LOG(String message) {
-        LOGGER.debug("[@ " + session.scriptId.toUpperCase() + " @]" + message)
+        LOGGER.debug("[@ " + session.currentActiveScript() + " @]" + message)
         return this
     }
 

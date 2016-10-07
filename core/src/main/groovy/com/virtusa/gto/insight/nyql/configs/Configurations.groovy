@@ -49,7 +49,7 @@ class Configurations {
     private void doConfig() throws NyException {
         boolean profileEnabled = loadProfiler()
         if (!profileEnabled) {
-            LOGGER.warn("Query profiling has been disabled! You might not be able to figure out timing of executions.")
+            LOGGER.warn('Query profiling has been disabled! You might not be able to figure out timing of executions.')
         } else {
             LOGGER.debug("Query profiling enabled with ${profiler.getClass().simpleName}!")
         }
@@ -62,10 +62,10 @@ class Configurations {
         // mark active database
         String activeDb = getActivatedDb()
         if (activeDb != null) {
-            LOGGER.debug("Activating DB: {}", activeDb)
+            LOGGER.debug("Activating DB: $activeDb")
             QDatabaseRegistry.instance.load(activeDb)
         } else {
-            throw new NyException("No database has been activated!")
+            throw new NyException('No database has been activated!')
         }
 
         // load repositories

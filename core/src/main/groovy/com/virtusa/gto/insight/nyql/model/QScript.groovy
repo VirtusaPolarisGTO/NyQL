@@ -9,6 +9,7 @@ import groovy.transform.ToString
 @ToString(excludes = ["qSession"])
 class QScript {
 
+    String id
     QResultProxy proxy
     QSession qSession
 

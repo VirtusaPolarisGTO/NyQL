@@ -78,7 +78,7 @@ class QJdbcExecutor implements QExecutor {
         }
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Query: -----------------------------------------------------\n" + script.proxy.query.trim())
+            LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" + script.proxy.query.trim())
             LOGGER.trace("------------------------------------------------------------")
         }
 
