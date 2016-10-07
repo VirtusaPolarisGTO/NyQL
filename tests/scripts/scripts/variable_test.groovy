@@ -14,5 +14,7 @@ $DSL.script {
     }
 
     RUN (innQ)
+    def result = RUN ("scripts/other_query")
+    $LOG result
 
 }

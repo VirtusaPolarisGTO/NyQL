@@ -51,10 +51,18 @@
     "SELECT \"hello\" AS constantColumn, \"yeah\" FROM `Actor` ac",
 
     $DSL.select {
-        TARGET (Film)
+        if ($SESSION.trueCondition) {
+            TARGET (Film)
+        } else {
+            TARGET (TVSeries)
+        }
+
         FETCH (film_id, title)
+        WHERE {
+            EQ (film_id, PARAM("filmId"))
+        }
     },
-    "SELECT film_id, title FROM `Film`",
+    "SELECT film_id, title FROM `Film` WHERE film_id = ?",
 
     $DSL.select {
         TARGET (Actor.alias("ac"))

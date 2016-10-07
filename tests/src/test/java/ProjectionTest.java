@@ -14,7 +14,10 @@ public class ProjectionTest extends AbstractTest {
 
     @Test
     public void testBasic() throws NyException {
-        Object result = NyQL.parse("projection/basic_projection");
+        Map<String, Object> data = new HashMap<>();
+        data.put("trueCondition", true);
+
+        Object result = NyQL.parse("projection/basic_projection", data);
         assertQueries(result);
     }
 
