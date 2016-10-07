@@ -17,12 +17,18 @@ public class ProjectionTest extends AbstractTest {
         Map<String, Object> data = new HashMap<>();
         data.put("trueCondition", true);
 
-        Object result = NyQL.parse("projection/basic_projection", data);
-        assertQueries(result);
+        assertQueries(NyQL.parse("projection/basic_projection", data));
+        assertQueries(NyQL.parse("projection/basic_projection", data));
+        assertQueries(NyQL.parse("projection/basic_projection", data));
+        assertQueries(NyQL.parse("projection/basic_projection", data));
     }
 
     @Test
     public void testImports() throws NyException {
+        assertQueries(NyQL.parse("projection/import_projection"));
+        assertQueries(NyQL.parse("projection/import_projection"));
+        assertQueries(NyQL.parse("projection/import_projection"));
+        assertQueries(NyQL.parse("projection/import_projection"));
         assertQueries(NyQL.parse("projection/import_projection"));
     }
 
@@ -31,6 +37,10 @@ public class ProjectionTest extends AbstractTest {
         Map<String, Object> data = new HashMap<>();
         data.put("listOfInt", Arrays.asList(1, 2, 3));
 
+        assertQueries(NyQL.parse("projection/func_projection", data));
+        assertQueries(NyQL.parse("projection/func_projection", data));
+        assertQueries(NyQL.parse("projection/func_projection", data));
+        assertQueries(NyQL.parse("projection/func_projection", data));
         assertQueries(NyQL.parse("projection/func_projection", data));
     }
 
