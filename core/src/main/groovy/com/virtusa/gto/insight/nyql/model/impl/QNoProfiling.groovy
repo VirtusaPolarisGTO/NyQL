@@ -14,6 +14,11 @@ class QNoProfiling implements QProfiling {
     private QNoProfiling() { }
 
     @Override
+    void start() {
+        // do nothing
+    }
+
+    @Override
     void doneParsing(String scriptId, long elapsed, QSession session) {
         // do nothing
     }

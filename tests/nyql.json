@@ -10,6 +10,8 @@
     "generatedQueries": true
   },
 
+  "addAutoShutdownHook": true,
+
   "defaultImports": [
     "com.virtusa.gto.insight.nyql.ddl.DKeyIndexType",
     "com.virtusa.gto.insight.nyql.ddl.DFieldType",
@@ -56,7 +58,7 @@
 
   "profiling": {
     "enabled": true,
-    "profiler": "com.virtusa.gto.insight.nyql.model.impl.QLogProfiler"
+    "profiler": "com.virtusa.gto.insight.nyql.profilers.QWebSocketProfiler"
   }
 
 }

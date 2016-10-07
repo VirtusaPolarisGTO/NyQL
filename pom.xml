@@ -26,6 +26,7 @@
         <module>engine</module>
         <module>translators</module>
         <module>tests</module>
+        <module>profilers</module>
     </modules>
 
     <dependencies>

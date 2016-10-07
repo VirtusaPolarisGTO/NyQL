@@ -90,6 +90,10 @@ class NyQL {
         }
     }
 
+    public static boolean hasConfigured() {
+        return Configurations.instance().configured
+    }
+
     /**
      * Config NyQL from classpath.
      *

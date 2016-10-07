@@ -19,6 +19,11 @@ class QLogProfiler implements QProfiling {
     private QLogProfiler() {}
 
     @Override
+    void start() {
+        LOGGER.info("$TAG Log profiler started.")
+    }
+
+    @Override
     void doneParsing(String scriptId, long elapsed, QSession session) {
         LOGGER.info("$TAG Script parsing '$scriptId' took ($elapsed ms) time.")
     }

@@ -67,13 +67,15 @@ public class AbstractTest {
 
     @BeforeClass
     public static void setupTests() {
-        System.setProperty("nyql.autoConfig", "false");
-        NyQL.configure(new File("./nyql.json"), true);
+        //if (NyQL.hasConfigured()) {
+            System.setProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true");
+            //NyQL.configure(new File("./nyql.json"), true);
+        //}
     }
 
     @AfterClass
     public static void tearDownTests() {
-        System.out.println("Shutting down test.");
-        NyQL.shutdown();
+        //System.out.println("Shutting down test.");
+        //NyQL.shutdown();
     }
 }
