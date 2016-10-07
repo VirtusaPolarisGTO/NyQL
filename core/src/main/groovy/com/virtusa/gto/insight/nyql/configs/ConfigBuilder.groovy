@@ -1,6 +1,7 @@
 package com.virtusa.gto.insight.nyql.configs
 
 import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
+import com.virtusa.gto.insight.nyql.model.QProfiling
 import com.virtusa.gto.insight.nyql.model.QRepository
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import groovy.transform.PackageScope
@@ -17,6 +18,15 @@ class ConfigBuilder {
     private Map<String, QScriptMapper> scriptMapper = [:]
 
     private ConfigBuilder() {}
+
+    public ConfigBuilder enableProfiler(QProfiling profilingImpl) {
+        if (!props["profiling"]) {
+            props["profiling"] = [:]
+        }
+        props["profiling"].enabled = true
+        props["profiling"].profiler = profilingImpl
+        return this
+    }
 
     public ConfigBuilder havingDefaultRepository(String repoName) {
         assertNotInitialized()

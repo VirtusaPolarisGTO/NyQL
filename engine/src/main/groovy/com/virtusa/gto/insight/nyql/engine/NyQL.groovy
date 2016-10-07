@@ -76,7 +76,7 @@ class NyQL {
                 }
                 //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
             } else {
-                LOGGER.debug("Loading configurations from " + nyConfig.absolutePath + "...")
+                LOGGER.debug("Loading configurations from " + nyConfig.canonicalPath + "...")
                 Map configData = new JsonSlurper().parse(nyConfig) as Map
                 configData.put("_location", new File(".").canonicalPath)
                 ConfigBuilder.instance().setupFrom(configData).build()

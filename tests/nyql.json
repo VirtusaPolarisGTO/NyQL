@@ -52,6 +52,11 @@
         "baseDir": "./scripts"
       }
     }
-  ]
+  ],
+
+  "profiling": {
+    "enabled": true,
+    "profiler": "com.virtusa.gto.insight.nyql.model.impl.QLogProfiler"
+  }
 
 }

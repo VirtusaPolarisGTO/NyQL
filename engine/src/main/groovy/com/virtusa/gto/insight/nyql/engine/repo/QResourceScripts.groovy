@@ -27,8 +27,8 @@ class QResourceScripts implements QScriptMapper {
             throw new NyConfigurationException("To create a new QResourceScripts requires at least one parameter with specifying a resource directory!")
         }
 
-        String path = args.resourceDir ?: "/";
-        return new QResourceScripts(path);
+        String path = args.resourceDir ?: "/"
+        new QResourceScripts(path)
     }
 
     @Override
@@ -50,14 +50,14 @@ class QResourceScripts implements QScriptMapper {
         def stream = Thread.currentThread().contextClassLoader.getResourceAsStream(subPath)
         if (stream != null) {
             try {
-                return stream.readLines(StandardCharsets.UTF_8.name()).join("\n")
+                return stream.readLines(StandardCharsets.UTF_8.name()).join('\n')
             } finally {
                 if (stream != null) {
                     stream.close()
                 }
             }
         }
-        throw new NyConfigurationException("There is no resource exist in '$subPath'!")
+        throw new NyConfigurationException("There is no resource exist in $subPath!")
     }
 
     @Override
@@ -67,6 +67,6 @@ class QResourceScripts implements QScriptMapper {
 
     @Override
     boolean canCacheAtStartup() {
-        return false
+        false
     }
 }

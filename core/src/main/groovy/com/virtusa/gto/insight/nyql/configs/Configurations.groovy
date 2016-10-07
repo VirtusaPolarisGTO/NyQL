@@ -4,6 +4,9 @@ import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.*
+import com.virtusa.gto.insight.nyql.model.impl.QNoProfiling
+import com.virtusa.gto.insight.nyql.model.impl.QProfExecutorFactory
+import com.virtusa.gto.insight.nyql.model.impl.QProfRepository
 import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import org.slf4j.Logger
@@ -22,6 +25,7 @@ class Configurations {
     private final Object lock = new Object();
     private boolean configured = false
     private ClassLoader classLoader
+    private QProfiling profiler
 
     private Configurations() {}
 
@@ -43,6 +47,13 @@ class Configurations {
     }
 
     private void doConfig() throws NyException {
+        boolean profileEnabled = loadProfiler()
+        if (!profileEnabled) {
+            LOGGER.warn("Query profiling has been disabled! You might not be able to figure out timing of executions.")
+        } else {
+            LOGGER.debug("Query profiling enabled with ${profiler.getClass().simpleName}!")
+        }
+
         def factoryClasses = getAvailableTranslators()
         if (QUtils.notNullNorEmpty(factoryClasses)) {
             factoryClasses.each { loadDBFactory it }
@@ -58,13 +69,35 @@ class Configurations {
         }
 
         // load repositories
-        loadRepos()
+        loadRepos(profileEnabled)
 
         // load executors
-        loadExecutors(activeDb)
+        loadExecutors(activeDb, profileEnabled)
     }
 
-    private void loadRepos() {
+    private boolean loadProfiler() throws NyConfigurationException {
+        def profiling = properties["profiling"]
+        if (profiling != null && profiling.enabled) {
+            def prof = profiling.profiler
+            if (prof instanceof QProfiling) {
+                profiler = prof
+                return true
+            } else {
+                try {
+                    profiler = classLoader.loadClass(String.valueOf(prof)).newInstance() as QProfiling
+                    return true
+                } catch (ReflectiveOperationException ex) {
+                    throw new NyConfigurationException("Error occurred while loading profiler! $prof", ex)
+                }
+            }
+
+        } else {
+            profiler = QNoProfiling.INSTANCE
+            return false
+        }
+    }
+
+    private void loadRepos(boolean profEnabled=false) {
         int added = 0
         String defRepo = properties.defaultRepository ?: Constants.DEFAULT_REPOSITORY_NAME
         List repos = properties.repositories ?: []
@@ -76,17 +109,24 @@ class Configurations {
             QScriptMapper scriptMapper = classLoader.loadClass(String.valueOf(r.mapper)).createNew(args)
             QRepository qRepository = (QRepository) classLoader.loadClass(String.valueOf(r.repo)).newInstance([scriptMapper].toArray())
 
+            if (profEnabled) {
+                qRepository = new QProfRepository(qRepository)
+            }
             QRepositoryRegistry.getInstance().register(String.valueOf(r.name), qRepository, thisDef)
             added++
         }
 
         if (properties["__repoMap"]) {
             Map<String, QRepository> repositoryMap = (Map<String, QRepository>) properties["__repoMap"]
-            repositoryMap.each { QRepositoryRegistry.instance.register(it.key, it.value, it.key == defRepo); added++ }
+            repositoryMap.each {
+                QRepository qRepository = profEnabled ? new QProfRepository(it.value) : it.value
+                QRepositoryRegistry.instance.register(it.key, qRepository, it.key == defRepo);
+                added++
+            }
         }
     }
 
-    private void loadExecutors(String activeDb) {
+    private void loadExecutors(String activeDb, boolean profEnabled=false) {
         QDbFactory activeFactory = QDatabaseRegistry.instance.getDbFactory(activeDb);
         boolean loadDefOnly = properties.loadDefaultExecutorOnly ?: false
         String defExec = properties.defaultExecutor ?: Constants.DEFAULT_EXECUTOR_NAME
@@ -100,6 +140,10 @@ class Configurations {
 
             QExecutorFactory executorFactory = (QExecutorFactory) classLoader.loadClass(String.valueOf(r.factory)).newInstance()
             r.put("jdbcDriverClass", activeFactory.driverClassName())
+
+            if (profEnabled) {
+                executorFactory = new QProfExecutorFactory(executorFactory)
+            }
             executorFactory.init(r)
 
             QExecutorRegistry.getInstance().register(String.valueOf(r.name), executorFactory, thisDef)
@@ -166,6 +210,10 @@ class Configurations {
 
     List getAvailableTranslators() {
         return properties.translators
+    }
+
+    QProfiling getProfiler() {
+        return profiler
     }
 
     static Configurations instance() {

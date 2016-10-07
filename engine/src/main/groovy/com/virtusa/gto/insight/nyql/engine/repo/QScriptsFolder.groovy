@@ -27,7 +27,7 @@ class QScriptsFolder implements QScriptMapper {
         baseDir = theBaseDir
 
         // scans the given directory
-        LOGGER.debug("Loading script files from directory '{}'", baseDir.absolutePath)
+        LOGGER.debug("Loading script files from directory '{}'", baseDir.canonicalPath)
         scanDir(baseDir)
         prettyPrintFiles()
     }

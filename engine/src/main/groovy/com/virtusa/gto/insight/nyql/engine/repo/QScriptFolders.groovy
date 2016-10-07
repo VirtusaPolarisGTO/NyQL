@@ -10,16 +10,16 @@ import com.virtusa.gto.insight.nyql.model.QSource
  */
 class QScriptFolders implements QScriptMapper {
 
-    private List<QScriptsFolder> scriptsFolderList = []
+    private final List<QScriptsFolder> scriptsFolderList = []
     private final Map<String, QSource> fileMap = [:]
 
-    public QScriptFolders(Collection<File> folders) {
+    QScriptFolders(Collection<File> folders) {
         if (folders != null) {
             folders.each { addScriptFolder(it) }
         }
     }
 
-    public QScriptFolders addScriptFolder(File file) {
+    QScriptFolders addScriptFolder(File file) {
         def impl = new QScriptsFolder(file)
         impl.allSources().each {
             def scriptId = it.id
@@ -35,16 +35,16 @@ class QScriptFolders implements QScriptMapper {
 
     static QScriptFolders createNew(Map args) throws NyException {
         if (args == null || args.size() == 0 || !args.baseDirs) {
-            throw new NyConfigurationException("To create a new QScriptsFolder requires at least " +
-                    "one parameter with specifying one or many directories!")
+            throw new NyConfigurationException('To create a new QScriptsFolder requires at least ' +
+                    'one parameter with specifying one or many directories!')
         }
 
-        List<String> paths = args.baseDirs;
+        List<String> paths = args.baseDirs
         List<File> folders = []
         for (String path : paths) {
             File dir = new File(path);
             if (!dir.exists()) {
-                String configFilePath = args._location;
+                String configFilePath = args._location
                 if (configFilePath != null) {
                     File activeDir = new File(configFilePath).canonicalFile.getParentFile()
                     if (activeDir.exists() && !dir.isAbsolute()) {
@@ -52,24 +52,24 @@ class QScriptFolders implements QScriptMapper {
                         continue
                     }
                 }
-                throw new NyConfigurationException("One of script folder does not exist! [" + path + "]")
+                throw new NyConfigurationException("One of script folder does not exist! $path")
             }
         }
-        return new QScriptFolders(folders);
+        new QScriptFolders(folders)
     }
 
     @Override
     QSource map(String id) {
-        return fileMap[id]
+        fileMap[id]
     }
 
     @Override
     Collection<QSource> allSources() {
-        return fileMap.values()
+        fileMap.values()
     }
 
     @Override
     boolean canCacheAtStartup() {
-        return true
+        true
     }
 }
