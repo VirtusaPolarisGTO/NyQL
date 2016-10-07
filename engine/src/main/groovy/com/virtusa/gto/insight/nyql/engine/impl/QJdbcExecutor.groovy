@@ -284,7 +284,8 @@ class QJdbcExecutor implements QExecutor {
     }
 
     private static boolean isReturnKeys(QScript script) {
-        script.proxy != null && script.proxy.qObject != null && script.proxy.qObject.returnType == QReturnType.KEYS
+        script.proxy != null && script.proxy.qObject != null && script.proxy.queryType == QueryType.INSERT &&
+                script.proxy.qObject.returnType == QReturnType.KEYS
     }
 
     private static Object deriveValue(Map dataMap, String name) {
