@@ -8,8 +8,8 @@ public class ConfigTest {
 
     @Test
     public void test() {
-        ConfigBuilder builder = ConfigBuilder.instance().activateDb("mysql");
-        builder.build();
+        //ConfigBuilder builder = ConfigBuilder.instance().activateDb("mysql");
+        //builder.build();
         //builder.activateDb("sss");
     }
 
