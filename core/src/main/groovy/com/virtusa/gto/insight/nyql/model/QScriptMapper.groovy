@@ -16,4 +16,6 @@ trait QScriptMapper implements Function<String, QSource> {
 
     abstract Collection<QSource> allSources()
 
+    abstract boolean canCacheAtStartup()
+
 }

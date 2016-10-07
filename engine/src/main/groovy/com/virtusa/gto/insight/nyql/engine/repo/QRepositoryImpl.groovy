@@ -33,7 +33,9 @@ class QRepositoryImpl implements QRepository {
     }
 
     private void initCache() throws NyException {
-        caching.compileAllScripts(mapper.allSources())
+        if (mapper.canCacheAtStartup()) {
+            caching.compileAllScripts(mapper.allSources())
+        }
     }
 
     public void clearCache(int level) {

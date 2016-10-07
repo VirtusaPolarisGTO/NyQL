@@ -1,6 +1,7 @@
 package com.virtusa.gto.insight.nyql.engine
 
 import com.virtusa.gto.insight.nyql.DSLContext
+import com.virtusa.gto.insight.nyql.configs.ConfigBuilder
 import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.engine.impl.QExternalJdbcFactory
 import com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutor
@@ -13,6 +14,7 @@ import groovy.json.JsonSlurper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.nio.charset.StandardCharsets
 import java.sql.Connection
 
 /**
@@ -29,9 +31,9 @@ class NyQL {
     private static final String JSON_CONFIG_FILENAME = "nyql.json";
 
     static {
-        if (!Boolean.parseBoolean(System.getProperty("nyql.autoConfig", "true"))) {
+        if (!Boolean.parseBoolean(System.getProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true"))) {
             LOGGER.warn("*"*100)
-            LOGGER.warn("You MUST EXPLICITLY Call Configure with nyql configuration json file!")
+            LOGGER.warn("You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!")
             LOGGER.warn("*"*100)
             return;
         }
@@ -65,21 +67,44 @@ class NyQL {
             LOGGER.warn("NyQL is going to configure with default configurations using classpath...")
             File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME);
             if (!nyConfig.exists()) {
-                LOGGER.error("*"*100)
-                LOGGER.error("No nyql.json file is found on classpath! [" + nyConfig.absolutePath + "]")
-                LOGGER.error(" "*50)
-                LOGGER.error("Explicitly call the configure method with configuration input file!")
-                LOGGER.error("*"*100)
+                if (!configFromClasspath()) {
+                    LOGGER.error("*" * 100)
+                    LOGGER.error("No nyql.json file is found on classpath! [" + nyConfig.absolutePath + "]")
+                    LOGGER.error(" " * 50)
+                    LOGGER.error("Explicitly call the configure method with configuration input file!")
+                    LOGGER.error("*" * 100)
+                }
                 //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
             } else {
                 LOGGER.debug("Loading configurations from " + nyConfig.absolutePath + "...")
                 Map configData = new JsonSlurper().parse(nyConfig) as Map
-                configData.put("_location", new File(".").absolutePath)
-                Configurations.instance().configure(configData)
+                configData.put("_location", new File(".").canonicalPath)
+                ConfigBuilder.instance().setupFrom(configData).build()
             }
 
         } else {
             LOGGER.warn("NyQL has already been configured!")
+        }
+    }
+
+    /**
+     * Config NyQL from classpath.
+     *
+     * @return true if successfully configured from
+     */
+    private static boolean configFromClasspath() {
+        if (!asBoolean(System.getProperty("com.virtusa.gto.insight.nyql.fromClasspath", "true"))) {
+            LOGGER.warn("NyQL configuration from classpath has been disabled!")
+            return false
+        }
+
+        def res = Thread.currentThread().contextClassLoader.getResourceAsStream(JSON_CONFIG_FILENAME)
+        if (res != null) {
+            LOGGER.debug("Loading configurations from classpath...")
+            Map configData = new JsonSlurper().parse(res, StandardCharsets.UTF_8.name()) as Map
+            ConfigBuilder.instance().setupFrom(configData).build()
+        } else {
+            return false
         }
     }
 
@@ -246,5 +271,9 @@ class NyQL {
      */
     public static String executeToJSON(String scriptName) throws NyException {
         return executeToJSON(scriptName, [:])
+    }
+
+    private static boolean asBoolean(String text) {
+        return text != null && (text.equalsIgnoreCase("true") || text.equalsIgnoreCase("yes"))
     }
 }

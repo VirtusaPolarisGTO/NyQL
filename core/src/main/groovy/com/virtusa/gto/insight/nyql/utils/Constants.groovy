@@ -1,7 +1,11 @@
 package com.virtusa.gto.insight.nyql.utils
+
+import groovy.transform.Immutable
+
 /**
  * @author IWEERARATHNA
  */
+@Immutable
 final class Constants {
 
     static final String DSL_ENTRY_WORD = '$DSL'

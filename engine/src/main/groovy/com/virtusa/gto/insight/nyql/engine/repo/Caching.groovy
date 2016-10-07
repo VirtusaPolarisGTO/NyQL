@@ -32,12 +32,13 @@ class Caching implements Closeable {
         if (Configurations.instance().cacheRawScripts()) {
             LOGGER.debug("Compiling all ${sources.size()} dsl script(s)...")
             for (QSource qSource : sources) {
+                String id = qSource.id
                 try {
-                    LOGGER.debug("  Compiling: " + qSource.id)
+                    LOGGER.debug("  Compiling: " + id)
                     gcl.parseClass(qSource.codeSource, true)
                 } catch (Exception ex) {
-                    LOGGER.error("Compilation error in script ${qSource.id}", ex)
-                    throw new NyException("Compilation error in script ${qSource.id}!", ex)
+                    LOGGER.error("Compilation error in script '$id'", ex)
+                    throw new NyException("Compilation error in script '$id'!", ex)
                 }
             }
             LOGGER.debug("Compilation successful!")

@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
+import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
@@ -72,7 +73,7 @@ class QScriptsFolder implements QScriptMapper {
 
     static QScriptsFolder createNew(Map args) throws NyException {
         if (args == null || args.size() == 0 || !args.baseDir) {
-            throw new NyException("To create a new QScriptsFolder requires at least one parameter with specifying base directory!")
+            throw new NyConfigurationException("To create a new QScriptsFolder requires at least one parameter with specifying base directory!")
         }
 
         String path = args.baseDir;
@@ -85,7 +86,7 @@ class QScriptsFolder implements QScriptMapper {
                     return new QScriptsFolder(activeDir.toPath().resolve(path).toFile())
                 }
             }
-            throw new NyException("Given script folder does not exist! [" + args[0] + "]")
+            throw new NyConfigurationException("Given script folder does not exist! [" + args[0] + "]")
         }
         return new QScriptsFolder(dir);
     }
@@ -98,6 +99,11 @@ class QScriptsFolder implements QScriptMapper {
     @Override
     Collection<QSource> allSources() {
         return fileMap.values()
+    }
+
+    @Override
+    boolean canCacheAtStartup() {
+        return true
     }
 
     private void prettyPrintFiles() {

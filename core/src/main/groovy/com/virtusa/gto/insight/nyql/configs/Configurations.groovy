@@ -1,6 +1,7 @@
 package com.virtusa.gto.insight.nyql.configs
 
 import com.virtusa.gto.insight.nyql.db.QDbFactory
+import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.*
 import com.virtusa.gto.insight.nyql.utils.Constants
@@ -13,19 +14,20 @@ import org.slf4j.LoggerFactory
  */
 class Configurations {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Configurations.class)
+    private static final Logger LOGGER = LoggerFactory.getLogger(Configurations)
 
     private Map properties = [:]
 
     private String cacheVarName
-
     private final Object lock = new Object();
     private boolean configured = false
+    private ClassLoader classLoader
 
     private Configurations() {}
 
     Configurations configure(Map configProps) throws NyException {
         properties = configProps
+        classLoader = Thread.currentThread().contextClassLoader
 
         synchronized (lock) {
             doConfig()
@@ -41,17 +43,9 @@ class Configurations {
     }
 
     private void doConfig() throws NyException {
-        def classLoader = Thread.currentThread().contextClassLoader
-        List<String> clzNames = getAvailableTranslators()
-        if (QUtils.notNullNorEmpty(clzNames)) {
-            clzNames.each {
-                try {
-                    def factory = classLoader.loadClass(it).newInstance() as QDbFactory
-                    QDatabaseRegistry.instance.register(factory)
-                } catch (ClassNotFoundException ex) {
-                    throw new NyException("No database implementation class found by name '$it'!", ex)
-                }
-            }
+        def factoryClasses = getAvailableTranslators()
+        if (QUtils.notNullNorEmpty(factoryClasses)) {
+            factoryClasses.each { loadDBFactory it }
         }
 
         // mark active database
@@ -63,8 +57,15 @@ class Configurations {
             throw new NyException("No database has been activated!")
         }
 
-
         // load repositories
+        loadRepos()
+
+        // load executors
+        loadExecutors(activeDb)
+    }
+
+    private void loadRepos() {
+        int added = 0
         String defRepo = properties.defaultRepository ?: Constants.DEFAULT_REPOSITORY_NAME
         List repos = properties.repositories ?: []
         for (Map r : repos) {
@@ -76,9 +77,16 @@ class Configurations {
             QRepository qRepository = (QRepository) classLoader.loadClass(String.valueOf(r.repo)).newInstance([scriptMapper].toArray())
 
             QRepositoryRegistry.getInstance().register(String.valueOf(r.name), qRepository, thisDef)
+            added++
         }
 
-        // load executors
+        if (properties["__repoMap"]) {
+            Map<String, QRepository> repositoryMap = (Map<String, QRepository>) properties["__repoMap"]
+            repositoryMap.each { QRepositoryRegistry.instance.register(it.key, it.value, it.key == defRepo); added++ }
+        }
+    }
+
+    private void loadExecutors(String activeDb) {
         QDbFactory activeFactory = QDatabaseRegistry.instance.getDbFactory(activeDb);
         boolean loadDefOnly = properties.loadDefaultExecutorOnly ?: false
         String defExec = properties.defaultExecutor ?: Constants.DEFAULT_EXECUTOR_NAME
@@ -96,6 +104,27 @@ class Configurations {
 
             QExecutorRegistry.getInstance().register(String.valueOf(r.name), executorFactory, thisDef)
         }
+    }
+
+    private void loadDBFactory(String clzName) throws NyConfigurationException {
+        try {
+            loadDBFactory(classLoader.loadClass(clzName))
+        } catch (ReflectiveOperationException ex) {
+            throw new NyConfigurationException("No database factory implementation class found by name '$clzName'!", ex)
+        }
+    }
+
+    private static void loadDBFactory(Class factoryClz) throws NyConfigurationException {
+        try {
+            def factory = factoryClz.newInstance() as QDbFactory
+            loadDBFactory(factory)
+        } catch (ReflectiveOperationException ex) {
+            throw new NyConfigurationException("Failed to initialize database factory class by name '${factoryClz.name}'!", ex)
+        }
+    }
+
+    private static void loadDBFactory(QDbFactory qDbFactory) {
+        QDatabaseRegistry.instance.register(qDbFactory)
     }
 
     boolean addShutdownHook() {
@@ -135,7 +164,7 @@ class Configurations {
         return (boolean) properties.caching.generatedQueries
     }
 
-    List<String> getAvailableTranslators() {
+    List getAvailableTranslators() {
         return properties.translators
     }
 
