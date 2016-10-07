@@ -28,12 +28,15 @@ class NyQL {
 
     private static final Map<String, Object> EMPTY_MAP = [:];
 
-    private static final String JSON_CONFIG_FILENAME = "nyql.json";
+    private static final String BOOTSTRAP_KEY = 'com.virtusa.gto.insight.nyql.autoBootstrap'
+    private static final String LOAD_CLASSPATH_KEY = 'com.virtusa.gto.insight.nyql.classpathBootstrap'
+    private static final String TRUE_STR = 'true'
+    private static final String JSON_CONFIG_FILENAME = 'nyql.json';
 
     static {
-        if (!Boolean.parseBoolean(System.getProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true"))) {
+        if (!Boolean.parseBoolean(System.getProperty(BOOTSTRAP_KEY, TRUE_STR))) {
             LOGGER.warn("*"*100)
-            LOGGER.warn("You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!")
+            LOGGER.warn('You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!')
             LOGGER.warn("*"*100)
             return;
         }
@@ -41,7 +44,7 @@ class NyQL {
         configure()
 
         if (Configurations.instance().addShutdownHook()) {
-            LOGGER.warn("Automatically adding a NyQL shutdown hook...")
+            LOGGER.warn('Automatically adding a NyQL shutdown hook...')
             Runtime.runtime.addShutdownHook(new Thread(new Runnable() {
                 @Override
                 void run() {
@@ -50,7 +53,7 @@ class NyQL {
             }));
         } else {
             LOGGER.warn("*"*100)
-            LOGGER.warn("You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!")
+            LOGGER.warn('You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!')
             LOGGER.warn("*"*100)
         }
     }
@@ -64,26 +67,26 @@ class NyQL {
      */
     public static void configure(File inputJson=null, boolean force=false) {
         if (!Configurations.instance().isConfigured() || force) {
-            LOGGER.warn("NyQL is going to configure with default configurations using classpath...")
+            LOGGER.warn('NyQL is going to configure with default configurations using classpath...')
             File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME);
             if (!nyConfig.exists()) {
                 if (!configFromClasspath()) {
                     LOGGER.error("*" * 100)
-                    LOGGER.error("No nyql.json file is found on classpath! [" + nyConfig.absolutePath + "]")
+                    LOGGER.error("No nyql.json file is found on classpath! [${nyConfig.absolutePath}]")
                     LOGGER.error(" " * 50)
-                    LOGGER.error("Explicitly call the configure method with configuration input file!")
+                    LOGGER.error('Explicitly call the configure method with configuration input file!')
                     LOGGER.error("*" * 100)
                 }
                 //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
             } else {
-                LOGGER.debug("Loading configurations from " + nyConfig.canonicalPath + "...")
+                LOGGER.debug("Loading configurations from ${nyConfig.canonicalPath}...")
                 Map configData = new JsonSlurper().parse(nyConfig) as Map
-                configData.put("_location", new File(".").canonicalPath)
+                configData.put('_location', new File('.').canonicalPath)
                 ConfigBuilder.instance().setupFrom(configData).build()
             }
 
         } else {
-            LOGGER.warn("NyQL has already been configured!")
+            LOGGER.warn('NyQL has already been configured!')
         }
     }
 
@@ -93,14 +96,14 @@ class NyQL {
      * @return true if successfully configured from
      */
     private static boolean configFromClasspath() {
-        if (!asBoolean(System.getProperty("com.virtusa.gto.insight.nyql.fromClasspath", "true"))) {
-            LOGGER.warn("NyQL configuration from classpath has been disabled!")
+        if (!asBoolean(System.getProperty(LOAD_CLASSPATH_KEY, TRUE_STR))) {
+            LOGGER.warn('NyQL configuration from classpath has been disabled!')
             return false
         }
 
         def res = Thread.currentThread().contextClassLoader.getResourceAsStream(JSON_CONFIG_FILENAME)
         if (res != null) {
-            LOGGER.debug("Loading configurations from classpath...")
+            LOGGER.debug('Loading configurations from classpath...')
             Map configData = new JsonSlurper().parse(res, StandardCharsets.UTF_8.name()) as Map
             ConfigBuilder.instance().setupFrom(configData).build()
         } else {
@@ -274,6 +277,6 @@ class NyQL {
     }
 
     private static boolean asBoolean(String text) {
-        return text != null && (text.equalsIgnoreCase("true") || text.equalsIgnoreCase("yes"))
+        text != null && (text.equalsIgnoreCase(TRUE_STR) || text.equalsIgnoreCase('yes'))
     }
 }

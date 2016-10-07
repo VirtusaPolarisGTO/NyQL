@@ -21,12 +21,12 @@ class QProfExecutorFactory implements QExecutorFactory {
 
     @Override
     QExecutor create() {
-        return new QProfExecutor(qExecutorFactory.create())
+        new QProfExecutor(qExecutorFactory.create())
     }
 
     @Override
     QExecutor createReusable() {
-        return new QProfExecutor(qExecutorFactory.createReusable())
+        new QProfExecutor(qExecutorFactory.createReusable())
     }
 
     @Override

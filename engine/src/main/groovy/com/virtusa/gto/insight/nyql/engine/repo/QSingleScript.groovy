@@ -1,6 +1,5 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
-import com.virtusa.gto.insight.nyql.configs.ConfigBuilder
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
 
@@ -21,16 +20,16 @@ class QSingleScript implements QScriptMapper {
 
     @Override
     QSource map(String id) {
-        return qSource
+        qSource
     }
 
     @Override
     Collection<QSource> allSources() {
-        return allSources
+        allSources
     }
 
     @Override
     boolean canCacheAtStartup() {
-        return true
+        true
     }
 }

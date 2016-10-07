@@ -60,7 +60,7 @@ class QScriptsFolder implements QScriptMapper {
     }
 
     private static String readAll(File file) {
-        return file.getText(StandardCharsets.UTF_8.displayName());
+        return file.getText(StandardCharsets.UTF_8.name());
     }
 
     private static String captureFileName(String path) {
@@ -73,7 +73,7 @@ class QScriptsFolder implements QScriptMapper {
 
     static QScriptsFolder createNew(Map args) throws NyException {
         if (args == null || args.size() == 0 || !args.baseDir) {
-            throw new NyConfigurationException("To create a new QScriptsFolder requires at least one parameter with specifying base directory!")
+            throw new NyConfigurationException('To create a new QScriptsFolder requires at least one parameter with specifying base directory!')
         }
 
         String path = args.baseDir;
@@ -86,35 +86,35 @@ class QScriptsFolder implements QScriptMapper {
                     return new QScriptsFolder(activeDir.toPath().resolve(path).toFile())
                 }
             }
-            throw new NyConfigurationException("Given script folder does not exist! [" + args[0] + "]")
+            throw new NyConfigurationException('Given script folder does not exist! [' + args[0] + ']')
         }
         return new QScriptsFolder(dir);
     }
 
     @Override
     QSource map(String id) {
-        return fileMap[id]
+        fileMap[id]
     }
 
     @Override
     Collection<QSource> allSources() {
-        return fileMap.values()
+        fileMap.values()
     }
 
     @Override
     boolean canCacheAtStartup() {
-        return true
+        true
     }
 
     private void prettyPrintFiles() {
         fileMap.keySet().sort().each {
             String kb = toKB(fileMap[it].file.length())
-            LOGGER.debug(" > " + it.padRight(maxLen + 5) + "${kb.padLeft(6)}")
+            LOGGER.debug(' > ' + it.padRight(maxLen + 5) + "${kb.padLeft(6)}")
         }
         LOGGER.debug("Found ${fileMap.size()} script(s).")
     }
 
     private static String toKB(long length) {
-        return ((int)Math.ceil(length / 1024.0)) + " KB"
+        return ((int)Math.ceil(length / 1024.0)) + ' KB'
     }
 }

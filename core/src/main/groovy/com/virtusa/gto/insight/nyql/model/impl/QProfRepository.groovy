@@ -14,7 +14,7 @@ class QProfRepository implements QRepository {
 
     private final QRepository repository
 
-    public QProfRepository(QRepository theRepository) {
+    QProfRepository(QRepository theRepository) {
         repository = theRepository
     }
 
@@ -30,11 +30,11 @@ class QProfRepository implements QRepository {
         long e = System.currentTimeMillis()
 
         if (result instanceof QScriptResult) {
-            Configurations.instance().getProfiler().doneExecuting(result, (e - s))
+            Configurations.instance().profiler.doneExecuting(result, (e - s))
         } else {
-            Configurations.instance().getProfiler().doneParsing(scriptId, (e - s), session)
+            Configurations.instance().profiler.doneParsing(scriptId, (e - s), session)
         }
-        return result
+        result
     }
 
     @Override

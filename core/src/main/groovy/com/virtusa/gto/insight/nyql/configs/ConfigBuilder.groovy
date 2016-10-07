@@ -4,7 +4,6 @@ import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.model.QProfiling
 import com.virtusa.gto.insight.nyql.model.QRepository
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
-import groovy.transform.PackageScope
 
 /**
  * @author IWEERARATHNA
@@ -19,116 +18,116 @@ class ConfigBuilder {
 
     private ConfigBuilder() {}
 
-    public ConfigBuilder enableProfiler(QProfiling profilingImpl) {
-        if (!props["profiling"]) {
-            props["profiling"] = [:]
+    ConfigBuilder enableProfiler(QProfiling profilingImpl) {
+        if (!props[ConfigKeys.PROFILING]) {
+            props[ConfigKeys.PROFILING] = [:]
         }
-        props["profiling"].enabled = true
-        props["profiling"].profiler = profilingImpl
+        props[ConfigKeys.PROFILING].enabled = true
+        props[ConfigKeys.PROFILING].profiler = profilingImpl
         return this
     }
 
-    public ConfigBuilder havingDefaultRepository(String repoName) {
+    ConfigBuilder havingDefaultRepository(String repoName) {
         assertNotInitialized()
-        props["defaultRepository"] = repoName
+        props[ConfigKeys.DEFAULT_REPO] = repoName
         return this
     }
 
-    public ConfigBuilder addScriptLoader(String mapperName, QScriptMapper qScriptMapper) {
+    ConfigBuilder addScriptLoader(String mapperName, QScriptMapper qScriptMapper) {
         scriptMapper.put(mapperName, qScriptMapper)
         return this
     }
 
-    public QScriptMapper getScriptLoader(String mapperName) {
+    QScriptMapper getScriptLoader(String mapperName) {
         return scriptMapper.get(mapperName)
     }
 
-    public QRepository getRepository(String name) {
+    QRepository getRepository(String name) {
         return repositoryMap[name]
     }
 
-    public ConfigBuilder addRepository(String name, QRepository repository) {
+    ConfigBuilder addRepository(String name, QRepository repository) {
         repositoryMap.put(name, repository)
         return this
     }
 
-    public ConfigBuilder addRepository(Map repositoryConfig) {
+    ConfigBuilder addRepository(Map repositoryConfig) {
         assertNotInitialized()
-        if (!props["repositories"]) {
-            props["repositories"] = []
+        if (!props[ConfigKeys.REPOSITORIES]) {
+            props[ConfigKeys.REPOSITORIES] = []
         }
-        props["repositories"] << repositoryConfig
+        props[ConfigKeys.REPOSITORIES] << repositoryConfig
         return this
     }
 
-    public ConfigBuilder havingDefaultExecutor(String executorName) {
+    ConfigBuilder havingDefaultExecutor(String executorName) {
         assertNotInitialized()
-        props["defaultExecutor"] = executorName
+        props[ConfigKeys.DEFAULT_EXECUTOR] = executorName
         return this
     }
 
-    public ConfigBuilder addExecutor(Map executorConfigs) {
+    ConfigBuilder addExecutor(Map executorConfigs) {
         assertNotInitialized()
-        if (!props["executors"]) {
+        if (!props[ConfigKeys.EXECUTORS]) {
             props["executors"] = []
         }
-        props["executors"] << executorConfigs
+        props[ConfigKeys.EXECUTORS] << executorConfigs
         return this
     }
 
-    public ConfigBuilder doCacheGeneratedQueries() {
+    ConfigBuilder doCacheGeneratedQueries() {
         assertNotInitialized()
-        if (!props["caching"]) {
-            props["caching"] = [:]
+        if (!props[ConfigKeys.CACHING]) {
+            props[ConfigKeys.CACHING] = [:]
         }
-        props["caching"].generatedQueries = true
+        props[ConfigKeys.CACHING].generatedQueries = true
         return this
     }
 
-    public ConfigBuilder doCacheCompiledScripts() {
+    ConfigBuilder doCacheCompiledScripts() {
         assertNotInitialized()
-        if (!props["caching"]) {
-            props["caching"] = [:]
+        if (!props[ConfigKeys.CACHING]) {
+            props[ConfigKeys.CACHING] = [:]
         }
-        props["caching"].compiledScripts = true
+        props[ConfigKeys.CACHING].compiledScripts = true
         return this
     }
 
-    public ConfigBuilder addDefaultImporters(String... clzFullName) {
+    ConfigBuilder addDefaultImporters(String... clzFullName) {
         assertNotInitialized()
         clzFullName.each { addDefaultImporter(it) }
         return this
     }
 
-    public ConfigBuilder addDefaultImporters(Collection<String> clzFullName) {
+    ConfigBuilder addDefaultImporters(Collection<String> clzFullName) {
         assertNotInitialized()
         clzFullName.each { addDefaultImporter(it) }
         return this
     }
 
-    public ConfigBuilder addDefaultImporter(String clzFullName) {
+    ConfigBuilder addDefaultImporter(String clzFullName) {
         assertNotInitialized()
-        if (!props["defaultImports"]) {
+        if (!props[ConfigKeys.DEFAULT_IMPORTS]) {
             props["defaultImports"] = []
         }
-        props["defaultImports"] << clzFullName
+        props[ConfigKeys.DEFAULT_IMPORTS] << clzFullName
         return this
     }
 
-    public ConfigBuilder addTranslators(Collection<String> clzNamesList) {
+    ConfigBuilder addTranslators(Collection<String> clzNamesList) {
         clzNamesList.each { addTranslator(it) }
         return this
     }
 
-    public ConfigBuilder addTranslator(String fullClzName) {
+    ConfigBuilder addTranslator(String fullClzName) {
         assertNotInitialized()
-        props["translators"] ? props["translators"].add(fullClzName) : [fullClzName]
+        props[ConfigKeys.TRANSLATORS] ? props[ConfigKeys.TRANSLATORS].add(fullClzName) : [fullClzName]
         return this
     }
 
-    public ConfigBuilder activateDb(String dbImplName) {
+    ConfigBuilder activateDb(String dbImplName) {
         assertNotInitialized()
-        props["activate"] = dbImplName
+        props[ConfigKeys.ACTIVATE_DB] = dbImplName
         return this
     }
 
@@ -140,14 +139,14 @@ class ConfigBuilder {
         }
     }
 
-    public ConfigBuilder setupFrom(Map map) {
+    ConfigBuilder setupFrom(Map map) {
         props.putAll(map)
         return this
     }
 
-    public Configurations build() {
-        props["__repoMap"] = repositoryMap
-        props["__scriptMapper"] = scriptMapper
+    Configurations build() {
+        props[ConfigKeys.REPO_MAP] = repositoryMap
+        props[ConfigKeys.SCRIPT_MAP] = scriptMapper
 
         synchronized (lock) {
             hasInitialized = true
@@ -155,7 +154,7 @@ class ConfigBuilder {
         Configurations.instance().configure(props)
     }
 
-    public static ConfigBuilder instance() {
+    static ConfigBuilder instance() {
         return Holder.INSTANCE
     }
 

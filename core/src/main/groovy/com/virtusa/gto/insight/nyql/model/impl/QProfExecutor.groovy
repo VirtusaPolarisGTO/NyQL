@@ -5,7 +5,6 @@ import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptResult
-import com.virtusa.gto.insight.nyql.model.QSession
 
 /**
  * @author IWEERARATHNA
@@ -30,7 +29,7 @@ class QProfExecutor implements QExecutor {
 
     @Override
     def checkPoint() throws NyException {
-        return executor.checkPoint()
+        executor.checkPoint()
     }
 
     @Override
@@ -49,9 +48,9 @@ class QProfExecutor implements QExecutor {
         def result = executor.execute(script)
         long e = System.currentTimeMillis()
         if (!(script instanceof QScriptResult)) {
-            Configurations.instance().getProfiler().doneExecuting(script, (e - s))
+            Configurations.instance().profiler.doneExecuting(script, (e - s))
         }
-        return result
+        result
     }
 
     @Override

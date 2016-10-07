@@ -76,20 +76,19 @@ class Configurations {
     }
 
     private boolean loadProfiler() throws NyConfigurationException {
-        def profiling = properties["profiling"]
-        if (profiling != null && profiling.enabled) {
+        def profiling = properties[ConfigKeys.PROFILING]
+        if (profiling?.enabled) {
             def prof = profiling.profiler
             if (prof instanceof QProfiling) {
                 profiler = prof
-                return true
             } else {
                 try {
                     profiler = classLoader.loadClass(String.valueOf(prof)).newInstance() as QProfiling
-                    return true
                 } catch (ReflectiveOperationException ex) {
                     throw new NyConfigurationException("Error occurred while loading profiler! $prof", ex)
                 }
             }
+            return true
 
         } else {
             profiler = QNoProfiling.INSTANCE
@@ -103,7 +102,7 @@ class Configurations {
         List repos = properties.repositories ?: []
         for (Map r : repos) {
             Map args = r.mapperArgs ?: [:]
-            args.put("_location", properties._location)
+            args.put('_location', properties._location)
 
             boolean thisDef = r.name == defRepo
             QScriptMapper scriptMapper = classLoader.loadClass(String.valueOf(r.mapper)).createNew(args)
@@ -116,8 +115,8 @@ class Configurations {
             added++
         }
 
-        if (properties["__repoMap"]) {
-            Map<String, QRepository> repositoryMap = (Map<String, QRepository>) properties["__repoMap"]
+        if (properties[ConfigKeys.REPO_MAP]) {
+            Map<String, QRepository> repositoryMap = (Map<String, QRepository>) properties[ConfigKeys.REPO_MAP]
             repositoryMap.each {
                 QRepository qRepository = profEnabled ? new QProfRepository(it.value) : it.value
                 QRepositoryRegistry.instance.register(it.key, qRepository, it.key == defRepo);
@@ -139,7 +138,7 @@ class Configurations {
             }
 
             QExecutorFactory executorFactory = (QExecutorFactory) classLoader.loadClass(String.valueOf(r.factory)).newInstance()
-            r.put("jdbcDriverClass", activeFactory.driverClassName())
+            r.put('jdbcDriverClass', activeFactory.driverClassName())
 
             if (profEnabled) {
                 executorFactory = new QProfExecutorFactory(executorFactory)
@@ -213,11 +212,11 @@ class Configurations {
     }
 
     QProfiling getProfiler() {
-        return profiler
+        profiler
     }
 
     static Configurations instance() {
-        return Holder.INSTANCE
+        Holder.INSTANCE
     }
 
     private static class Holder {

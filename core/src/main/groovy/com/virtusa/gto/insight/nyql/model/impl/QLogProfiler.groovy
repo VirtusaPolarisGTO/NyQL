@@ -14,7 +14,7 @@ class QLogProfiler implements QProfiling {
     static final QLogProfiler INSTANCE = new QLogProfiler()
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QLogProfiler)
-    private static final String TAG = "[NyPROFILE]"
+    private static final String TAG = '[NyPROFILE]'
 
     private QLogProfiler() {}
 
@@ -30,6 +30,6 @@ class QLogProfiler implements QProfiling {
 
     @Override
     void close() throws IOException {
-
+        LOGGER.debug("Closing log profile.")
     }
 }

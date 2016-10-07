@@ -15,16 +15,16 @@ class QNoProfiling implements QProfiling {
 
     @Override
     void doneParsing(String scriptId, long elapsed, QSession session) {
-
+        // do nothing
     }
 
     @Override
     void doneExecuting(QScript script, long elapsed) {
-
+        // do nothing
     }
 
     @Override
     void close() throws IOException {
-
+        // do nothing
     }
 }
