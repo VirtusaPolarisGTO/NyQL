@@ -47,7 +47,7 @@ class QAverageProfiler implements QProfiling {
         LOGGER.debug("Query Stats:")
         LOGGER.debug("-"*75)
 
-        parseStatMap.each {
+        parseStatMap.sort().each {
             LOGGER.debug("Query Parsing: " + it.key)
             LOGGER.debug("   > Invoked #:  " + it.value.getInvocationCount())
             LOGGER.debug("   > Avg Time :  " + FORMATTER.format(it.value.getAvgTime()) + " ms")
@@ -55,7 +55,8 @@ class QAverageProfiler implements QProfiling {
             LOGGER.debug("   > Min Time :  " + it.value.getMinTime() + " ms")
         }
 
-        statMap.each {
+        LOGGER.debug("-"*75)
+        statMap.sort().each {
             LOGGER.debug("Query Execution: " + it.key)
             LOGGER.debug("   > Invoked #:  " + it.value.getInvocationCount())
             LOGGER.debug("   > Avg Time :  " + FORMATTER.format(it.value.getAvgTime()) + " ms")

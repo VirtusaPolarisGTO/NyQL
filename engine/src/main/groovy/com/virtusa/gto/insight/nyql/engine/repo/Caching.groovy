@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
+import com.virtusa.gto.insight.nyql.QResultProxy
 import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScript
@@ -57,8 +58,17 @@ class Caching implements Closeable {
         return qScript
     }
 
+    private static QScript spawnScriptFrom(QScript src) {
+        QScript script = new QScript(id: src.id, qSession: null)
+        def resultProxy = src.proxy
+        if (resultProxy != null) {
+            script.proxy = resultProxy.dehydrate()
+        }
+        script
+    }
+
     QScript addGeneratedQuery(String scriptId, QScript script) {
-        cache.put(scriptId, script)
+        cache.put(scriptId, spawnScriptFrom(script))
         return script
     }
 

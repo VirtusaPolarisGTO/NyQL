@@ -3,9 +3,9 @@
 A common query DSL for popular relational databases.
 
 #### Terminology:
-* Query Repository: A folder containing all your query scripts.
-* Mapper: An instance responsible of mapping an identifier to a valid source which is consumable by any repository.
-* QResultProxy: Contains a database specific generated query with parameters in correct order
+* `Query Repository`: A folder containing all your query scripts and responsible of parsing a nyql query and generate a native query for the activated database.
+* `Mapper`: An instance responsible of mapping a script identifier to a valid source which is consumable by any repository.
+* `QResultProxy`: Contains a database specific generated query with parameters in correct order
 * QScript: Executable entity contains a QResultProxy instance with relevant data
 * Executor: Entity which executes script(s)
 
@@ -52,7 +52,10 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
       * **username**: database username
       * **password**: database password
       * **pooling**: NyQL uses HikariCP for JDBC connection pooling. And you can specify those configurations here as a JSON object. See their [site](https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby) for available configurations
-
+    * **profiling**: Enables query profiling at runtime and emits time taken for every query invocation.
+      * **enabled**: `true/false` enable/disable profiling
+      * **profiler**: full class name for the profiler to activate.
+      * **options**: a set of options for the profiler.
 
 3. If you want to see the db specific query, then use below code piece.
 
