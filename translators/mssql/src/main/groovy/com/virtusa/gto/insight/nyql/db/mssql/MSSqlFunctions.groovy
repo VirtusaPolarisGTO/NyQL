@@ -6,7 +6,12 @@ import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 /**
  * @author IWEERARATHNA
  */
-trait MSSqlFunctions implements QFunctions {
+class MSSqlFunctions implements QFunctions {
+
+    @Override
+    def date_trunc(Object it) {
+        return null
+    }
 
     def date_diff_years(c) {
         if (c instanceof List) return "DATEDIFF(year, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"

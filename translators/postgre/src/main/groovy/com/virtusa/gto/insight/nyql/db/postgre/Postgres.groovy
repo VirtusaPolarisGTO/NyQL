@@ -16,7 +16,7 @@ import java.util.stream.Stream
 /**
  * @author Isuru Weerarathna
  */
-class Postgres implements QTranslator, PostgresFunctions {
+class Postgres extends PostgresFunctions implements QTranslator {
 
     private static final PostgreDDL DDL = new PostgreDDL()
 

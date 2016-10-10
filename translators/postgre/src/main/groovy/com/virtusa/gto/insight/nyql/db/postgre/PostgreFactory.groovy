@@ -19,7 +19,7 @@ class PostgreFactory implements QDbFactory {
 
     @Override
     List<Class<?>> createTraits() {
-        return [PostgresFunctions]
+        return []
     }
 
     @Override

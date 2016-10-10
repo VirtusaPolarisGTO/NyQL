@@ -12,7 +12,7 @@ import java.util.stream.Collectors
 /**
  * @author IWEERARATHNA
  */
-trait PostgresFunctions implements QFunctions {
+class PostgresFunctions implements QFunctions {
 
     def current_date(c) { return "CURRENT_TIME" }
     def current_time(c) { return "CURRENT_DATE" }

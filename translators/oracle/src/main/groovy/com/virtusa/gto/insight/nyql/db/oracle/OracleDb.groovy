@@ -21,7 +21,7 @@ import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 /**
  * @author IWEERARATHNA
  */
-class OracleDb implements QTranslator, OracleFunctions {
+class OracleDb extends OracleFunctions implements QTranslator {
 
     static String STR_QUOTE = "'"
 

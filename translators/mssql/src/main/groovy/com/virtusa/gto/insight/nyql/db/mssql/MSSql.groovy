@@ -29,7 +29,7 @@ import java.util.stream.Stream
 /**
  * @author IWEERARATHNA
  */
-class MSSql implements QTranslator, MSSqlFunctions {
+class MSSql extends MSSqlFunctions implements QTranslator {
 
     private static final MSSqlDDL DDL = new MSSqlDDL()
 

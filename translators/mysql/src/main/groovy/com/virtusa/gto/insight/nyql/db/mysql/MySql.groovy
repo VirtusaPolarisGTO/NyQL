@@ -15,7 +15,7 @@ import java.util.stream.Stream
 /**
  * @author Isuru Weerarathna
  */
-class MySql implements QTranslator, MySqlFunctions {
+class MySql extends MySqlFunctions implements QTranslator {
 
     private static final MySqlDDL DDL = new MySqlDDL()
 

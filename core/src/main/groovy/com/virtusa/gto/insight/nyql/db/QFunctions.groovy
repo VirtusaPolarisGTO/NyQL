@@ -23,7 +23,7 @@ trait QFunctions {
     def current_timestamp() { return 'NOW()' }
     def current_date() { return 'CURDATE()' }
     def current_time() { return 'CURTIME()' }
-    def date_trunc(it) { 'DATE(' + ___resolveIn(it) + ')' }
+    abstract def date_trunc(it)
 
     /**
      * String functions.

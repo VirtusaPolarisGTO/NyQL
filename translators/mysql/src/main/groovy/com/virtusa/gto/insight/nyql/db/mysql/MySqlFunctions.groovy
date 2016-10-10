@@ -10,7 +10,9 @@ import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 /**
  * @author Isuru Weerarathna
  */
-trait MySqlFunctions implements QFunctions {
+class MySqlFunctions implements QFunctions {
+
+    def date_trunc(it) { 'DATE(' + ___resolveIn(it) + ')' }
 
     def date_diff_years(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(YEAR, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'

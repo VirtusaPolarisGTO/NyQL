@@ -24,7 +24,7 @@ class MySqlFactory implements QDbFactory {
 
     @Override
     List<Class<?>> createTraits() {
-        return [MySqlFunctions]
+        return []
     }
 
     @Override
