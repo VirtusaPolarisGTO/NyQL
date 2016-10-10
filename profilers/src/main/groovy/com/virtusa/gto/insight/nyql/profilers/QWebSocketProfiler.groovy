@@ -53,17 +53,17 @@ class QWebSocketProfiler implements QProfiling {
 
     @Override
     void doneParsing(String scriptId, long elapsed, QSession session) {
-        WSServer.sendToAll(String.valueOf([type: "Parse", id: scriptId, time: elapsed]))
+        WSServer.sendToAll(String.valueOf([type: 'Parse', id: scriptId, time: elapsed]))
     }
 
     @Override
     void doneExecuting(QScript script, long elapsed) {
-        WSServer.sendToAll(String.valueOf([type: "Execute", id: script.id, time: elapsed, query: script.proxy?.query]))
+        WSServer.sendToAll(String.valueOf([type: 'Execute', id: script.id, time: elapsed, query: script.proxy?.query]))
     }
 
     @Override
     void close() throws IOException {
-        LOGGER.debug("Shutting down profiler web socket!")
+        LOGGER.debug('Shutting down profiler web socket!')
         if (context != null) {
             context.shutdown()
         }
@@ -73,14 +73,14 @@ class QWebSocketProfiler implements QProfiling {
         if (server != null) {
             server.stop()
         }
-        LOGGER.debug("Successfully shutdown web-socket.")
+        LOGGER.debug('Successfully shutdown web-socket.')
     }
 
     private static class JettyNoLog implements Logger {
 
         @Override
         String getName() {
-            return "nyql-none"
+            return 'nyql-none'
         }
 
         @Override

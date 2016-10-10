@@ -10,6 +10,8 @@ import javax.websocket.OnOpen
 import javax.websocket.Session
 import javax.websocket.server.ServerEndpoint
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 /**
  * @author IWEERARATHNA
@@ -20,6 +22,8 @@ class WSServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(WSServer)
 
     private static Queue<Session> queue = new ConcurrentLinkedQueue<>()
+
+    private static final Executor POOL = Executors.newFixedThreadPool(3)
 
     @OnMessage
     public void onMessage(Session session, String msg) {
@@ -41,10 +45,15 @@ class WSServer {
         queue.remove(session)
     }
 
-    static void sendToAll(Object msg) {
-        for (Session s : queue) {
-            s.asyncRemote.sendObject(msg)
-        }
+    static void sendToAll(final Object msg) {
+        POOL.execute(new Runnable() {
+            @Override
+            void run() {
+                for (Session s : queue) {
+                    s.asyncRemote.sendObject(msg)
+                }
+            }
+        })
     }
 
 }

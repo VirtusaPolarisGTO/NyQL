@@ -81,7 +81,7 @@ class QScriptsFolder implements QScriptMapper {
         if (!dir.exists()) {
             String configFilePath = args._location;
             if (configFilePath != null) {
-                File activeDir = new File(configFilePath).canonicalFile.getParentFile()
+                File activeDir = new File(configFilePath).getCanonicalFile().getParentFile()
                 if (activeDir.exists() && !dir.isAbsolute()) {
                     return new QScriptsFolder(activeDir.toPath().resolve(path).toFile())
                 }
