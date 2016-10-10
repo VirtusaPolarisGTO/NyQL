@@ -28,16 +28,17 @@ class QWebSocketProfiler implements QProfiling {
     private ServerContainer wsContainer
 
     @Override
-    void start() {
+    void start(Map options) {
         if (server != null && server.isRunning()) {
             return
         }
 
-        LOGGER.debug("Starting profiler @ localhost:$PORT ...")
+        int port = options.port ?: PORT
+        LOGGER.debug("Starting profiler @ localhost:$port ...")
         Log.setLog(new JettyNoLog())
         server = new Server()
         connector = new ServerConnector(server)
-        connector.setPort(PORT)
+        connector.setPort(port)
         server.addConnector(connector)
 
         context = new ServletContextHandler(ServletContextHandler.SESSIONS)

@@ -14,7 +14,7 @@ class QNoProfiling implements QProfiling {
     private QNoProfiling() { }
 
     @Override
-    void start() {
+    void start(Map options) {
         // do nothing
     }
 

@@ -19,7 +19,7 @@ class QLogProfiler implements QProfiling {
     private QLogProfiler() {}
 
     @Override
-    void start() {
+    void start(Map options) {
         LOGGER.info("$TAG Log profiler started.")
     }
 

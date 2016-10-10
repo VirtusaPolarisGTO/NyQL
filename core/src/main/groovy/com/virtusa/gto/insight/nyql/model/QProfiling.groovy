@@ -5,7 +5,7 @@ package com.virtusa.gto.insight.nyql.model
  */
 interface QProfiling extends Closeable {
 
-    void start()
+    void start(Map options)
 
     void doneParsing(String scriptId, long elapsed, QSession session)
 
