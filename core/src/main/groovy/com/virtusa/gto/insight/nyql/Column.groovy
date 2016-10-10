@@ -11,7 +11,7 @@ class Column {
     String __alias = null
 
     def alias(String newName) {
-        _ctx?.renameColumn(__alias, newName, this)
+        _ctx.renameColumn(__alias, newName, this)
         __alias = newName
         return this
     }

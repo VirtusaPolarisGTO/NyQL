@@ -56,5 +56,16 @@ def innerImportImport = $DSL.$q {
         },
         "SELECT ac.year, ac.id, ac.title FROM `Actor` ac",
 
+        $DSL.select {
+            TARGET (Actor.alias("ac"))
+            FETCH ($IMPORT('projection/import_part2'))
+        },
+        "SELECT ac.id, IFNULL(ac.year, 2016) AS thisYear, ac.title AS nickName FROM `Actor` ac",
 
+        $DSL.select {
+            TARGET (Actor.alias("ac"))
+            FETCH ($IMPORT('projection/import_part2'))
+            GROUP_BY (thisYear)
+        },
+        "SELECT ac.id, IFNULL(ac.year, 2016) AS thisYear, ac.title AS nickName FROM `Actor` ac GROUP BY thisYear",
 ]

@@ -8,7 +8,6 @@ import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
  */
 class Case extends Column implements DataTypeTraits {
 
-    QContext _ctx = null
     Query _ownerQ = null
 
     CaseType caseType = CaseType.OTHER

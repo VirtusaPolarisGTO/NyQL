@@ -118,14 +118,14 @@ class MySql implements QTranslator, MySqlFunctions {
 
     @Override
     def ___columnName(final Column column, final QContextType contextType) {
-        if (column instanceof Case) {
-            return ___ifColumn(column, null)
-        }
-
         if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY) {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, BACK_TICK)
             }
+        }
+
+        if (column instanceof Case) {
+            return ___ifColumn(column, null)
         }
 
         if (contextType == QContextType.INTO) {
@@ -277,7 +277,7 @@ class MySql implements QTranslator, MySqlFunctions {
 
         if (QUtils.notNullNorEmpty(q.groupBy)) {
             query.append(' GROUP BY ').append(q.groupBy.stream()
-                    .map({ Object t -> return ___columnName(t, QContextType.GROUP_BY) })
+                    .map({ return ___columnName(it, QContextType.GROUP_BY) })
                     .collect(Collectors.joining(', ')))
 
             if (q.groupHaving != null) {

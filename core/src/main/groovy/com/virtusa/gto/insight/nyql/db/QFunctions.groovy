@@ -20,54 +20,38 @@ trait QFunctions {
     /**
      * Date and Time functions
      */
-    def current_timestamp   = { c -> return "NOW()" }
-    def current_date        = { c -> return "CURDATE()" }
-    def current_time        = { c -> return "CURTIME()" }
-
-    def date_trunc          = { "DATE(" + ___resolveIn(it) + ")" }
+    def current_timestamp() { return 'NOW()' }
+    def current_date() { return 'CURDATE()' }
+    def current_time() { return 'CURTIME()' }
+    def date_trunc(it) { 'DATE(' + ___resolveIn(it) + ')' }
 
     /**
      * String functions.
      */
-    def lcase   = { c ->
-        if (c instanceof String) return "LOWER($c)"
-        else return "LOWER(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")"
+    def lcase(c) { return 'LOWER(' + ___resolveIn(c) + ')' }
+    def ucase(c) { return 'UPPER(' + ___resolveIn(c) + ')' }
+    def trim(c) { return 'TRIM(' + ___resolveIn(c) + ')' }
+    def len(c) { return 'CHAR_LENGTH(' + ___resolveIn(c) + ')' }
+
+    /**
+     * Math functions.
+     */
+    def round(c) {
+        if (c instanceof List) return 'ROUND(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        else throw new NyException('ROUND function requires two parameters!')
     }
 
-    def ucase   = { c ->
-        if (c instanceof String) return "UPPER($c)"
-        else return "UPPER(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")"
-    }
+    def floor(c) { return 'FLOOR(' + ___resolveIn(c) + ')' }
+    def ceil(c) { return 'CEILING(' + ___resolveIn(c) + ')' }
+    def abs(c) { return 'ABS(' + ___resolveIn(c) + ')' }
 
-    def trim   = { c ->
-        if (c instanceof String) return "TRIM($c)"
-        else return "TRIM(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")"
-    }
+    def distinct(c) { return 'DISTINCT ' + ___resolveIn(c) }
 
-    def len     = { c ->
-        if (c instanceof String) return "CHAR_LENGTH($c)"
-        else return "CHAR_LENGTH(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")"
-    }
-
-    def round   = { c ->
-        if (c instanceof List) return "ROUND(" + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + ", " + ___resolve(c[1], QContextType.INSIDE_FUNCTION) + ")"
-        else throw new NyException("ROUND function requires two parameters!")
-    }
-
-    def floor   = { c -> return "FLOOR(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")" }
-    def ceil   = { c -> return "CEILING(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")" }
-    def abs   = { c -> return "ABS(" + ___resolve(c, QContextType.INSIDE_FUNCTION) + ")" }
-
-    def distinct   = { c ->
-        return "DISTINCT " + ___resolve(c, QContextType.INSIDE_FUNCTION)
-    }
-
-    def between = { c ->
+    def between(c) {
             if (c instanceof List) {
-                return "BETWEEN " + ___resolve(c[0], QContextType.INSIDE_FUNCTION) + " AND " +
-                        ___resolve(c[1], QContextType.INSIDE_FUNCTION)
+                return 'BETWEEN ' + ___resolveIn(c[0]) + ' AND ' + ___resolveIn(c[1])
             } else {
-                throw new NyException("Invalid syntax for BETWEEN function!")
+                throw new NyException('Invalid syntax for BETWEEN function!')
             }
     }
 

@@ -49,7 +49,7 @@ class QContext {
 
     void mergeFrom(QContext otherCtx) {
         otherCtx.tables.each { k, t -> tables.putIfAbsent(k, t) }
-        otherCtx.columns.each { k, c -> columns.putIfAbsent(k, c) }
+        otherCtx.columns.each { k, c -> columns.put(k, c) }
         otherCtx.allParams.each {k, p -> allParams.putIfAbsent(k, p) }
     }
 }

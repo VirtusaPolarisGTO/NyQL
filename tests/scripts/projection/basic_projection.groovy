@@ -70,4 +70,18 @@
         ORDER_BY (ASC(ac.joinYear), DESC(ac.totalPerformances))
     },
     "SELECT * FROM `Actor` ac ORDER BY ac.joinYear ASC, ac.totalPerformances DESC",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (ac.joinYear.alias("joinY"))
+        ORDER_BY (ASC(joinY))
+    },
+    "SELECT ac.joinYear AS joinY FROM `Actor` ac ORDER BY joinY ASC",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (ac.joinYear.alias("joinY"))
+        GROUP_BY (joinY)
+    },
+    "SELECT ac.joinYear AS joinY FROM `Actor` ac GROUP BY joinY",
 ]
