@@ -109,6 +109,6 @@ class Assign implements DataTypeTraits, ScriptTraits {
     static class AnAssign {
         def leftOp
         def rightOp
-        String op = "="
+        String op = '='
     }
 }

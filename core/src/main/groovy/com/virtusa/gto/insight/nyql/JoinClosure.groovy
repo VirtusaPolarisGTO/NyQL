@@ -27,10 +27,10 @@ class JoinClosure extends AbstractClause {
         if (proxy.queryType == QueryType.PART) {
             Query q = proxy.qObject as Query
             _ctx.mergeFrom(q._ctx)
-            activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, (Table)proxy.rawObject, "INNER_JOIN")
+            activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, (Table)proxy.rawObject, 'INNER_JOIN')
             return proxy.rawObject
         }
-        throw new NySyntaxException("You can only import a query part having a Table reference!")
+        throw new NySyntaxException('You can only import a query part having a Table reference!')
     }
 
     def JOIN(Table t) {
@@ -39,27 +39,27 @@ class JoinClosure extends AbstractClause {
     }
 
     def INNER_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, "INNER_JOIN")
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'INNER_JOIN')
         return activeTable
     }
 
     def LEFT_OUTER_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, "LEFT_OUTER_JOIN")
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'LEFT_OUTER_JOIN')
         return activeTable
     }
 
     def RIGHT_OUTER_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, "RIGHT_OUTER_JOIN")
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'RIGHT_OUTER_JOIN')
         return activeTable
     }
 
     def RIGHT_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, "RIGHT_JOIN")
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'RIGHT_JOIN')
         return activeTable
     }
 
     def LEFT_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, "LEFT_JOIN")
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'LEFT_JOIN')
         return activeTable
     }
 

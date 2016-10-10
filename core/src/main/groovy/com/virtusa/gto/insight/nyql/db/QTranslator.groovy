@@ -15,8 +15,8 @@ import java.util.stream.Collectors
  */
 trait QTranslator extends QJoins {
 
-    String NULL() { "NULL" }
-    String COMPARATOR_NULL() { "IS" }
+    String NULL() { 'NULL' }
+    String COMPARATOR_NULL() { 'IS' }
 
     def ___resolve(Object obj, QContextType contextType, List<AParam> paramOrder=null) {
         if (obj == null) {
@@ -24,9 +24,9 @@ trait QTranslator extends QJoins {
         }
 
         if (obj instanceof QString) {
-            return ___quoteString(obj.text) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? " AS " + obj.__alias : "")
+            return ___quoteString(obj.text) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? ' AS ' + obj.__alias : '')
         } else if (obj instanceof QNumber) {
-            return ___convertNumeric(obj.number) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? " AS " + obj.__alias : "")
+            return ___convertNumeric(obj.number) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? ' AS ' + obj.__alias : '')
         } else if (obj instanceof Join) {
             return ___tableJoinName(obj, contextType, paramOrder)
         } else if (obj instanceof Table) {
@@ -41,15 +41,15 @@ trait QTranslator extends QJoins {
             return ___convertNumeric(obj)
         } else if (obj instanceof AParam) {
             if (obj instanceof ParamList) {
-                return "::" + obj.__name + "::"
+                return '::' + obj.__name + '::'
             }
-            return "?" + (obj.__aliasDefined() && contextType == QContextType.SELECT ? " AS " + obj.__alias : "")
+            return '?' + (obj.__aliasDefined() && contextType == QContextType.SELECT ? ' AS ' + obj.__alias : '')
         } else if (obj instanceof QResultProxy) {
             return (obj.query ?: "").trim()
         } else if (obj instanceof List) {
-            return obj.stream().map({ ___resolve(it, contextType, paramOrder) }).collect(Collectors.joining(", ", "(", ")"))
+            return obj.stream().map({ ___resolve(it, contextType, paramOrder) }).collect(Collectors.joining(', ', '(', ')'))
         } else {
-            throw new NyException("Unsupported data object to convert! [" + obj + ", type: " + obj.class + "]")
+            throw new NyException('Unsupported data object to convert! [' + obj + ', type: ' + obj.class + ']')
         }
     }
 

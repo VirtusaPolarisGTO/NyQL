@@ -23,15 +23,15 @@ class DField extends DAbstractEntity {
             return dField
         }
 
-        dField.name = values["name"]
-        dField.comment = values["comment"]
-        dField.unsigned = (boolean)(values["unsigned"] ?: false)
-        dField.sequence = (boolean)(values["sequence"] ?: false)
-        dField.notNull = (boolean)(values["notNull"] ?: false)
-        dField.length = (long)(values["length"] ?: -1)
-        dField.type = toEnum(values, "type", DFieldType.TEXT)
-        dField.specifiedDefault = values.containsKey("defaultValue")
-        dField.defaultValue = values["defaultValue"] ?: null
+        dField.name = values['name']
+        dField.comment = values['comment']
+        dField.unsigned = (boolean)(values['unsigned'] ?: false)
+        dField.sequence = (boolean)(values['sequence'] ?: false)
+        dField.notNull = (boolean)(values['notNull'] ?: false)
+        dField.length = (long)(values['length'] ?: -1)
+        dField.type = toEnum(values, 'type', DFieldType.TEXT)
+        dField.specifiedDefault = values.containsKey('defaultValue')
+        dField.defaultValue = values['defaultValue'] ?: null
         return dField
     }
 

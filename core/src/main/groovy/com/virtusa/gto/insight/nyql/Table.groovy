@@ -17,7 +17,7 @@ class Table {
 
     QContext _ctx = null
 
-    def __name = ""
+    def __name = ''
     def __alias = null
 
     def __resultOf
@@ -39,23 +39,23 @@ class Table {
      * @return new join instance
      */
     def INNER_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, "INNER_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, 'INNER_JOIN')
     }
 
     def LEFT_OUTER_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, "LEFT_OUTER_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, 'LEFT_OUTER_JOIN')
     }
 
     def RIGHT_OUTER_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, "RIGHT_OUTER_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, 'RIGHT_OUTER_JOIN')
     }
 
     def RIGHT_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, "RIGHT_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, 'RIGHT_JOIN')
     }
 
     def LEFT_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, "LEFT_JOIN")
+        return QUtils.mergeJoinClauses(_ctx, this, t, 'LEFT_JOIN')
     }
 
     def alias(String newName) {

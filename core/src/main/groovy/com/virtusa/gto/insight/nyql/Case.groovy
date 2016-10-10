@@ -34,7 +34,7 @@ class Case extends Column implements DataTypeTraits {
 
     def THEN(closure) {
         if (__lastWhere == null) {
-            throw new NySyntaxException("No associated WHEN condition found for this THEN!")
+            throw new NySyntaxException('No associated WHEN condition found for this THEN!')
         }
 
         def code = closure.rehydrate(_ownerQ ?: this, this, this)

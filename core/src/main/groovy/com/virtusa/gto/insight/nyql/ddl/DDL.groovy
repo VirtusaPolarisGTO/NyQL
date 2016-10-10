@@ -85,13 +85,13 @@ class DDL {
     }
 
     private List<QScript> callCreateTable(DTable dTable) {
-        LOGGER.debug("Executing table creation command...")
+        LOGGER.debug('Executing table creation command...')
         List<QResultProxy> proxies = session.dslContext.qTranslator.___ddls().___createTable(dTable)
         return proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
     }
 
     private List<QScript> callDropTable(DTable dTable) {
-        LOGGER.debug("Executing table drop command...")
+        LOGGER.debug('Executing table drop command...')
         List<QResultProxy> proxies = session.dslContext.qTranslator.___ddls().___dropTable(dTable)
         return proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
     }

@@ -19,7 +19,7 @@ class QUtils {
         return col != null && !col.isEmpty()
     }
 
-    static String quote(String text, String c="`") {
+    static String quote(String text, String c='`') {
         return "$c$text$c"
     }
 
@@ -28,10 +28,10 @@ class QUtils {
     }
 
     static String classNameFromScriptId(String scriptId) {
-        return StringUtils.substringAfterLast(scriptId, "/");
+        return StringUtils.substringAfterLast(scriptId, '/');
     }
 
-    static String quoteIfWS(String text, String c="`") {
+    static String quoteIfWS(String text, String c='`') {
         if (hasWS(text)) {
             return quote(text, c)
         } else {
@@ -55,7 +55,7 @@ class QUtils {
                 if (table2 instanceof Join) {
                     return table2
                 } else {
-                    throw new NySyntaxException("You are trying to join same tables consecutively! At least table alias must be different!")
+                    throw new NySyntaxException('You are trying to join same tables consecutively! At least table alias must be different!')
                 }
             }
         }

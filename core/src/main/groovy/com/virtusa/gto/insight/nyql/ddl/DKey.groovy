@@ -19,17 +19,17 @@ class DKey extends DAbstractEntity {
             return dKey
         }
 
-        dKey.name = values["name"]
-        dKey.comment = values["comment"]
-        dKey.type = toEnum(values, "type", DKeyType.INDEX)
-        dKey.unique = (boolean)(values["unique"] ?: false)
-        dKey.fields = (List)(values["fields"] ?: [])
-        dKey.refTable = values["refTable"] ?: null
-        dKey.refFields = (List)(values["refFields"] ?: [])
+        dKey.name = values['name']
+        dKey.comment = values['comment']
+        dKey.type = toEnum(values, 'type', DKeyType.INDEX)
+        dKey.unique = (boolean)(values['unique'] ?: false)
+        dKey.fields = (List)(values['fields'] ?: [])
+        dKey.refTable = values['refTable'] ?: null
+        dKey.refFields = (List)(values['refFields'] ?: [])
 
-        dKey.indexType = toEnum(values, "indexType", null)
-        dKey.onDelete = toEnum(values, "onDelete", DReferenceOption.NO_ACTION)
-        dKey.onUpdate = toEnum(values, "onUpdate", DReferenceOption.NO_ACTION)
+        dKey.indexType = toEnum(values, 'indexType', null)
+        dKey.onDelete = toEnum(values, 'onDelete', DReferenceOption.NO_ACTION)
+        dKey.onUpdate = toEnum(values, 'onUpdate', DReferenceOption.NO_ACTION)
         return dKey
     }
 

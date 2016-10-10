@@ -252,7 +252,7 @@ class DSL {
             }
 
         } catch (Throwable ex) {
-            LOGGER.error("Error occurred while in transaction!", ex)
+            LOGGER.error('Error occurred while in transaction!', ex)
             ROLLBACK()
 
         } finally {
@@ -305,7 +305,7 @@ class DSL {
     }
 
     DSL $LOG(String message) {
-        LOGGER.debug("[@ " + session.currentActiveScript() + " @]" + message)
+        LOGGER.debug('[@ ' + session.currentActiveScript() + ' @]' + message)
         return this
     }
 

@@ -31,7 +31,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
-        clauses.add(new QConditionGroup(where: inner, condConnector: "AND"))
+        clauses.add(new QConditionGroup(where: inner, condConnector: 'AND'))
         return this
     }
 
@@ -40,7 +40,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
-        clauses.add(new QConditionGroup(where: inner, condConnector: "OR"))
+        clauses.add(new QConditionGroup(where: inner, condConnector: 'OR'))
         return this
     }
 
@@ -79,27 +79,27 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def OR() {
-        clauses.add(" OR ")
+        clauses.add(' OR ')
         return this
     }
 
     def AND() {
-        clauses.add(" AND ")
+        clauses.add(' AND ')
         return this
     }
 
-    def ON(Object c1, String op="", Object c2) {
+    def ON(Object c1, String op='', Object c2) {
         clauses.add(new QCondition(leftOp: c1, rightOp: c2, op: op))
         return this
     }
 
     def ISNULL(Object c) {
-        clauses.add(new QCondition(leftOp: c, rightOp: null, op: "IS"))
+        clauses.add(new QCondition(leftOp: c, rightOp: null, op: 'IS'))
         return this
     }
 
     def NOTNULL(Object c) {
-        clauses.add(new QCondition(leftOp: c, rightOp: null, op: "IS NOT"))
+        clauses.add(new QCondition(leftOp: c, rightOp: null, op: 'IS NOT'))
         return this
     }
 
@@ -107,30 +107,30 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         if (c2 == null) {
             return ISNULL(c1)
         }
-        return ON(c1, "=", c2)
+        return ON(c1, '=', c2)
     }
 
     def NEQ(Object c1, Object c2) {
         if (c2 == null) {
             return NOTNULL(c1)
         }
-        return ON(c1, "<>", c2)
+        return ON(c1, '<>', c2)
     }
 
     def GT(Object c1, Object c2) {
-        return ON(c1, ">", c2)
+        return ON(c1, '>', c2)
     }
 
     def GTE(Object c1, Object c2) {
-        return ON(c1, ">=", c2)
+        return ON(c1, '>=', c2)
     }
 
     def LT(Object c1, Object c2) {
-        return ON(c1, "<", c2)
+        return ON(c1, '<', c2)
     }
 
     def LTE(Object c1, Object c2) {
-        return ON(c1, "<=", c2)
+        return ON(c1, '<=', c2)
     }
 
     def BETWEEN(Object c1, Object startValue, Object endValue) {
@@ -214,9 +214,9 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def propertyMissing(String name) {
-        if ("AND" == name) {
+        if ('AND' == name) {
             return AND()
-        } else if ("OR" == name) {
+        } else if ('OR' == name) {
             return OR()
         } else if (name == Constants.DSL_SESSION_WORD) {
             return _ctx.ownerSession.sessionVariables
@@ -239,9 +239,9 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def methodMissing(String name, def args) {
-        if (name == "AND" || name == "OR") {
+        if (name == 'AND' || name == 'OR') {
             if (args.getClass().isArray() && args[0] instanceof Where) {
-                ((Where) args[0]).appendOneLastBefore(" " + name + " ");
+                ((Where) args[0]).appendOneLastBefore(' ' + name + ' ');
                 return
             }
         }
@@ -259,7 +259,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     static class QConditionGroup {
         Where where
-        String condConnector = "AND"
+        String condConnector = 'AND'
     }
 
     static class QCondition {
