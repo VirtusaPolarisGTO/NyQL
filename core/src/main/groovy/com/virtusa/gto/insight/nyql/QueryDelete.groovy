@@ -13,11 +13,11 @@ class QueryDelete extends Query {
 
     def TARGET(Table table) {
         sourceTbl = table
-        return this
+        this
     }
 
     def TARGET() {
-        return sourceTbl
+        sourceTbl
     }
 
     def JOIN(Table startTable, closure) {
@@ -28,7 +28,7 @@ class QueryDelete extends Query {
         code()
 
         _joiningTable = joinClosure.activeTable
-        return this
+        this
     }
 
 }

@@ -96,4 +96,10 @@ import com.sun.org.apache.bcel.internal.generic.IFNULL
         FETCH (ADD($SESSION.listOfInt))
     },
     "SELECT (1 + 2 + 3) FROM `Payment` p",
+
+    $DSL.select {
+        TARGET (Payment.alias("p"))
+        FETCH (SUBSTRING(p.recieptName, 4, 10), SUBSTRING(p.recieptName, 6), POSITION(p.title, STR("MMM")))
+    },
+    "SELECT SUBSTRING(p.recieptName, 4, 10), SUBSTRING(p.recieptName, 6), POSITION(\"MMM\" IN p.title) FROM `Payment` p",
 ]
