@@ -5,6 +5,8 @@ package com.virtusa.gto.insight.nyql
  */
 class QueryDelete extends Query {
 
+    Table _joiningTable = null
+
     QueryDelete(QContext contextParam) {
         super(contextParam)
     }
@@ -16,6 +18,17 @@ class QueryDelete extends Query {
 
     def TARGET() {
         return sourceTbl
+    }
+
+    def JOIN(Table startTable, closure) {
+        JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
+
+        def code = closure.rehydrate(joinClosure, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        _joiningTable = joinClosure.activeTable
+        return this
     }
 
 }

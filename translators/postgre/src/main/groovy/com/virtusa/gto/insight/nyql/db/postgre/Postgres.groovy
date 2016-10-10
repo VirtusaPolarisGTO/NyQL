@@ -168,9 +168,29 @@ class Postgres extends PostgresFunctions implements QTranslator {
     QResultProxy ___deleteQuery(QueryDelete q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
-        query.append("DELETE FROM ").append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append("\n")
+        query.append('DELETE FROM ').append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append('\n')
+        if (q._joiningTable != null) {
+            // has joining tables
+            List<Table> allTables = new ArrayList<>()
+            List<String> allClauses = new ArrayList<>()
+            QUtils.filterAllJoinConditions(q._joiningTable, allClauses, ' AND ')
+            QUtils.findAlTables(q._joiningTable, allTables)
+            allTables.remove(q.sourceTbl)
+
+            query.append('USING ').append(allTables.stream().map({
+                t -> return ___tableName(t, QContextType.FROM)
+            }).collect(Collectors.joining(', '))).append('\n')
+
+            if (q.whereObj == null) {
+                q.whereObj = new Where(q._ctx)
+            } else if (!q.whereObj.clauses.isEmpty() && !allClauses.isEmpty()) {
+                q.whereObj.clauses.add(0, ' AND ')
+            }
+            q.whereObj.clauses.addAll(0, allClauses)
+        }
+
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
-            query.append(" WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append("\n")
+            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append('\n')
         }
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
     }

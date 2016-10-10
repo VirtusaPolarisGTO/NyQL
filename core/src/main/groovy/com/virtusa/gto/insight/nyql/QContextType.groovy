@@ -17,6 +17,9 @@ enum QContextType {
     UPDATE_JOIN,
     UPDATE_SET,
 
+    DELETE_FROM,
+    DELETE_CONDITIONAL,
+
     FROM,
 
     DDL,

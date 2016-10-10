@@ -33,6 +33,7 @@ trait QFunctions {
     def trim(c) { return 'TRIM(' + ___resolveIn(c) + ')' }
     def len(c) { return 'CHAR_LENGTH(' + ___resolveIn(c) + ')' }
     abstract def substr(c)
+    abstract def position(c)
 
     /**
      * Math functions.

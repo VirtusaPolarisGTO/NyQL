@@ -156,9 +156,17 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     QResultProxy ___deleteQuery(QueryDelete q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
-        query.append("DELETE FROM ").append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append("\n")
+
+        query.append('DELETE ')
+        if (q._joiningTable != null) {
+            query.append(___deriveSource(q.sourceTbl, paramList, QContextType.DELETE_FROM)).append('\n')
+            query.append('FROM ').append(___deriveSource(q._joiningTable, paramList, QContextType.DELETE_FROM)).append('\n')
+        } else {
+            query.append('FROM ').append(___deriveSource(q.sourceTbl, paramList, QContextType.DELETE_FROM)).append('\n')
+        }
+
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
-            query.append(" WHERE ").append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append("\n")
+            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.DELETE_CONDITIONAL)).append('\n')
         }
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
     }

@@ -23,6 +23,13 @@ class MySqlFunctions implements QFunctions {
         }
     }
 
+    @Override
+    def position(Object c) {
+        if (c instanceof List) {
+            return 'POSITION(' + ___resolveIn(c[1]) + ' IN ' + ___resolveIn(c[0]) + ')'
+        }
+    }
+
     def date_diff_years(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(YEAR, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()

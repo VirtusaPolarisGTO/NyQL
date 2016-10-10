@@ -27,6 +27,13 @@ class PostgresFunctions implements QFunctions {
         }
     }
 
+    @Override
+    def position(Object c) {
+        if (c instanceof List) {
+            return 'POSITION(' + ___resolveIn(c[1]) + ' IN ' + ___resolveIn(c[0]) + ')'
+        }
+    }
+
     def date_diff_years(c) {
         if (c instanceof List) return "DATE_PART('year', " + ___resolveIn(c[0]) + ") - DATE_PART('year', " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")

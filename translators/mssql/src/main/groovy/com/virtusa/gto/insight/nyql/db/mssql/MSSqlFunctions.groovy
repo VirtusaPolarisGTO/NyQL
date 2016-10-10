@@ -21,6 +21,13 @@ class MSSqlFunctions implements QFunctions {
         }
     }
 
+    @Override
+    def position(Object c) {
+        if (c instanceof List) {
+            return 'CHARINDEX(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        }
+    }
+
     def date_diff_years(c) {
         if (c instanceof List) return "DATEDIFF(year, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")

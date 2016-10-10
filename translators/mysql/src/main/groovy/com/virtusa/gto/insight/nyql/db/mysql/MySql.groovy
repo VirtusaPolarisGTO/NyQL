@@ -74,7 +74,9 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     @Override
     def ___tableName(final Table table, final QContextType contextType) {
-        if (contextType == QContextType.INTO) {
+        if (contextType == QContextType.DELETE_FROM || contextType == QContextType.DELETE_CONDITIONAL) {
+            return QUtils.quote(table.__name)
+        } else if (contextType == QContextType.INTO) {
             return QUtils.quote(table.__name)
         } else if (contextType == QContextType.FROM) {
             if (table.__isResultOf()) {
@@ -110,11 +112,16 @@ class MySql extends MySqlFunctions implements QTranslator {
         qstr.append(___resolve(join.table2, contextType, paramOrder))
 
         if (join.___hasCondition()) {
-            qstr.append(' ON ').append(___expandConditions(join.onConditions, paramOrder, QContextType.CONDITIONAL))
+            qstr.append(' ON ').append(___expandConditions(join.onConditions, paramOrder,
+                    isInsideDelete(contextType) ? QContextType.DELETE_CONDITIONAL : QContextType.CONDITIONAL))
         }
         return qstr
     }
 
+    private static boolean isInsideDelete(QContextType contextType) {
+        return contextType == QContextType.DELETE_CONDITIONAL ||
+                contextType == QContextType.DELETE_FROM
+    }
 
     @Override
     def ___columnName(final Column column, final QContextType contextType) {
@@ -130,6 +137,10 @@ class MySql extends MySqlFunctions implements QTranslator {
 
         if (contextType == QContextType.INTO) {
             return column.__name
+        }
+
+        if (contextType == QContextType.DELETE_CONDITIONAL) {
+            return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
         }
 
         if (column instanceof FunctionColumn) {
@@ -210,9 +221,18 @@ class MySql extends MySqlFunctions implements QTranslator {
     QResultProxy ___deleteQuery(QueryDelete q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
-        query.append('DELETE FROM ').append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append('\n')
+        Table mainTable =  q.sourceTbl
+
+        query.append('DELETE ')
+        if (q._joiningTable != null) {
+            query.append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append(' \n')
+            query.append('FROM ').append(___deriveSource(q._joiningTable, paramList, QContextType.DELETE_FROM)).append('\n')
+        } else {
+            query.append('FROM ').append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append('\n')
+        }
+
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
-            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append('\n')
+            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.DELETE_CONDITIONAL)).append('\n')
         }
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
     }
