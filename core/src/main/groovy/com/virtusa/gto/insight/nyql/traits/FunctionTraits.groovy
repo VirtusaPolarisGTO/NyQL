@@ -15,7 +15,6 @@ trait FunctionTraits {
     def MODULUS(Object op1, Object op2)     { return vColumn("op_modulus", op1, op2) }
     def INVERSE(Object op1)     { return DIVIDE(1, op1) }
 
-
     def ASC(Column column)      { return fColumn(column, "asc") }
     def DESC(Column column)     { return fColumn(column, "desc") }
     def COUNT(Object column)    { return fColumn(column, "count") }
@@ -29,6 +28,7 @@ trait FunctionTraits {
     def UCASE(Column column)    { return fColumn(column, "ucase") }
     def TRIM(Column column)     { return fColumn(column, "trim") }
     def LEN(Column column)      { return fColumn(column, "len") }
+    def SUBSTRING(Object column, Object start, Object length) { return fColumn(column, "substr") }
 
     def ROUND(Column column, Object decimalPlaces)    { return vColumn("round", column, decimalPlaces) }
     def FLOOR(Column column) { return fColumn(column, "floor") }

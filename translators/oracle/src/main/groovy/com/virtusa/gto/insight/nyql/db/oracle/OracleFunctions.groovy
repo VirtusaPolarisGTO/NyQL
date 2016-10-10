@@ -11,4 +11,9 @@ class OracleFunctions implements QFunctions {
     def date_trunc(Object it) {
         return null
     }
+
+    @Override
+    def substr(Object c) {
+        return null
+    }
 }

@@ -19,6 +19,14 @@ class PostgresFunctions implements QFunctions {
 
     def date_trunc(c) { return "DATE_TRUNC('day', " + ___resolveIn(c) + ")" }
 
+    @Override
+    def substr(Object c) {
+        if (c instanceof List) {
+            return 'SUBSTRING(' + ___resolveIn(c[0]) + ', FROM ' + ___resolveIn(c[1]) +
+                    (c.size() > 2 ? ', FOR ' + ___resolveIn(c[2]) : '') + ')'
+        }
+    }
+
     def date_diff_years(c) {
         if (c instanceof List) return "DATE_PART('year', " + ___resolveIn(c[0]) + ") - DATE_PART('year', " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")

@@ -12,7 +12,16 @@ import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
  */
 class MySqlFunctions implements QFunctions {
 
+    @Override
     def date_trunc(it) { 'DATE(' + ___resolveIn(it) + ')' }
+
+    @Override
+    def substr(Object c) {
+        if (c instanceof List) {
+            return 'SUBSTRING(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) +
+                    (c.size() > 2 ? ', ' + ___resolveIn(c[2]) : '') + ')'
+        }
+    }
 
     def date_diff_years(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(YEAR, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'

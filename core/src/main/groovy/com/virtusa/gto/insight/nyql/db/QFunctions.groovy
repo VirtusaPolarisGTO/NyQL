@@ -32,6 +32,7 @@ trait QFunctions {
     def ucase(c) { return 'UPPER(' + ___resolveIn(c) + ')' }
     def trim(c) { return 'TRIM(' + ___resolveIn(c) + ')' }
     def len(c) { return 'CHAR_LENGTH(' + ___resolveIn(c) + ')' }
+    abstract def substr(c)
 
     /**
      * Math functions.

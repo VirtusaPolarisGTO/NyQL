@@ -10,7 +10,15 @@ class MSSqlFunctions implements QFunctions {
 
     @Override
     def date_trunc(Object it) {
-        return null
+        return 'CAST(' + ___resolveIn(it) + ' AS DATE)'
+    }
+
+    @Override
+    def substr(Object c) {
+        if (c instanceof List) {
+            return 'SUBSTRING(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) +
+                    (c.size() > 2 ? ', ' + ___resolveIn(c[2]) : '') + ')'
+        }
     }
 
     def date_diff_years(c) {
