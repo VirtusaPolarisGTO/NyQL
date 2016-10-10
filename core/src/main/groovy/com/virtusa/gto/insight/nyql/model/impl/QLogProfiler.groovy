@@ -35,6 +35,6 @@ class QLogProfiler implements QProfiling {
 
     @Override
     void close() throws IOException {
-        LOGGER.debug("Closing log profile.")
+        LOGGER.debug('Closing log profile.')
     }
 }

@@ -169,4 +169,13 @@
         }
     },
     "SELECT * FROM `Address` ad WHERE ad.city_id = (ad.city_id + 1)",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            LIKE (f.description, CONCAT(STR("%"), POSITION(f.title, STR("a")), STR("-%")))
+        }
+    },
+    "SELECT * FROM `Film` f WHERE f.description LIKE CONCAT(\"%\", POSITION(\"a\" IN f.title), \"-%\")",
 ]
