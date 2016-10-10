@@ -26,6 +26,7 @@ class QSession {
     DSLContext dslContext
 
     private int execDepth = 0
+    private final Object depthLock = new Object()
 
     private QSession() {}
 
@@ -102,12 +103,16 @@ class QSession {
         }
     }
 
-    private synchronized int incrStack() {
-        ++execDepth
+    private int incrStack() {
+        synchronized (depthLock) {
+            ++execDepth
+        }
     }
 
-    private synchronized int decrStack() {
-        --execDepth
+    private int decrStack() {
+        synchronized (depthLock) {
+            --execDepth
+        }
     }
 
 
