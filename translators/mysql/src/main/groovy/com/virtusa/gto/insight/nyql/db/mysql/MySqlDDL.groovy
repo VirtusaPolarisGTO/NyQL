@@ -33,7 +33,7 @@ class MySqlDDL implements QDdl {
             List<DField> fields = dTable.fields
             boolean added = false
             for (DField f : fields) {
-                if (added) query.append(',\n\t')
+                if (added) query.append(', \n\t')
 
                 query.append(___ddlExpandField(f))
                 added = true
@@ -42,7 +42,7 @@ class MySqlDDL implements QDdl {
             if (QUtils.notNullNorEmpty(dTable.keys)) {
                 List<DKey> keys = dTable.keys
                 for (DKey k : keys) {
-                    query.append(',\n\t').append(___ddlExpandKey(k))
+                    query.append(', \n\t').append(___ddlExpandKey(k))
                 }
             }
 
@@ -67,16 +67,16 @@ class MySqlDDL implements QDdl {
     private static String ___ddlExpandKey(DKey key) {
         if (key.type == DKeyType.PRIMARY) {
             return 'PRIMARY KEY ' + key.fields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) })
-                    .collect(Collectors.joining(',', '(', ')'))
+                    .collect(Collectors.joining(', ', '(', ')'))
         } else if (key.type == DKeyType.INDEX) {
             return 'KEY ' + QUtils.quote(key.name, MySql.BACK_TICK) + ' ' +
-                    key.fields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(',', '(', ')')) +
+                    key.fields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(', ', '(', ')')) +
                     (key.indexType != null ? ' USING ' + key.indexType.name() : '')
         } else if (key.type == DKeyType.FOREIGN) {
             return 'CONSTRAINT ' + QUtils.quote(key.name) + ' FOREIGN KEY ' +
-                    key.fields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(',', '(', ')')) +
+                    key.fields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(', ', '(', ')')) +
                     ' REFERENCES ' + QUtils.quoteIfWS(key.refTable, MySql.BACK_TICK) +
-                    key.refFields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(',', '(', ')')) +
+                    key.refFields.stream().map({ QUtils.quote(it, MySql.BACK_TICK) }).collect(Collectors.joining(', ', '(', ')')) +
                     (key.onUpdate != DReferenceOption.NO_ACTION ? ' ON UPDATE ' + key.onUpdate.name().replace('_', ' ') : '') +
                     (key.onDelete != DReferenceOption.NO_ACTION ? ' ON DELETE ' + key.onDelete.name().replace('_', ' ') : '')
         }

@@ -57,7 +57,7 @@
   ],
 
   "profiling": {
-    "enabled": true,
+    "enabled": false,
     "profiler": "com.virtusa.gto.insight.nyql.profilers.QWebSocketProfiler",
     "options": {
       "port": 9009

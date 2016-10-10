@@ -1,7 +1,9 @@
 import com.virtusa.gto.insight.nyql.QResultProxy;
 import com.virtusa.gto.insight.nyql.engine.NyQL;
 import com.virtusa.gto.insight.nyql.model.QScript;
+import com.virtusa.gto.insight.nyql.model.QScriptList;
 import com.virtusa.gto.insight.nyql.model.QScriptResult;
+import junit.framework.AssertionFailedError;
 import org.junit.*;
 
 import java.io.File;
@@ -28,27 +30,39 @@ public class AbstractTest {
 
     public void assertScript(List<Object> objects) {
         for (int i = 0; i < objects.size(); i += 2) {
-            QResultProxy proxy = deriveProxy(objects.get(i));
-            String query = String.valueOf(objects.get(i + 1));
-
-            String q1 = proxy.getQuery().replace("\n", "").trim();
-            String q2 = query.replace("\n", "").trim();
-            System.out.println("Generated Query:");
-            System.out.println(q1);
-            //System.out.println("Expected:");
-            //System.out.println(q2);
-            Assert.assertEquals(q2, q1);
+            deriveProxy(objects.get(i), objects.get(i + 1));
         }
     }
 
-    private QResultProxy deriveProxy(Object obj) {
+    private void deriveProxy(Object obj, Object gen) {
         if (obj instanceof QResultProxy) {
-            return (QResultProxy)obj;
+            compare ((QResultProxy)obj, String.valueOf(gen));
+        } else if (obj instanceof QScriptList) {
+            if (!(gen instanceof List)) {
+                throw new AssertionFailedError("Script List must have a list as input!");
+            }
+
+            List res = (List)gen;
+            for (int i = 0; i < ((QScriptList) obj).getScripts().size(); i++) {
+                QScript qScript = ((QScriptList) obj).getScripts().get(i);
+                compare(qScript.getProxy(), String.valueOf(res.get(i)));
+            }
+
         } else if (obj instanceof QScript) {
-            return ((QScriptResult) obj).getProxy();
+            compare (((QScript) obj).getProxy(), String.valueOf(gen));
         } else {
             throw new RuntimeException("Unknown result type from test script!");
         }
+    }
+
+    private void compare(QResultProxy proxy, String query) {
+        String q1 = proxy.getQuery().replace("\n", "").replace("\t", "").trim();
+        String q2 = query.replace("\n", "").trim();
+        System.out.println("Generated Query:");
+        System.out.println(q1);
+        //System.out.println("Expected:");
+        //System.out.println(q2);
+        Assert.assertEquals(q2, q1);
     }
 
     @Before
