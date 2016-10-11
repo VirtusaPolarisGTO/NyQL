@@ -79,11 +79,11 @@ class QJdbcExecutor implements QExecutor {
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" + script.proxy.query.trim())
-            LOGGER.trace("------------------------------------------------------------")
+            LOGGER.trace('------------------------------------------------------------')
         }
 
         if (script.proxy.queryType == QueryType.BULK_INSERT) {
-            LOGGER.debug("Executing as batch...")
+            LOGGER.debug('Executing as batch...')
             return batchExecute(script);
         }
 
@@ -95,10 +95,10 @@ class QJdbcExecutor implements QExecutor {
 
             if (script.proxy.queryType == QueryType.SELECT) {
                 if (returnRaw) {
-                    LOGGER.info("Returning raw result")
+                    LOGGER.info('Returning raw result')
                     return statement.executeQuery()
                 } else {
-                    LOGGER.trace("Transforming result set using {}", transformer.class.name)
+                    LOGGER.trace('Transforming result set using {}', transformer.class.name)
                     return transformer.apply(statement.executeQuery())
                 }
             } else {
@@ -130,6 +130,14 @@ class QJdbcExecutor implements QExecutor {
         }
     }
 
+    /**
+     * Executes the script as a batch and returns number of updated/inserted count as
+     * the result set.
+     *
+     * @param script script to be executed.
+     * @return total number of updated rows.
+     * @throws Exception any exception thrown while executing batch.
+     */
     private def batchExecute(QScript script) throws Exception {
         PreparedStatement statement = null
         try {
@@ -141,7 +149,7 @@ class QJdbcExecutor implements QExecutor {
             if (batchData == null) {
                 throw new NyScriptExecutionException("No batch data has been specified through session variables 'batch'!");
             } else if (!(batchData instanceof List)) {
-                throw new NyScriptExecutionException("Batch data expected to be a list of hashmaps!");
+                throw new NyScriptExecutionException('Batch data expected to be a list of hashmaps!');
             }
 
             List<Map> records = batchData as List<Map>
@@ -152,7 +160,7 @@ class QJdbcExecutor implements QExecutor {
 
             int[] counts = statement.executeBatch()
             connection.commit()
-            return counts;
+            return [count: counts]
 
         } finally {
             if (statement != null) {
@@ -229,6 +237,9 @@ class QJdbcExecutor implements QExecutor {
         }
     }
 
+    /**
+     * Closes the connection if reusable is not specified.
+     */
     private void closeConnection() {
         if (connection == null || reusable) {
             return
@@ -245,8 +256,7 @@ class QJdbcExecutor implements QExecutor {
                 throw new NyException("Data for parameter '$param.__name' cannot be found!")
             }
 
-
-            cp = invokeCorrectInput(statement, param, itemValue, cp)
+            statement.setObject(cp++, itemValue)
         }
     }
 
@@ -317,7 +327,7 @@ class QJdbcExecutor implements QExecutor {
     @Override
     void startTransaction() throws NyException {
         getConnection().setAutoCommit(false)
-        LOGGER.info("Starting new transaction.")
+        LOGGER.info('Starting new transaction.')
     }
 
     @Override
@@ -343,21 +353,6 @@ class QJdbcExecutor implements QExecutor {
     void done() throws NyException {
         connection.setAutoCommit(true)
         LOGGER.info("Transaction completed.")
-    }
-
-    private static int invokeCorrectInput(PreparedStatement statement, AParam param, Object data, int index) {
-        if (param.length > 0) {
-            if (data instanceof List) {
-                for (int i = 0; i < param.length; i++) {
-                    statement.setObject(index + i, data.get(i))
-                }
-                return index + param.length
-            }
-            throw new NyException("Expected a List for the parameter '${param.__name}' having length greater than zero!")
-        } else {
-            statement.setObject(index, data)
-            return index + 1
-        }
     }
 
     private static List<Map> toMap(int count, List keys = null) {
