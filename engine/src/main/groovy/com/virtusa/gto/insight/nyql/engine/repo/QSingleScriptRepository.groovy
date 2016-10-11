@@ -11,6 +11,8 @@ import com.virtusa.gto.insight.nyql.model.QSource
 import org.codehaus.groovy.control.CompilationFailedException
 
 /**
+ * A repository accepting a single file only.
+ *
  * @author IWEERARATHNA
  */
 class QSingleScriptRepository extends QRepositoryImpl {
@@ -30,7 +32,7 @@ class QSingleScriptRepository extends QRepositoryImpl {
             Binding binding = new Binding(session?.sessionVariables ?: [:])
             GroovyShell shell = new GroovyShell(binding, caching.makeCompilerConfigs())
             Object result = shell.evaluate(qSource.codeSource)
-            QScript script = convertResult(result, session)
+            QScript script = convertResult(scriptId, result, session)
             return script
 
         } catch (CompilationFailedException ex) {

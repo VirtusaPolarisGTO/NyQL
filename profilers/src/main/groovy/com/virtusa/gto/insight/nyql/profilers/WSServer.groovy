@@ -1,16 +1,9 @@
 package com.virtusa.gto.insight.nyql.profilers
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-import javax.websocket.OnClose
-import javax.websocket.OnError
-import javax.websocket.OnMessage
-import javax.websocket.OnOpen
-import javax.websocket.Session
+import javax.websocket.*
 import javax.websocket.server.ServerEndpoint
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
@@ -19,15 +12,24 @@ import java.util.concurrent.Executors
 @ServerEndpoint("/nyql/")
 class WSServer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WSServer)
+    /**
+     * Maximum number of threads that can be emit at once.
+     */
+    private static final int MAX_THREADS = 2
 
-    private static Queue<Session> queue = new ConcurrentLinkedQueue<>()
+    /**
+     * Queue holding all connected sessions.
+     */
+    private static final Queue<Session> queue = new ConcurrentLinkedQueue<>()
 
-    private static final Executor POOL = Executors.newFixedThreadPool(3)
+    /**
+     * Pool running for emits.
+     */
+    private static final ExecutorService POOL = Executors.newFixedThreadPool(MAX_THREADS)
 
     @OnMessage
     public void onMessage(Session session, String msg) {
-
+        // don't do anything here.
     }
 
     @OnOpen
@@ -45,6 +47,11 @@ class WSServer {
         queue.remove(session)
     }
 
+    /**
+     * Sends the given message to all clients asynchronously.
+     *
+     * @param msg input message to send.
+     */
     static void sendToAll(final Object msg) {
         POOL.execute(new Runnable() {
             @Override
@@ -54,6 +61,18 @@ class WSServer {
                 }
             }
         })
+    }
+
+    /**
+     * Closes all active connection.
+     */
+    static void closeAllConnections() {
+        for (Session s : queue) {
+            s.close()
+        }
+
+        queue.clear()
+        POOL.shutdown()
     }
 
 }

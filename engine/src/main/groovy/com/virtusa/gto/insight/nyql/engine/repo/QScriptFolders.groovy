@@ -6,6 +6,8 @@ import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
 
 /**
+ * Stores script mapping from several folders in the system.
+ *
  * @author IWEERARATHNA
  */
 class QScriptFolders implements QScriptMapper {

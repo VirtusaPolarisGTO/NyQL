@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 
 /**
+ * Contains script mapping from a single folder in the system.
+ *
  * @author IWEERARATHNA
  */
 class QScriptsFolder implements QScriptMapper {

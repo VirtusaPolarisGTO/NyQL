@@ -4,6 +4,8 @@ import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
 
 /**
+ * Contains a mapper for a single folder.
+ *
  * @author IWEERARATHNA
  */
 class QSingleScript implements QScriptMapper {

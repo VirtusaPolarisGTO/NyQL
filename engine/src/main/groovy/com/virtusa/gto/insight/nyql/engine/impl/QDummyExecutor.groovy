@@ -16,53 +16,47 @@ class QDummyExecutor implements QExecutor {
 
     @Override
     def execute(QScript script) throws Exception {
-        LOGGER.debug("=====================================================================")
-        LOGGER.debug("Executing query:")
+        LOGGER.debug('=====================================================================')
+        LOGGER.debug('Executing query:')
         LOGGER.debug("\t${script.proxy.query.trim()}")
         if (QUtils.notNullNorEmpty(script.proxy.orderedParameters)) {
-            LOGGER.debug("-------------------------------------------------")
-            LOGGER.debug("  with ")
+            LOGGER.debug('-------------------------------------------------')
+            LOGGER.debug('  with ')
             script.proxy.orderedParameters.each {LOGGER.debug("    $it")}
         }
 
-        int p = new Random(System.currentTimeMillis()).nextInt(10)
-        if (p % 2 == 0) {
-            LOGGER.debug("  Returning list")
-            return ["isuru", "wee"]
-        } else {
-            LOGGER.debug("  Returning numeric")
-            return p
-        }
+        LOGGER.debug('  Returning list of maps')
+        [[id: "1", title: "item-1"]]
     }
 
     @Override
     void startTransaction() throws NyException {
-        LOGGER.debug("Starting a new transaction...")
+        LOGGER.debug('Starting a new transaction...')
     }
 
     @Override
     void commit() throws NyException {
-        LOGGER.debug("Committed.")
+        LOGGER.debug('Committed.')
     }
 
     @Override
     def checkPoint() throws NyException {
-        LOGGER.debug("Adding checkpoint here. . .")
+        LOGGER.debug('Adding checkpoint here. . .')
         return null
     }
 
     @Override
     void rollback(Object checkpoint) throws NyException {
-        LOGGER.debug("Rollback to the checkpoint: " + checkpoint ?: "<>")
+        LOGGER.debug('Rollback to the checkpoint: ' + checkpoint ?: '<>')
     }
 
     @Override
     void done() throws NyException {
-        LOGGER.debug("Script is done!")
+        LOGGER.debug('Script is done!')
     }
 
     @Override
     void close() throws IOException {
-        LOGGER.debug("Closing executor!")
+        LOGGER.debug('Closing executor!')
     }
 }

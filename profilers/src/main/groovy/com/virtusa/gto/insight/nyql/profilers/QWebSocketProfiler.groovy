@@ -20,7 +20,13 @@ class QWebSocketProfiler implements QProfiling {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(QWebSocketProfiler)
 
+    /**
+     * default port of web socket.
+     */
     private static final int PORT = 9029
+
+    private static final String TYPE_PARSE = 'Parse'
+    private static final String TYPE_EXECUTE = 'Execute'
 
     private Server server
     private ServerConnector connector
@@ -35,7 +41,11 @@ class QWebSocketProfiler implements QProfiling {
 
         int port = options.port ?: PORT
         LOGGER.debug("Starting profiler @ localhost:$port ...")
+
+        // we don't need jetty logs printing
         Log.setLog(new JettyNoLog())
+
+        // initialize jetty server.
         server = new Server()
         connector = new ServerConnector(server)
         connector.setPort(port)
@@ -48,22 +58,24 @@ class QWebSocketProfiler implements QProfiling {
         wsContainer = WebSocketServerContainerInitializer.configureContext(context)
         wsContainer.addEndpoint(WSServer)
 
+        // start the server.
         server.start()
     }
 
     @Override
     void doneParsing(String scriptId, long elapsed, QSession session) {
-        WSServer.sendToAll(String.valueOf([type: 'Parse', id: scriptId, time: elapsed]))
+        WSServer.sendToAll(String.valueOf([type: TYPE_PARSE, id: scriptId, time: elapsed]))
     }
 
     @Override
     void doneExecuting(QScript script, long elapsed) {
-        WSServer.sendToAll(String.valueOf([type: 'Execute', id: script.id, time: elapsed, query: script.proxy?.query]))
+        WSServer.sendToAll(String.valueOf([type: TYPE_EXECUTE, id: script.id, time: elapsed, query: script.proxy?.query]))
     }
 
     @Override
     void close() throws IOException {
         LOGGER.debug('Shutting down profiler web socket!')
+        WSServer.closeAllConnections()
         if (context != null) {
             context.shutdown()
         }
