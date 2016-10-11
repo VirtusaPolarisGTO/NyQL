@@ -16,7 +16,9 @@
     "com.virtusa.gto.insight.nyql.ddl.DFieldType",
     "com.virtusa.gto.insight.nyql.ddl.DReferenceOption",
     "com.virtusa.gto.insight.nyql.utils.QueryType",
-    "java.sql.JDBCType"
+    "java.sql.JDBCType",
+    "java.sql.Types",
+    "com.virtusa.gto.insight.nyql.model.blocks.AParam.ParamScope"
   ],
 
   "defaultExecutor": "jdbc",

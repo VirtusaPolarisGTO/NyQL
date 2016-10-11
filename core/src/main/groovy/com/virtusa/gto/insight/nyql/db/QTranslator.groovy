@@ -55,8 +55,21 @@ trait QTranslator extends QJoins {
 
     abstract def ___ifColumn(Case aCaseCol, List<AParam> paramOrder)
 
+    /**
+     * Transform the given text suitable inside a query. You may add proper
+     * quoting here.
+     *
+     * @param text text to transform.
+     * @return transformed text.
+     */
     abstract def ___quoteString(String text)
 
+    /**
+     * Converts a boolean value to database specific representation in the query.
+     *
+     * @param value boolean value.
+     * @return string representation of boolean value inside a query.
+     */
     abstract def ___convertBool(Boolean value)
 
     abstract def ___tableName(Table table, QContextType contextType)
@@ -65,10 +78,29 @@ trait QTranslator extends QJoins {
 
     abstract def ___columnName(Column column, QContextType contextType)
 
+    /**
+     * Generate a query part which could be reusable among other queries.
+     *
+     * @param q input query part model.
+     * @return generated query.
+     */
     abstract QResultProxy ___partQuery(QueryPart q)
 
+    /**
+     * Generate a delete query using given query model.
+     *
+     * @param q delete query model.
+     * @return generated query.
+     */
     abstract QResultProxy ___deleteQuery(QueryDelete q)
 
+    /**
+     * Generate q query composed of several queries with combinators like
+     * UNION, EXCEPT, etc.
+     *
+     * @param q query model.
+     * @return generated query.
+     */
     abstract QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries)
 
     /**
@@ -79,19 +111,48 @@ trait QTranslator extends QJoins {
      */
     abstract QResultProxy ___selectQuery(QuerySelect q)
 
+    /**
+     * Generate an insert query using given query model.
+     *
+     * @param q insert query model.
+     * @return generated query.
+     */
     abstract QResultProxy ___insertQuery(QueryInsert q)
 
+    /**
+     * Generate a query which can be executed as a stored function in database.
+     *
+     * @param q stored function model.
+     * @return generated query.
+     */
     abstract QResultProxy ___storedFunction(StoredFunction sp)
 
+    /**
+     * Generate an update query using given query model.
+     *
+     * @param q update query model.
+     * @return generated query.
+     */
     abstract QResultProxy ___updateQuery(QueryUpdate q)
 
     def ___convertOperator(String op) {
         return op
     }
 
+    /**
+     * Converts a numeric value to database specific representation in the query.
+     *
+     * @param value numeric value.
+     * @return string representation of numeric value inside a query.
+     */
     def ___convertNumeric(Number number) {
         return String.valueOf(number)
     }
 
+    /**
+     * Returns the DDL translator for this database.
+     *
+     * @return the DDL translator.
+     */
     abstract QDdl ___ddls()
 }
