@@ -162,35 +162,42 @@ class QJdbcExecutor implements QExecutor {
         }
     }
 
+    /**
+     * Call a stored function in the database and returns the result.
+     *
+     * @param script script to be executed.
+     * @return result of the stored function.
+     * @throws Exception any exception thrown while executing db function.
+     */
     private def executeCall(QScript script) throws Exception {
         CallableStatement statement = null
         try {
             StoredFunction sp = script.proxy.rawObject
             LOGGER.info("Executing stored function '{}'", sp.name)
             statement = getConnection().prepareCall(script.proxy.query)
-            Map<String, Object> data = script.qSession.sessionVariables
 
-            List<AParam> parameters = script.proxy.orderedParameters
+            Map<String, Object> data = script.qSession.sessionVariables ?: [:]
+            List<AParam> parameters = script.proxy.orderedParameters ?: []
 
             // register out parameters
             for (int i = 0; i < parameters.size(); i++) {
                 AParam param = parameters[i]
                 if (!(param instanceof NamedParam)) {
-                    throw new NyScriptExecutionException("Stored functions required to have named parameters!")
+                    throw new NyScriptExecutionException('Stored functions required to have named parameters!')
                 }
                 NamedParam namedParam = param as NamedParam
                 if (namedParam.scope == null || namedParam.scope == AParam.ParamScope.IN) {
                     continue
                 }
 
-                LOGGER.trace("  <- Registering output: {}", namedParam.__mappingParamName)
-                statement.registerOutParameter(namedParam.__mappingParamName, param.type)
+                LOGGER.trace('  <- Registering output: {}   [Type: {}]', namedParam.__mappingParamName, namedParam.type)
+                statement.registerOutParameter(namedParam.__mappingParamName, namedParam.type)
             }
 
             // set parameter values
             for (int i = 0; i < parameters.size(); i++) {
-                AParam param = parameters[i] as NamedParam
-                Object itemValue = data.get(param.__name)
+                NamedParam param = parameters[i] as NamedParam
+                Object itemValue = deriveValue(data, param.__name)
                 if (itemValue == null) {
                     throw new NyException("Data for parameter '$param.__name' cannot be found!")
                 }
@@ -198,7 +205,7 @@ class QJdbcExecutor implements QExecutor {
                     throw new NyException("Mapping parameter name has not been defined for SP input parameter '$param.__name'!")
                 }
 
-                LOGGER.trace(" Parameter #{} : {}", param.__mappingParamName, itemValue)
+                LOGGER.trace(' Parameter #{} : {} [{}]', param.__mappingParamName, itemValue, itemValue.class.simpleName)
                 statement.setObject(param.__mappingParamName, itemValue)
             }
 
@@ -208,7 +215,9 @@ class QJdbcExecutor implements QExecutor {
                     return statement.getResultSet()
                 } else {
                     JdbcCallTransformInput input = new JdbcCallTransformInput(statement: statement, script: script)
-                    return callResultTransformer.apply(input)
+                    def result = callResultTransformer.apply(input)
+                    input.clear()
+                    return result
                 }
             }
 
@@ -252,7 +261,7 @@ class QJdbcExecutor implements QExecutor {
                 throw new NyScriptExecutionException("Data for parameter '$param.__name' cannot be found!")
             }
 
-            LOGGER.trace(" Parameter #{} : {} [{}]", (cp), itemValue, itemValue.class.simpleName)
+            LOGGER.trace(" Parameter #{} : {} [{}]", cp, itemValue, itemValue.class.simpleName)
             if (param instanceof ParamList) {
                 if (itemValue instanceof List) {
                     List itemList = itemValue

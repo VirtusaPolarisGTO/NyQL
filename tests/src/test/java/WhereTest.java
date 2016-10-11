@@ -22,4 +22,13 @@ public class WhereTest extends AbstractTest {
         assertQueries(NyQL.parse("where/basic_where", data));
     }
 
+    @Test
+    public void testImport() throws NyException {
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("emptyList", new ArrayList<>());
+//        data.put("singleList", Arrays.asList(1));
+//        data.put("doubleList", Arrays.asList(1, 2));
+
+        assertQueries(NyQL.parse("where/where_import"));
+    }
 }

@@ -11,7 +11,7 @@ trait ScriptTraits {
 
     abstract def $IMPORT(String scriptId)
 
-    abstract AParam PARAM(String name, JDBCType type, AParam.ParamScope scope, String mappingName);
+    abstract AParam PARAM(String name, AParam.ParamScope scope, String mappingName);
 
     abstract AParam PARAMLIST(String name);
 }

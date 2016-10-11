@@ -149,11 +149,11 @@ class QUtils {
         }
     }
 
-    static AParam createParam(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
+    static AParam createParam(String name, AParam.ParamScope scope=null, String mappingName=null) {
         if (scope == null && mappingName == null) {
-            return new AParam(__name: name, type: type)
+            return new AParam(__name: name)
         } else {
-            return new NamedParam(__name: name, type: type, scope: scope, __mappingParamName: mappingName)
+            return new NamedParam(__name: name, scope: scope, __mappingParamName: mappingName)
         }
     }
 

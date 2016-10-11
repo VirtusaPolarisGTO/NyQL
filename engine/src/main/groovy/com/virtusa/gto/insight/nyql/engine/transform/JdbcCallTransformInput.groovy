@@ -12,4 +12,8 @@ class JdbcCallTransformInput {
     CallableStatement statement
     QScript script
 
+    void clear() {
+        statement = null
+        script = null
+    }
 }

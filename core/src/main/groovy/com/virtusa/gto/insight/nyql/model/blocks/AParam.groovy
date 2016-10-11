@@ -11,8 +11,6 @@ class AParam {
     String __name
     String __alias
 
-    def type
-
     AParam alias(String theAlias) {
         __alias = theAlias
         return this

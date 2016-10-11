@@ -52,8 +52,8 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return ON(c1, NOTLIKE(c2))
     }
 
-    AParam PARAM(String name, JDBCType type=null, AParam.ParamScope scope=null, String mappingName=null) {
-        return _ctx.addParam(QUtils.createParam(name, type, scope, mappingName))
+    AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
+        return _ctx.addParam(QUtils.createParam(name, scope, mappingName))
     }
 
     AParam PARAMLIST(String name) {
@@ -203,10 +203,6 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             THEN { val }
             ELSE { column }
         })
-    }
-
-    def RAW(String cla) {
-        clauses.add(cla)
     }
 
     def __hasClauses() {

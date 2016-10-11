@@ -43,7 +43,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
 
     @Override
     def ___convertBool(Boolean value) {
-        return (value ? "True" : "False")
+        return (value ? 'True' : 'False')
     }
 
     @Override
