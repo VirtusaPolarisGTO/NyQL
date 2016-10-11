@@ -3,63 +3,56 @@ package com.virtusa.gto.insight.nyql.profilers
 import com.virtusa.gto.insight.nyql.model.QProfiling
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QSession
-import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.server.ServerConnector
-import org.eclipse.jetty.servlet.ServletContextHandler
-import org.eclipse.jetty.util.log.Log
-import org.eclipse.jetty.util.log.Logger
-import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import javax.websocket.server.ServerContainer
 
 /**
  * @author IWEERARATHNA
  */
 class QWebSocketProfiler implements QProfiling {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(QWebSocketProfiler)
+    private static final Logger LOGGER = LoggerFactory.getLogger(QWebSocketProfiler)
 
     /**
      * default port of web socket.
      */
-    private static final int PORT = 9029
+    //private static final int PORT = 9029
 
     private static final String TYPE_PARSE = 'Parse'
     private static final String TYPE_EXECUTE = 'Execute'
 
-    private Server server
-    private ServerConnector connector
-    private ServletContextHandler context
-    private ServerContainer wsContainer
+//    private Server server
+//    private ServerConnector connector
+//    private ServletContextHandler context
+//    private ServerContainer wsContainer
 
     @Override
     void start(Map options) {
-        if (server != null && server.isRunning()) {
-            return
-        }
-
-        int port = options.port ?: PORT
-        LOGGER.debug("Starting profiler @ localhost:$port ...")
-
-        // we don't need jetty logs printing
-        Log.setLog(new JettyNoLog())
-
-        // initialize jetty server.
-        server = new Server()
-        connector = new ServerConnector(server)
-        connector.setPort(port)
-        server.addConnector(connector)
-
-        context = new ServletContextHandler(ServletContextHandler.SESSIONS)
-        context.setContextPath('/')
-        server.setHandler(context)
-
-        wsContainer = WebSocketServerContainerInitializer.configureContext(context)
-        wsContainer.addEndpoint(WSServer)
-
-        // start the server.
-        server.start()
+//        if (server != null && server.isRunning()) {
+//            return
+//        }
+//
+//        int port = options.port ?: PORT
+//        LOGGER.debug("Starting profiler @ localhost:$port ...")
+//
+//        // we don't need jetty logs printing
+//        Log.setLog(new JettyNoLog())
+//
+//        // initialize jetty server.
+//        server = new Server()
+//        connector = new ServerConnector(server)
+//        connector.setPort(port)
+//        server.addConnector(connector)
+//
+//        context = new ServletContextHandler(ServletContextHandler.SESSIONS)
+//        context.setContextPath('/')
+//        server.setHandler(context)
+//
+//        wsContainer = WebSocketServerContainerInitializer.configureContext(context)
+//        wsContainer.addEndpoint(WSServer)
+//
+//        // start the server.
+//        server.start()
     }
 
     @Override
@@ -76,93 +69,16 @@ class QWebSocketProfiler implements QProfiling {
     void close() throws IOException {
         LOGGER.debug('Shutting down profiler web socket!')
         WSServer.closeAllConnections()
-        if (context != null) {
-            context.shutdown()
-        }
-        if (connector != null) {
-            connector.shutdown()
-        }
-        if (server != null) {
-            server.stop()
-        }
+//        if (context != null) {
+//            context.shutdown()
+//        }
+//        if (connector != null) {
+//            connector.shutdown()
+//        }
+//        if (server != null) {
+//            server.stop()
+//        }
         LOGGER.debug('Successfully shutdown web-socket.')
     }
 
-    private static class JettyNoLog implements Logger {
-
-        @Override
-        String getName() {
-            return 'nyql-none'
-        }
-
-        @Override
-        void warn(String s, Object... objects) {
-
-        }
-
-        @Override
-        void warn(Throwable throwable) {
-
-        }
-
-        @Override
-        void warn(String s, Throwable throwable) {
-
-        }
-
-        @Override
-        void info(String s, Object... objects) {
-
-        }
-
-        @Override
-        void info(Throwable throwable) {
-
-        }
-
-        @Override
-        void info(String s, Throwable throwable) {
-
-        }
-
-        @Override
-        boolean isDebugEnabled() {
-            return false
-        }
-
-        @Override
-        void setDebugEnabled(boolean b) {
-
-        }
-
-        @Override
-        void debug(String s, Object... objects) {
-
-        }
-
-        @Override
-        void debug(String s, long l) {
-
-        }
-
-        @Override
-        void debug(Throwable throwable) {
-
-        }
-
-        @Override
-        void debug(String s, Throwable throwable) {
-
-        }
-
-        @Override
-        Logger getLogger(String s) {
-            return this
-        }
-
-        @Override
-        void ignore(Throwable throwable) {
-
-        }
-    }
 }
