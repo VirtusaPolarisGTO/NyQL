@@ -38,7 +38,9 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
     <version>5.1.36</version>
 </dependency>
 ```
+
 #### Note
+
 * By default, NyQL will try to configure itself automatically if classpath contains a nyql configuration file. 
 If you want to turn it off, add a system property `com.virtusa.gto.insight.nyql.autoBootstrap` value set as `false`. 
   * __Eg:__ your application may start with below jvm argument.
