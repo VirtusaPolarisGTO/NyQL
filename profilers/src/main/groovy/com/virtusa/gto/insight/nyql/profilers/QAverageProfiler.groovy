@@ -131,7 +131,7 @@ class QAverageProfiler implements QProfiling {
             writeToFile()
         }
 
-        POOL.shutdown()
+        POOL.shutdownNow()
         statMap.clear()
         parseStatMap.clear()
     }

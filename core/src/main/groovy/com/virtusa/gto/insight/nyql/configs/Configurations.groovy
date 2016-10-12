@@ -180,6 +180,7 @@ class Configurations {
         QExecutorRegistry.instance.shutdown()
         QRepositoryRegistry.instance.shutdown()
         profiler.close()
+        LOGGER.debug("Shutdown completed.")
     }
 
     String cachingIndicatorVarName() {

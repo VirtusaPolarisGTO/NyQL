@@ -72,7 +72,7 @@ class WSServer {
         }
 
         queue.clear()
-        POOL.shutdown()
+        POOL.shutdownNow()
     }
 
 }

@@ -29,8 +29,10 @@ class NyQL {
     private static final Map<String, Object> EMPTY_MAP = [:];
 
     private static final String BOOTSTRAP_KEY = 'com.virtusa.gto.insight.nyql.autoBootstrap'
+    private static final String AUTO_SHUTDOWN_KEY = 'com.virtusa.gto.insight.nyql.addShutdownHook'
     private static final String LOAD_CLASSPATH_KEY = 'com.virtusa.gto.insight.nyql.classpathBootstrap'
     private static final String TRUE_STR = 'true'
+    private static final String FALSE_STR = 'false'
     private static final String JSON_CONFIG_FILENAME = 'nyql.json';
 
     static {
@@ -43,7 +45,7 @@ class NyQL {
 
         configure()
 
-        if (Configurations.instance().addShutdownHook()) {
+        if (Boolean.parseBoolean(System.getProperty(AUTO_SHUTDOWN_KEY, FALSE_STR)) || Configurations.instance().addShutdownHook()) {
             LOGGER.warn('Automatically adding a NyQL shutdown hook...')
             Runtime.runtime.addShutdownHook(new Thread({ shutdown() }));
         } else {
@@ -63,30 +65,26 @@ class NyQL {
     public static void configure(File inputJson=null, boolean force=false) {
         if (!Configurations.instance().isConfigured() || force) {
             LOGGER.warn('NyQL is going to configure with default configurations using classpath...')
-            File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME);
-            if (!nyConfig.exists()) {
-                if (!configFromClasspath()) {
+            if (!configFromClasspath()) {
+                File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME);
+                if (!nyConfig.exists()) {
                     LOGGER.error("*" * 100)
                     LOGGER.error("No nyql.json file is found on classpath! [${nyConfig.absolutePath}]")
                     LOGGER.error(" " * 50)
                     LOGGER.error('Explicitly call the configure method with configuration input file!')
                     LOGGER.error("*" * 100)
+                    //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
+                } else {
+                    LOGGER.debug("Loading configurations from ${nyConfig.canonicalPath}...")
+                    Map configData = new JsonSlurper().parse(nyConfig) as Map
+                    configData.put('_location', new File('.').canonicalPath)
+                    ConfigBuilder.instance().setupFrom(configData).build()
                 }
-                //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
-            } else {
-                LOGGER.debug("Loading configurations from ${nyConfig.canonicalPath}...")
-                Map configData = new JsonSlurper().parse(nyConfig) as Map
-                configData.put('_location', new File('.').canonicalPath)
-                ConfigBuilder.instance().setupFrom(configData).build()
             }
 
         } else {
             LOGGER.warn('NyQL has already been configured!')
         }
-    }
-
-    public static boolean hasConfigured() {
-        return Configurations.instance().configured
     }
 
     /**

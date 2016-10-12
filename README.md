@@ -6,8 +6,8 @@ A common query DSL for popular relational databases.
 * `Query Repository`: A folder containing all your query scripts and responsible of parsing a nyql query and generate a native query for the activated database.
 * `Mapper`: An instance responsible of mapping a script identifier to a valid source which is consumable by any repository.
 * `QResultProxy`: Contains a database specific generated query with parameters in correct order
-* QScript: Executable entity contains a QResultProxy instance with relevant data
-* Executor: Entity which executes script(s)
+* `QScript`: Executable entity contains a QResultProxy instance with relevant data
+* `Executor`: Entity which executes script(s)
 
 #### How to Use Through Java
 * Add the dependency `nyql-engine` to the maven project, and also corresponding nyql database translator.
@@ -38,6 +38,18 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
     <version>5.1.36</version>
 </dependency>
 ```
+#### Note
+* By default, NyQL will try to configure itself automatically if classpath contains a nyql configuration file. 
+If you want to turn it off, add a system property `com.virtusa.gto.insight.nyql.autoBootstrap` value set as `false`. 
+  * __Eg:__ your application may start with below jvm argument.
+   `-Dcom.virtusa.gto.insight.nyql.autoBootstrap=false`
+
+* Also NyQL will __not__ automatically shutdown when your application closes, but if you specified jvm property
+`com.virtusa.gto.insight.nyql.addShutdownHook=true`, then NyQL will automatically add a shutdown hook for your application.
+
+* NyQL will first search for a configuration file in its classpath, if not found, then it will search in current working directory.
+
+#### Configuration JSON
 
 * NyQL uses a configuration json file in the classpath to configure automatically. See a sample [nyql.json](nyql.json). It has below properties.
     * **translators**: an array of fully qualified class names of db factories. These will be loaded at the beginning and will throw exception if not found. So make sure you specify only you needed.
