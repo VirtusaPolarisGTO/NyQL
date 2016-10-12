@@ -1,6 +1,8 @@
 /**
  * @author IWEERARATHNA
  */
+@Field do_cache = true
+
 $DSL.$q {
 
     EXPECT (Film.alias("f"))

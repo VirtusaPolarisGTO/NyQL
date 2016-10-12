@@ -19,6 +19,14 @@ class QContext {
     Map<String, Column> columns = new HashMap<>()
     Query ownQuery
 
+    QContext cloneContext() {
+        QContext qContext = new QContext()
+        qContext.tables.putAll(this.tables)
+        qContext.columns.putAll(this.columns)
+        qContext.allParams.putAll(this.allParams)
+        return qContext
+    }
+
     Table getTheOnlyTable() {
         if (tables.size() != 1) {
             return null;

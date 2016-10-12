@@ -19,6 +19,8 @@ public class UpdateTest extends AbstractTest {
         //data.put("doubleList", Arrays.asList(1, 2));
 
         assertQueries(NyQL.parse("updates/basic", data));
+        assertQueries(NyQL.parse("updates/basic", data));
+        assertQueries(NyQL.parse("updates/basic", data));
     }
 
     @Test
