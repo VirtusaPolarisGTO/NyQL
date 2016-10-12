@@ -33,17 +33,17 @@ class QAverageProfiler implements QProfiling {
      */
     private final Map<String, AQueryStat> parseStatMap = [:] as ConcurrentHashMap
 
-    private static final DecimalFormat FORMATTER = new DecimalFormat("#0.0")
+    private static final DecimalFormat FORMATTER = new DecimalFormat('#0.0')
 
     /**
-     * interval to save stats to a file.
+     * default interval to save stats to a file.
      */
     private static final int DUMP_INTERVAL = 10000
 
     /**
      * output file for the stats.
      */
-    private static final String OUTPUT_FILE = "./nyprofile-output.json"
+    private static final String OUTPUT_FILE = './nyprofile-output.json'
 
     /**
      * thread pool used to save to the file.
@@ -54,10 +54,16 @@ class QAverageProfiler implements QProfiling {
      * last dump time.
      */
     private long lastDumpTime = 0L
+    private int writeInterval = DUMP_INTERVAL
+    private boolean autoWriteOnClose = true
+    private String outputFilePath = OUTPUT_FILE
     private final Object timeLock = new Object()
 
     @Override
     void start(Map options) {
+        writeInterval = options['writeIntervalMS'] ?: DUMP_INTERVAL
+        autoWriteOnClose = options['autoWriteOnClose'] ?: true
+        outputFilePath = options['outputFilePath'] ?: OUTPUT_FILE
         synchronized (timeLock) {
             lastDumpTime = System.currentTimeMillis()
         }
@@ -89,7 +95,7 @@ class QAverageProfiler implements QProfiling {
     private void dumpToFile(boolean force = false) {
         synchronized (timeLock) {
             long current = System.currentTimeMillis()
-            boolean needWrite = force || DUMP_INTERVAL < (current - lastDumpTime)
+            boolean needWrite = force || writeInterval < (current - lastDumpTime)
             lastDumpTime = current
 
             if (needWrite) {
@@ -102,20 +108,28 @@ class QAverageProfiler implements QProfiling {
      * Write stats to the file.
      */
     private void writeToFile() {
-        Map<String, Map> map = new HashMap<>()
-        map.put("executions", statMap)
-        map.put("parsing", parseStatMap)
+        Map<String, Object> map = new LinkedHashMap<>()
+        map.put('writtenTime', System.currentTimeMillis())
+        map.put('executions', statMap)
+        map.put('parsing', parseStatMap)
 
-        new File(OUTPUT_FILE).withWriter(StandardCharsets.UTF_8.name()) {
-            it.write(JsonOutput.toJson(map))
-            it.flush()
+        try {
+            new File(outputFilePath).withWriter(StandardCharsets.UTF_8.name()) {
+                it.write(JsonOutput.toJson(map))
+                it.flush()
+            }
+        } catch (IOException ex) {
+            LOGGER.error('Stat writing error!', ex)
+            LOGGER.error('Error occurred while writing query stats to the file {}!', outputFilePath)
         }
     }
 
     @Override
     void close() throws IOException {
         dumpToLog()
-        writeToFile()
+        if (autoWriteOnClose) {
+            writeToFile()
+        }
 
         POOL.shutdown()
         statMap.clear()

@@ -60,7 +60,9 @@
     "enabled": true,
     "profiler": "com.virtusa.gto.insight.nyql.profilers.QAverageProfiler",
     "options": {
-      "port": 9009
+      "port": 9009,
+      "writeIntervalMS": 10000,
+      "autoWriteOnClose": true
     }
   }
 
