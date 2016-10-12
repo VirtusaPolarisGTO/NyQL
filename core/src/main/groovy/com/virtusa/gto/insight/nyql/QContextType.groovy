@@ -24,6 +24,7 @@ enum QContextType {
 
     DDL,
 
+    INSERT_PROJECTION,
     INTO,
 
     UNKNOWN

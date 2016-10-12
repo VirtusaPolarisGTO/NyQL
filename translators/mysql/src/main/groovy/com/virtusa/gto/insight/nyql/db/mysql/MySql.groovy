@@ -135,8 +135,8 @@ class MySql extends MySqlFunctions implements QTranslator {
             return ___ifColumn(column, null)
         }
 
-        if (contextType == QContextType.INTO) {
-            return column.__name
+        if (contextType == QContextType.INTO || contextType == QContextType.INSERT_PROJECTION) {
+            return QUtils.quote(column.__name, BACK_TICK)
         }
 
         if (contextType == QContextType.DELETE_CONDITIONAL) {
@@ -278,7 +278,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append('INSERT INTO ').append(___tableName(q._intoTable, QContextType.INTO)).append(' ')
             if (QUtils.notNullNorEmpty(q._intoColumns)) {
                 query.append(q._intoColumns.stream().map({
-                    return ___columnName(it, QContextType.INTO)
+                    return ___columnName(it, QContextType.INSERT_PROJECTION)
                 }).collect(Collectors.joining(', ', '(', ')')))
             }
             query.append("\n")
@@ -342,16 +342,16 @@ class MySql extends MySqlFunctions implements QTranslator {
         List<String> colList = new LinkedList<>()
         List<String> valList = new LinkedList<>()
         q._data.each { k, v ->
-            colList.add(k)
+            colList.add(QUtils.quote(k, BACK_TICK))
 
             if (v instanceof AParam) {
                 paramList.add((AParam)v)
             }
             valList.add(String.valueOf(___resolve(v, QContextType.CONDITIONAL)))
         }
-        query.append(colList.stream().collect(Collectors.joining(', ')))
+        query.append(colList.join(', '))
                 .append(') VALUES (')
-                .append(valList.stream().collect(Collectors.joining(', ')))
+                .append(valList.join(', '))
                 .append(')')
 
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT, qObject: q)
