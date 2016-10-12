@@ -48,7 +48,9 @@
       "repo": "com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl",
       "mapper": "com.virtusa.gto.insight.nyql.engine.repo.QScriptsFolder",
       "mapperArgs": {
-        "baseDir": "./examples"
+        "baseDir": "./examples",
+        "inclusions": "",
+        "exclusions": ""
       }
     }
   ],

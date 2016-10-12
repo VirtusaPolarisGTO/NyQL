@@ -22,7 +22,7 @@ class QScriptFolders implements QScriptMapper {
     }
 
     QScriptFolders addScriptFolder(File file) {
-        def impl = new QScriptsFolder(file)
+        def impl = new QScriptsFolder(file).scanDir()
         impl.allSources().each {
             def scriptId = it.id
             if (fileMap.containsKey(scriptsFolderList)) {
