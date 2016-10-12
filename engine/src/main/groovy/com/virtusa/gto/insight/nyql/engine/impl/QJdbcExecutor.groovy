@@ -210,7 +210,8 @@ class QJdbcExecutor implements QExecutor {
                     throw new NyException("Mapping parameter name has not been defined for SP input parameter '$param.__name'!")
                 }
 
-                LOGGER.trace(' Parameter #{} : {} [{}]', param.__mappingParamName, itemValue, itemValue.class.simpleName)
+                LOGGER.trace(' Parameter #{} : {} [{}]', param.__mappingParamName, itemValue,
+                        itemValue != null ? itemValue.class.simpleName : "")
                 statement.setObject(param.__mappingParamName, itemValue)
             }
 
@@ -265,7 +266,7 @@ class QJdbcExecutor implements QExecutor {
         for (AParam param : paramList) {
             Object itemValue = deriveValue(data, param.__name)
 
-            LOGGER.trace(" Parameter #{} : {} [{}]", cp, itemValue, itemValue.class.simpleName)
+            LOGGER.trace(" Parameter #{} : {} [{}]", cp, itemValue, itemValue != null ? itemValue.class.simpleName : "")
             if (param instanceof ParamList) {
                 if (itemValue instanceof List) {
                     List itemList = itemValue
