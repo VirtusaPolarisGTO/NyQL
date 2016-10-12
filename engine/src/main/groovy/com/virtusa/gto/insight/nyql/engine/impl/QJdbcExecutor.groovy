@@ -206,9 +206,6 @@ class QJdbcExecutor implements QExecutor {
             for (int i = 0; i < parameters.size(); i++) {
                 NamedParam param = parameters[i] as NamedParam
                 Object itemValue = deriveValue(data, param.__name)
-                if (itemValue == null) {
-                    throw new NyException("Data for parameter '$param.__name' cannot be found!")
-                }
                 if (param.__mappingParamName == null) {
                     throw new NyException("Mapping parameter name has not been defined for SP input parameter '$param.__name'!")
                 }
@@ -267,9 +264,6 @@ class QJdbcExecutor implements QExecutor {
 
         for (AParam param : paramList) {
             Object itemValue = deriveValue(data, param.__name)
-            if (itemValue == null) {
-                throw new NyScriptExecutionException("Data for parameter '$param.__name' cannot be found!")
-            }
 
             LOGGER.trace(" Parameter #{} : {} [{}]", cp, itemValue, itemValue.class.simpleName)
             if (param instanceof ParamList) {
@@ -320,7 +314,11 @@ class QJdbcExecutor implements QExecutor {
             return res
 
         } else {
-            return dataMap[name];
+            if (dataMap.containsKey(name)) {
+                return dataMap[name];
+            } else {
+                throw new NyScriptExecutionException("Data for parameter '$name' cannot be found!")
+            }
         }
     }
 
