@@ -1,6 +1,6 @@
 package com.virtusa.gto.insight.nyql
 
-import com.virtusa.gto.insight.nyql.db.QTranslator
+import com.virtusa.gto.insight.nyql.db.QDbFactory
 
 /**
  * @author IWEERARATHNA
@@ -10,8 +10,7 @@ class DSLContext {
     static DSLContext activeDSLContext;
 
     String activeDb
-    QTranslator qTranslator
-    List<Class<?>> dbTraits
+    QDbFactory activeFactory
 
     DSLContext(String dbName) {
         activeDb = dbName

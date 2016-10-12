@@ -11,8 +11,6 @@ import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
-import java.sql.JDBCType
-
 /**
  * @author Isuru Weerarathna
  */

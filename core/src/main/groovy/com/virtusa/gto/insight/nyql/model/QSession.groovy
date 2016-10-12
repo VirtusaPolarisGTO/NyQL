@@ -2,36 +2,66 @@ package com.virtusa.gto.insight.nyql.model
 
 import com.virtusa.gto.insight.nyql.DSL
 import com.virtusa.gto.insight.nyql.DSLContext
+import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.utils.Constants
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
+ * A context associated with a given script parsing and execution.
+ *
  * @author IWEERARATHNA
  */
 class QSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QSession.class)
 
+    /**
+     * root script id which is the first (root) script which user has commanded to run.
+     */
     String rootScriptId
+
+    /**
+     * Stack of scripts which are running.
+     */
     final Stack<String> scriptStack = new Stack<>()
     private final Object stackLock = new Object()
+
+    /**
+     * session variable set given by user.
+     */
     Map<String, Object> sessionVariables = Collections.synchronizedMap([:])
 
+    /**
+     * active script repository.
+     */
     QRepository scriptRepo
 
+    /**
+     * executor factory to execute scripts.
+     */
     QExecutorFactory executorFactory
+
+    /**
+     * Database factory.
+     */
+    QDbFactory dbFactory
+
+    /**
+     * active executor for this session.
+     */
     QExecutor executor
 
-    DSLContext dslContext
-
+    /**
+     * current execution depth.
+     */
     private int execDepth = 0
     private final Object depthLock = new Object()
 
     private QSession() {}
 
     static QSession create(String theScriptId) {
-        QSession qSession = createSession(DSLContext.getActiveDSLContext(),
+        QSession qSession = createSession(DSLContext.getActiveDSLContext().activeFactory,
                 QRepositoryRegistry.instance.defaultRepository(),
                 null,
                 QExecutorRegistry.instance.defaultExecutorFactory())
@@ -40,10 +70,11 @@ class QSession {
         return qSession
     }
 
-    static QSession createSession(DSLContext context, QRepository repository, QExecutor executor, QExecutorFactory executorFactory) {
+    static QSession createSession(QDbFactory dbFactory, QRepository repository,
+                                  QExecutor executor, QExecutorFactory executorFactory) {
         QSession session = new QSession()
 
-        session.dslContext = context
+        session.dbFactory = dbFactory
         session.scriptRepo = repository
         session.executor = executor
         session.executorFactory = executorFactory
@@ -73,17 +104,17 @@ class QSession {
     QExecutor beingScript() {
         executor = executorFactory.createReusable();
         def stack = incrStack()
-        LOGGER.debug("Session {} starting script at execution depth {}", this, stack)
+        LOGGER.debug('Session {} starting script at execution depth {}', this, stack)
         return executor
     }
 
     void closeScript() {
         def stack = decrStack()
         if (executor != null && stack <= 0) {
-            LOGGER.debug("Closing executor since script has completed running.")
+            LOGGER.debug('Closing executor since script has completed running.')
             executor.close()
         } else if (stack > 0) {
-            LOGGER.debug("Session {} ended script at execution depth {}", this, stack)
+            LOGGER.debug('Session {} ended script at execution depth {}', this, stack)
         }
     }
 
@@ -114,7 +145,6 @@ class QSession {
             --execDepth
         }
     }
-
 
     @Override
     public String toString() {

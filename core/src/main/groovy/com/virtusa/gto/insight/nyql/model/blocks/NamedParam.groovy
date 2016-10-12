@@ -1,7 +1,4 @@
 package com.virtusa.gto.insight.nyql.model.blocks
-
-import java.sql.Types
-
 /**
  * @author IWEERARATHNA
  */

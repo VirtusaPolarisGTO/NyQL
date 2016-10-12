@@ -1,6 +1,5 @@
 package com.virtusa.gto.insight.nyql.ddl
 
-import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.QResultProxy
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptList
@@ -20,14 +19,14 @@ class DDL {
     private static final Logger LOGGER = LoggerFactory.getLogger(DDL.class)
 
     final QSession session
-    final DSLContext dslContext
+    //final DSLContext dslContext
 
     Map<String, DTable> tables = [:]
     List<DTable> tablesToDrop = []
 
     public DDL(QSession theSession) {
         session = theSession
-        dslContext = session.dslContext
+        //dslContext = session.dslContext
     }
 
     DDL TEMP_TABLE(String name, @DelegatesTo(DTable) Closure closure) {
@@ -86,13 +85,13 @@ class DDL {
 
     private List<QScript> callCreateTable(DTable dTable) {
         LOGGER.debug('Executing table creation command...')
-        List<QResultProxy> proxies = session.dslContext.qTranslator.___ddls().___createTable(dTable)
+        List<QResultProxy> proxies = session.dbFactory.createTranslator().___ddls().___createTable(dTable)
         return proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
     }
 
     private List<QScript> callDropTable(DTable dTable) {
         LOGGER.debug('Executing table drop command...')
-        List<QResultProxy> proxies = session.dslContext.qTranslator.___ddls().___dropTable(dTable)
+        List<QResultProxy> proxies = session.dbFactory.createTranslator().___ddls().___dropTable(dTable)
         return proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
     }
 }

@@ -7,28 +7,35 @@ import com.virtusa.gto.insight.nyql.db.QTranslator
  * @author IWEERARATHNA
  */
 class MySqlFactory implements QDbFactory {
+
+    private static final String DB_NAME = 'mysql'
+    private static final String DATA_SOURCE_CLASS_NAME = 'com.mysql.jdbc.jdbc2.optional.MysqlDataSource'
+    private static final String JDBC_CLASS_NAME = 'com.mysql.jdbc.Driver'
+    private final MySql mySql = new MySql()
+    private final List<Class<?>> traits = []
+
     @Override
     String dbName() {
-        return "mysql"
+        return DB_NAME
     }
 
     @Override
     String dataSourceClassName() {
-        return "com.mysql.jdbc.jdbc2.optional.MysqlDataSource"
+        return DATA_SOURCE_CLASS_NAME
     }
 
     @Override
     QTranslator createTranslator() {
-        return new MySql()
+        return mySql
     }
 
     @Override
     List<Class<?>> createTraits() {
-        return []
+        return traits
     }
 
     @Override
     String driverClassName() {
-        return "com.mysql.jdbc.Driver"
+        return JDBC_CLASS_NAME
     }
 }

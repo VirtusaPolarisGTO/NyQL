@@ -35,8 +35,7 @@ final class QDatabaseRegistry {
             }
 
             DSLContext dslContext = DSLContext.register(dbName)
-            dslContext.qTranslator = factory.createTranslator()
-            dslContext.dbTraits = factory.createTraits()
+            dslContext.activeFactory = factory
 
             dslContextMap.put(dbName, dslContext)
             return dslContext

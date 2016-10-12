@@ -22,13 +22,13 @@ class DSL {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSL.class)
 
     final QSession session
-    final DSLContext dslContext
+    //final DSLContext dslContext
 
     private boolean currentTransactionAutoCommit = false
 
     public DSL(QSession theSession) {
         session = theSession
-        dslContext = session.dslContext
+        //dslContext = session.dslContext
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ class DSL {
                 list.add(q.proxy)
             }
         }
-        return session.dslContext.qTranslator.___combinationQuery(QueryCombineType.UNION, list);
+        return session.dbFactory.createTranslator().___combinationQuery(QueryCombineType.UNION, list);
     }
 
     QResultProxy unionDistinct(Object... qResultProxies) {
@@ -100,12 +100,12 @@ class DSL {
                 list.add(q.proxy)
             }
         }
-        return session.dslContext.qTranslator.___combinationQuery(QueryCombineType.UNION_DISTINCT, list);
+        return session.dbFactory.createTranslator().___combinationQuery(QueryCombineType.UNION_DISTINCT, list);
     }
 
     QResultProxy dbFunction(String name, List<AParam> paramList) {
         StoredFunction sp = new StoredFunction(name: name, paramList: new ArrayList<AParam>(paramList))
-        return session.dslContext.qTranslator.___storedFunction(sp)
+        return session.dbFactory.createTranslator().___storedFunction(sp)
     }
 
     @SuppressWarnings("GrMethodMayBeStatic")
@@ -116,9 +116,10 @@ class DSL {
     }
 
     QResultProxy nativeQuery(QueryType queryType, List<AParam> orderedParams = [], Map queries) {
-        def query = queries[dslContext.activeDb]
+        String activeDb = session.dbFactory.dbName()
+        def query = queries[activeDb]
         if (query == null) {
-            throw new NyException("No query is defined for the database '${dslContext.activeDb}'!")
+            throw new NyException("No query is defined for the database '${activeDb}'!")
         }
         return new QResultProxy(query: String.valueOf(query).trim(),
                 queryType: queryType,
@@ -311,13 +312,15 @@ class DSL {
     }
 
     private def createContext(String db=null) {
-        String dbName = db ?: dslContext.activeDb
-        return new QContext(translator: dslContext.qTranslator, translatorName: dbName, ownerSession: session)
+        String dbName = db ?: session.dbFactory.dbName()
+        return new QContext(translator: session.dbFactory.createTranslator(),
+                translatorName: dbName,
+                ownerSession: session)
     }
 
     private Object assignTraits(Query query) {
         //String dbName = query._ctx.translatorName
-        List<Class<?>> classes = dslContext.dbTraits
+        List<Class<?>> classes = session.dbFactory.createTraits()
         if (QUtils.notNullNorEmpty(classes)) {
             Class<?>[] clz = new Class<?>[classes.size()]
             clz = classes.toArray(clz)

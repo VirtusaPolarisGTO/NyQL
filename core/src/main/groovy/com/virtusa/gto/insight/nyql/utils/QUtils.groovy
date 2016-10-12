@@ -8,8 +8,6 @@ import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
 import org.apache.commons.lang3.StringUtils
 
-import java.sql.JDBCType
-
 /**
  * @author Isuru Weerarathna
  */

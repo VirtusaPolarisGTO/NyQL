@@ -45,12 +45,7 @@ class NyQL {
 
         if (Configurations.instance().addShutdownHook()) {
             LOGGER.warn('Automatically adding a NyQL shutdown hook...')
-            Runtime.runtime.addShutdownHook(new Thread(new Runnable() {
-                @Override
-                void run() {
-                    shutdown()
-                }
-            }));
+            Runtime.runtime.addShutdownHook(new Thread({ shutdown() }));
         } else {
             LOGGER.warn("*"*100)
             LOGGER.warn('You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!')
@@ -240,7 +235,7 @@ class NyQL {
         QJdbcExecutor jdbcExecutor = new QJdbcExecutor(connection)
         QSingleScript qSingleScript = new QSingleScript(scriptId, dslSql)
         QRepository repository = new QSingleScriptRepository(qSingleScript)
-        QSession session = QSession.createSession(DSLContext.getActiveDSLContext(),
+        QSession session = QSession.createSession(DSLContext.getActiveDSLContext().activeFactory,
                             repository, jdbcExecutor, new QExternalJdbcFactory(connection))
 
         session.sessionVariables.putAll(data ?: [:])
