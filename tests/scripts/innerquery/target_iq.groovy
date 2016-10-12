@@ -17,5 +17,10 @@ def innQ = $DSL.select {
     $DSL.select {
         TARGET (TABLE($IMPORT("innerquery/other_query")).alias("iq"))
     },
+    "SELECT * FROM (SELECT * FROM `Film` f) iq",
+
+    $DSL.select {
+        TARGET (TABLE($IMPORT("innerquery/other_query")).alias("iq"))
+    },
     "SELECT * FROM (SELECT * FROM `Film` f) iq"
 ]

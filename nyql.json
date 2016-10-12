@@ -12,6 +12,7 @@
   },
 
   "defaultImports": [
+    "groovy.transform.Field",
     "com.virtusa.gto.insight.nyql.ddl.DKeyIndexType",
     "com.virtusa.gto.insight.nyql.ddl.DFieldType",
     "com.virtusa.gto.insight.nyql.ddl.DReferenceOption",

@@ -11,6 +11,8 @@ import org.codehaus.groovy.control.CompilationFailedException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.lang.reflect.Field
+
 /**
  * @author IWEERARATHNA
  */
@@ -72,12 +74,16 @@ class QRepositoryImpl implements QRepository {
     }
 
     protected void cacheIfSpecified(Script compiledScript, String scriptId, QScript script) {
-        if (compiledScript.getBinding().hasVariable(configurations.cachingIndicatorVarName())) {
-            boolean doCache = (compiledScript.getBinding().variables.get(configurations.cachingIndicatorVarName()) ?: false)
+        try {
+            def field = compiledScript.getClass().getDeclaredField(configurations.cachingIndicatorVarName())
+            field.setAccessible(true)
+            boolean doCache = field.get(compiledScript) ?: false
             if (doCache) {
                 LOGGER.trace("Script $scriptId cachable status: " + doCache)
                 caching.addGeneratedQuery(scriptId, script)
             }
+        } catch (ignored) {
+            //LOGGER.error("No field do_cache in $scriptId")
         }
     }
 

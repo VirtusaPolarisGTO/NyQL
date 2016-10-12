@@ -31,7 +31,8 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
 ```
 
 * Make sure to have correct driver classes in your classpath at the runtime through maven dependencies. For eg, if you are using mysql database use mysql jdbc driver.
- ```xml
+
+```xml
 <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
