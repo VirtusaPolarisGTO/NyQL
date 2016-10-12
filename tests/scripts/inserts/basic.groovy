@@ -9,6 +9,6 @@
                     "title": PARAM("title")
             )
         },
-        "INSERT INTO `Film` (film_id, title) VALUES (?, ?)"
+        "INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)"
 
 ]
