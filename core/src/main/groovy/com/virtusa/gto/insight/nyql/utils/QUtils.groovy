@@ -13,6 +13,19 @@ import org.apache.commons.lang3.StringUtils
  */
 class QUtils {
 
+    private static final String NL = '\n'
+
+    static String generateErrStr(String mainError, String... helpLines) {
+        StringBuilder builder = new StringBuilder().append(mainError)
+        if (helpLines != null) {
+            builder.append(NL)
+            for (String line : helpLines) {
+                builder.append('\t> ').append(line).append(NL)
+            }
+        }
+        return builder.toString()
+    }
+
     /**
      * Returns true if collection is not null nor empty.
      *

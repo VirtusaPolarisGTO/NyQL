@@ -74,7 +74,10 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         if (_ctx.columns.containsKey(colName)) {
             return _ctx.columns.get(colName)
         } else {
-            throw new NySyntaxException("No column is found by name '$colName'!")
+            throw new NySyntaxException(QUtils.generateErrStr(
+                    "No column is found by name '$colName'!",
+                    "If you are specifying column name directly then make sure it has an alias!"
+            ))
         }
     }
 
@@ -128,7 +131,11 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
             if (column != null) {
                 return column
             }
-            throw new NySyntaxException("No table by name '$name' found!")
+            throw new NySyntaxException(QUtils.generateErrStr(
+                    "No table by name '$name' found!",
+                    "You cannot refer to a column without mentioning its table or alias.",
+                    "Or, did you misspelled the table name?"
+            ))
         }
     }
 

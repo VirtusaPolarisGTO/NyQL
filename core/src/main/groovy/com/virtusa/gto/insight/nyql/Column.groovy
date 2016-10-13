@@ -1,4 +1,8 @@
 package com.virtusa.gto.insight.nyql
+
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.insight.nyql.utils.QUtils
+
 /**
  * @author Isuru Weerarathna
  */
@@ -38,5 +42,12 @@ class Column {
 
     Column mod(Object other) {
         return new FunctionColumn(_columns: [this, other], _func: 'op_modulus', _setOfCols: true, _ctx: _ctx)
+    }
+
+    def propertyMissing(String name, def arg) {
+        throw new NySyntaxException(QUtils.generateErrStr(
+                "You cannot refer to a column called '$name' inside the column '${this.__name}'!",
+                "Did you spell the table name correctly? [Table Name: $name]"
+        ))
     }
 }

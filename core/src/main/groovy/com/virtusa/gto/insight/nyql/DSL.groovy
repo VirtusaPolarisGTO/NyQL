@@ -132,9 +132,9 @@ class DSL {
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        QueryInsert q = code()
+        code()
 
-        QResultProxy proxy = q._ctx.translator.___insertQuery(q)
+        QResultProxy proxy = qs._ctx.translator.___insertQuery(qs)
         proxy.setQueryType(QueryType.BULK_INSERT)
         return RUN(proxy)
     }
@@ -145,9 +145,9 @@ class DSL {
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        QueryDelete q = code()
+        code()
 
-        return q._ctx.translator.___deleteQuery(q)
+        return qs._ctx.translator.___deleteQuery(qs)
     }
 
     QResultProxy insert(closure) {
@@ -156,9 +156,9 @@ class DSL {
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        QueryInsert q = code()
+        code()
 
-        return q._ctx.translator.___insertQuery(q)
+        return qs._ctx.translator.___insertQuery(qs)
     }
 
     QResultProxy select(closure) {
@@ -167,9 +167,9 @@ class DSL {
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        QuerySelect q = code()
+        code()
 
-        return q._ctx.translator.___selectQuery(q)
+        return qs._ctx.translator.___selectQuery(qs)
     }
 
     QResultProxy update(closure) {
@@ -178,9 +178,9 @@ class DSL {
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        QueryUpdate q = code()
+        code()
 
-        return q._ctx.translator.___updateQuery(q)
+        return qs._ctx.translator.___updateQuery(qs)
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -195,9 +195,9 @@ class DSL {
 
         def code = closure.rehydrate(qp, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        QueryPart q = code()
+        code()
 
-        return q._ctx.translator.___partQuery(q)
+        return qp._ctx.translator.___partQuery(qp)
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +211,7 @@ class DSL {
 
         def code = closure.rehydrate(activeDDL, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        activeDDL = code()
+        code()
 
         return activeDDL.createScripts()
     }

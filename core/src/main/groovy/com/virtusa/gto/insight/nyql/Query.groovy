@@ -17,10 +17,6 @@ class Query extends AbstractClause {
         super(contextParam)
     }
 
-    def IMPORT(String scriptId) {
-        return $IMPORT(scriptId)
-    }
-
     def LIMIT(Object total) {
         _limit = total
         return this

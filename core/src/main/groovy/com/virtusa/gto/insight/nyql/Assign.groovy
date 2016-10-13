@@ -100,7 +100,11 @@ class Assign implements DataTypeTraits, ScriptTraits {
             _ctx.tables.put(name, table)
             return table
         } else {
-            throw new NySyntaxException("No table by name $name found!")
+            throw new NySyntaxException(QUtils.generateErrStr(
+                    "No table by name '$name' found!",
+                    "You cannot refer to a column without mentioning its table or alias.",
+                    "Or, did you misspelled the table name?"
+            ))
         }
     }
 
