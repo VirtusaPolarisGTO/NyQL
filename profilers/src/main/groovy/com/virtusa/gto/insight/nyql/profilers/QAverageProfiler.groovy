@@ -70,7 +70,7 @@ class QAverageProfiler implements QProfiling {
     }
 
     @Override
-    void doneParsing(String scriptId, long elapsed, QSession session) {
+    void doneParsing(final String scriptId, final long elapsed, final QSession session) {
         AQueryStat queryStat = parseStatMap.computeIfAbsent(scriptId, { new AQueryStat() })
         queryStat.update(elapsed)
 
@@ -79,7 +79,7 @@ class QAverageProfiler implements QProfiling {
     }
 
     @Override
-    void doneExecuting(QScript script, long elapsed) {
+    void doneExecuting(final QScript script, final long elapsed) {
         AQueryStat queryStat = statMap.computeIfAbsent(script.id, { new AQueryStat() })
         queryStat.update(elapsed)
 

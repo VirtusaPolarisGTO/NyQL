@@ -177,10 +177,21 @@ class Configurations {
 
     void shutdown() {
         LOGGER.debug("Shutting down nyql...")
-        QExecutorRegistry.instance.shutdown()
-        QRepositoryRegistry.instance.shutdown()
-        profiler.close()
+        safeClose("Executors", { QExecutorRegistry.instance.shutdown() })
+        safeClose("Repositories", { QRepositoryRegistry.instance.shutdown() })
+        safeClose("Profiler", { profiler.close() })
+        //QExecutorRegistry.instance.shutdown()
+        //QRepositoryRegistry.instance.shutdown()
+        //profiler.close()
         LOGGER.debug("Shutdown completed.")
+    }
+
+    private static void safeClose(String workerName, Runnable runnable) {
+        try {
+            runnable.run()
+        } catch (Throwable ignored) {
+            LOGGER.error('Failed to close ' + workerName + '!', ignored)
+        }
     }
 
     String cachingIndicatorVarName() {

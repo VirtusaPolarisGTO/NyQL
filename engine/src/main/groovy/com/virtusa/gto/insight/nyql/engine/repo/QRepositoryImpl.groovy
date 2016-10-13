@@ -11,8 +11,6 @@ import org.codehaus.groovy.control.CompilationFailedException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.lang.reflect.Field
-
 /**
  * @author IWEERARATHNA
  */
@@ -47,7 +45,7 @@ class QRepositoryImpl implements QRepository {
 
     QScript parse(String scriptId, QSession session) throws NyException {
         QSource src = mapper.map(scriptId)
-        if (src == null || src.file == null || !src.file.exists()) {
+        if (src == null || (src.file != null && !src.file.exists())) {
             throw new NyScriptNotFoundException(scriptId)
         }
 

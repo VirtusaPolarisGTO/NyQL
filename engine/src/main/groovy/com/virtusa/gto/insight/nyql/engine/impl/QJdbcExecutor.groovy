@@ -78,12 +78,12 @@ class QJdbcExecutor implements QExecutor {
         }
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" + script.proxy.query.trim())
+            LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" +
+                    script.proxy.query.trim())
             LOGGER.trace('------------------------------------------------------------')
         }
 
         if (script.proxy.queryType == QueryType.BULK_INSERT) {
-            LOGGER.debug('Executing as batch...')
             return batchExecute(script);
         }
 
@@ -98,7 +98,7 @@ class QJdbcExecutor implements QExecutor {
                     LOGGER.info('Returning raw result')
                     return statement.executeQuery()
                 } else {
-                    LOGGER.trace('Transforming result set using {}', transformer.class.name)
+                    //LOGGER.trace('Transforming result set using {}', transformer.class.name)
                     return transformer.apply(statement.executeQuery())
                 }
             } else {
@@ -139,13 +139,14 @@ class QJdbcExecutor implements QExecutor {
      * @throws Exception any exception thrown while executing batch.
      */
     private def batchExecute(QScript script) throws Exception {
+        LOGGER.debug('Executing as batch...')
         PreparedStatement statement = null
         try {
             statement = getConnection().prepareStatement(script.proxy.query)
             connection.setAutoCommit(false);
 
             List<AParam> parameters = script.proxy.orderedParameters
-            Object batchData = script.qSession.sessionVariables["batch"];
+            Object batchData = script.qSession.sessionVariables['batch'];
             if (batchData == null) {
                 throw new NyScriptExecutionException("No batch data has been specified through session variables 'batch'!");
             } else if (!(batchData instanceof List)) {
