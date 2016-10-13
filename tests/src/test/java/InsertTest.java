@@ -11,4 +11,8 @@ public class InsertTest extends AbstractTest {
         assertQueries(NyQL.parse("inserts/basic"));
     }
 
+    @Test
+    public void testSelectInserts() throws Exception {
+        assertQueries(NyQL.parse("inserts/select_inserts"));
+    }
 }

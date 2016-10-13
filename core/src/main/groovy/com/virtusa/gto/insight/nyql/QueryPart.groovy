@@ -7,6 +7,7 @@ class QueryPart extends Query {
 
     Assign _assigns
     List<Object> _allProjections
+    List<Object> _intoColumns
 
     QueryPart(QContext contextParam) {
         super(contextParam)
@@ -20,6 +21,21 @@ class QueryPart extends Query {
         } else {
             if (!_ctx.tables.containsKey(table.__name)) {
                 _ctx.tables.containsKey(table.__name)
+            }
+        }
+        return this
+    }
+
+    QueryPart COLUMNS(Object... columns) {
+        if (_intoColumns == null) {
+            _intoColumns = new LinkedList<>()
+        }
+
+        for (Object col : columns) {
+            if (col instanceof List) {
+                _intoColumns.addAll(col)
+            } else {
+                _intoColumns.add(col)
             }
         }
         return this

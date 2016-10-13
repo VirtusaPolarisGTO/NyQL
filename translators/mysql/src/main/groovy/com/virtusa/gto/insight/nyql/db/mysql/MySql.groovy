@@ -268,6 +268,12 @@ class MySql extends MySqlFunctions implements QTranslator {
                     orderedParameters: paramList, rawObject: q._assigns, qObject: q)
         }
 
+        if (QUtils.notNullNorEmpty(q._intoColumns)) {
+            query.append(___expandProjection(q._intoColumns, paramList, QContextType.INSERT_PROJECTION))
+            return new QResultProxy(query: query.toString(), queryType: queryType,
+                    orderedParameters: paramList, rawObject: q._intoColumns, qObject: q)
+        }
+
         throw new NyException('Parts are no longer supports to reuse other than WHERE and JOINING!')
     }
 
@@ -279,9 +285,9 @@ class MySql extends MySqlFunctions implements QTranslator {
             queryType = QueryType.INSERT
             query.append('INSERT INTO ').append(___tableName(q._intoTable, QContextType.INTO)).append(' ')
             if (QUtils.notNullNorEmpty(q._intoColumns)) {
-                query.append(q._intoColumns.stream().map({
-                    ___columnName((Column)it, QContextType.INSERT_PROJECTION)
-                }).collect(Collectors.joining(', ', '(', ')')))
+                query.append('(')
+                        .append(___expandProjection(q._intoColumns, paramList, QContextType.INSERT_PROJECTION))
+                        .append(') ')
             }
             query.append(NL)
         }
@@ -364,7 +370,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         return DDL
     }
 
-    String ___expandProjection(List<Object> columns, List<AParam> paramList) {
+    String ___expandProjection(List<Object> columns, List<AParam> paramList, QContextType contextType = QContextType.SELECT) {
         List<String> cols = new ArrayList<>()
         if (columns == null || columns.isEmpty()) {
             return '*'
@@ -391,13 +397,13 @@ class MySql extends MySqlFunctions implements QTranslator {
             if (c instanceof String) {
                 cols.add(c)
             } else if (c instanceof Table) {
-                String tbName = ___tableName((Table)c, QContextType.SELECT)
+                String tbName = ___tableName((Table)c, contextType)
                 cols.add("$tbName.*")
             } else if (c instanceof Column) {
-                String cName = ___columnName(c, QContextType.SELECT)
+                String cName = ___columnName(c, contextType)
                 cols.add("$cName");
             } else {
-                cols.add(String.valueOf(___resolve(c, QContextType.SELECT, paramList)))
+                cols.add(String.valueOf(___resolve(c, contextType, paramList)))
             }
         }
         return cols.join(', ')

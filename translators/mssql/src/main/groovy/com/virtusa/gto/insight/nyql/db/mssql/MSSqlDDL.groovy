@@ -35,14 +35,14 @@ class MSSqlDDL implements QDdl {
             for (DField f : fields) {
                 if (added) query.append(', \n\t')
 
-                query.append(___ddlExpandField(f))
+                query.append(___ddlExpandField(f, dTable))
                 added = true
             }
 
             if (QUtils.notNullNorEmpty(dTable.keys)) {
                 List<DKey> keys = dTable.keys
                 for (DKey k : keys) {
-                    query.append(', \n\t').append(___ddlExpandKey(k))
+                    query.append(', \n\t').append(___ddlExpandKey(k, dTable))
                 }
             }
 
@@ -64,18 +64,19 @@ class MSSqlDDL implements QDdl {
         return Arrays.asList(rProxy)
     }
 
-    private static String ___ddlExpandKey(DKey key) {
+    private static String ___ddlExpandKey(DKey key, DTable dTable) {
         if (key.type == DKeyType.PRIMARY) {
-            return 'PRIMARY KEY ' + key.fields.stream().map({ QUtils.quote(it, MSSql.QUOTE) })
+            return 'CONSTRAINT ' + QUtils.quote('PK_' + removeWSWith(dTable.name), MSSql.QUOTE) +
+                    ' PRIMARY KEY ' + key.fields.stream().map({ QUtils.quote(it, MSSql.QUOTE) })
                     .collect(Collectors.joining(', ', '(', ')'))
         } else if (key.type == DKeyType.INDEX) {
             return 'KEY ' + QUtils.quote(key.name, MSSql.QUOTE) + ' ' +
                     key.fields.stream().map({ QUtils.quote(it, MSSql.QUOTE) }).collect(Collectors.joining(', ', '(', ')')) +
                     (key.indexType != null ? ' USING ' + key.indexType.name() : '')
         } else if (key.type == DKeyType.FOREIGN) {
-            return 'CONSTRAINT ' + QUtils.quote(key.name) + ' FOREIGN KEY ' +
+            return 'CONSTRAINT ' + QUtils.quote(key.name, MSSql.QUOTE) + ' FOREIGN KEY ' +
                     key.fields.stream().map({ QUtils.quote(it, MSSql.QUOTE) }).collect(Collectors.joining(', ', '(', ')')) +
-                    ' REFERENCES ' + QUtils.quoteIfWS(key.refTable, MSSql.QUOTE) +
+                    ' REFERENCES ' + QUtils.quote(key.refTable, MSSql.QUOTE) +
                     key.refFields.stream().map({ QUtils.quote(it, MSSql.QUOTE) }).collect(Collectors.joining(', ', '(', ')')) +
                     (key.onUpdate != DReferenceOption.NO_ACTION ? ' ON UPDATE ' + key.onUpdate.name().replace('_', ' ') : '') +
                     (key.onDelete != DReferenceOption.NO_ACTION ? ' ON DELETE ' + key.onDelete.name().replace('_', ' ') : '')
@@ -83,18 +84,23 @@ class MSSqlDDL implements QDdl {
         throw new NyException("Unknown table key type! [${key.type}]")
     }
 
-    private static String ___ddlExpandField(DField dField) {
+    private static String ___ddlExpandField(DField dField, DTable dTable) {
         StringBuilder q = new StringBuilder()
         q.append(colName(dField)).append(' ').append(_resolveType(dField.type, dField)).append(' ')
 
         if (dField.notNull) {
             q.append('NOT NULL ')
+        } else {
+            q.append('NULL ')
         }
+
         if (dField.sequence) {
-            q.append('AUTO_INCREMENT ')
+            q.append('IDENTITY (1, 1) ')
         }
         if (dField.specifiedDefault) {
-            q.append('DEFAULT ').append(_describeDefaultVal(dField)).append(' ')
+            q.append('CONSTRAINT ').append(MSSql.QUOTE)
+                .append('DF_').append(removeWSWith(dTable.name)).append('_')
+                .append(removeWSWith(dField.name)).append(MSSql.QUOTE).append(' DEFAULT ').append(_describeDefaultVal(dField)).append(' ')
         }
 
         return q.toString().trim()
@@ -122,19 +128,19 @@ class MSSqlDDL implements QDdl {
             if ('CURRENT_TIMESTAMP'.equalsIgnoreCase(dField.defaultValue)) {
                 return 'CURRENT_TIMESTAMP'
             } else {
-                return QUtils.quote(dField.defaultValue, "'")
+                return QUtils.quote(dField.defaultValue, MSSql.QUOTE)
             }
         }
         if (isNumber(dField.type)) {
-            return String.valueOf(dField.defaultValue)
+            return '(' + String.valueOf(dField.defaultValue) + ')'
         } else {
-            return QUtils.quote(dField.defaultValue, "'")
+            return QUtils.quote(dField.defaultValue, MSSql.QUOTE)
         }
     }
 
     private static String _resolveType(DFieldType fieldType, DField field) {
         switch (fieldType) {
-            case DFieldType.BOOLEAN:    return 'TINYINT(1)'
+            case DFieldType.BOOLEAN:    return 'BIT'
             case DFieldType.BIGINT:     return 'BIGINT' + _chkLength(field) + _chkUnsigned(field)
             case DFieldType.DOUBLE:     return 'DOUBLE' + _chkUnsigned(field)
             case DFieldType.BINARY:     return 'BLOB'
@@ -170,6 +176,10 @@ class MSSqlDDL implements QDdl {
 
     private static String colName(DField field) {
         return QUtils.quote(field.name, MSSql.QUOTE)
+    }
+
+    private static String removeWSWith(String text, String replacement='_') {
+        return text.replaceAll(' ', replacement)
     }
 
     private static boolean isNumber(DFieldType type) {
