@@ -13,7 +13,8 @@ class QContext {
     QTranslator translator;
     String translatorName;
 
-    Map<String, AParam> allParams = new HashMap<>()
+    //Map<String, AParam> allParams = new HashMap<>()
+    List<AParam> allParams = new LinkedList<>()
 
     Tables tables = new Tables()
     Map<String, Column> columns = new HashMap<>()
@@ -23,7 +24,7 @@ class QContext {
         QContext qContext = new QContext()
         qContext.tables.putAll(this.tables)
         qContext.columns.putAll(this.columns)
-        qContext.allParams.putAll(this.allParams)
+        qContext.allParams.addAll(this.allParams)
         return qContext
     }
 
@@ -38,10 +39,11 @@ class QContext {
     }
 
     AParam addParam(AParam param) {
-        if (allParams.containsKey(param.__name)) {
-            return allParams[param.__name]
-        }
-        allParams.put(param.__name, param)
+        //if (allParams.containsKey(param.__name)) {
+        //    return allParams[param.__name]
+        //}
+        //allParams.put(param.__name, param)
+        allParams.add(param)
         return param
     }
 
@@ -58,6 +60,6 @@ class QContext {
     void mergeFrom(QContext otherCtx) {
         otherCtx.tables.each { k, t -> tables.putIfAbsent(k, t) }
         otherCtx.columns.each { k, c -> columns.put(k, c) }
-        otherCtx.allParams.each {k, p -> allParams.putIfAbsent(k, p) }
+        otherCtx.allParams.each { p -> allParams.add(p) }
     }
 }

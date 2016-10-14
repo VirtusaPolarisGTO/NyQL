@@ -84,4 +84,10 @@
         GROUP_BY (joinY)
     },
     "SELECT ac.joinYear AS joinY FROM `Actor` ac GROUP BY joinY",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (PARAM("abc").alias("name"), PARAM("abc").alias("id"))
+    },
+    "SELECT ? AS name, ? AS id FROM `Actor` ac",
 ]
