@@ -74,6 +74,12 @@ class Table {
         return __alias != null
     }
 
+    Column COLUMN_ALIAS(String name, String alias) {
+        Column column = new Column(__name: name, __alias: alias, _owner: this, _ctx: _ctx)
+        __allColumns.put(name + "::" + alias, column)
+        return column
+    }
+
     Column COLUMN(String name) {
         Column oCol = __allColumns.get(name)
         if (oCol != null) {
