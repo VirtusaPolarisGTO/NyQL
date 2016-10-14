@@ -1,3 +1,5 @@
+package nyql.tests;
+
 import com.virtusa.gto.insight.nyql.utils.QUtils;
 import groovy.lang.GroovyClassLoader;
 import net.sf.jsqlparser.JSQLParserException;

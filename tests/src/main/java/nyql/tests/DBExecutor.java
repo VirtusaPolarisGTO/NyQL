@@ -1,4 +1,5 @@
-import com.virtusa.gto.insight.nyql.configs.ConfigBuilder;
+package nyql.tests;
+
 import com.virtusa.gto.insight.nyql.engine.NyQL;
 import com.virtusa.gto.insight.nyql.model.QScript;
 import org.slf4j.Logger;
