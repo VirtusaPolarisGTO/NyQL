@@ -37,6 +37,16 @@ class QUtils {
     }
 
     /**
+     * Returns true if given map is null or empty.
+     *
+     * @param col collection to check.
+     * @return true if it is null or empty.
+     */
+    static boolean isNullOrEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty()
+    }
+
+    /**
      * Quote the given text by padding given character.
      *
      * @param text text to be quoted.

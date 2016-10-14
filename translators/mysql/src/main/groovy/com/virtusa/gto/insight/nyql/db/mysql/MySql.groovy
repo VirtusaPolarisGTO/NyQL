@@ -343,10 +343,14 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     QResultProxy ___insertQuery(QueryInsert q) {
+        if (QUtils.isNullOrEmpty(q._data)) {
+            return ___selectQuery(q)
+        }
+
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
 
-        query.append('INSERT INTO ').append(___resolve(q._targetTable, QContextType.INTO, paramList)).append(' (')
+        query.append('INSERT INTO ').append(___resolve(q.sourceTbl, QContextType.INTO, paramList)).append(' (')
         List<String> colList = new LinkedList<>()
         List<String> valList = new LinkedList<>()
         q._data.each { k, v ->

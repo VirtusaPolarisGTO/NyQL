@@ -5,18 +5,12 @@ import com.virtusa.gto.insight.nyql.utils.QReturnType
 /**
  * @author Isuru Weerarathna
  */
-class QueryInsert extends Query {
+class QueryInsert extends QuerySelect {
 
-    Table _targetTable
     Map<String, Object> _data = new LinkedHashMap<>()
 
     QueryInsert(QContext contextParam) {
         super(contextParam)
-    }
-
-    def TARGET(Table table) {
-        _targetTable = table
-        return this
     }
 
     def DATA(Map args) {
