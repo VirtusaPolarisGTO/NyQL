@@ -7,8 +7,8 @@ $DSL.select {
 
     TARGET (Simple.alias("sim"))
 
-    JOIN {
-        TARGET() INNER_JOIN TABLE(q1).alias("d") ON (d.id, sim.id)
+    JOIN (TARGET()) {
+        INNER_JOIN (TABLE(q1).alias("d")) ON (d.id, sim.id)
 
     }
 

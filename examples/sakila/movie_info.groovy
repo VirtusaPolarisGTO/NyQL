@@ -5,8 +5,9 @@ $DSL.select {
 
     TARGET (Film.alias("f"))
 
-    JOIN {
-        TARGET() INNER_JOIN $IMPORT("partials/movie_join") INNER_JOIN Fork.alias("fk")
+    JOIN (TARGET()) {
+        $IMPORT("partials/movie_join")
+        INNER_JOIN (Fork.alias("fk"))
     }
 
     FETCH ()

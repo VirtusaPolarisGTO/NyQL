@@ -5,10 +5,10 @@ def innQ = $DSL.select {
 
     TARGET (TABLE("Release_Module_Dev_Metric").alias("rmdm"))
 
-    JOIN {
-        TARGET() INNER_JOIN TABLE("scm_user").alias("su") ON rmdm.scm_user_id, su.scm_user_id \
-            INNER_JOIN TABLE("Scm_User_Team").alias("sut") ON rmdm.scm_user_id, sut.scm_user_id \
-            INNER_JOIN TABLE("Module").alias("m") ON rmdm.module_id, m.module_id
+    JOIN (TARGET()) {
+        INNER_JOIN (TABLE("scm_user").alias("su")) ON rmdm.scm_user_id, su.scm_user_id
+        INNER_JOIN (TABLE("Scm_User_Team").alias("sut")) ON rmdm.scm_user_id, sut.scm_user_id
+        INNER_JOIN (TABLE("Module").alias("m")) ON rmdm.module_id, m.module_id
     }
 
     FETCH ($IMPORT("partials/selectprojection"))

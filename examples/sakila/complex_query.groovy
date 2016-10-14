@@ -4,12 +4,12 @@
 
 $DSL.select {
 
-    def gQ = IMPORT("sakila/top_customers")
+    def gQ = $IMPORT("sakila/top_customers")
 
     TARGET (Rental.alias("rx"))
 
-    JOINING {
-        TARGET() INNER_JOIN TABLE(gQ).alias("cu") ON cu.customer_id, rx.customer_id
+    JOIN (TARGET()) {
+        INNER_JOIN (TABLE(gQ).alias("cu")) ON cu.customer_id, rx.customer_id
     }
 
 //    WHERE {

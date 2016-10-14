@@ -9,6 +9,7 @@ import java.util.concurrent.Executors
 /**
  * @author IWEERARATHNA
  */
+@Deprecated
 @ServerEndpoint("/nyql/")
 class WSServer {
 

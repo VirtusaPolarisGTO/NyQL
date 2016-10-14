@@ -14,8 +14,8 @@ $DSL.select {
 
     TARGET (Country.alias("c"))
 
-    JOINING {
-        TARGET() INNER_JOIN City.alias("ct") ON ct.CountryCode, c.Code
+    JOIN (TARGET()) {
+        INNER_JOIN (City.alias("ct")) ON ct.CountryCode, c.Code
     }
 
     FETCH (ct.District,
@@ -28,12 +28,12 @@ $DSL.select {
     )
 
     WHERE {
-        EQ (c.Code, P("aus"))
+        EQ (c.Code, PARAM("aus"))
     }
 
     GROUP_BY (ct.District)
     HAVING {
-        ON (COUNT(), ">", 1)
+        GT (COUNT(), 1)
     }
 
     ORDER_BY (DESC(total))

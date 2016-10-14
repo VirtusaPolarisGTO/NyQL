@@ -52,14 +52,14 @@
       "repo": "com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl",
       "mapper": "com.virtusa.gto.insight.nyql.engine.repo.QScriptsFolder",
       "mapperArgs": {
-        "baseDir": "./scripts"
+        "baseDir": "../examples"
       }
     }
   ],
 
   "profiling": {
     "enabled": true,
-    "profiler": "com.virtusa.gto.insight.nyql.profilers.QAverageProfiler",
+    "profiler": "com.virtusa.gto.insight.nyql.server.NyServerProfile",
     "options": {
       "port": 9009,
       "writeIntervalMS": 10000,

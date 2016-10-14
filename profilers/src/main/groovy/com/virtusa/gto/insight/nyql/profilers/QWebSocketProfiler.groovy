@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 /**
  * @author IWEERARATHNA
  */
+@Deprecated
 class QWebSocketProfiler implements QProfiling {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QWebSocketProfiler)

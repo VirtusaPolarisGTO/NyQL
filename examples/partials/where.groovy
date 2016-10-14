@@ -7,11 +7,11 @@ $DSL.$q {
     EXPECT (Album.alias("alb"))
 
     WHERE {
-        ON (alb.year, BETWEEN(s.year, s.nextyear))
+        BETWEEN (alb.year, s.year, s.nextyear)
         OR()
-        ON (alb.genre, LIKE(STR("%hello%")))
+        LIKE (alb.genre, STR("%hello%"))
         AND()
-        ON (alb.title, "=", PARAM("insideP"))
+        EQ (alb.title, PARAM("insideP"))
     }
 
 
