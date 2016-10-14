@@ -19,6 +19,7 @@
         <groovy.version>2.4.7</groovy.version>
         <slf4j.version>1.7.21</slf4j.version>
         <hikari.version>2.5.1</hikari.version>
+        <spark.version>2.5</spark.version>
     </properties>
 
     <modules>
@@ -27,6 +28,7 @@
         <module>translators</module>
         <module>tests</module>
         <module>profilers</module>
+        <module>server</module>
     </modules>
 
     <dependencies>

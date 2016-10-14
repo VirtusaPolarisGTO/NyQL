@@ -1,0 +1,14 @@
+{
+  "port": 9009,
+
+  "basePath": "/ny",
+
+  "ssl": {
+    "enabled": false,
+
+    "keystoreFile": "",
+    "keystorePassword": "",
+    "truststoreFile": "",
+    "truststorePassword": ""
+  }
+}
