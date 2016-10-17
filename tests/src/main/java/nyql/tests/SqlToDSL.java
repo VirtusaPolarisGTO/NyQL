@@ -4,8 +4,7 @@ import com.virtusa.gto.insight.nyql.utils.QUtils;
 import groovy.lang.GroovyClassLoader;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
-import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
+import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
@@ -310,9 +309,11 @@ public class SqlToDSL {
 
     private static void resolveExpr(Expression expr, StringBuilder dsl) {
         if (expr instanceof Addition) {
+            dsl.append("ADD(");
             resolveExpr(((Addition) expr).getLeftExpression(), dsl);
-            dsl.append(" + ");
+            dsl.append(", ");
             resolveExpr(((Addition) expr).getRightExpression(), dsl);
+            dsl.append(")");
         } else if (expr instanceof AndExpression) {
             resolveExpr(((AndExpression) expr).getLeftExpression(), dsl);
             dsl.append("\nAND");
@@ -321,12 +322,32 @@ public class SqlToDSL {
             resolveExpr(((AndExpression) expr).getRightExpression(), dsl);
             if (p) dsl.append("\n}");
         } else if (expr instanceof Between) {
+            if (((Between) expr).isNot()) dsl.append("NOT");
+            dsl.append("BETWEEN (");
             resolveExpr(((Between) expr).getLeftExpression(), dsl);
-            if (((Between) expr).isNot()) dsl.append("NOT ");
-            dsl.append("BETWEEN ");
+            dsl.append(", ");
             resolveExpr(((Between) expr).getBetweenExpressionStart(), dsl);
-            dsl.append("AND ");
+            dsl.append(", ");
             resolveExpr(((Between) expr).getBetweenExpressionEnd(), dsl);
+            dsl.append(")");
+        } else if (expr instanceof BitwiseAnd) {
+            dsl.append("BITAND(");
+            resolveExpr(((BitwiseAnd) expr).getLeftExpression(), dsl);
+            dsl.append(", ");
+            resolveExpr(((BitwiseAnd) expr).getRightExpression(), dsl);
+            dsl.append(")");
+        } else if (expr instanceof BitwiseOr) {
+            dsl.append("BITOR(");
+            resolveExpr(((BitwiseOr) expr).getLeftExpression(), dsl);
+            dsl.append(", ");
+            resolveExpr(((BitwiseOr) expr).getRightExpression(), dsl);
+            dsl.append(")");
+        } else if (expr instanceof BitwiseXor) {
+            dsl.append("BITXOR(");
+            resolveExpr(((BitwiseXor) expr).getLeftExpression(), dsl);
+            dsl.append(", ");
+            resolveExpr(((BitwiseXor) expr).getRightExpression(), dsl);
+            dsl.append(")");
         } else if (expr instanceof CaseExpression) {
             dsl.append("CASE {");
             for (Expression e : ((CaseExpression) expr).getWhenClauses()) {
@@ -350,6 +371,12 @@ public class SqlToDSL {
             dsl.append(",");
             resolveExpr(((Concat) expr).getRightExpression(), dsl);
             dsl.append(") ");
+        } else if (expr instanceof Division) {
+            dsl.append("DIVIDE(");
+            resolveExpr(((Division) expr).getLeftExpression(), dsl);
+            dsl.append(", ");
+            resolveExpr(((Division) expr).getRightExpression(), dsl);
+            dsl.append(")");
         } else if (expr instanceof DateValue) {
             dsl.append(quote(((DateValue) expr).getValue().toString()));
         } else if (expr instanceof DoubleValue) {
@@ -381,6 +408,9 @@ public class SqlToDSL {
             resolveExpr(((GreaterThanEquals) expr).getRightExpression(), dsl);
             dsl.append(") ");
         } else if (expr instanceof InExpression) {
+            if (((InExpression) expr).isNot()) {
+                dsl.append("NOT");
+            }
             dsl.append("IN (");
             resolveExpr(((InExpression) expr).getLeftExpression(), dsl);
             dsl.append(", ");
@@ -403,7 +433,7 @@ public class SqlToDSL {
         } else if (expr instanceof JdbcNamedParameter) {
             dsl.append("PARAM(").append(quote(((JdbcNamedParameter) expr).getName())).append(") ");
         } else if (expr instanceof JdbcParameter) {
-            dsl.append("PARAM(").append(quote("<your-param-name-here>")).append(") ");
+            dsl.append("PARAM(").append(quote("<your-param-name-here-" + Integer.toHexString(expr.hashCode()) + ">")).append(") ");
         } else if (expr instanceof LikeExpression) {
             if (((LikeExpression) expr).isNot()) dsl.append("NOTLIKE (");
             else dsl.append("LIKE (");
@@ -425,6 +455,18 @@ public class SqlToDSL {
             dsl.append(", ");
             resolveExpr(((MinorThanEquals) expr).getRightExpression(), dsl);
             dsl.append(") ");
+        } else if (expr instanceof Modulo) {
+            dsl.append("MODULUS(");
+            resolveExpr(((Modulo) expr).getLeftExpression(), dsl);
+            dsl.append(", ");
+            resolveExpr(((Modulo) expr).getRightExpression(), dsl);
+            dsl.append(")");
+        } else if (expr instanceof Multiplication) {
+            dsl.append("MULTIPLY(");
+            resolveExpr(((Multiplication) expr).getLeftExpression(), dsl);
+            dsl.append(", ");
+            resolveExpr(((Multiplication) expr).getRightExpression(), dsl);
+            dsl.append(")");
         } else if (expr instanceof NotEqualsTo) {
             dsl.append("NEQ (");
             resolveExpr(((NotEqualsTo) expr).getLeftExpression(), dsl);
@@ -444,6 +486,12 @@ public class SqlToDSL {
             resolveExpr(((Parenthesis) expr).getExpression(), dsl);
         } else if (expr instanceof StringValue) {
             dsl.append("STR(").append(quote(((StringValue) expr).getValue())).append(")");
+        } else if (expr instanceof Subtraction) {
+            dsl.append("MINUS(");
+            resolveExpr(((Subtraction) expr).getLeftExpression(), dsl);
+            dsl.append(", ");
+            resolveExpr(((Subtraction) expr).getRightExpression(), dsl);
+            dsl.append(")");
         } else if (expr instanceof TimeValue) {
             dsl.append(quote(((TimeValue) expr).getValue().toString()));
         } else if (expr instanceof TimestampValue) {

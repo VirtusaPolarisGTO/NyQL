@@ -155,4 +155,12 @@ class PostgresFunctions implements QFunctions {
         }
     }
 
+    @Override
+    def op_bit_xor(Object it) {
+        if (it instanceof List) {
+            return ___resolveIn(it[0]) + ' # ' + ___resolveIn(it[1])
+        } else {
+            throw new NySyntaxException('Bitwise Xor operation requires at least two operands!')
+        }
+    }
 }

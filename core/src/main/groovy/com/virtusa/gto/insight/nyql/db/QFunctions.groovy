@@ -400,4 +400,60 @@ trait QFunctions {
             throw new NySyntaxException('Modulus operation requires at least two operands!')
         }
     }
+
+    /**
+     * Bitwise And operation.
+     *
+     * @param it function input parameters.
+     * @return string representation of function.
+     */
+    def op_bit_and(it) {
+        if (it instanceof List) {
+            return ___resolveIn(it[0]) + ' & ' + ___resolveIn(it[1])
+        } else {
+            throw new NySyntaxException('Bitwise And operation requires at least two operands!')
+        }
+    }
+
+    /**
+     * Bitwise Or operation.
+     *
+     * @param it function input parameters.
+     * @return string representation of function.
+     */
+    def op_bit_or(it) {
+        if (it instanceof List) {
+            return ___resolveIn(it[0]) + ' | ' + ___resolveIn(it[1])
+        } else {
+            throw new NySyntaxException('Bitwise Or operation requires at least two operands!')
+        }
+    }
+
+    /**
+     * Bitwise Or operation.
+     *
+     * @param it function input parameters.
+     * @return string representation of function.
+     */
+    def op_bit_xor(it) {
+        if (it instanceof List) {
+            return ___resolveIn(it[0]) + ' ^ ' + ___resolveIn(it[1])
+        } else {
+            throw new NySyntaxException('Bitwise Xor operation requires at least two operands!')
+        }
+    }
+
+    /**
+     * Bitwise Not operation.
+     *
+     * @param it function input parameters.
+     * @return string representation of function.
+     */
+    def op_bit_not(it) {
+        if (it instanceof List) {
+            return '~ ' + ___resolveIn(it[0])
+        } else {
+            return '~ ' + ___resolveIn(it)
+        }
+    }
 }
