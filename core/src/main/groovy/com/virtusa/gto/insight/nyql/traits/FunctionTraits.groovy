@@ -15,10 +15,10 @@ trait FunctionTraits {
     def MODULUS(Object op1, Object op2)     { vColumn('op_modulus', op1, op2) }
     def INVERSE(Object op1)     { DIVIDE(1, op1) }
 
-    def BITAND(Object left, Object right) { vColumn("op_bit_and", left, right) }
-    def BITOR(Object left, Object right) { vColumn("op_bit_or", left, right) }
-    def BITXOR(Object left, Object right) { vColumn("op_bit_xor", left, right) }
-    def BITNOT(Object left, Object right) { vColumn("op_bit_not", left, right) }
+    def BITAND(Object left, Object right) { vColumn('op_bit_and', left, right) }
+    def BITOR(Object left, Object right) { vColumn('op_bit_or', left, right) }
+    def BITXOR(Object left, Object right) { vColumn('op_bit_xor', left, right) }
+    def BITNOT(Object left) { fColumn(left, 'op_bit_not') }
 
     def ASC(Column column)      { fColumn(column, 'asc') }
     def DESC(Column column)     { fColumn(column, 'desc') }

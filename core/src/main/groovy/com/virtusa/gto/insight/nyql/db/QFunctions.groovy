@@ -451,9 +451,9 @@ trait QFunctions {
      */
     def op_bit_not(it) {
         if (it instanceof List) {
-            return '~ ' + ___resolveIn(it[0])
+            return '~' + ___resolveIn(it[0])
         } else {
-            return '~ ' + ___resolveIn(it)
+            return '~' + ___resolveIn(it)
         }
     }
 }

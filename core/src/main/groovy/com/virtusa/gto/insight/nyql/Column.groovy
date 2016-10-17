@@ -44,6 +44,18 @@ class Column {
         return new FunctionColumn(_columns: [this, other], _func: 'op_modulus', _setOfCols: true, _ctx: _ctx)
     }
 
+    Column and(Object other) {
+        new FunctionColumn(_columns: [this, other], _func: 'op_bit_and', _setOfCols: true, _ctx: _ctx)
+    }
+
+    Column or(Object other) {
+        new FunctionColumn(_columns: [this, other], _func: 'op_bit_or', _setOfCols: true, _ctx: _ctx)
+    }
+
+    Column xor(Object other) {
+        new FunctionColumn(_columns: [this, other], _func: 'op_bit_xor', _setOfCols: true, _ctx: _ctx)
+    }
+
     def propertyMissing(String name, def arg) {
         throw new NySyntaxException(QUtils.generateErrStr(
                 "You cannot refer to a column called '$name' inside the column '${this.__name}'!",

@@ -102,4 +102,16 @@ import com.sun.org.apache.bcel.internal.generic.IFNULL
         FETCH (SUBSTRING(p.recieptName, 4, 10), SUBSTRING(p.recieptName, 6), POSITION(p.title, STR("MMM")))
     },
     "SELECT SUBSTRING(p.recieptName, 4, 10), SUBSTRING(p.recieptName, 6), POSITION(\"MMM\" IN p.title) FROM `Payment` p",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH (f.rental_duration & 5, f.length | f.rental_duration, f.length ^ 10, BITNOT(f.rental_duration))
+    },
+    "SELECT f.rental_duration & 5, f.length | f.rental_duration, f.length ^ 10, ~f.rental_duration FROM `Film` f",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH (BITAND(f.rental_duration, 5), BITOR(f.length, f.rental_duration), BITXOR(f.length, 10))
+    },
+    "SELECT f.rental_duration & 5, f.length | f.rental_duration, f.length ^ 10 FROM `Film` f",
 ]
