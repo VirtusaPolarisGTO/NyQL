@@ -12,4 +12,8 @@ public class JoinTest extends AbstractTest {
         assertQueries(NyQL.parse("joins/simple"));
     }
 
+    @Test
+    public void testImports() throws NyException {
+        assertQueries(NyQL.parse("joins/import_test"));
+    }
 }

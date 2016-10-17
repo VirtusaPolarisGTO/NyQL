@@ -3,6 +3,8 @@ package com.virtusa.gto.insight.nyql.utils
 import com.virtusa.gto.insight.nyql.Join
 import com.virtusa.gto.insight.nyql.QContext
 import com.virtusa.gto.insight.nyql.Table
+import com.virtusa.gto.insight.nyql.TableProxy
+import com.virtusa.gto.insight.nyql.Where
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
@@ -97,6 +99,7 @@ class QUtils {
         Table table2 = tableRight
         Table rmost = findRightMostTable(table1)
         Table lmost = findLeftMostTable(table2)
+        Where joinCond = null
         if (rmost.__name == lmost.__name && rmost.__alias == lmost.__alias) {
             if (table1 instanceof Join) {
                 if (table2 instanceof Join) {
@@ -113,22 +116,26 @@ class QUtils {
             }
         }
 
-        if (rmost == Table.ANY_TABLE) {
+        if (rmost instanceof TableProxy) {
             if (table1 instanceof Join) {
+                joinCond = table1.onConditions
                 table1 = table1.table1
-            } else {
-                return tableRight
             }
+//            else {
+//                return tableRight
+//            }
         }
-        if (lmost == Table.ANY_TABLE) {
+        if (lmost instanceof TableProxy) {
             if (table2 instanceof Join) {
+                joinCond = table2.onConditions
                 table2 = table2.table2
-            } else {
-                return table1
             }
+//            else {
+//                return table1
+//            }
         }
 
-        new Join(table1: table1, table2: table2, _ctx: ctx, type: type)
+        new Join(table1: table1, table2: table2, _ctx: ctx, type: type, onConditions: joinCond)
     }
 
     /**

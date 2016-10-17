@@ -57,7 +57,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
     }
 
     def OTHER() {
-        return Table.ANY_TABLE
+        new TableProxy()
     }
 
     def TABLE(QResultProxy resultProxy) {

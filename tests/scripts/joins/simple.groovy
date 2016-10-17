@@ -26,7 +26,7 @@
 
         $DSL.select {
             TARGET (Film.alias("f"))
-            JOIN (OTHER()) {
+            JOIN (TARGET()) {
                 $IMPORT ("joins/import_anyjoin")
             }
             FETCH ()
