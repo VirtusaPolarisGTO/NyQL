@@ -90,4 +90,9 @@
         FETCH (PARAM("abc").alias("name"), PARAM("abc").alias("id"))
     },
     "SELECT ? AS name, ? AS id FROM `Actor` ac",
+
+    $DSL.select {
+        FETCH (NUM(12345).alias("sid"))
+    },
+    "SELECT 12345 AS sid",
 ]

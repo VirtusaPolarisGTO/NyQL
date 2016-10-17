@@ -297,7 +297,10 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append('DISTINCT ')
         }
         query.append(___expandProjection(q.projection, paramList)).append(NL)
-        query.append(' FROM ').append(___deriveSource(q._joiningTable ?: q.sourceTbl, paramList, QContextType.FROM)).append(NL)
+        // target is optional
+        if (q._joiningTable ?: q.sourceTbl) {
+            query.append(' FROM ').append(___deriveSource(q._joiningTable ?: q.sourceTbl, paramList, QContextType.FROM)).append(NL)
+        }
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
             query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append(NL)
