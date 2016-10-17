@@ -121,21 +121,25 @@ class QUtils {
                 joinCond = table1.onConditions
                 table1 = table1.table1
             }
-//            else {
-//                return tableRight
-//            }
         }
         if (lmost instanceof TableProxy) {
             if (table2 instanceof Join) {
-                joinCond = table2.onConditions
-                table2 = table2.table2
+                replaceLeftMostTableWith(table2, table1)
+                return table2
             }
-//            else {
-//                return table1
-//            }
         }
 
         new Join(table1: table1, table2: table2, _ctx: ctx, type: type, onConditions: joinCond)
+    }
+
+    private static void replaceLeftMostTableWith(Join join, Table tableToReplace) {
+        if (join.table1 instanceof Join) {
+            replaceLeftMostTableWith((Join)join.table1, tableToReplace)
+        } else {
+            if (join.table1 instanceof TableProxy) {
+                join.table1 = tableToReplace
+            }
+        }
     }
 
     /**

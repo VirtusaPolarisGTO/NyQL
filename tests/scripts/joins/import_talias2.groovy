@@ -7,8 +7,6 @@ $DSL.$q {
 
     JOIN (f) {
         INNER_JOIN (Actor.alias("ac")) ON f.actor_id, ac.actor_id
-        INNER_JOIN (Payment.alias("p")) ON ac.payment_id, p.payment_id
     }
 
 }
-
