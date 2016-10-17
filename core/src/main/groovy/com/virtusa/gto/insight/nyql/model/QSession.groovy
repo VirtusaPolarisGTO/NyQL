@@ -102,7 +102,9 @@ class QSession {
     }
 
     QExecutor beingScript() {
-        executor = executorFactory.createReusable()
+        if (executor == null) {
+            executor = executorFactory.createReusable()
+        }
         def stack = incrStack()
         LOGGER.debug('Session {} starting script at execution depth {}', this, stack)
         return executor
@@ -113,6 +115,7 @@ class QSession {
         if (executor != null && stack <= 0) {
             LOGGER.debug('Closing executor since script has completed running.')
             executor.close()
+            executor = null
         } else if (stack > 0) {
             LOGGER.debug('Session {} ended script at execution depth {}', this, stack)
         }
