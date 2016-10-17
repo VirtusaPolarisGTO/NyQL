@@ -40,6 +40,17 @@ class DDL {
         return this
     }
 
+    DDL TEMP_TABLE(String name, boolean ifNotExists, @DelegatesTo(DTable) Closure closure) {
+        DTable dTable = new DTable(name: name, temporary: true, ifNotExist: ifNotExists)
+
+        def code = closure.rehydrate(dTable, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        DTable rTable = code()
+        tables.put(rTable.name, rTable)
+
+        return this
+    }
+
     DDL TABLE(String name, @DelegatesTo(DTable) Closure closure) {
         DTable dTable = new DTable()
 
