@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
  */
 class QSession {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(QSession.class)
+    private static final Logger LOGGER = LoggerFactory.getLogger(QSession)
 
     /**
      * root script id which is the first (root) script which user has commanded to run.
@@ -24,7 +24,7 @@ class QSession {
     /**
      * Stack of scripts which are running.
      */
-    final Stack<String> scriptStack = new Stack<>()
+    final Stack<String> scriptStack = [] as Stack
     private final Object stackLock = new Object()
 
     /**
@@ -102,7 +102,7 @@ class QSession {
     }
 
     QExecutor beingScript() {
-        executor = executorFactory.createReusable();
+        executor = executorFactory.createReusable()
         def stack = incrStack()
         LOGGER.debug('Session {} starting script at execution depth {}', this, stack)
         return executor
@@ -147,7 +147,7 @@ class QSession {
     }
 
     @Override
-    public String toString() {
-        return 'QSession@' + Integer.toHexString(hashCode());
+    String toString() {
+        return 'QSession@' + Integer.toHexString(hashCode())
     }
 }

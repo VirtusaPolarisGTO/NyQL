@@ -32,9 +32,10 @@ class QScriptFolders implements QScriptMapper {
             fileMap.put(scriptId, it)
         }
         scriptsFolderList << impl
-        return this
+        this
     }
 
+    @SuppressWarnings("UnnecessaryGetter")
     static QScriptFolders createNew(Map args) throws NyException {
         if (args == null || args.size() == 0 || !args.baseDirs) {
             throw new NyConfigurationException('To create a new QScriptsFolder requires at least ' +
@@ -44,7 +45,7 @@ class QScriptFolders implements QScriptMapper {
         List<String> paths = args.baseDirs
         List<File> folders = []
         for (String path : paths) {
-            File dir = new File(path);
+            File dir = new File(path)
             if (!dir.exists()) {
                 String configFilePath = args._location
                 if (configFilePath != null) {

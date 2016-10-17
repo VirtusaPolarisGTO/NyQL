@@ -13,7 +13,7 @@ class Table {
      */
     static final Table ANY_TABLE = new Table()
 
-    private Map<String, Column> __allColumns = new HashMap<>()
+    private Map<String, Column> __allColumns = [:]
 
     QContext _ctx = null
 
@@ -76,8 +76,8 @@ class Table {
 
     Column COLUMN_AS(String name, String alias) {
         Column column = new Column(__name: name, __alias: alias, _owner: this, _ctx: _ctx)
-        __allColumns.put(name + "::" + alias, column)
-        return column
+        __allColumns.put(name + '::' + alias, column)
+        column
     }
 
     Column COLUMN(String name) {
@@ -87,11 +87,11 @@ class Table {
         }
         Column col = new Column(__name: name, _owner: this, _ctx: _ctx)
         __allColumns.put(name, col)
-        return col
+        col
     }
 
     def propertyMissing(String name) {
-        return COLUMN(name)
+        COLUMN(name)
     }
 
 }

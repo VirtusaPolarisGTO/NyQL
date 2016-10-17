@@ -6,6 +6,7 @@ import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.ParamList
 import com.virtusa.gto.insight.nyql.model.blocks.QNumber
 import com.virtusa.gto.insight.nyql.model.blocks.QString
+import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 
 import java.util.stream.Collectors
@@ -41,11 +42,11 @@ trait QTranslator extends QJoins {
             return ___convertNumeric(obj)
         } else if (obj instanceof AParam) {
             if (obj instanceof ParamList) {
-                return '::' + obj.__name + '::'
+                return QUtils.padParamList(obj.__name)
             }
             return '?' + (obj.__aliasDefined() && contextType == QContextType.SELECT ? ' AS ' + obj.__alias : '')
         } else if (obj instanceof QResultProxy) {
-            return (obj.query ?: "").trim()
+            return (obj.query ?: '').trim()
         } else if (obj instanceof List) {
             return obj.stream().map({ ___resolve(it, contextType, paramOrder) }).collect(Collectors.joining(', ', '(', ')'))
         } else {

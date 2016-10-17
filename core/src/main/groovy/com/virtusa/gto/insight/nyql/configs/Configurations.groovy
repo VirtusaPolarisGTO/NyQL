@@ -22,7 +22,7 @@ class Configurations {
     private Map properties = [:]
 
     private String cacheVarName
-    private final Object lock = new Object();
+    private final Object lock = new Object()
     private boolean configured = false
     private ClassLoader classLoader
     private QProfiling profiler
@@ -42,7 +42,7 @@ class Configurations {
 
     boolean isConfigured() {
         synchronized (lock) {
-            return configured;
+            return configured
         }
     }
 
@@ -120,14 +120,14 @@ class Configurations {
             Map<String, QRepository> repositoryMap = (Map<String, QRepository>) properties[ConfigKeys.REPO_MAP]
             repositoryMap.each {
                 QRepository qRepository = profEnabled ? new QProfRepository(it.value) : it.value
-                QRepositoryRegistry.instance.register(it.key, qRepository, it.key == defRepo);
+                QRepositoryRegistry.instance.register(it.key, qRepository, it.key == defRepo)
                 added++
             }
         }
     }
 
     private void loadExecutors(String activeDb, boolean profEnabled=false) {
-        QDbFactory activeFactory = QDatabaseRegistry.instance.getDbFactory(activeDb);
+        QDbFactory activeFactory = QDatabaseRegistry.instance.getDbFactory(activeDb)
         boolean loadDefOnly = properties.loadDefaultExecutorOnly ?: false
         String defExec = properties.defaultExecutor ?: Constants.DEFAULT_EXECUTOR_NAME
         List execs = properties.executors ?: []
@@ -177,15 +177,16 @@ class Configurations {
 
     void shutdown() {
         LOGGER.debug("Shutting down nyql...")
-        safeClose("Executors", { QExecutorRegistry.instance.shutdown() })
-        safeClose("Repositories", { QRepositoryRegistry.instance.shutdown() })
-        safeClose("Profiler", { profiler.close() })
+        safeClose('Executors') { QExecutorRegistry.instance.shutdown() }
+        safeClose('Repositories') { QRepositoryRegistry.instance.shutdown() }
+        safeClose('Profiler') { profiler.close() }
         //QExecutorRegistry.instance.shutdown()
         //QRepositoryRegistry.instance.shutdown()
         //profiler.close()
-        LOGGER.debug("Shutdown completed.")
+        LOGGER.debug('Shutdown completed.')
     }
 
+    @SuppressWarnings("CatchThrowable")
     private static void safeClose(String workerName, Runnable runnable) {
         try {
             runnable.run()

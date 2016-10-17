@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
 
 import java.sql.ResultSet
+@java.lang.SuppressWarnings("JdbcStatementReference")
 import java.sql.Statement
 
 /**

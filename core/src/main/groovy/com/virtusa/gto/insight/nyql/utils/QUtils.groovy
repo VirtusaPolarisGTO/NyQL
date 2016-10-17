@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils
 class QUtils {
 
     private static final String NL = '\n'
+    private static final String P_PAD = '::'
 
     static String generateErrStr(String mainError, String... helpLines) {
         StringBuilder builder = new StringBuilder().append(mainError)
@@ -127,7 +128,7 @@ class QUtils {
             }
         }
 
-        return new Join(table1: table1, table2: table2, _ctx: ctx, type: type)
+        new Join(table1: table1, table2: table2, _ctx: ctx, type: type)
     }
 
     /**
@@ -232,6 +233,16 @@ class QUtils {
         } else {
             return new NamedParam(__name: name, scope: scope, __mappingParamName: mappingName)
         }
+    }
+
+    /**
+     * Creates a parameter placeholder id for a given parameter name by appending '::'.
+     *
+     * @param name name of parameter.
+     * @return padded parameter name.
+     */
+    static String padParamList(String name) {
+        return P_PAD + name + P_PAD
     }
 
 }

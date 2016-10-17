@@ -1,11 +1,11 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
-import com.virtusa.gto.insight.nyql.QResultProxy
 import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.model.QSource
+import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
@@ -37,7 +37,7 @@ class Caching implements Closeable {
                 try {
                     LOGGER.debug("  Compiling: " + id)
                     gcl.parseClass(qSource.codeSource, true)
-                } catch (Exception ex) {
+                } catch (CompilationFailedException ex) {
                     LOGGER.error("Compilation error in script '$id'", ex)
                     throw new NyException("Compilation error in script '$id'!", ex)
                 }

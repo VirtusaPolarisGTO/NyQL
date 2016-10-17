@@ -140,23 +140,25 @@ class MySqlFunctions implements QFunctions {
         return new FunctionColumn(_columns: vals, _func: fName, _setOfCols: true, _ctx: _ctx)
     }
 
+    /*
     private FunctionColumn fColumn(Column column, String fName) {
         return new FunctionColumn(_wrapper: column, _func: fName, _ctx: _ctx)
     }
+    */
 
-    private NyException requireTwoParams() {
-        return new NySyntaxException('DATE DIFF function requires exactly two parameters!')
+    private static NyException requireTwoParams() {
+        new NySyntaxException('DATE DIFF function requires exactly two parameters!')
     }
 
-    private NySyntaxException invalidSyntax(String func='') {
-        return new NySyntaxException('Invalid syntax for ' + func + ' function!')
+    private static NySyntaxException invalidSyntax(String func='') {
+        new NySyntaxException('Invalid syntax for ' + func + ' function!')
     }
 
-    private NySyntaxException invalidDateAddSyntax() {
-        return invalidSyntax('DATE_ADD')
+    private static NySyntaxException invalidDateAddSyntax() {
+        invalidSyntax('DATE_ADD')
     }
 
-    private NySyntaxException invalidDateSubSyntax() {
-        return invalidSyntax('DATE_SUB')
+    private static NySyntaxException invalidDateSubSyntax() {
+        invalidSyntax('DATE_SUB')
     }
 }

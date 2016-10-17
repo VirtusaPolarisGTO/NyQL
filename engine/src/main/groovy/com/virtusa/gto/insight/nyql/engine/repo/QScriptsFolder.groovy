@@ -25,6 +25,10 @@ import java.util.stream.Stream
  */
 class QScriptsFolder implements QScriptMapper {
 
+    private static final String KEY_INCLUSIONS = 'inclusions'
+    private static final String KEY_EXCLUSIONS = 'exclusions'
+    private static final String SPLIT_PATTERN = '[,]'
+    private static final String GLOB_NAME = 'glob:'
     private static final Logger LOGGER = LoggerFactory.getLogger(QScriptsFolder.class)
 
     private static final boolean DEF_CACHING = false
@@ -75,6 +79,7 @@ class QScriptsFolder implements QScriptMapper {
         return path
     }
 
+    @SuppressWarnings("UnnecessaryGetter")
     static QScriptsFolder createNew(Map args) throws NyException {
         if (args == null || args.size() == 0 || !args.baseDir) {
             throw new NyConfigurationException('To create a new QScriptsFolder requires at least one parameter with specifying base directory!')
@@ -88,16 +93,16 @@ class QScriptsFolder implements QScriptMapper {
                 File activeDir = new File(configFilePath).getCanonicalFile()
                 if (activeDir.exists() && !dir.isAbsolute()) {
                     QScriptsFolder qScriptsFolder = new QScriptsFolder(activeDir.toPath().resolve(path).toFile())
-                    qScriptsFolder.inclusionPatterns = args['inclusions'] ?: ''
-                    qScriptsFolder.exclusionPatterns = args['exclusions'] ?: ''
+                    qScriptsFolder.inclusionPatterns = args[KEY_INCLUSIONS] ?: ''
+                    qScriptsFolder.exclusionPatterns = args[KEY_EXCLUSIONS] ?: ''
                     return qScriptsFolder.scanDir()
                 }
             }
             throw new NyConfigurationException('Given script folder does not exist! [' + args[0] + ']')
         }
         QScriptsFolder qScriptsFolder = new QScriptsFolder(dir);
-        qScriptsFolder.inclusionPatterns = args['inclusions'] ?: ''
-        qScriptsFolder.exclusionPatterns = args['exclusions'] ?: ''
+        qScriptsFolder.inclusionPatterns = args[KEY_INCLUSIONS] ?: ''
+        qScriptsFolder.exclusionPatterns = args[KEY_EXCLUSIONS] ?: ''
         return qScriptsFolder.scanDir()
     }
 
@@ -130,29 +135,30 @@ class QScriptsFolder implements QScriptMapper {
 
     private static class ScriptVisitor extends SimpleFileVisitor<Path> {
 
-        private final List<PathMatcher> inclusions = new LinkedList<>()
-        private final List<PathMatcher> exclusions = new LinkedList<>()
+        private final List<PathMatcher> inclusions = [] as Queue
+        private final List<PathMatcher> exclusions = [] as Queue
         private final QScriptsFolder scriptsFolder
         private final Path startDir
 
+        @SuppressWarnings("UnnecessaryGetter")
         ScriptVisitor(QScriptsFolder qScriptsFolder, Path rootDir, String patternInclusions, String patternExclusions) {
             scriptsFolder = qScriptsFolder
             startDir = rootDir
             if (patternInclusions.trim().length() > 0) {
-                inclusions.addAll(Stream.of(patternInclusions.split('[,]'))
-                        .map({ FileSystems.getDefault().getPathMatcher('glob:' + it) })
+                inclusions.addAll(Stream.of(patternInclusions.split(SPLIT_PATTERN))
+                        .map { FileSystems.getDefault().getPathMatcher(GLOB_NAME + it) }
                         .collect(Collectors.toList()))
             }
             if (patternExclusions.trim().length() > 0) {
-                exclusions.addAll(Stream.of(patternExclusions.split('[,]'))
-                        .map({ FileSystems.getDefault().getPathMatcher('glob:' + it) })
+                exclusions.addAll(Stream.of(patternExclusions.split(SPLIT_PATTERN))
+                        .map { FileSystems.getDefault().getPathMatcher(GLOB_NAME + it) }
                         .collect(Collectors.toList()))
             }
         }
 
         @Override
         FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            if (!attrs.directory && !file.getFileName().toString().toLowerCase().endsWith(".groovy")) {
+            if (!attrs.directory && !file.getFileName().toString().toLowerCase().endsWith('.groovy')) {
                 return FileVisitResult.SKIP_SUBTREE
             }
 
@@ -161,9 +167,8 @@ class QScriptsFolder implements QScriptMapper {
                     scriptsFolder.processScript(file.toFile())
                 }
                 return FileVisitResult.CONTINUE
-            } else {
-                return FileVisitResult.SKIP_SUBTREE
             }
+            FileVisitResult.SKIP_SUBTREE
         }
 
         private boolean check(Path file) {

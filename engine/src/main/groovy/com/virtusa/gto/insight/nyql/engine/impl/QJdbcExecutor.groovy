@@ -277,7 +277,7 @@ class QJdbcExecutor implements QExecutor {
                         LOGGER.warn('Empty parameter list received!')
                         pStr = 'NULL'
                     }
-                    query = query.replaceAll('::' + param.__name + '::', pStr)
+                    query = query.replaceAll(QUtils.padParamList(param.__name), pStr)
                     cp += itemList.size()
 
                 } else {

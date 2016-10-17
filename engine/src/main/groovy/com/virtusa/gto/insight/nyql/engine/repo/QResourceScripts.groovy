@@ -18,7 +18,7 @@ class QResourceScripts implements QScriptMapper {
 
     private final Map<String, QSource> resMap = [:]
 
-    public QResourceScripts(String theRootDir) {
+    QResourceScripts(String theRootDir) {
         rootRes = theRootDir
     }
 
@@ -34,7 +34,7 @@ class QResourceScripts implements QScriptMapper {
     @Override
     QSource map(String id) {
         if (resMap.containsKey(id)) {
-            return resMap[id]
+            resMap[id]
         } else {
             String content = readAll(rootRes + id)
             GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, id, GroovyShell.DEFAULT_CODE_BASE)
@@ -42,7 +42,7 @@ class QResourceScripts implements QScriptMapper {
 
             def qSrc = new QSource(id: id, file: null, doCache: false, codeSource: groovyCodeSource)
             resMap[id] = qSrc
-            return qSrc
+            qSrc
         }
     }
 

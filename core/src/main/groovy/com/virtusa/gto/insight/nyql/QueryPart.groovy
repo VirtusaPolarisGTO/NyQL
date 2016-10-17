@@ -23,12 +23,12 @@ class QueryPart extends Query {
                 _ctx.tables.containsKey(table.__name)
             }
         }
-        return this
+        this
     }
 
     QueryPart COLUMNS(Object... columns) {
         if (_intoColumns == null) {
-            _intoColumns = new LinkedList<>()
+            _intoColumns = [] as Queue
         }
 
         for (Object col : columns) {
@@ -38,12 +38,12 @@ class QueryPart extends Query {
                 _intoColumns.add(col)
             }
         }
-        return this
+        this
     }
 
     QueryPart FETCH(Object... columns) {
         if (_allProjections == null) {
-            _allProjections = new LinkedList<>()
+            _allProjections = [] as Queue
         }
         for (Object col : columns) {
             if (col instanceof List) {
@@ -53,7 +53,7 @@ class QueryPart extends Query {
             }
         }
 
-        return this
+        this
     }
 
     QueryPart JOIN(Table startTable, closure) {
@@ -64,7 +64,7 @@ class QueryPart extends Query {
         code()
 
         sourceTbl = joinClosure.activeTable
-        return this
+        this
     }
 
     QueryPart SET(closure) {
@@ -75,6 +75,6 @@ class QueryPart extends Query {
         code()
 
         _assigns = ass
-        return this
+        this
     }
 }

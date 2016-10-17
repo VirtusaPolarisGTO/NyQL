@@ -102,8 +102,8 @@ class Assign implements DataTypeTraits, ScriptTraits {
         } else {
             throw new NySyntaxException(QUtils.generateErrStr(
                     "No table by name '$name' found!",
-                    "You cannot refer to a column without mentioning its table or alias.",
-                    "Or, did you misspelled the table name?"
+                    'You cannot refer to a column without mentioning its table or alias.',
+                    'Or, did you misspelled the table name?'
             ))
         }
     }

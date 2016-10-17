@@ -31,7 +31,7 @@ class ConfigBuilder {
         }
         props[ConfigKeys.PROFILING].enabled = true
         props[ConfigKeys.PROFILING].profiler = profilingImpl
-        return this
+        this
     }
 
     /**
@@ -43,7 +43,7 @@ class ConfigBuilder {
     ConfigBuilder havingDefaultRepository(String repoName) {
         assertNotInitialized()
         props[ConfigKeys.DEFAULT_REPO] = repoName
-        return this
+        this
     }
 
     /**
@@ -56,7 +56,7 @@ class ConfigBuilder {
      */
     ConfigBuilder addScriptLoader(String mapperName, QScriptMapper qScriptMapper) {
         scriptMapper.put(mapperName, qScriptMapper)
-        return this
+        this
     }
 
     /**
@@ -66,7 +66,7 @@ class ConfigBuilder {
      * @return mapper instance or null if no such mapper exist.
      */
     QScriptMapper getScriptLoader(String mapperName) {
-        return scriptMapper.get(mapperName)
+        scriptMapper.get(mapperName)
     }
 
     /**
@@ -76,7 +76,7 @@ class ConfigBuilder {
      * @return repository instance or null if no such repository found.
      */
     QRepository getRepository(String name) {
-        return repositoryMap[name]
+        repositoryMap[name]
     }
 
     /**
@@ -88,7 +88,7 @@ class ConfigBuilder {
      */
     ConfigBuilder addRepository(String name, QRepository repository) {
         repositoryMap.put(name, repository)
-        return this
+        this
     }
 
     /**
@@ -107,7 +107,7 @@ class ConfigBuilder {
             props[ConfigKeys.REPOSITORIES] = []
         }
         props[ConfigKeys.REPOSITORIES] << repositoryConfig
-        return this
+        this
     }
 
     /**
@@ -119,7 +119,7 @@ class ConfigBuilder {
     ConfigBuilder havingDefaultExecutor(String executorName) {
         assertNotInitialized()
         props[ConfigKeys.DEFAULT_EXECUTOR] = executorName
-        return this
+        this
     }
 
     /**
@@ -131,10 +131,10 @@ class ConfigBuilder {
     ConfigBuilder addExecutor(Map executorConfigs) {
         assertNotInitialized()
         if (!props[ConfigKeys.EXECUTORS]) {
-            props["executors"] = []
+            props[ConfigKeys.EXECUTORS] = []
         }
         props[ConfigKeys.EXECUTORS] << executorConfigs
-        return this
+        this
     }
 
     /**
@@ -148,7 +148,7 @@ class ConfigBuilder {
             props[ConfigKeys.CACHING] = [:]
         }
         props[ConfigKeys.CACHING].generatedQueries = true
-        return this
+        this
     }
 
     /**
@@ -162,7 +162,7 @@ class ConfigBuilder {
             props[ConfigKeys.CACHING] = [:]
         }
         props[ConfigKeys.CACHING].compiledScripts = true
-        return this
+        this
     }
 
     /**
@@ -174,7 +174,7 @@ class ConfigBuilder {
     ConfigBuilder addDefaultImporters(String... clzFullName) {
         assertNotInitialized()
         clzFullName.each { addDefaultImporter(it) }
-        return this
+        this
     }
 
     /**
@@ -186,7 +186,7 @@ class ConfigBuilder {
     ConfigBuilder addDefaultImporters(Collection<String> clzFullName) {
         assertNotInitialized()
         clzFullName.each { addDefaultImporter(it) }
-        return this
+        this
     }
 
     /**
@@ -198,10 +198,10 @@ class ConfigBuilder {
     ConfigBuilder addDefaultImporter(String clzFullName) {
         assertNotInitialized()
         if (!props[ConfigKeys.DEFAULT_IMPORTS]) {
-            props["defaultImports"] = []
+            props[ConfigKeys.DEFAULT_IMPORTS] = []
         }
         props[ConfigKeys.DEFAULT_IMPORTS] << clzFullName
-        return this
+        this
     }
 
     /**
@@ -213,7 +213,7 @@ class ConfigBuilder {
      */
     ConfigBuilder addTranslators(Collection<String> clzNamesList) {
         clzNamesList.each { addTranslator(it) }
-        return this
+        this
     }
 
     /**
@@ -226,7 +226,7 @@ class ConfigBuilder {
     ConfigBuilder addTranslator(String fullClzName) {
         assertNotInitialized()
         props[ConfigKeys.TRANSLATORS] ? props[ConfigKeys.TRANSLATORS].add(fullClzName) : [fullClzName]
-        return this
+        this
     }
 
     /**
@@ -238,7 +238,7 @@ class ConfigBuilder {
     ConfigBuilder activateDb(String dbImplName) {
         assertNotInitialized()
         props[ConfigKeys.ACTIVATE_DB] = dbImplName
-        return this
+        this
     }
 
     private void assertNotInitialized() {
@@ -258,7 +258,7 @@ class ConfigBuilder {
      */
     ConfigBuilder setupFrom(Map map) {
         props.putAll(map)
-        return this
+        this
     }
 
     /**
@@ -282,7 +282,7 @@ class ConfigBuilder {
      * @return an instance of config builder.
      */
     static ConfigBuilder instance() {
-        return Holder.INSTANCE
+        Holder.INSTANCE
     }
 
     private static class Holder {

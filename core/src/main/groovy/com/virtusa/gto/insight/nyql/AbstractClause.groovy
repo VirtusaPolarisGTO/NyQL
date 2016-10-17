@@ -76,7 +76,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         } else {
             throw new NySyntaxException(QUtils.generateErrStr(
                     "No column is found by name '$colName'!",
-                    "If you are specifying column name directly then make sure it has an alias!"
+                    'If you are specifying column name directly then make sure it has an alias!'
             ))
         }
     }
@@ -133,8 +133,8 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
             }
             throw new NySyntaxException(QUtils.generateErrStr(
                     "No table by name '$name' found!",
-                    "You cannot refer to a column without mentioning its table or alias.",
-                    "Or, did you misspelled the table name?"
+                    'You cannot refer to a column without mentioning its table or alias.',
+                    'Or, did you misspelled the table name?'
             ))
         }
     }

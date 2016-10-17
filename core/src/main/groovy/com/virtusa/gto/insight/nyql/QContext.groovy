@@ -14,7 +14,7 @@ class QContext {
     String translatorName;
 
     //Map<String, AParam> allParams = new HashMap<>()
-    List<AParam> allParams = new LinkedList<>()
+    List<AParam> allParams = [] as Queue
 
     Tables tables = new Tables()
     Map<String, Column> columns = new HashMap<>()
@@ -25,7 +25,7 @@ class QContext {
         qContext.tables.putAll(this.tables)
         qContext.columns.putAll(this.columns)
         qContext.allParams.addAll(this.allParams)
-        return qContext
+        qContext
     }
 
     Table getTheOnlyTable() {
@@ -44,7 +44,7 @@ class QContext {
         //}
         //allParams.put(param.__name, param)
         allParams.add(param)
-        return param
+        param
     }
 
     void renameColumn(String oldKey, String newKey, Column col) {
@@ -54,7 +54,7 @@ class QContext {
     }
 
     Column getColumnIfExist(String name) {
-        return columns[name]
+        columns[name]
     }
 
     void mergeFrom(QContext otherCtx) {
