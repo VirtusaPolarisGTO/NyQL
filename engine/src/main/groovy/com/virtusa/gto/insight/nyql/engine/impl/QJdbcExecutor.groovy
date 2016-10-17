@@ -273,7 +273,11 @@ class QJdbcExecutor implements QExecutor {
                     List itemList = itemValue
                     itemList.each { orderedParams.add(it) }
                     String pStr = itemList.stream().map { return "?" }.collect(Collectors.joining(", "))
-                    query = query.replaceAll("::" + param.__name + "::", pStr)
+                    if (itemList.isEmpty()) {
+                        LOGGER.warn('Empty parameter list received!')
+                        pStr = 'NULL'
+                    }
+                    query = query.replaceAll('::' + param.__name + '::', pStr)
                     cp += itemList.size()
 
                 } else {
