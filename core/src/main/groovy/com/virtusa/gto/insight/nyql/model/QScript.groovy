@@ -13,12 +13,17 @@ class QScript {
     QResultProxy proxy
     QSession qSession
 
+    void free() {
+        proxy.free()
+        qSession.free()
+    }
+
     @Override
     public String toString() {
         String params = "";
         if (proxy != null) {
             params = proxy.orderedParameters.toString()
         }
-        return proxy == null ? "" : (proxy.query ?: "").trim() + "\n" + params
+        return proxy == null ? '' : (proxy.query ?: '').trim() + '\n' + params
     }
 }

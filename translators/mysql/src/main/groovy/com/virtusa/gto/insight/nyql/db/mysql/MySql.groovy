@@ -441,18 +441,20 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     void ___scanForParameters(def expression, List<AParam> paramOrder) {
-        if (expression instanceof AParam) {
-            paramOrder?.add((AParam)expression)
-        }
-        if (expression instanceof QResultProxy) {
-            QResultProxy resultProxy = expression
-            paramOrder?.addAll(resultProxy.orderedParameters ?: [])
-        }
-        if (expression instanceof FunctionColumn) {
-            ___expandColumn((FunctionColumn)expression, paramOrder)
-        }
-        if (expression instanceof List) {
-            expression.each { ___scanForParameters(it, paramOrder) }
+        if (expression != null) {
+            if (expression instanceof AParam) {
+                paramOrder?.add((AParam) expression)
+            }
+            if (expression instanceof QResultProxy) {
+                QResultProxy resultProxy = expression
+                paramOrder?.addAll(resultProxy.orderedParameters ?: [])
+            }
+            if (expression instanceof FunctionColumn) {
+                ___expandColumn((FunctionColumn) expression, paramOrder)
+            }
+            if (expression instanceof List) {
+                expression.each { ___scanForParameters(it, paramOrder) }
+            }
         }
     }
 
@@ -473,27 +475,33 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     String ___expandCondition(Where.QCondition c, List<AParam> paramOrder, QContextType contextType) {
-        if (c.leftOp instanceof AParam) {
+        if (c.leftOp != null && c.leftOp instanceof AParam) {
             paramOrder?.add((AParam)c.leftOp)
         }
         ___scanForParameters(c.rightOp, paramOrder)
-        boolean parenthesis = (c.rightOp instanceof QResultProxy)
+        boolean parenthesis = (c.rightOp != null && c.rightOp instanceof QResultProxy)
 
-        return ___resolve(c.leftOp, contextType) +
-                (c.op.length() > 0 ? ' ' + String.valueOf(c.op) + ' ' : ' ') +
-                (!parenthesis ? ___resolve(c.rightOp, contextType) : '(' + ___resolve(c.rightOp, contextType) + ')')
+        if (c instanceof Where.QUnaryCondition) {
+            return String.valueOf(c.op) + ' ' +
+                    (parenthesis ? '(' + ___resolve(c.chooseOp(), contextType, paramOrder) + ')' : ___resolve(c.chooseOp(), contextType, paramOrder))
+        } else {
+            return ___resolve(c.leftOp, contextType) +
+                    (c.op.length() > 0 ? ' ' + String.valueOf(c.op) + ' ' : ' ') +
+                    (!parenthesis ? ___resolve(c.rightOp, contextType) : '(' + ___resolve(c.rightOp, contextType) + ')')
+        }
     }
 
     String ___expandConditionGroup(Where.QConditionGroup group, List<AParam> paramOrder, QContextType contextType) {
         String gCon = group.condConnector.isEmpty() ? '' : ' ' + group.condConnector + ' ';
         return group.where.clauses.stream()
-                .map({ c -> if (c instanceof Where.QCondition) {
-            return ___expandCondition(c, paramOrder, contextType)
-        } else if (c instanceof Where.QConditionGroup) {
-            return '(' + ___expandConditionGroup(c, paramOrder, contextType) + ')'
-        } else {
-            return String.valueOf(c)
-        }
+                .map({ c ->
+            if (c instanceof Where.QCondition) {
+                return ___expandCondition(c, paramOrder, contextType)
+            } else if (c instanceof Where.QConditionGroup) {
+                return '(' + ___expandConditionGroup(c, paramOrder, contextType) + ')'
+            } else {
+                return String.valueOf(c)
+            }
         }).collect(Collectors.joining(gCon))
     }
 

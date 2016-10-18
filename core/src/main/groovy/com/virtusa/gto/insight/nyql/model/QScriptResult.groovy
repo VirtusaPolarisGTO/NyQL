@@ -10,4 +10,9 @@ class QScriptResult extends QScript {
 
     def scriptResult
 
+    @Override
+    void free() {
+        super.free()
+        scriptResult = null
+    }
 }

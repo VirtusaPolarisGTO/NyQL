@@ -12,6 +12,14 @@ class QScriptList extends QScript {
 
     List<QScript> scripts
 
+    @Override
+    void free() {
+        super.free()
+        if (scripts != null) {
+            scripts.each { it.free() }
+            scripts.clear()
+        }
+    }
 
     @Override
     public String toString() {

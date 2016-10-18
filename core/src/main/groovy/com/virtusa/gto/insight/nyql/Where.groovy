@@ -203,6 +203,16 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         })
     }
 
+    def EXISTS(Object subquery) {
+        clauses.add(new QUnaryCondition(rightOp: subquery, op: 'EXISTS'))
+        return this
+    }
+
+    def NOTEXISTS(Object subquery) {
+        clauses.add(new QUnaryCondition(rightOp: subquery, op: 'NOT EXISTS'))
+        return this
+    }
+
     def __hasClauses() {
         return QUtils.notNullNorEmpty(clauses)
     }
@@ -261,4 +271,11 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         def rightOp
         def op
     }
+
+    static class QUnaryCondition extends QCondition {
+        def chooseOp() {
+            return leftOp ?: rightOp
+        }
+    }
+
 }

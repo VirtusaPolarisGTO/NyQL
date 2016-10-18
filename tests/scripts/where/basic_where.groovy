@@ -1,6 +1,11 @@
 /**
  * @author IWEERARATHNA
  */
+
+def innQ = $DSL.select {
+    TARGET (Film.alias("f"))
+}
+
 [
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -178,4 +183,14 @@
         }
     },
     "SELECT * FROM `Film` f WHERE f.description LIKE CONCAT(\"%\", POSITION(\"a\" IN f.title), \"-%\")",
+
+    $DSL.select {
+        TARGET (Address.alias("ad"))
+        WHERE {
+            EXISTS (innQ)
+            AND
+            NOTEXISTS (innQ)
+        }
+    },
+    "SELECT * FROM `Address` ad WHERE EXISTS (SELECT * FROM `Film` f) AND NOT EXISTS (SELECT * FROM `Film` f)",
 ]

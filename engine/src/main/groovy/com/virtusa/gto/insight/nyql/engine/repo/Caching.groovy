@@ -35,14 +35,14 @@ class Caching implements Closeable {
             for (QSource qSource : sources) {
                 String id = qSource.id
                 try {
-                    LOGGER.debug("  Compiling: " + id)
+                    LOGGER.debug('  Compiling: ' + id)
                     gcl.parseClass(qSource.codeSource, true)
                 } catch (CompilationFailedException ex) {
                     LOGGER.error("Compilation error in script '$id'", ex)
                     throw new NyException("Compilation error in script '$id'!", ex)
                 }
             }
-            LOGGER.debug("Compilation successful!")
+            LOGGER.debug('Compilation successful!')
         }
     }
 

@@ -3,6 +3,10 @@ import com.sun.org.apache.bcel.internal.generic.IFNULL
 /**
  * @author IWEERARATHNA
  */
+def innQ = $DSL.select {
+    TARGET (Film.alias("f"))
+}
+
 [
     $DSL.select {
         TARGET (Actor.alias("ac"))
@@ -114,4 +118,15 @@ import com.sun.org.apache.bcel.internal.generic.IFNULL
         FETCH (BITAND(f.rental_duration, 5), BITOR(f.length, f.rental_duration), BITXOR(f.length, 10))
     },
     "SELECT f.rental_duration & 5, f.length | f.rental_duration, f.length ^ 10 FROM `Film` f",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (CASE {
+            WHEN { EXISTS (innQ) } THEN { STR("replaced") }
+            ELSE { STR("deleted") }
+        }
+        )
+    },
+    "SELECT CASE WHEN EXISTS (SELECT * FROM `Film` f) THEN \"replaced\" ELSE \"deleted\" END FROM `Actor` ac",
+
 ]

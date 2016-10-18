@@ -191,7 +191,15 @@ class NyQL {
      * @throws NyException any exception thrown while parsing or executing.
      */
     public static <T> T execute(String scriptName, Map<String, Object> data) throws NyException {
-        return (T) QExecutorRegistry.instance.defaultExecutorFactory().create().execute(parse(scriptName, data))
+        QScript script = null
+        try {
+            script = parse(scriptName, data)
+            return (T) QExecutorRegistry.instance.defaultExecutorFactory().create().execute(script)
+        } finally {
+            if (script != null) {
+                script.free()
+            }
+        }
     }
 
     /**

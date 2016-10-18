@@ -60,6 +60,21 @@ class QSession {
 
     private QSession() {}
 
+    final void free() {
+        synchronized (depthLock) {
+            if (execDepth > 1) {
+                LOGGER.warn('Cannot free session instance at this moment! Stack: ' + execDepth)
+                return
+            }
+        }
+        sessionVariables.clear()
+        scriptStack.clear()
+        scriptRepo = null
+        executorFactory = null
+        dbFactory = null
+        executor = null
+    }
+
     static QSession create(String theScriptId) {
         QSession qSession = createSession(DSLContext.getActiveDSLContext().activeFactory,
                 QRepositoryRegistry.instance.defaultRepository(),
