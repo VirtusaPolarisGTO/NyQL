@@ -8,6 +8,7 @@ import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.FunctionTraits
 import com.virtusa.gto.insight.nyql.traits.ScriptTraits
 import com.virtusa.gto.insight.nyql.utils.Constants
+import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
 
@@ -86,18 +87,18 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return this
     }
 
-    def ON(Object c1, String op='', Object c2) {
+    def ON(Object c1, QOperator op = QOperator.UNKNOWN, Object c2) {
         clauses.add(new QCondition(leftOp: c1, rightOp: c2, op: op))
         return this
     }
 
     def ISNULL(Object c) {
-        clauses.add(new QCondition(leftOp: c, rightOp: null, op: 'IS'))
+        clauses.add(new QCondition(leftOp: c, rightOp: null, op: QOperator.IS))
         return this
     }
 
     def NOTNULL(Object c) {
-        clauses.add(new QCondition(leftOp: c, rightOp: null, op: 'IS NOT'))
+        clauses.add(new QCondition(leftOp: c, rightOp: null, op: QOperator.IS_NOT))
         return this
     }
 
@@ -105,30 +106,30 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         if (c2 == null) {
             return ISNULL(c1)
         }
-        return ON(c1, '=', c2)
+        return ON(c1, QOperator.EQUAL, c2)
     }
 
     def NEQ(Object c1, Object c2) {
         if (c2 == null) {
             return NOTNULL(c1)
         }
-        return ON(c1, '<>', c2)
+        return ON(c1, QOperator.NOT_EQUAL, c2)
     }
 
     def GT(Object c1, Object c2) {
-        return ON(c1, '>', c2)
+        return ON(c1, QOperator.GREATER_THAN, c2)
     }
 
     def GTE(Object c1, Object c2) {
-        return ON(c1, '>=', c2)
+        return ON(c1, QOperator.GREATER_THAN_EQUAL, c2)
     }
 
     def LT(Object c1, Object c2) {
-        return ON(c1, '<', c2)
+        return ON(c1, QOperator.LESS_THAN, c2)
     }
 
     def LTE(Object c1, Object c2) {
-        return ON(c1, '<=', c2)
+        return ON(c1, QOperator.LESS_THAN_EQUAL, c2)
     }
 
     def BETWEEN(Object c1, Object startValue, Object endValue) {
@@ -146,7 +147,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             if (list.size() == 0) {
                 list.add(null)
             }
-            return ON(c1, _ctx.translator.OP_IN(), list)
+            return ON(c1, QOperator.IN, list)
         }
     }
 
@@ -157,7 +158,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             if (list.size() == 0) {
                 list.add(null)
             }
-            return ON(c1, _ctx.translator.OP_NOTIN(), list)
+            return ON(c1, QOperator.NOT_IN, list)
         }
     }
 
@@ -204,12 +205,12 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def EXISTS(Object subquery) {
-        clauses.add(new QUnaryCondition(rightOp: subquery, op: 'EXISTS'))
+        clauses.add(new QUnaryCondition(rightOp: subquery, op: QOperator.EXISTS))
         return this
     }
 
     def NOTEXISTS(Object subquery) {
-        clauses.add(new QUnaryCondition(rightOp: subquery, op: 'NOT EXISTS'))
+        clauses.add(new QUnaryCondition(rightOp: subquery, op: QOperator.NOT_EXISTS))
         return this
     }
 
@@ -278,7 +279,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     static class QCondition {
         def leftOp
         def rightOp
-        def op
+        QOperator op
     }
 
     static class QUnaryCondition extends QCondition {

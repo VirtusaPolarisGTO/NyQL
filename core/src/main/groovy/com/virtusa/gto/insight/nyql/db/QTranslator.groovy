@@ -6,6 +6,7 @@ import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.ParamList
 import com.virtusa.gto.insight.nyql.model.blocks.QNumber
 import com.virtusa.gto.insight.nyql.model.blocks.QString
+import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 
@@ -136,8 +137,8 @@ trait QTranslator extends QJoins {
      */
     abstract QResultProxy ___updateQuery(QueryUpdate q)
 
-    def ___convertOperator(String op) {
-        return op
+    String ___convertOperator(QOperator op) {
+        return op.getOp()
     }
 
     /**

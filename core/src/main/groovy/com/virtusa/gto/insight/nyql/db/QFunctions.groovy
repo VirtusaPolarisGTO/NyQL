@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.FunctionColumn
 import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 
 import java.util.stream.Collectors
@@ -455,5 +456,15 @@ trait QFunctions {
         } else {
             return '~' + ___resolveIn(it)
         }
+    }
+
+    /**
+     * Exists function for projection.
+     *
+     * @param it inner query.
+     * @return generated function.
+     */
+    def exists(it) {
+        QOperator.EXISTS.getOp() + ___resolve(it, QContextType.UNKNOWN)
     }
 }

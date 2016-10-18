@@ -97,21 +97,25 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
     }
 
     def IFNULL(Column column, Object val) {
-        Case aCase = CASE({
+        Case aCase = CASE {
             WHEN { ISNULL(column) }
             THEN { val }
             ELSE { column }
-        })
+        }
         aCase.setCaseType(Case.CaseType.IFNULL)
         return aCase
     }
 
     def IFNOTNULL(Column column, Object val) {
-        return CASE({
+        return CASE {
             WHEN { NOTNULL(column) }
             THEN { val }
             ELSE { column }
-        })
+        }
+    }
+
+    def EXISTS(QResultProxy innerQuery) {
+        return new FunctionColumn(_ctx: _ctx, _setOfCols: true, _func: 'exists', _columns: [innerQuery])
     }
 
     def propertyMissing(String name) {

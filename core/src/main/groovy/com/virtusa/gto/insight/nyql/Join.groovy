@@ -1,4 +1,7 @@
 package com.virtusa.gto.insight.nyql
+
+import com.virtusa.gto.insight.nyql.utils.QOperator
+
 /**
  * @author Isuru Weerarathna
  */
@@ -16,7 +19,7 @@ class Join extends Table {
         return this
     }
 
-    def ON(Column c1, String op='=', Column c2) {
+    def ON(Column c1, QOperator op = QOperator.EQUAL, Column c2) {
         ___initClauses()
         onConditions.ON(c1, op, c2)
         return this

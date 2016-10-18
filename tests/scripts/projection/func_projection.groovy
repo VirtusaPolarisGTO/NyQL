@@ -134,4 +134,9 @@ def innQ = $DSL.select {
     },
     "SELECT CASE WHEN EXISTS (SELECT * FROM `Film` f) THEN \"replaced\" ELSE \"deleted\" END FROM `Actor` ac",
 
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (EXISTS(innQ))
+    },
+    "SELECT EXISTS(SELECT * FROM `Film` f) FROM `Actor` ac",
 ]
