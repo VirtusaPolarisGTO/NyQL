@@ -151,8 +151,8 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
 
         if (column instanceof FunctionColumn) {
-            return this.invokeMethod(column._func, column._setOfCols ? column._columns : column._wrapper) + (column.__aliasDefined() ?
-                    ' AS ' + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
+            return this.invokeMethod(column._func, column._setOfCols ? column._columns : column._wrapper) +
+                    (column.__aliasDefined() ? ' AS ' + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
         } else {
             boolean tableHasAlias = column._owner != null && column._owner.__aliasDefined()
             if (tableHasAlias) {
@@ -416,6 +416,7 @@ class MySql extends MySqlFunctions implements QTranslator {
                 String tbName = ___tableName((Table)c, contextType)
                 cols.add("$tbName.*")
             } else if (c instanceof Column) {
+                appendParamsFromColumn(c, paramList)
                 String cName = ___columnName(c, contextType)
                 cols.add(cName);
             } else {
@@ -423,6 +424,23 @@ class MySql extends MySqlFunctions implements QTranslator {
             }
         }
         return cols.join(COMMA)
+    }
+
+    private static void appendParamsFromColumn(Column column, List<AParam> paramList) {
+        if (column instanceof FunctionColumn) {
+            if (column._setOfCols) {
+                column._columns.each {
+                    if (it instanceof QResultProxy && it.orderedParameters != null) {
+                        paramList.addAll(it.orderedParameters)
+                    }
+                }
+            } else {
+                Object wrap = column._wrapper
+                if (wrap instanceof QResultProxy && wrap.orderedParameters != null) {
+                    paramList.addAll(wrap.orderedParameters)
+                }
+            }
+        }
     }
 
     def ___deriveSource(Table table, List<AParam> paramOrder, QContextType contextType) {

@@ -6,6 +6,13 @@ def innQ = $DSL.select {
     TARGET (Film.alias("f"))
 }
 
+def innQP = $DSL.select {
+    TARGET (Film.alias("f"))
+    WHERE {
+        EQ (f.film_id, PARAM("filmId"))
+    }
+}
+
 [
     $DSL.select {
         TARGET (Actor.alias("ac"))
@@ -139,4 +146,14 @@ def innQ = $DSL.select {
         FETCH (EXISTS(innQ))
     },
     "SELECT EXISTS(SELECT * FROM `Film` f) FROM `Actor` ac",
+
+    $DSL.select {
+        FETCH (EXISTS(innQ))
+    },
+    "SELECT EXISTS(SELECT * FROM `Film` f)",
+
+    $DSL.select {
+        FETCH (EXISTS(innQP))
+    },
+    "SELECT EXISTS(SELECT * FROM `Film` f WHERE f.film_id = ?)",
 ]

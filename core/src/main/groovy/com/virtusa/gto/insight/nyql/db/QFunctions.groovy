@@ -464,7 +464,7 @@ trait QFunctions {
      * @param it inner query.
      * @return generated function.
      */
-    def exists(it) {
-        QOperator.EXISTS.getOp() + ___resolve(it, QContextType.UNKNOWN)
+    String exists(it) {
+        QOperator.EXISTS.getOp() + (String)___resolve(it, QContextType.UNKNOWN)
     }
 }
