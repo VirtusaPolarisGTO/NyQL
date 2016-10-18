@@ -45,9 +45,5 @@ class QResultProxy {
     final void free() {
         qObject = null
         rawObject = null
-        if (orderedParameters != null) {
-            orderedParameters.clear()
-        }
-        query = null
     }
 }

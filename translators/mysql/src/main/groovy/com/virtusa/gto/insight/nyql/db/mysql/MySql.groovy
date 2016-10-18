@@ -91,12 +91,17 @@ class MySql extends MySqlFunctions implements QTranslator {
                 return OP + proxy.query.trim() + CP + (table.__aliasDefined() ? ' ' + table.__alias : '')
             }
             return QUtils.quote(table.__name, BACK_TICK) + (table.__aliasDefined() ? ' ' + table.__alias : '')
-        } else {
-            if (table.__aliasDefined()) {
-                return table.__alias
-            } else {
-                return QUtils.quote(table.__name, BACK_TICK)
+        } else if (contextType == QContextType.SELECT) {
+            if (table.__isResultOf()) {
+                QResultProxy proxy = table.__resultOf as QResultProxy
+                return OP + proxy.query.trim() + CP + (table.__aliasDefined() ? ' AS ' + table.__alias : '')
             }
+        }
+
+        if (table.__aliasDefined()) {
+            return table.__alias
+        } else {
+            return QUtils.quote(table.__name, BACK_TICK)
         }
     }
 
@@ -413,8 +418,13 @@ class MySql extends MySqlFunctions implements QTranslator {
             if (c instanceof String) {
                 cols.add(c)
             } else if (c instanceof Table) {
-                String tbName = ___tableName((Table)c, contextType)
-                cols.add("$tbName.*")
+                appendParamsFromTable(c, paramList)
+                String tbName = ___tableName(c, contextType)
+                if (c.__isResultOf()) {
+                    cols.add(tbName)
+                } else {
+                    cols.add("$tbName.*")
+                }
             } else if (c instanceof Column) {
                 appendParamsFromColumn(c, paramList)
                 String cName = ___columnName(c, contextType)
@@ -424,6 +434,15 @@ class MySql extends MySqlFunctions implements QTranslator {
             }
         }
         return cols.join(COMMA)
+    }
+
+    private static void appendParamsFromTable(Table table, List<AParam> paramList) {
+        if (table.__isResultOf()) {
+            QResultProxy proxy = table.__resultOf as QResultProxy
+            if (proxy.orderedParameters != null) {
+                paramList.addAll(proxy.orderedParameters)
+            }
+        }
     }
 
     private static void appendParamsFromColumn(Column column, List<AParam> paramList) {

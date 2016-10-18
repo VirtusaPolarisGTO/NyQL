@@ -18,9 +18,8 @@ import java.util.stream.Collectors
 trait QTranslator extends QJoins {
 
     String NULL() { 'NULL' }
-    String COMPARATOR_NULL() { 'IS' }
 
-    def ___resolve(Object obj, QContextType contextType, List<AParam> paramOrder=null) {
+    String ___resolve(Object obj, QContextType contextType, List<AParam> paramOrder=null) {
         if (obj == null) {
             return NULL()
         }
@@ -49,7 +48,7 @@ trait QTranslator extends QJoins {
         } else if (obj instanceof QResultProxy) {
             return (obj.query ?: '').trim()
         } else if (obj instanceof List) {
-            return obj.stream().map({ ___resolve(it, contextType, paramOrder) }).collect(Collectors.joining(', ', '(', ')'))
+            return obj.stream().map { ___resolve(it, contextType, paramOrder) }.collect(Collectors.joining(', ', '(', ')'))
         } else {
             throw new NyException('Unsupported data object to convert! [' + obj + ', type: ' + obj.class + ']')
         }
