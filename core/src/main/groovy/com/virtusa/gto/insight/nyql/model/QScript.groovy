@@ -14,8 +14,12 @@ class QScript {
     QSession qSession
 
     void free() {
-        proxy.free()
-        qSession.free()
+        if (proxy != null) {
+            proxy.free()
+        }
+        if (qSession != null) {
+            qSession.free()
+        }
     }
 
     @Override
