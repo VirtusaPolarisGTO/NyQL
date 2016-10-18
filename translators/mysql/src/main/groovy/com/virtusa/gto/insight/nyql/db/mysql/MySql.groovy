@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.*
 import com.virtusa.gto.insight.nyql.db.QDdl
 import com.virtusa.gto.insight.nyql.db.QTranslator
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
@@ -182,7 +183,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append('WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append(' ').append(NL)
         }
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE, qObject: q)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
     }
 
     @Override
@@ -199,6 +200,10 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) {
+        if (combineType == QueryCombineType.INTERSECT) {
+            return manipulateIntersect(queries)
+        }
+
         List<AParam> paramList = new LinkedList<>()
         Stream<Object> stream = queries.stream().map({ q ->
             if (q instanceof QResultProxy) {
@@ -217,7 +222,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         } else {
             qStr = stream.collect(Collectors.joining('; '))
         }
-        return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT, qObject: queries)
+        return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT)
     }
 
     QResultProxy ___deleteQuery(QueryDelete q) {
@@ -342,7 +347,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             }
         }
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: queryType, qObject: q)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: queryType)
     }
 
     QResultProxy ___insertQuery(QueryInsert q) {
@@ -369,7 +374,7 @@ class MySql extends MySqlFunctions implements QTranslator {
                 .append(valList.join(', '))
                 .append(')')
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT, qObject: q)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT, returnType: q.returnType)
     }
 
     @Override
@@ -526,4 +531,63 @@ class MySql extends MySqlFunctions implements QTranslator {
         return derived.join(', ')
     }
 
+    private QResultProxy manipulateIntersect(List<Object> queries) {
+        if (queries.size() != 2) {
+            throw new NySyntaxException('MySQL intersect operator exactly requires only two queries!')
+        }
+        List<AParam> paramList = [] as Queue
+        QResultProxy proxyTop = queries.get(0) as QResultProxy
+        QResultProxy proxyDown = queries.get(1) as QResultProxy
+        QuerySelect queryTop = (QuerySelect) proxyTop.qObject
+        QuerySelect queryDown = (QuerySelect) proxyDown.qObject
+
+        if (queryTop.projection == null || queryTop.projection.isEmpty()) {
+            throw new NySyntaxException("MySQL intersect does not allow to have intersect on ALL fields!")
+        }
+
+        if (queryTop.projection.size() > 1) {
+            // multiple expressions
+            paramList.addAll(proxyTop.orderedParameters ?: [])
+            paramList.addAll(proxyDown.orderedParameters ?: [])
+            if (queryTop.whereObj == null) {
+                queryTop.whereObj = new Where(queryTop._ctx)
+            }
+            if (queryTop.whereObj.__hasClauses()) {
+                queryTop.whereObj.AND()
+            }
+
+            if (queryDown.whereObj == null) {
+                queryDown.whereObj = new Where(queryDown._ctx)
+            }
+
+            for (int i = 0; i < queryDown.projection.size(); i++) {
+                Column colDown = (Column) queryDown.projection.get(i)
+                Column colUp = (Column) queryTop.projection.get(i)
+
+                if (queryDown.whereObj.__hasClauses()) {
+                    queryDown.whereObj.AND()
+                }
+                queryDown.whereObj.EQ(colDown, colUp)
+            }
+            queryDown.projection.clear()
+            String qStr = ___resolve(queryTop, QContextType.UNKNOWN)
+            return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT)
+
+        } else {
+            paramList.addAll(proxyTop.orderedParameters ?: [])
+            paramList.addAll(proxyDown.orderedParameters ?: [])
+            Column column = (Column) queryTop.projection.get(0)
+            if (queryTop.whereObj == null) {
+                queryTop.whereObj = new Where(queryTop._ctx)
+            }
+
+            if (queryTop.whereObj.__hasClauses()) {
+                queryTop.whereObj.AND()
+            }
+            queryTop.whereObj.IN(column, proxyDown)
+
+            String qStr = ___resolve(queryTop, QContextType.UNKNOWN)
+            return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT)
+        }
+    }
 }

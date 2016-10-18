@@ -181,8 +181,7 @@ class QJdbcExecutor implements QExecutor {
     private def executeCall(QScript script) throws Exception {
         CallableStatement statement = null
         try {
-            StoredFunction sp = script.proxy.rawObject
-            LOGGER.info("Executing stored function '{}'", sp.name)
+            LOGGER.info("Executing stored function '{}'", script.proxy.query)
             statement = getConnection().prepareCall(script.proxy.query)
 
             Map<String, Object> data = script.qSession.sessionVariables ?: [:]
@@ -303,8 +302,8 @@ class QJdbcExecutor implements QExecutor {
     }
 
     private static boolean isReturnKeys(QScript script) {
-        script.proxy != null && script.proxy.qObject != null && script.proxy.queryType == QueryType.INSERT &&
-                script.proxy.qObject.returnType == QReturnType.KEYS
+        script.proxy != null && script.proxy.queryType == QueryType.INSERT &&
+                script.proxy.returnType == QReturnType.KEYS
     }
 
     private static Object deriveValue(Map dataMap, String name) {

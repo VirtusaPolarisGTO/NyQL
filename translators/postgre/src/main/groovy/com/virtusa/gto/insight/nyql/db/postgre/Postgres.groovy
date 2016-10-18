@@ -23,6 +23,8 @@ class Postgres extends PostgresFunctions implements QTranslator {
     static final String DOUBLE_QUOTE = "\""
     static final String STR_QUOTE = "'"
 
+    private static final String NL = '\n'
+
     Postgres() {}
 
     @Override
@@ -212,6 +214,8 @@ class Postgres extends PostgresFunctions implements QTranslator {
             qStr = stream.collect(Collectors.joining("\nUNION ALL\n"))
         } else if (combineType == QueryCombineType.UNION_DISTINCT) {
             qStr = stream.collect(Collectors.joining("\nUNION\n"))
+        } else if (combineType == QueryCombineType.INTERSECT) {
+            qStr = stream.collect(Collectors.joining(NL + 'INTERSECT' + NL))
         } else {
             qStr = stream.collect(Collectors.joining("; "))
         }

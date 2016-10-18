@@ -20,7 +20,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     List<Object> clauses = new ArrayList<>()
 
-    public Where(QContext context) {
+    Where(QContext context) {
         _ctx = context
     }
 

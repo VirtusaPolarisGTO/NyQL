@@ -196,7 +196,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
             query.append('WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append(' ').append(NL)
         }
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE, qObject: q)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
     }
 
     @Override
@@ -228,10 +228,12 @@ class MSSql extends MSSqlFunctions implements QTranslator {
             qStr = stream.collect(Collectors.joining(NL + 'UNION ALL' + NL))
         } else if (combineType == QueryCombineType.UNION_DISTINCT) {
             qStr = stream.collect(Collectors.joining(NL + 'UNION' + NL))
+        } else if (combineType == QueryCombineType.INTERSECT) {
+            qStr = stream.collect(Collectors.joining(NL + 'INTERSECT' + NL))
         } else {
             qStr = stream.collect(Collectors.joining('; '))
         }
-        return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT, qObject: queries)
+        return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT)
     }
 
     QResultProxy ___deleteQuery(QueryDelete q) {
@@ -353,7 +355,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
             }
         }
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: queryType, qObject: q)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: queryType)
     }
 
     QResultProxy ___insertQuery(QueryInsert q) {
@@ -376,7 +378,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
                 .append(valList.join(', '))
                 .append(')')
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT, qObject: q)
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT, returnType: q.returnType)
     }
 
     @Override

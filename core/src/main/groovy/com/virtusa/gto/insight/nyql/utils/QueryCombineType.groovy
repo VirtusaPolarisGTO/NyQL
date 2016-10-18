@@ -16,6 +16,11 @@ enum QueryCombineType {
     UNION_DISTINCT,
 
     /**
+     * Returns only common records from both queries.
+     */
+    INTERSECT,
+
+    /**
      * Sequential records.
      */
     SEQUENTIAL
