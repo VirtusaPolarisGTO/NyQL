@@ -53,7 +53,7 @@ class Caching implements Closeable {
     QScript getGeneratedQuery(String scriptId, QSession session) {
         QScript qScript = cache.get(scriptId)
         if (qScript != null) {
-            return new QScript(proxy: qScript.proxy, qSession: session)
+            return new QScript(id: qScript.id, proxy: qScript.proxy, qSession: session)
         }
         return qScript
     }

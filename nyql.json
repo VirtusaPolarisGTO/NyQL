@@ -36,7 +36,11 @@
         "maximumPoolSize": 1,
         "prepStmtCacheSize": 300,
         "prepStmtCacheSqlLimit": 2048,
-        "useServerPrepStmts": true
+        "useServerPrepStmts": true,
+
+        "connectionTimeout": 30000,
+        "idleTimeout": 0,
+        "maxLifetime": 0
       }
     }
   ],
