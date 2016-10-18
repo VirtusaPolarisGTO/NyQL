@@ -225,9 +225,9 @@ class MySql extends MySqlFunctions implements QTranslator {
 
         String qStr;
         if (combineType == QueryCombineType.UNION) {
-            qStr = stream.collect(Collectors.joining(NL + 'UNION ALL' + NL))
+            qStr = stream.collect(Collectors.joining(NL + ' UNION ALL ' + NL))
         } else if (combineType == QueryCombineType.UNION_DISTINCT) {
-            qStr = stream.collect(Collectors.joining(NL + 'UNION' + NL))
+            qStr = stream.collect(Collectors.joining(NL + ' UNION ' + NL))
         } else {
             qStr = stream.collect(Collectors.joining('; '))
         }

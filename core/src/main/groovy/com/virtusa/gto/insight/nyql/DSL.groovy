@@ -136,7 +136,7 @@ class DSL {
 
         QResultProxy proxy = qs._ctx.translator.___insertQuery(qs)
         proxy.setQueryType(QueryType.BULK_INSERT)
-        return RUN(proxy)
+        return proxy
     }
 
     QResultProxy delete(closure) {
@@ -309,6 +309,16 @@ class DSL {
     DSL $LOG(String message) {
         LOGGER.debug('[@ ' + session.currentActiveScript() + ' @]' + message)
         return this
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    ////
+    ////   Common Commands
+    ////
+    ///////////////////////////////////////////////////////////////////////////////////
+
+    AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
+        return QUtils.createParam(name, scope, mappingName)
     }
 
     private def createContext(String db=null) {

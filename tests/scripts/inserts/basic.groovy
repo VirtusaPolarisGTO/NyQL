@@ -20,6 +20,16 @@
             )
             RETURN_KEYS()
         },
-        ["INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)", ["id", "title"]]
+        ["INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)", ["id", "title"]],
+
+        $DSL.bulkInsert {
+            TARGET (Film.alias("f"))
+            DATA (
+                    "film_id": PARAM("id"),
+                    "title": PARAM("title")
+            )
+        },
+        ["INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)",
+         ["id", "title"]],
 
 ]

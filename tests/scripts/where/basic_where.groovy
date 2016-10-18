@@ -170,6 +170,18 @@ def innQ = $DSL.select {
             "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (NULL)",
 
     $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            NEQ (f.title, STR("ACE GOLDFINDER"))
+            AND
+            NOTIN (f.release_year, $SESSION.emptyList)
+        }
+    },
+    "SELECT * FROM `Film` f " +
+            "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year NOT IN (NULL)",
+
+    $DSL.select {
         TARGET (Address.alias("ad"))
         FETCH ()
         WHERE {
@@ -216,4 +228,12 @@ def innQ = $DSL.select {
         }
     },
     "SELECT * FROM `Film` f WHERE f.description = CASE WHEN f.alternative_title IS NOT NULL THEN \"\" ELSE f.alternative_title END",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        WHERE {
+            AND (EQ (f.description, STR("hello")))
+        }
+    },
+    "SELECT * FROM `Film` f WHERE  AND f.description = \"hello\"",
 ]

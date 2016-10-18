@@ -11,6 +11,7 @@ import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
+import org.apache.commons.lang3.StringUtils
 
 /**
  * @author Isuru Weerarathna
@@ -155,7 +156,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         if (cs != null) {
             List list = new LinkedList()
             QUtils.expandToList(list, cs)
-            if (list.size() == 0) {
+            if (list.isEmpty()) {
                 list.add(null)
             }
             return ON(c1, QOperator.NOT_IN, list)
@@ -204,13 +205,13 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         })
     }
 
-    def EXISTS(Object subquery) {
-        clauses.add(new QUnaryCondition(rightOp: subquery, op: QOperator.EXISTS))
+    def EXISTS(Object subQuery) {
+        clauses.add(new QUnaryCondition(rightOp: subQuery, op: QOperator.EXISTS))
         return this
     }
 
-    def NOTEXISTS(Object subquery) {
-        clauses.add(new QUnaryCondition(rightOp: subquery, op: QOperator.NOT_EXISTS))
+    def NOTEXISTS(Object subQuery) {
+        clauses.add(new QUnaryCondition(rightOp: subQuery, op: QOperator.NOT_EXISTS))
         return this
     }
 
@@ -234,11 +235,6 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
         if (_ctx.tables.containsKey(name)) {
             return _ctx.tables[name]
-        } else if (Character.isUpperCase(name.charAt(0))) {
-            // table name
-            Table table = new Table(__name: name, _ctx: _ctx)
-            _ctx.tables.put(name, table)
-            return table
         } else {
             if (_ctx.columns.containsKey(name)) {
                 return _ctx.columns.get(name)
@@ -255,17 +251,17 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     def methodMissing(String name, def args) {
         if (name == 'AND' || name == 'OR') {
             if (args.getClass().isArray() && args[0] instanceof Where) {
-                ((Where) args[0]).appendOneLastBefore(' ' + name + ' ');
+                ((Where) args[0]).appendOneLastBefore(name + ' ');
                 return
             }
         }
         throw new NySyntaxException("Unknown function detected! [Name: '$name', params: $args]")
     }
 
-    protected void appendOneLastBefore(Object clause) {
+    protected void appendOneLastBefore(String clause) {
         if (clauses.size() > 0) {
             int idx = clauses.size() - 1
-            clauses.add(idx, clause)
+            clauses.add(idx, ' ' + clause)
         } else {
             clauses.add(clause)
         }
