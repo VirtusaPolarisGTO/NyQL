@@ -30,7 +30,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
     }
 
     AParam PARAMLIST(String name) {
-        return _ctx.addParam(new ParamList(__name: name))
+        throw new NySyntaxException('You cannot use list parameters when assigning!')
     }
 
     def CASE(closure) {

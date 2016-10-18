@@ -58,7 +58,7 @@ class MySqlDDL implements QDdl {
         StringBuilder query = new StringBuilder('DROP ')
         if (dTable.temporary) query.append('TEMPORARY ')
         query.append('TABLE ')
-        //query.append("IF EXISTS ")
+        if (dTable.ifNotExist) query.append("IF EXISTS ")
         query.append(___ddlResolve(dTable))
         def rProxy = new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
         return Arrays.asList(rProxy)

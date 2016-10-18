@@ -8,11 +8,6 @@ import com.virtusa.gto.insight.nyql.utils.QUtils
 
 class Table {
 
-    /**
-     * Represents any table replaceable with any table in joins.
-     */
-    static final Table ANY_TABLE = new Table()
-
     private Map<String, Column> __allColumns = [:]
 
     QContext _ctx = null
@@ -21,42 +16,6 @@ class Table {
     def __alias = null
 
     def __resultOf
-
-    /**
-     * This is cross join.
-     *
-     * @param t other table to be joined with
-     * @return new join instance
-     */
-    def JOIN(Table t) {
-        return INNER_JOIN(t)
-    }
-
-    /**
-     * Inner join
-     *
-     * @param t other table to be joined with.
-     * @return new join instance
-     */
-    def INNER_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, 'INNER_JOIN')
-    }
-
-    def LEFT_OUTER_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, 'LEFT_OUTER_JOIN')
-    }
-
-    def RIGHT_OUTER_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, 'RIGHT_OUTER_JOIN')
-    }
-
-    def RIGHT_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, 'RIGHT_JOIN')
-    }
-
-    def LEFT_JOIN(Table t) {
-        return QUtils.mergeJoinClauses(_ctx, this, t, 'LEFT_JOIN')
-    }
 
     def alias(String newName) {
         __alias = newName

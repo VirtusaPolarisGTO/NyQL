@@ -95,4 +95,16 @@
         FETCH (NUM(12345).alias("sid"))
     },
     "SELECT 12345 AS sid",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (ac.COLUMN("name").alias("nameOne"), ac.COLUMN_AS("name", "nameTwo"))
+    },
+    "SELECT ac.name AS nameOne, ac.name AS nameTwo FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (ac.COLUMN_AS("name", "nameOne"), ac.COLUMN_AS("name", "nameTwo"))
+    },
+    "SELECT ac.name AS nameOne, ac.name AS nameTwo FROM `Actor` ac",
 ]

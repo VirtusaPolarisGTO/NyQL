@@ -52,7 +52,17 @@ class DDL {
     }
 
     DDL TABLE(String name, @DelegatesTo(DTable) Closure closure) {
-        DTable dTable = new DTable()
+        DTable dTable = new DTable(name: name, temporary: false)
+
+        def code = closure.rehydrate(dTable, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        DTable rTable = code()
+        tables.put(rTable.name, rTable)
+        return this
+    }
+
+    DDL TABLE(String name, boolean ifNotExists, @DelegatesTo(DTable) Closure closure) {
+        DTable dTable = new DTable(name: name, temporary: false, ifNotExist: ifNotExists)
 
         def code = closure.rehydrate(dTable, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -74,12 +84,36 @@ class DDL {
         return this
     }
 
+    DDL DROP_TEMP_TABLE(String name, boolean ifExists) {
+        DTable rTable
+        if (tables.containsKey(name)) {
+            rTable = tables[name]
+        } else {
+            rTable = new DTable(name: name, temporary: true, ifNotExist: ifExists)
+        }
+        rTable.temporary = true
+        tablesToDrop.add(rTable)
+
+        return this
+    }
+
     DDL DROP_TABLE(String name) {
         DTable rTable
         if (tables.containsKey(name)) {
             rTable = tables[name]
         } else {
             rTable = new DTable(name: name)
+        }
+        tablesToDrop.add(rTable)
+        return this
+    }
+
+    DDL DROP_TABLE(String name, boolean ifExists) {
+        DTable rTable
+        if (tables.containsKey(name)) {
+            rTable = tables[name]
+        } else {
+            rTable = new DTable(name: name, ifNotExist: ifExists)
         }
         tablesToDrop.add(rTable)
         return this

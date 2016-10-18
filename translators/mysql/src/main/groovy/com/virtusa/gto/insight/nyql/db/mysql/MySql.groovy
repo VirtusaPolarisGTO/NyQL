@@ -128,7 +128,7 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     @Override
     def ___columnName(final Column column, final QContextType contextType) {
-        if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY) {
+        if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY || contextType == QContextType.HAVING) {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, BACK_TICK)
             }
@@ -317,7 +317,7 @@ class MySql extends MySqlFunctions implements QTranslator {
                     .collect(Collectors.joining(', ')))
 
             if (q.groupHaving != null) {
-                query.append(NL).append(' HAVING ').append(___expandConditions(q.groupHaving, paramList, QContextType.GROUP_BY))
+                query.append(NL).append(' HAVING ').append(___expandConditions(q.groupHaving, paramList, QContextType.HAVING))
             }
             query.append(NL)
         }
@@ -480,11 +480,11 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     String ___expandCondition(Where.QCondition c, List<AParam> paramOrder, QContextType contextType) {
-        if (c.leftOp != null && c.leftOp instanceof AParam) {
+        if (c.leftOp instanceof AParam) {
             paramOrder?.add((AParam)c.leftOp)
         }
         ___scanForParameters(c.rightOp, paramOrder)
-        boolean parenthesis = (c.rightOp != null && c.rightOp instanceof QResultProxy)
+        boolean parenthesis = (c.rightOp instanceof QResultProxy)
 
         if (c instanceof Where.QUnaryCondition) {
             return String.valueOf(c.op) + ' ' +
@@ -542,7 +542,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         QuerySelect queryDown = (QuerySelect) proxyDown.qObject
 
         if (queryTop.projection == null || queryTop.projection.isEmpty()) {
-            throw new NySyntaxException("MySQL intersect does not allow to have intersect on ALL fields!")
+            throw new NySyntaxException('MySQL intersect does not allow to have intersect on ALL fields!')
         }
 
         if (queryTop.projection.size() > 1) {

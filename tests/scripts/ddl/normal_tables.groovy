@@ -6,7 +6,7 @@ import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType
  */
 [
         $DSL.ddl {
-            TEMP_TABLE ("Film") {
+            TABLE ("Film") {
                 FIELD ("id", DFieldType.INT, [sequence: true, notNull: true])
                 FIELD ("title", DFieldType.BOOLEAN, [notNull: true])
                 FIELD ("mainLanguage", DFieldType.TEXT, [defaultValue: "English"])
@@ -14,7 +14,7 @@ import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType
                 FIELD ("movieId", DFieldType.BIGINT)
             }
         },
-        ["CREATE TEMPORARY TABLE `Film`(" +
+        ["CREATE TABLE `Film`(" +
                  "`id` INT NOT NULL AUTO_INCREMENT, " +
                  "`title` TINYINT(1) NOT NULL, " +
                  "`mainLanguage` TEXT DEFAULT 'English', " +
@@ -24,17 +24,17 @@ import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType
         ],
 
         $DSL.ddl {
-            DROP_TEMP_TABLE ("Film")
+            DROP_TABLE ("Film")
         },
-        ["DROP TEMPORARY TABLE `Film`"],
+        ["DROP TABLE `Film`"],
 
         $DSL.ddl {
-            DROP_TEMP_TABLE ("Film", true)
+            DROP_TABLE ("Film", true)
         },
-        ["DROP TEMPORARY TABLE IF EXISTS `Film`"],
+        ["DROP TABLE IF EXISTS `Film`"],
 
         $DSL.ddl {
-            TEMP_TABLE ("Film") {
+            TABLE ("Film") {
                 FIELD ("id", DFieldType.INT, [sequence: true, notNull: true])
                 FIELD ("title", DFieldType.BOOLEAN, [notNull: true])
                 FIELD ("mainLanguage", DFieldType.TEXT, [defaultValue: "English"])
@@ -47,7 +47,7 @@ import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType
                 FOREIGN_KEY ("fk_film_movie_movieId", "movieId", [refTable: "Movie", refFields: ["id"]])
             }
         },
-        ["CREATE TEMPORARY TABLE `Film`(" +
+        ["CREATE TABLE `Film`(" +
                  "`id` INT NOT NULL AUTO_INCREMENT, " +
                  "`title` TINYINT(1) NOT NULL, " +
                  "`mainLanguage` TEXT DEFAULT 'English', " +
@@ -60,17 +60,17 @@ import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType
         ],
 
         $DSL.ddl {
-            TEMP_TABLE ("Film", true) {
+            TABLE ("Film", true) {
                 FIELD ("id", DFieldType.INT, [sequence: true, notNull: true])
                 FIELD ("title", DFieldType.BOOLEAN, [notNull: true])
                 FIELD ("mainLanguage", DFieldType.TEXT, [defaultValue: "English"])
                 FIELD ("ticketPrice", DFieldType.DOUBLE)
                 FIELD ("movieId", DFieldType.BIGINT)
 
-                PRIMARY_KEY (["id", "movieId"])
+                PRIMARY_KEY ("id", "movieId")
             }
         },
-        ["CREATE TEMPORARY TABLE IF NOT EXISTS `Film`(" +
+        ["CREATE TABLE IF NOT EXISTS `Film`(" +
                  "`id` INT NOT NULL AUTO_INCREMENT, " +
                  "`title` TINYINT(1) NOT NULL, " +
                  "`mainLanguage` TEXT DEFAULT 'English', " +

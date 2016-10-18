@@ -12,4 +12,9 @@ public class DDLTest extends AbstractTest {
         assertQueries(NyQL.parse("ddl/temp_tables"));
     }
 
+    @Test
+    public void testNormalTable() throws NyException {
+        assertQueries(NyQL.parse("ddl/normal_tables"));
+    }
+
 }

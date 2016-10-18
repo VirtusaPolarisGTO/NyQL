@@ -193,4 +193,24 @@ def innQ = $DSL.select {
         }
     },
     "SELECT * FROM `Address` ad WHERE EXISTS (SELECT * FROM `Film` f) AND NOT EXISTS (SELECT * FROM `Film` f)",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            NEQ (f.title, STR("ACE GOLDFINDER"))
+            AND
+            IN (f.release_year, PARAMLIST("years"))
+        }
+    },
+    "SELECT * FROM `Film` f " +
+            "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (::years::)",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        WHERE {
+            EQ (f.description, IFNOTNULL(f.alternative_title, STR("")))
+        }
+    },
+    "SELECT * FROM `Film` f WHERE f.description = CASE WHEN f.alternative_title IS NOT NULL THEN \"\" ELSE f.alternative_title END",
 ]

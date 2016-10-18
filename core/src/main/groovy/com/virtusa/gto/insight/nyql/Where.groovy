@@ -213,6 +213,11 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return this
     }
 
+    def RAW(Object val) {
+        clauses.add(val)
+        return this
+    }
+
     def __hasClauses() {
         return QUtils.notNullNorEmpty(clauses)
     }
@@ -234,6 +239,10 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             _ctx.tables.put(name, table)
             return table
         } else {
+            if (_ctx.columns.containsKey(name)) {
+                return _ctx.columns.get(name)
+            }
+
             def column = _ctx.getTheOnlyTable()?.COLUMN(name)
             if (column != null) {
                 return column

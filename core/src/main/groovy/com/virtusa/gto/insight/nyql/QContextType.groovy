@@ -11,6 +11,7 @@ enum QContextType {
     CONDITIONAL,
     ORDER_BY,
     GROUP_BY,
+    HAVING,
     INSIDE_FUNCTION,
 
     UPDATE_FROM,

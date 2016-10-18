@@ -74,6 +74,11 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         if (_ctx.columns.containsKey(colName)) {
             return _ctx.columns.get(colName)
         } else {
+            def column = _ctx.getTheOnlyTable()?.COLUMN(colName)
+            if (column != null) {
+                return column
+            }
+
             throw new NySyntaxException(QUtils.generateErrStr(
                     "No column is found by name '$colName'!",
                     'If you are specifying column name directly then make sure it has an alias!'

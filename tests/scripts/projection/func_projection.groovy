@@ -1,4 +1,3 @@
-import com.sun.org.apache.bcel.internal.generic.IFNULL
 
 /**
  * @author IWEERARATHNA
@@ -32,6 +31,12 @@ def innQ = $DSL.select {
         FETCH (IFNULL(ac.middleName, STR("")))
     },
     "SELECT IFNULL(ac.middleName, \"\") FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (IFNOTNULL(ac.middleName, STR("")))
+    },
+    "SELECT CASE WHEN ac.middleName IS NOT NULL THEN \"\" ELSE ac.middleName END FROM `Actor` ac",
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
