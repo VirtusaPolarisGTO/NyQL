@@ -14,7 +14,8 @@
                 $IMPORT ("where/import_wpart")
             }
         },
-        "SELECT * FROM `Film` f " +
+        ["SELECT * FROM `Film` f " +
                 "WHERE f.film_id = 123 AND f.rental_duration = ? AND f.replacement_cost >= 20.0",
+         ["duration"]],
 
 ]

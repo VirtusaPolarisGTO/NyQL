@@ -9,7 +9,8 @@
                     "title": PARAM("title")
             )
         },
-        "INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)",
+        ["INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)",
+         ["id", "title"]],
 
         $DSL.insert {
             TARGET (Film.alias("f"))
@@ -19,6 +20,6 @@
             )
             RETURN_KEYS()
         },
-        "INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)"
+        ["INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)", ["id", "title"]]
 
 ]

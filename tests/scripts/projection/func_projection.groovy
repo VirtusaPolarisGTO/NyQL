@@ -155,5 +155,5 @@ def innQP = $DSL.select {
     $DSL.select {
         FETCH (EXISTS(innQP))
     },
-    "SELECT EXISTS(SELECT * FROM `Film` f WHERE f.film_id = ?)",
+    ["SELECT EXISTS(SELECT * FROM `Film` f WHERE f.film_id = ?)", ["filmId"]],
 ]

@@ -3,6 +3,8 @@ import com.virtusa.gto.insight.nyql.engine.NyQL;
 import com.virtusa.gto.insight.nyql.model.QScript;
 import com.virtusa.gto.insight.nyql.model.QScriptList;
 import com.virtusa.gto.insight.nyql.model.QScriptResult;
+import com.virtusa.gto.insight.nyql.model.blocks.AParam;
+import com.virtusa.gto.insight.nyql.utils.QUtils;
 import junit.framework.AssertionFailedError;
 import org.junit.*;
 
@@ -36,7 +38,7 @@ public class AbstractTest {
 
     private void deriveProxy(Object obj, Object gen) {
         if (obj instanceof QResultProxy) {
-            compare ((QResultProxy)obj, String.valueOf(gen));
+            compare ((QResultProxy)obj, gen);
         } else if (obj instanceof QScriptList) {
             if (!(gen instanceof List)) {
                 throw new AssertionFailedError("Script List must have a list as input!");
@@ -55,14 +57,44 @@ public class AbstractTest {
         }
     }
 
-    private void compare(QResultProxy proxy, String query) {
+    private void compare(QResultProxy proxy, Object query) {
         String q1 = proxy.getQuery().replace("\n", "").replace("\t", "").trim();
-        String q2 = query.replace("\n", "").trim();
+
+        String q2;
+        List pList = null;
+        if (query instanceof List) {
+            q2 = ((List) query).get(0).toString().replace("\n", "").trim();
+            pList = (List) ((List) query).get(1);
+        } else {
+            q2 = String.valueOf(query).replace("\n", "").trim();
+        }
         System.out.println("Generated Query:");
         System.out.println(q1);
-        //System.out.println("Expected:");
-        //System.out.println(q2);
         Assert.assertEquals(q2, q1);
+
+        List<AParam> paramList = proxy.getOrderedParameters();
+        assertLists(paramList, pList);
+    }
+
+    private void assertLists(List first, List second) {
+        if (first == null || first.isEmpty()) {
+            if (second != null && !second.isEmpty()) {
+                Assert.assertEquals("Original does not have parameters at all!", 0, second.size());
+                return;
+            } else {
+                return;
+            }
+        } else if (second == null || second.isEmpty()) {
+            Assert.assertEquals("Original has more parameters than expected!", first.size(), 0);
+            return;
+        }
+        Assert.assertEquals("Parameters size are different!", first.size(), second.size());
+        for (int i = 0; i < first.size(); i++) {
+            AParam param = (AParam) first.get(i);
+            if (!param.get__name().equals(second.get(i))) {
+                Assert.assertEquals("Parameter #" + (i+1) + " are not equal!", param.get__name(), second.get(i));
+            }
+        }
     }
 
     @Before

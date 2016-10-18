@@ -20,8 +20,9 @@ def innQ = $DSL.select {
             IN (f.language_id, PARAM("langId"))
         }
     },
-    "SELECT * FROM `Film` f " +
+    ["SELECT * FROM `Film` f " +
             "WHERE f.film_id = 123 AND f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (2006) OR f.language_id IN (?)",
+     ["langId"]],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -37,8 +38,9 @@ def innQ = $DSL.select {
             GTE (f.rental_duration, PARAM("y2017"))
         }
     },
-    "SELECT * FROM `Film` f " +
+    ["SELECT * FROM `Film` f " +
             "WHERE (f.film_id = 123 AND f.title <> \"ACE GOLDFINDER\") AND f.release_year > 2004 OR f.rental_duration >= ?",
+     ["y2017"]],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -55,8 +57,9 @@ def innQ = $DSL.select {
             }
         }
     },
-    "SELECT * FROM `Film` f " +
+    ["SELECT * FROM `Film` f " +
             "WHERE (f.film_id = 123 OR f.title <> \"AIRPLANE SIERRA\") AND f.release_year < 2015 OR f.length <= ?",
+     ["y2017"]],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -128,8 +131,8 @@ def innQ = $DSL.select {
             OR (IN (f.language_id, PARAMLIST("singleList")))
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 OR f.language_id IN (::singleList::)",
+    ["SELECT * FROM `Film` f " +
+            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 OR f.language_id IN (::singleList::)", ["singleList"]],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -139,8 +142,8 @@ def innQ = $DSL.select {
             AND (IN (f.language_id, PARAMLIST("doubleList")))
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id IN (::doubleList::)",
+    ["SELECT * FROM `Film` f " +
+            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id IN (::doubleList::)", ["doubleList"]],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -203,8 +206,8 @@ def innQ = $DSL.select {
             IN (f.release_year, PARAMLIST("years"))
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (::years::)",
+    ["SELECT * FROM `Film` f " +
+            "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (::years::)", ["years"]],
 
     $DSL.select {
         TARGET (Film.alias("f"))

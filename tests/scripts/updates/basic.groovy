@@ -10,7 +10,7 @@
                 SET_NULL (f.language_id)
             }
         },
-        "UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL",
+        ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL", ["title"]],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -25,7 +25,7 @@
                 EQ (f.year, 2016)
             }
         },
-        "UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL WHERE f.year = 2016",
+        ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL WHERE f.year = 2016", ["title"]],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -43,7 +43,8 @@
                 EQ (f.year, 2016)
             }
         },
-        "UPDATE `Film` f LEFT JOIN `Actor` ac ON f.actor_id = ac.actor_id SET f.film_id = 1234, f.title = ? WHERE f.year = 2016",
+        ["UPDATE `Film` f LEFT JOIN `Actor` ac ON f.actor_id = ac.actor_id SET f.film_id = 1234, f.title = ? WHERE f.year = 2016",
+         ["title"]],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -52,6 +53,6 @@
                 $IMPORT "updates/import_part"
             }
         },
-        "UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = 1",
+        ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = 1", ["title"]],
 
 ]

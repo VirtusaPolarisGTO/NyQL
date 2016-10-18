@@ -46,7 +46,7 @@
             }
             LIMIT (PARAM("limitP"))
         },
-        "SELECT * FROM `Film` f WHERE f.film_id > 100 LIMIT ?",
+        ["SELECT * FROM `Film` f WHERE f.film_id > 100 LIMIT ?", ["limitP"]],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -55,5 +55,5 @@
             }
             LIMIT (PARAM("limitP")) OFFSET (PARAM("offSet"))
         },
-        "SELECT * FROM `Film` f WHERE f.film_id > 100 LIMIT ? OFFSET ?",
+        ["SELECT * FROM `Film` f WHERE f.film_id > 100 LIMIT ? OFFSET ?", ["limitP", "offSet"]],
 ]

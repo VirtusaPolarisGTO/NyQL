@@ -62,7 +62,7 @@
             EQ (film_id, PARAM("filmId"))
         }
     },
-    "SELECT film_id, title FROM `Film` WHERE film_id = ?",
+    ["SELECT film_id, title FROM `Film` WHERE film_id = ?", ["filmId"]],
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
@@ -89,7 +89,7 @@
         TARGET (Actor.alias("ac"))
         FETCH (PARAM("abc").alias("name"), PARAM("abc").alias("id"))
     },
-    "SELECT ? AS name, ? AS id FROM `Actor` ac",
+    ["SELECT ? AS name, ? AS id FROM `Actor` ac", ["abc", "abc"]],
 
     $DSL.select {
         FETCH (NUM(12345).alias("sid"))
