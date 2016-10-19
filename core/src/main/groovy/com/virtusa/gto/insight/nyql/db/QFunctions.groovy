@@ -166,7 +166,7 @@ trait QFunctions {
      * @param c input columns.
      * @return String representation of distinct.
      */
-    def distinct(c) { 'DISTINCT ' + ___resolveIn(c) }
+    def distinct(c) { 'DISTINCT(' + ___resolveIn(c) + ')' }
 
     /**
      * Check a value is in between given two values. Requires minimum two values.
@@ -175,11 +175,11 @@ trait QFunctions {
      * @return string representation of between.
      */
     def between(c) {
-            if (c instanceof List) {
-                return 'BETWEEN ' + ___resolveIn(c[0]) + ' AND ' + ___resolveIn(c[1])
-            } else {
-                throw new NyException('Invalid syntax for BETWEEN function!')
-            }
+        if (c instanceof List) {
+            return 'BETWEEN ' + ___resolveIn(c[0]) + ' AND ' + ___resolveIn(c[1])
+        } else {
+            throw new NyException('Invalid syntax for BETWEEN function!')
+        }
     }
 
     /**

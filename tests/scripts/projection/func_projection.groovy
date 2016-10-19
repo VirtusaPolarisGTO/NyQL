@@ -90,6 +90,12 @@ def innQP = $DSL.select {
     "SELECT (SUM(ac.actings) % 100) FROM `Actor` ac",
 
     $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (SUM(DISTINCT(ac.actings)))
+    },
+    "SELECT SUM(DISTINCT(ac.actings)) FROM `Actor` ac",
+
+    $DSL.select {
         TARGET (Payment.alias("p"))
         FETCH (FLOOR(p.amount).alias("roundDown"), CEIL(p.amount).alias("roundUp"), ABS(p.amount))
     },
