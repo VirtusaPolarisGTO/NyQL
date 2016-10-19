@@ -28,10 +28,16 @@ import java.util.List;
 public class SqlToDSL {
 
     public static void main(String[] args) throws JSQLParserException {
-        Statement stmt = CCJSqlParserUtil.parse("SELECT o.OrderID, c.CustomerName, o.OrderDate\n" +
-                "FROM Orders o\n" +
-                "INNER JOIN Customers c ON o.CustomerID=c.CustomerID " +
-                "INNER JOIN Department d ON d.id = c.id");
+        Statement stmt = CCJSqlParserUtil.parse("SELECT \n" +
+                "    (SELECT count(*) FROM s_comment comment\n" +
+                "        LEFT OUTER JOIN s_comment_seen_by seen on seen.comment_sid = comment.sid AND seen.user_sid = 25066 \n" +
+                "        WHERE comment.discussion_sid = discussion.sid AND seen.user_sid IS NULL)\n" +
+                "     AS unseenComments,\n" +
+                "    (SELECT count(*) as allCommentCount FROM s_comment comment\n" +
+                "        WHERE comment.discussion_sid = discussion.sid)\n" +
+                "     AS totalComments\n" +
+                "  FROM s_discussion discussion\n" +
+                "WHERE discussion.code = 'work-item-460065'");
         if (stmt instanceof Select) {
             System.out.println(visit((Select)stmt));
         } else if (stmt instanceof Update) {
@@ -286,15 +292,18 @@ public class SqlToDSL {
                 dsl.append("(").append(toTable((Table)j.getRightItem(), true)).append(") ");
             }
 
-            if (j.getOnExpression() != null) {
+            Expression onExpression = j.getOnExpression();
+            if (onExpression != null) {
                 dsl.append("ON ");
-                if (j.getOnExpression() instanceof EqualsTo) {
-                    resolveExpr(((EqualsTo) j.getOnExpression()).getLeftExpression(), dsl);
+                if (onExpression instanceof EqualsTo
+                        && ((EqualsTo) onExpression).getLeftExpression() instanceof Column
+                        && ((EqualsTo) onExpression).getRightExpression() instanceof Column) {
+                    resolveExpr(((EqualsTo) onExpression).getLeftExpression(), dsl);
                     dsl.append(", ");
-                    resolveExpr(((EqualsTo) j.getOnExpression()).getRightExpression(), dsl);
+                    resolveExpr(((EqualsTo) onExpression).getRightExpression(), dsl);
                 } else {
                     dsl.append("{");
-                    resolveExpr(j.getOnExpression(), dsl);
+                    resolveExpr(onExpression, dsl);
                     dsl.append("}");
                 }
 

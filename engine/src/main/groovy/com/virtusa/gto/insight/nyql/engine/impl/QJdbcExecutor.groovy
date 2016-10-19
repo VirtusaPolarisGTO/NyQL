@@ -1,6 +1,5 @@
 package com.virtusa.gto.insight.nyql.engine.impl
 
-import com.virtusa.gto.insight.nyql.StoredFunction
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.insight.nyql.engine.impl.pool.QJdbcPoolFetcher
 import com.virtusa.gto.insight.nyql.engine.transform.JdbcCallResultTransformer

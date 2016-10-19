@@ -26,8 +26,9 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     private static final String NL = '\n'
     private static final String COMMA = ', '
-    private static final String OP = '('
-    private static final String CP = ')'
+    static final String OP = '('
+    static final String CP = ')'
+    private static final String _AS_ = ' AS '
 
     MySql() {}
 
@@ -43,7 +44,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append(CP)
 
             if (aCaseCol.__aliasDefined()) {
-                query.append(' AS ').append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
+                query.append(_AS_).append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
             }
             return query.toString()
 
@@ -61,7 +62,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append(' END')
 
             if (aCaseCol.__aliasDefined()) {
-                query.append(' AS ').append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
+                query.append(_AS_).append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
             }
             return query.toString()
         }
@@ -70,31 +71,31 @@ class MySql extends MySqlFunctions implements QTranslator {
     String JOIN(QContextType contextType) { 'JOIN' }
 
     @Override
-    def ___quoteString(final String text) {
+    String ___quoteString(final String text) {
         return QUtils.quote(text, STR_QUOTE)
     }
 
     @Override
-    def ___convertBool(Boolean value) {
+    String ___convertBool(Boolean value) {
         return value != null && value ? '1' : '0'
     }
 
     @Override
-    def ___tableName(final Table table, final QContextType contextType) {
+    String ___tableName(final Table table, final QContextType contextType) {
         if (contextType == QContextType.DELETE_FROM || contextType == QContextType.DELETE_CONDITIONAL) {
             return QUtils.quote(table.__name)
         } else if (contextType == QContextType.INTO) {
             return QUtils.quote(table.__name)
-        } else if (contextType == QContextType.FROM) {
+        } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
-                return OP + proxy.query.trim() + CP + (table.__aliasDefined() ? ' ' + table.__alias : '')
+                return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + table.__alias : '')
             }
             return QUtils.quote(table.__name, BACK_TICK) + (table.__aliasDefined() ? ' ' + table.__alias : '')
         } else if (contextType == QContextType.SELECT) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
-                return OP + proxy.query.trim() + CP + (table.__aliasDefined() ? ' AS ' + table.__alias : '')
+                return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? _AS_ + table.__alias : '')
             }
         }
 
@@ -106,7 +107,7 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     @Override
-    def ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
+    String ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
         StringBuilder qstr = new StringBuilder();
         String jtype = invokeMethod(join.type, null)
 
@@ -136,7 +137,7 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     @Override
-    def ___columnName(final Column column, final QContextType contextType) {
+    String ___columnName(final Column column, final QContextType contextType) {
         if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY || contextType == QContextType.HAVING) {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, BACK_TICK)
@@ -157,17 +158,17 @@ class MySql extends MySqlFunctions implements QTranslator {
 
         if (column instanceof FunctionColumn) {
             return this.invokeMethod(column._func, column._setOfCols ? column._columns : column._wrapper) +
-                    (column.__aliasDefined() ? ' AS ' + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
+                    (column.__aliasDefined() ? _AS_ + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
         } else {
             boolean tableHasAlias = column._owner != null && column._owner.__aliasDefined()
             if (tableHasAlias) {
                 return column._owner.__alias + "." + column.__name +
                         (column.__aliasDefined() && contextType == QContextType.SELECT ?
-                                ' AS ' + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
+                                _AS_ + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
             } else {
                 return QUtils.quoteIfWS(column.__name, BACK_TICK) +
                         (column.__aliasDefined() && contextType == QContextType.SELECT ?
-                                ' AS ' + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
+                                _AS_ + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
             }
         }
     }
@@ -179,13 +180,13 @@ class MySql extends MySqlFunctions implements QTranslator {
 
         if (q._joiningTable != null) {
             // has joining tables
-            query.append('UPDATE ').append(___deriveSource(q._joiningTable, paramList, QContextType.FROM)).append(' ').append(NL)
+            query.append('UPDATE ').append(___deriveSource(q._joiningTable, paramList, QContextType.UPDATE_FROM)).append(' ').append(NL)
         } else {
-            query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append(' ').append(NL)
+            query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append(' ').append(NL)
         }
 
         if (q._assigns.__hasAssignments()) {
-            query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.CONDITIONAL)).append(' ').append(NL)
+            query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(' ').append(NL)
         }
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
@@ -217,7 +218,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         Stream<Object> stream = queries.stream().map({ q ->
             if (q instanceof QResultProxy) {
                 paramList.addAll(q.orderedParameters ?: [])
-                return OP + ___resolve(q, QContextType.UNKNOWN) + CP
+                return QUtils.parenthesis(___resolve(q, QContextType.UNKNOWN))
             } else {
                 return ___resolve(q, QContextType.UNKNOWN, paramList)
             }
@@ -299,9 +300,8 @@ class MySql extends MySqlFunctions implements QTranslator {
             queryType = QueryType.INSERT
             query.append('INSERT INTO ').append(___tableName(q._intoTable, QContextType.INTO)).append(' ')
             if (QUtils.notNullNorEmpty(q._intoColumns)) {
-                query.append(OP)
-                        .append(___expandProjection(q._intoColumns, paramList, QContextType.INSERT_PROJECTION))
-                        .append(CP).append(' ')
+                query.append(QUtils.parenthesis(___expandProjection(q._intoColumns, paramList, QContextType.INSERT_PROJECTION)))
+                        .append(' ')
             }
             query.append(NL)
         }
@@ -513,7 +513,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             } else if (c instanceof Where.QCondition) {
                 builder.append(___expandCondition(c, paramOrder, contextType))
             } else if (c instanceof Where.QConditionGroup) {
-                builder.append(OP).append(___expandConditionGroup(c, paramOrder, contextType)).append(CP)
+                builder.append(QUtils.parenthesis(___expandConditionGroup(c, paramOrder, contextType)))
             }
         }
 
@@ -529,11 +529,11 @@ class MySql extends MySqlFunctions implements QTranslator {
 
         if (c instanceof Where.QUnaryCondition) {
             return ___convertOperator(c.op) + ' ' +
-                    (parenthesis ? OP + ___resolve(c.chooseOp(), contextType, paramOrder) + CP : ___resolve(c.chooseOp(), contextType, paramOrder))
+                    (parenthesis ? QUtils.parenthesis(___resolve(c.chooseOp(), contextType, paramOrder)) : ___resolve(c.chooseOp(), contextType, paramOrder))
         } else {
             return ___resolve(c.leftOp, contextType) +
                     (c.op != QOperator.UNKNOWN ? ' ' + ___convertOperator(c.op) + ' ' : ' ') +
-                    (!parenthesis ? ___resolve(c.rightOp, contextType) : OP + ___resolve(c.rightOp, contextType) + CP)
+                    (!parenthesis ? ___resolve(c.rightOp, contextType) : QUtils.parenthesis(___resolve(c.rightOp, contextType)))
         }
     }
 
@@ -544,7 +544,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             if (c instanceof Where.QCondition) {
                 return ___expandCondition(c, paramOrder, contextType)
             } else if (c instanceof Where.QConditionGroup) {
-                return OP + ___expandConditionGroup(c, paramOrder, contextType) + CP
+                return QUtils.parenthesis(___expandConditionGroup(c, paramOrder, contextType))
             } else {
                 return String.valueOf(c)
             }
@@ -564,7 +564,8 @@ class MySql extends MySqlFunctions implements QTranslator {
                 ___scanForParameters(c.rightOp, paramOrder)
 
                 String val = ___resolve(c.leftOp, contextType, paramOrder) +
-                        ' ' + c.op + ' ' + ___resolve(c.rightOp, contextType, paramOrder)
+                        ' ' + ___convertOperator(c.op) + ' ' +
+                        ___resolve(c.rightOp, contextType, paramOrder)
                 derived.add(val)
             }
         }

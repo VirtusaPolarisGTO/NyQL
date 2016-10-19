@@ -48,17 +48,17 @@ class Postgres extends PostgresFunctions implements QTranslator {
     }
 
     @Override
-    def ___quoteString(final String text) {
+    String ___quoteString(final String text) {
         return QUtils.quote(text, STR_QUOTE)
     }
 
     @Override
-    def ___convertBool(Boolean value) {
+    String ___convertBool(Boolean value) {
         return ___quoteString(value ? "t" : "f")
     }
 
     @Override
-    def ___tableName(final Table table, final QContextType contextType) {
+    String ___tableName(final Table table, final QContextType contextType) {
         if (contextType == QContextType.INTO) {
             return QUtils.quote(table.__name)
         } else if (contextType == QContextType.FROM) {
@@ -77,7 +77,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
     }
 
     @Override
-    def ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
+    String ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
         StringBuilder qstr = new StringBuilder();
         String jtype = invokeMethod(join.type, null)
 
@@ -101,7 +101,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
     }
 
     @Override
-    def ___columnName(final Column column, final QContextType contextType) {
+    String ___columnName(final Column column, final QContextType contextType) {
         if (column instanceof Case) {
             return ___ifColumn(column, null)
         }

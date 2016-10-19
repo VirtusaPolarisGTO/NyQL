@@ -9,12 +9,12 @@ import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 class MSSqlFunctions implements QFunctions {
 
     @Override
-    def date_trunc(Object it) {
+    String date_trunc(Object it) {
         return 'CAST(' + ___resolveIn(it) + ' AS DATE)'
     }
 
     @Override
-    def substr(Object c) {
+    String substr(Object c) {
         if (c instanceof List) {
             return 'SUBSTRING(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) +
                     (c.size() > 2 ? ', ' + ___resolveIn(c[2]) : '') + ')'
@@ -22,37 +22,37 @@ class MSSqlFunctions implements QFunctions {
     }
 
     @Override
-    def position(Object c) {
+    String position(Object c) {
         if (c instanceof List) {
             return 'CHARINDEX(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         }
     }
 
-    def date_diff_years(c) {
+    String date_diff_years(c) {
         if (c instanceof List) return "DATEDIFF(year, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
-    def date_diff_months(c) {
+    String date_diff_months(c) {
         if (c instanceof List) return "DATEDIFF(month, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
-    def date_diff_days(c) {
+    String date_diff_days(c) {
         if (c instanceof List) return "DATEDIFF(day, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
-    def date_diff_weeks(c) {
+    String date_diff_weeks(c) {
         if (c instanceof List) return "DATEDIFF(week, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
-    def date_diff_hours(c) {
+    String date_diff_hours(c) {
         if (c instanceof List) return "DATEDIFF(hour, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
-    def date_diff_minutes(c) {
+    String date_diff_minutes(c) {
         if (c instanceof List) return "DATEDIFF(minute, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
-    def date_diff_seconds(c) {
+    String date_diff_seconds(c) {
         if (c instanceof List) return "DATEDIFF(second, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }

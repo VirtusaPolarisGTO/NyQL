@@ -13,10 +13,10 @@ import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 class MySqlFunctions implements QFunctions {
 
     @Override
-    def date_trunc(it) { 'DATE(' + ___resolveIn(it) + ')' }
+    String date_trunc(it) { 'DATE(' + ___resolveIn(it) + ')' }
 
     @Override
-    def substr(Object c) {
+    String substr(Object c) {
         if (c instanceof List) {
             return 'SUBSTRING(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) +
                     (c.size() > 2 ? ', ' + ___resolveIn(c[2]) : '') + ')'
@@ -24,104 +24,104 @@ class MySqlFunctions implements QFunctions {
     }
 
     @Override
-    def position(Object c) {
+    String position(Object c) {
         if (c instanceof List) {
             return 'POSITION(' + ___resolveIn(c[1]) + ' IN ' + ___resolveIn(c[0]) + ')'
         }
     }
 
-    def date_diff_years(c) {
+    String date_diff_years(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(YEAR, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()
     }
-    def date_diff_months(c) {
+    String date_diff_months(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(MONTH, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()
     }
-    def date_diff_days(c) {
+    String date_diff_days(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(DAY, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()
     }
-    def date_diff_weeks(c) {
+    String date_diff_weeks(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(WEEK, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()
     }
-    def date_diff_hours(c) {
+    String date_diff_hours(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(HOUR, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()
     }
-    def date_diff_minutes(c) {
+    String date_diff_minutes(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(MINUTE, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()
     }
-    def date_diff_seconds(c) {
+    String date_diff_seconds(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(SECOND, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()
     }
 
-    def date_add_days(c) {
+    String date_add_days(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' DAY)'
         else throw invalidDateAddSyntax()
     }
-    def date_add_months(c) {
+    String date_add_months(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' MONTH)'
         else throw invalidDateAddSyntax()
     }
-    def date_add_years(c) {
+    String date_add_years(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' YEAR)'
         else throw invalidDateAddSyntax()
     }
-    def date_add_weeks(c) {
+    String date_add_weeks(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' WEEK)'
         else throw invalidDateAddSyntax()
     }
-    def date_add_hours(c) {
+    String date_add_hours(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' HOUR)'
         else throw invalidDateAddSyntax()
     }
-    def date_add_minutes(c) {
+    String date_add_minutes(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' MINUTE)'
         else throw invalidDateAddSyntax()
     }
-    def date_add_seconds(c) {
+    String date_add_seconds(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' SECOND)'
         else throw invalidDateAddSyntax()
     }
 
-    def date_sub_days(c) {
+    String date_sub_days(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' DAY)'
         else throw invalidDateSubSyntax()
     }
-    def date_sub_months(c) {
+    String date_sub_months(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' MONTH)'
         else throw invalidDateSubSyntax()
     }
-    def date_sub_years(c) {
+    String date_sub_years(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' YEAR)'
         else throw invalidDateSubSyntax()
     }
-    def date_sub_weeks(c) {
+    String date_sub_weeks(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' WEEK)'
         else throw invalidDateSubSyntax()
     }
-    def date_sub_hours(c) {
+    String date_sub_hours(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' HOUR)'
         else throw invalidDateSubSyntax()
     }
-    def date_sub_minutes(c) {
+    String date_sub_minutes(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' MINUTE)'
         else throw invalidDateSubSyntax()
     }
-    def date_sub_seconds(c) {
+    String date_sub_seconds(c) {
         if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' SECOND)'
         else throw invalidDateSubSyntax()
     }
 
-    def current_epoch(it) { return 'UNIX_TIMESTAMP() * 1000' }
-    def current_epoch() { current_epoch(null) }
+    String current_epoch(it) { return 'UNIX_TIMESTAMP() * 1000' }
+    String current_epoch() { current_epoch(null) }
 
-    def epoch_to_date(it) { return 'DATE(FROM_UNIXTIME(' + ___resolveIn(it) + ' / 1000))' }
-    def epoch_to_datetime(it) { return 'FROM_UNIXTIME(' + ___resolveIn(it) + ' / 1000)' }
+    String epoch_to_date(it) { return 'DATE(FROM_UNIXTIME(' + ___resolveIn(it) + ' / 1000))' }
+    String epoch_to_datetime(it) { return 'FROM_UNIXTIME(' + ___resolveIn(it) + ' / 1000)' }
 
     String mysql_cast(it) {
             if (it instanceof List)
@@ -130,7 +130,7 @@ class MySqlFunctions implements QFunctions {
                 throw new NyException('CAST function expects two parameters!')
     }
 
-    def CAST(Column source, Object toType) {
+    FunctionColumn CAST(Column source, Object toType) {
         return vColumn('mysql_cast', source, toType)
     }
 

@@ -63,7 +63,7 @@ trait QTranslator extends QJoins {
      * @param text text to transform.
      * @return transformed text.
      */
-    abstract def ___quoteString(String text)
+    abstract String ___quoteString(String text)
 
     /**
      * Converts a boolean value to database specific representation in the query.
@@ -71,13 +71,35 @@ trait QTranslator extends QJoins {
      * @param value boolean value.
      * @return string representation of boolean value inside a query.
      */
-    abstract def ___convertBool(Boolean value)
+    abstract String ___convertBool(Boolean value)
 
-    abstract def ___tableName(Table table, QContextType contextType)
+    /**
+     * Converts a table name to string according to the given context.
+     *
+     * @param table table instance.
+     * @param contextType context type.
+     * @return string representation of the table.
+     */
+    abstract String ___tableName(Table table, QContextType contextType)
 
-    abstract def ___tableJoinName(Join join, QContextType contextType, List<AParam> paramOrder)
+    /**
+     * Converts a join chain to a string according to the given context.
+     *
+     * @param join join instance having a left and right table.
+     * @param contextType context type.
+     * @param paramOrder list of parameters.
+     * @return string representation of the join.
+     */
+    abstract String ___tableJoinName(Join join, QContextType contextType, List<AParam> paramOrder)
 
-    abstract def ___columnName(Column column, QContextType contextType)
+    /**
+     * Converts a column to string according to the given context.
+     *
+     * @param column column instance.
+     * @param contextType context type.
+     * @return string representation of the column.
+     */
+    abstract String ___columnName(Column column, QContextType contextType)
 
     /**
      * Generate a query part which could be reusable among other queries.
@@ -136,6 +158,12 @@ trait QTranslator extends QJoins {
      */
     abstract QResultProxy ___updateQuery(QueryUpdate q)
 
+    /**
+     * Converts a given operator to appropriate db specific string.
+     *
+     * @param op operator.
+     * @return string representation of operator.
+     */
     String ___convertOperator(QOperator op) {
         return op.getOp()
     }

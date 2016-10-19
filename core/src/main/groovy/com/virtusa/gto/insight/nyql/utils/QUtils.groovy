@@ -1,13 +1,10 @@
 package com.virtusa.gto.insight.nyql.utils
 
-import com.virtusa.gto.insight.nyql.Join
-import com.virtusa.gto.insight.nyql.QContext
-import com.virtusa.gto.insight.nyql.Table
-import com.virtusa.gto.insight.nyql.TableProxy
-import com.virtusa.gto.insight.nyql.Where
+import com.virtusa.gto.insight.nyql.*
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
+import groovy.transform.CompileStatic
 import org.apache.commons.lang3.StringUtils
 
 /**
@@ -17,6 +14,8 @@ class QUtils {
 
     private static final String NL = '\n'
     private static final String P_PAD = '::'
+    private static final String OP = '('
+    private static final String CP = ')'
 
     static String generateErrStr(String mainError, String... helpLines) {
         StringBuilder builder = new StringBuilder().append(mainError)
@@ -27,6 +26,17 @@ class QUtils {
             }
         }
         return builder.toString()
+    }
+
+    /**
+     * Enclose in parenthesis given text.
+     *
+     * @param text input text to enclose.
+     * @return text enclosed inside parenthesis.
+     */
+    @CompileStatic
+    static String parenthesis(String text) {
+        return OP + text + CP
     }
 
     /**
@@ -57,7 +67,7 @@ class QUtils {
      * @return quoted string.
      */
     static String quote(String text, String c='`') {
-        return "$c$text$c"
+        return c + text + c
     }
 
     /**

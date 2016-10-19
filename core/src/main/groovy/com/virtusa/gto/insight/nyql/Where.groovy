@@ -11,7 +11,6 @@ import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
-import org.apache.commons.lang3.StringUtils
 
 /**
  * @author Isuru Weerarathna

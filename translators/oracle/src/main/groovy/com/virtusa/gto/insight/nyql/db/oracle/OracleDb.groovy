@@ -31,27 +31,27 @@ class OracleDb extends OracleFunctions implements QTranslator {
     }
 
     @Override
-    def ___quoteString(String text) {
+    String ___quoteString(String text) {
         return QUtils.quote(text, STR_QUOTE)
     }
 
     @Override
-    def ___convertBool(Boolean value) {
+    String ___convertBool(Boolean value) {
         return null
     }
 
     @Override
-    def ___tableName(Table table, QContextType contextType) {
+    String ___tableName(Table table, QContextType contextType) {
         return null
     }
 
     @Override
-    def ___tableJoinName(Join join, QContextType contextType, List<AParam> paramOrder) {
+    String ___tableJoinName(Join join, QContextType contextType, List<AParam> paramOrder) {
         return null
     }
 
     @Override
-    def ___columnName(Column column, QContextType contextType) {
+    String ___columnName(Column column, QContextType contextType) {
         return null
     }
 

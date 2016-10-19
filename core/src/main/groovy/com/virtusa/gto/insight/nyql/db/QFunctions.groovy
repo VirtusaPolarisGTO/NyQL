@@ -16,7 +16,7 @@ import java.util.stream.Collectors
  */
 trait QFunctions {
 
-    def ___resolveIn(def obj) {
+    String ___resolveIn(def obj) {
         ___resolve(obj, QContextType.INSIDE_FUNCTION)
     }
 
@@ -31,28 +31,28 @@ trait QFunctions {
      *
      * @return string <i>NOW()</i>
      */
-    def current_timestamp() { 'NOW()' }
+    String current_timestamp() { 'NOW()' }
 
     /**
      * Returns current date without time.
      *
      * @return string representation of current date function.
      */
-    def current_date() { 'CURDATE()' }
+    String current_date() { 'CURDATE()' }
 
     /**
      * Returns current time without date.
      *
      * @return string representation of current time function.
      */
-    def current_time() { 'CURTIME()' }
+    String current_time() { 'CURTIME()' }
 
     /**
      * Returns date part from datetime or timestamp.
      *
      * @return string representation of converting to date part.
      */
-    abstract date_trunc(it)
+    abstract String date_trunc(it)
 
     /**
      * --------------------------------------------------------------
@@ -65,42 +65,42 @@ trait QFunctions {
      *
      * @param c input column to convert.
      */
-    def lcase(c) { 'LOWER(' + ___resolveIn(c) + ')' }
+    String lcase(c) { 'LOWER(' + ___resolveIn(c) + ')' }
 
     /**
      * Returns upper case string representation.
      *
      * @param c input column to convert.
      */
-    def ucase(c) { 'UPPER(' + ___resolveIn(c) + ')' }
+    String ucase(c) { 'UPPER(' + ___resolveIn(c) + ')' }
 
     /**
      * Returns whitespace trimmed string.
      *
      * @param c input column to convert.
      */
-    def trim(c) { 'TRIM(' + ___resolveIn(c) + ')' }
+    String trim(c) { 'TRIM(' + ___resolveIn(c) + ')' }
 
     /**
      * Returns the length of string.
      *
      * @param c input column to find length.
      */
-    def len(c) { 'CHAR_LENGTH(' + ___resolveIn(c) + ')' }
+    String len(c) { 'CHAR_LENGTH(' + ___resolveIn(c) + ')' }
 
     /**
      * Returns substring of the given string starting from start position and length.
      *
      * @param c input column to substring.
      */
-    abstract substr(c)
+    abstract String substr(c)
 
     /**
      * Returns position of string in the given main string.
      *
      * @param c input column to find position.
      */
-    abstract position(c)
+    abstract String position(c)
 
     /**
      * Math functions.
@@ -112,7 +112,7 @@ trait QFunctions {
      * @param c input column and the number of decimal digits.
      * @return String representation of round function.
      */
-    def round(c) {
+    String round(c) {
         if (c instanceof List) 'ROUND(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw new NyException('ROUND function requires two parameters!')
     }
@@ -122,21 +122,21 @@ trait QFunctions {
      *
      * @param c input column.
      */
-    def floor(c) { 'FLOOR(' + ___resolveIn(c) + ')' }
+    String floor(c) { 'FLOOR(' + ___resolveIn(c) + ')' }
 
     /**
      * Returns ceiling value of the column.
      *
      * @param c input column.
      */
-    def ceil(c) { 'CEILING(' + ___resolveIn(c) + ')' }
+    String ceil(c) { 'CEILING(' + ___resolveIn(c) + ')' }
 
     /**
      * Returns absolute value of the column.
      *
      * @param c input column.
      */
-    def abs(c) { 'ABS(' + ___resolveIn(c) + ')' }
+    String abs(c) { 'ABS(' + ___resolveIn(c) + ')' }
 
     /**
      * Returns a number raised to a power. <b>x ^ y</b>
@@ -144,9 +144,11 @@ trait QFunctions {
      * @param c input base and power value.
      * @return String representation of power value.
      */
-    def power(c) {
+    String power(c) {
         if (c instanceof List) {
             'POWER(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        } else {
+            throw new NySyntaxException('Power requires exactly two parameters!')
         }
     }
 
@@ -156,7 +158,7 @@ trait QFunctions {
      * @param c input column
      * @return String representation of sqrt function.
      */
-    def sqrt(c) {
+    String sqrt(c) {
         'SQRT(' + ___resolveIn(c) + ")"
     }
 
@@ -166,7 +168,7 @@ trait QFunctions {
      * @param c input columns.
      * @return String representation of distinct.
      */
-    def distinct(c) { 'DISTINCT(' + ___resolveIn(c) + ')' }
+    String distinct(c) { 'DISTINCT(' + ___resolveIn(c) + ')' }
 
     /**
      * Check a value is in between given two values. Requires minimum two values.
@@ -174,7 +176,7 @@ trait QFunctions {
      * @param c input values
      * @return string representation of between.
      */
-    def between(c) {
+    String between(c) {
         if (c instanceof List) {
             return 'BETWEEN ' + ___resolveIn(c[0]) + ' AND ' + ___resolveIn(c[1])
         } else {
@@ -188,7 +190,7 @@ trait QFunctions {
      * @param c input values
      * @return string representation of not between.
      */
-    def not_between(c) {
+    String not_between(c) {
         if (c instanceof List) {
             return 'NOT BETWEEN ' + ___resolveIn(c[0]) + ' AND ' + ___resolveIn(c[1])
         } else {
@@ -202,7 +204,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of like.
      */
-    def like(c) {
+    String like(c) {
         if (c instanceof List) { return 'LIKE ' + ___resolveIn(c[0]) }
         else { return 'LIKE ' + ___resolveIn(c) }
     }
@@ -213,7 +215,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of not like.
      */
-    def not_like(c) {
+    String not_like(c) {
         if (c instanceof List) { return 'NOT LIKE ' + ___resolveIn(c[0]) }
         else { return 'NOT LIKE ' + ___resolveIn(c) }
     }
@@ -224,7 +226,7 @@ trait QFunctions {
      * @param c input objects or columns to concatenate.
      * @return string representation of concatenation.
      */
-    def concat(c) {
+    String concat(c) {
         if (c instanceof String) {
             return String.valueOf(c)
         } else {
@@ -252,7 +254,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of ascending.
      */
-    def asc(c) {
+    String asc(c) {
         return ___resolve(c, QContextType.ORDER_BY) + ' ASC'
     }
 
@@ -262,7 +264,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of descending.
      */
-    def desc(c) {
+    String desc(c) {
         return ___resolve(c, QContextType.ORDER_BY) + ' DESC'
     }
 
@@ -272,7 +274,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of function
      */
-    def count(c) {
+    String count(c) {
         'COUNT(' + ___resolveIn(c ?: '*') + ')'
     }
 
@@ -282,7 +284,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of function
      */
-    def count_distinct(c) {
+    String count_distinct(c) {
         if (c == null) return 'COUNT(DISTINCT)'
         else return 'COUNT(' + distinct(c) + ')'
     }
@@ -293,7 +295,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of function
      */
-    def sum(c) {
+    String sum(c) {
         'SUM(' + ___resolveIn(c ?: '*') + ')'
     }
 
@@ -303,7 +305,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of function
      */
-    def avg(c) {
+    String avg(c) {
         'AVG(' + ___resolveIn(c ?: '*') + ')'
     }
 
@@ -313,7 +315,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of function
      */
-    def min(c) {
+    String min(c) {
         'MIN(' + ___resolveIn(c ?: '*') + ')'
     }
 
@@ -323,7 +325,7 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of function
      */
-    def max(c) {
+    String max(c) {
         'MAX(' + ___resolveIn(c ?: '*') + ')'
     }
 
@@ -335,7 +337,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_add(it) {
+    String op_add(it) {
         if (it instanceof List) {
             List items = []
             QUtils.expandToList(items, it)
@@ -352,7 +354,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_minus(it) {
+    String op_minus(it) {
         if (it instanceof List) {
             return '(' + ___resolveIn(it[0]) + ' - ' + ___resolveIn(it[1]) + ')'
         } else {
@@ -366,7 +368,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_multiply(it) {
+    String op_multiply(it) {
         if (it instanceof List) {
             return '(' + ___resolveIn(it[0]) + ' * ' + ___resolveIn(it[1]) + ')'
         } else {
@@ -380,7 +382,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_divide(it) {
+    String op_divide(it) {
         if (it instanceof List) {
             return '(' + ___resolveIn(it[0]) + ' / ' + ___resolveIn(it[1]) + ')'
         } else {
@@ -394,7 +396,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_modulus(it) {
+    String op_modulus(it) {
         if (it instanceof List) {
             return '(' + ___resolveIn(it[0]) + ' % ' + ___resolveIn(it[1]) + ')'
         } else {
@@ -408,7 +410,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_bit_and(it) {
+    String op_bit_and(it) {
         if (it instanceof List) {
             return ___resolveIn(it[0]) + ' & ' + ___resolveIn(it[1])
         } else {
@@ -422,7 +424,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_bit_or(it) {
+    String op_bit_or(it) {
         if (it instanceof List) {
             return ___resolveIn(it[0]) + ' | ' + ___resolveIn(it[1])
         } else {
@@ -436,7 +438,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_bit_xor(it) {
+    String op_bit_xor(it) {
         if (it instanceof List) {
             return ___resolveIn(it[0]) + ' ^ ' + ___resolveIn(it[1])
         } else {
@@ -450,7 +452,7 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    def op_bit_not(it) {
+    String op_bit_not(it) {
         if (it instanceof List) {
             return '~' + ___resolveIn(it[0])
         } else {

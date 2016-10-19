@@ -79,17 +79,17 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     String JOIN(QContextType contextType) { 'INNER JOIN' }
 
     @Override
-    def ___quoteString(final String text) {
+    String ___quoteString(final String text) {
         return QUtils.quote(text, STR_QUOTE)
     }
 
     @Override
-    def ___convertBool(Boolean value) {
+    String ___convertBool(Boolean value) {
         return value != null && value ? '1' : '0'
     }
 
     @Override
-    def ___tableName(final Table table, final QContextType contextType) {
+    String ___tableName(final Table table, final QContextType contextType) {
         if (contextType == QContextType.DELETE_FROM || contextType == QContextType.DELETE_CONDITIONAL) {
             return QUtils.quote(table.__name)
         } else if (contextType == QContextType.INTO) {
@@ -110,7 +110,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     }
 
     @Override
-    def ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
+    String ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
         StringBuilder qstr = new StringBuilder();
         String jtype = invokeMethod(join.type, null)
 
@@ -140,7 +140,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     }
 
     @Override
-    def ___columnName(final Column column, final QContextType contextType) {
+    String ___columnName(final Column column, final QContextType contextType) {
         if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY) {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, QUOTE)
