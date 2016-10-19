@@ -56,10 +56,11 @@ class Column {
         new FunctionColumn(_columns: [this, other], _func: 'op_bit_xor', _setOfCols: true, _ctx: _ctx)
     }
 
-    def propertyMissing(String name, def arg) {
+    def propertyMissing(String name) {
         throw new NySyntaxException(QUtils.generateErrStr(
                 "You cannot refer to a column called '$name' inside the column '${this.__name}'!",
-                "Did you spell the table name correctly? [Table Name: $name]"
+                "Did you spell the table name correctly? [Table Name: ${this.__name}]",
+                "Or, is table missing from your query context? If so use EXPECT to declare the table name!"
         ))
     }
 }

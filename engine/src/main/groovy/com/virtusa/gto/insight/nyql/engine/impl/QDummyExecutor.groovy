@@ -3,6 +3,7 @@ package com.virtusa.gto.insight.nyql.engine.impl
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
+import com.virtusa.gto.insight.nyql.model.QScriptResult
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,6 +17,9 @@ class QDummyExecutor implements QExecutor {
 
     @Override
     def execute(QScript script) throws Exception {
+        if (script instanceof QScriptResult) {
+            return script.scriptResult
+        }
         LOGGER.debug('=====================================================================')
         LOGGER.debug('Executing query:')
         LOGGER.debug("\t${script.proxy.query.trim()}")
@@ -42,7 +46,7 @@ class QDummyExecutor implements QExecutor {
     @Override
     def checkPoint() throws NyException {
         LOGGER.debug('Adding checkpoint here. . .')
-        return null
+        return new Object()
     }
 
     @Override
@@ -52,7 +56,7 @@ class QDummyExecutor implements QExecutor {
 
     @Override
     void done() throws NyException {
-        LOGGER.debug('Script is done!')
+        LOGGER.debug('Transaction is done!')
     }
 
     @Override

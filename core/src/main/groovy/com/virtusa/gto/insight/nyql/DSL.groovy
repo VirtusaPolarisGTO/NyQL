@@ -126,7 +126,7 @@ class DSL {
                 orderedParameters: orderedParams)
     }
 
-    def bulkInsert(closure) {
+    QResultProxy bulkInsert(closure) {
         QueryInsert queryInsert = new QueryInsert(createContext())
         Object qs = assignTraits(queryInsert)
 

@@ -33,6 +33,18 @@ class Query extends AbstractClause {
         return this
     }
 
+    Query EXPECT(Table table) {
+        if (table.__aliasDefined()) {
+            if (!_ctx.tables.containsKey(table.__alias)) {
+                _ctx.tables.put(table.__alias, table)
+            }
+        } else {
+            if (!_ctx.tables.containsKey(table.__name)) {
+                _ctx.tables.containsKey(table.__name)
+            }
+        }
+        this
+    }
 
 
 }

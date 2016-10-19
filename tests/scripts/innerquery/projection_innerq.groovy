@@ -9,6 +9,18 @@ def innQ1 = $DSL.select {
     }
 }
 
+def innQU = $DSL.select {
+    EXPECT (Payment.alias("p"))
+
+    TARGET (Film.alias("f"))
+    FETCH (COUNT().alias("totalFilms"))
+    WHERE {
+        EQ (f.film_id, PARAM("filmId"))
+        AND
+        EQ (p.payment_id, f.payment_id)
+    }
+}
+
 def innQ2 = $DSL.select {
     TARGET (Actor.alias("ac"))
     FETCH ()
@@ -31,4 +43,11 @@ def innQ2 = $DSL.select {
                  "(SELECT * FROM `Actor` ac) FROM `Payment` p",
          ["filmId"]],
 
+        $DSL.select {
+            TARGET (Payment.alias("p"))
+            FETCH (TABLE(innQU).alias("films"), TABLE(innQ2))
+        },
+        ["SELECT (SELECT COUNT(*) AS totalFilms FROM `Film` f WHERE f.film_id = ? AND p.payment_id = f.payment_id) AS films, " +
+                 "(SELECT * FROM `Actor` ac) FROM `Payment` p",
+         ["filmId"]],
 ]
