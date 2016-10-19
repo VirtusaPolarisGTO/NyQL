@@ -180,9 +180,10 @@ class Configurations {
         safeClose('Executors') { QExecutorRegistry.instance.shutdown() }
         safeClose('Repositories') { QRepositoryRegistry.instance.shutdown() }
         safeClose('Profiler') { profiler.close() }
-        //QExecutorRegistry.instance.shutdown()
-        //QRepositoryRegistry.instance.shutdown()
-        //profiler.close()
+        synchronized (lock) {
+            configured = false
+        }
+        ConfigBuilder.instance().reset()
         LOGGER.debug('Shutdown completed.')
     }
 

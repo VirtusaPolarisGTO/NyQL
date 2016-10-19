@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="TestScripts">
+
+    <test name="scripting">
+        <packages>
+            <package name="nyql.scripting.*" />
+        </packages>
+    </test>
+
+</suite>

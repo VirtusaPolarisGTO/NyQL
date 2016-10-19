@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="TestParsing">
+
+    <test name="parsings">
+        <packages>
+            <package name="nyql.parsing.*" />
+        </packages>
+    </test>
+
+</suite>

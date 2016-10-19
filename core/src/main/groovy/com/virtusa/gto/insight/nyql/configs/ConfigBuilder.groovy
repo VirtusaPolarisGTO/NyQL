@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.model.QProfiling
 import com.virtusa.gto.insight.nyql.model.QRepository
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
+import groovy.transform.PackageScope
 
 /**
  * @author IWEERARATHNA
@@ -283,6 +284,12 @@ class ConfigBuilder {
      */
     static ConfigBuilder instance() {
         Holder.INSTANCE
+    }
+
+    @PackageScope void reset() {
+        synchronized (lock) {
+            hasInitialized = false
+        }
     }
 
     private static class Holder {

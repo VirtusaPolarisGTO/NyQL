@@ -1,0 +1,71 @@
+{
+  "activate": "mysql",
+
+  "translators": [
+    "com.virtusa.gto.insight.nyql.db.mysql.MySqlFactory"
+  ],
+
+  "caching": {
+    "compiledScripts": true,
+    "generatedQueries": true
+  },
+
+  "defaultImports": [
+    "groovy.transform.Field",
+    "com.virtusa.gto.insight.nyql.ddl.DKeyIndexType",
+    "com.virtusa.gto.insight.nyql.ddl.DFieldType",
+    "com.virtusa.gto.insight.nyql.ddl.DReferenceOption",
+    "com.virtusa.gto.insight.nyql.utils.QueryType",
+    "java.sql.JDBCType",
+    "java.sql.Types",
+    "com.virtusa.gto.insight.nyql.model.blocks.AParam.ParamScope"
+  ],
+
+  "defaultExecutor": "test",
+  "loadDefaultExecutorOnly": true,
+  "executors": [
+    {
+      "name": "jdbc",
+      "factory": "com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutorFactory",
+
+      "url": "jdbc:mysql://localhost/sakila",
+      "username": "root",
+      "password": "",
+
+      "pooling": {
+        "maximumPoolSize": 1,
+        "prepStmtCacheSize": 300,
+        "prepStmtCacheSqlLimit": 2048,
+        "useServerPrepStmts": true
+      }
+    },
+    {
+      "name": "dummy",
+      "factory": "com.virtusa.gto.insight.nyql.engine.impl.QDummyExecFactory"
+    }
+  ],
+
+  "defaultRepository": "default",
+  "repositories": [
+    {
+      "name": "default",
+      "repo": "com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl",
+      "mapper": "com.virtusa.gto.insight.nyql.engine.repo.QScriptsFolder",
+      "mapperArgs": {
+        "baseDir": "./scripts",
+        "inclusions": "scripts/**"
+      }
+    }
+  ],
+
+  "profiling": {
+    "enabled": true,
+    "profiler": "com.virtusa.gto.insight.nyql.profilers.QAverageProfiler",
+    "options": {
+      "port": 9009,
+      "writeIntervalMS": 10000,
+      "autoWriteOnClose": true
+    }
+  }
+
+}
