@@ -3,9 +3,7 @@ import com.virtusa.gto.insight.nyql.configs.ConfigBuilder;
 import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType;
 import com.virtusa.gto.insight.nyql.ddl.DKeyType;
 import com.virtusa.gto.insight.nyql.model.impl.QLogProfiler;
-import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -13,7 +11,6 @@ import java.util.Collections;
  */
 public class ConfigTest {
 
-    @Test
     public void test() {
         ConfigBuilder configBuilder = ConfigBuilder.instance();
         configBuilder.activateDb("mysql")

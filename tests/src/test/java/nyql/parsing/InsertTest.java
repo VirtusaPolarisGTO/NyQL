@@ -1,17 +1,18 @@
+package nyql.parsing;
+
 import com.virtusa.gto.insight.nyql.engine.NyQL;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 /**
  * @author IWEERARATHNA
  */
+@Test(groups = {"parsing"})
 public class InsertTest extends AbstractTest {
 
-    @Test
     public void testBasic() throws Exception {
         assertQueries(NyQL.parse("inserts/basic"));
     }
 
-    @Test
     public void testSelectInserts() throws Exception {
         assertQueries(NyQL.parse("inserts/select_inserts"));
     }

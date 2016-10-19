@@ -1,18 +1,19 @@
+package nyql.parsing;
+
 import com.virtusa.gto.insight.nyql.engine.NyQL;
 import com.virtusa.gto.insight.nyql.exceptions.NyException;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 /**
  * @author IWEERARATHNA
  */
+@Test(groups = {"parsing"})
 public class DeleteTest extends AbstractTest {
 
-    @Test
     public void testDelete() throws NyException {
         assertQueries(NyQL.parse("delete/basic"));
     }
 
-    @Test
     public void testJoins() throws NyException {
         assertQueries(NyQL.parse("delete/joins"));
     }

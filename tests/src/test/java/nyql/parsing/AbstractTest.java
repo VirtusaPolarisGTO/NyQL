@@ -1,16 +1,19 @@
+package nyql.parsing;
+
 import com.virtusa.gto.insight.nyql.QResultProxy;
 import com.virtusa.gto.insight.nyql.engine.NyQL;
 import com.virtusa.gto.insight.nyql.model.QScript;
 import com.virtusa.gto.insight.nyql.model.QScriptList;
 import com.virtusa.gto.insight.nyql.model.QScriptResult;
 import com.virtusa.gto.insight.nyql.model.blocks.AParam;
-import com.virtusa.gto.insight.nyql.utils.QUtils;
-import junit.framework.AssertionFailedError;
-import org.junit.*;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeSuite;
 
 import java.io.File;
 import java.util.List;
-import java.util.StringJoiner;
 
 /**
  * @author IWEERARATHNA
@@ -41,7 +44,7 @@ public class AbstractTest {
             compare ((QResultProxy)obj, gen);
         } else if (obj instanceof QScriptList) {
             if (!(gen instanceof List)) {
-                throw new AssertionFailedError("Script List must have a list as input!");
+                throw new AssertionError("Script List must have a list as input!");
             }
 
             List res = (List)gen;
@@ -79,49 +82,49 @@ public class AbstractTest {
     private void assertLists(List first, List second) {
         if (first == null || first.isEmpty()) {
             if (second != null && !second.isEmpty()) {
-                Assert.assertEquals("Original does not have parameters at all!", 0, second.size());
+                Assert.assertEquals(0, second.size(), "Original does not have parameters at all!");
                 return;
             } else {
                 return;
             }
         } else if (second == null || second.isEmpty()) {
-            Assert.assertEquals("Original has more parameters than expected!", first.size(), 0);
+            Assert.assertEquals(first.size(), 0, "Original has more parameters than expected!");
             return;
         }
-        Assert.assertEquals("Parameters size are different!", first.size(), second.size());
+        Assert.assertEquals(first.size(), second.size(), "Parameters size are different!");
         for (int i = 0; i < first.size(); i++) {
             AParam param = (AParam) first.get(i);
             if (!param.get__name().equals(second.get(i))) {
-                Assert.assertEquals("Parameter #" + (i+1) + " are not equal!", param.get__name(), second.get(i));
+                Assert.assertEquals(param.get__name(), second.get(i), "Parameter #" + (i+1) + " are not equal!");
             }
         }
     }
 
-    @Before
+    @BeforeClass
     public void doBefore() {
         System.out.println("***********************************************************************************************");
         System.out.println("  Running Tests @ " + this.getClass().getSimpleName());
         System.out.println("***********************************************************************************************");
     }
 
-    @After
+    @AfterClass
     public void doAfter() {
         System.out.println("-----------------------------------------------------------------------------------------------");
         System.out.println("  Test Run Completed @ " + this.getClass().getSimpleName());
         System.out.println("-----------------------------------------------------------------------------------------------");
     }
 
-    @BeforeClass
+    @BeforeSuite
     public static void setupTests() {
         //if (NyQL.hasConfigured()) {
-            System.setProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true");
-            //NyQL.configure(new File("./nyql.json"), true);
+            //System.setProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true");
+            NyQL.configure(new File("./nyql.json"));
         //}
     }
 
-    @AfterClass
+    @AfterSuite
     public static void tearDownTests() {
-        //System.out.println("Shutting down test.");
-        //NyQL.shutdown();
+        System.out.println("Shutting down test.");
+        NyQL.shutdown();
     }
 }

@@ -1,12 +1,14 @@
+package nyql.parsing;
+
 import com.virtusa.gto.insight.nyql.engine.NyQL;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 /**
  * @author IWEERARATHNA
  */
+@Test(groups = {"parsing"})
 public class CombineTest extends AbstractTest {
 
-    @Test
     public void testUnion() throws Exception {
         assertQueries(NyQL.parse("combines/basic_union"));
     }

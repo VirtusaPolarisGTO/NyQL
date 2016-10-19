@@ -1,17 +1,17 @@
-import com.virtusa.gto.insight.nyql.engine.NyQL;
-import org.junit.Test;
+package nyql.parsing;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.virtusa.gto.insight.nyql.engine.NyQL;
+import org.testng.annotations.Test;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author IWEERARATHNA
  */
+@Test(groups = {"parsing"})
 public class UpdateTest extends AbstractTest {
 
-    @Test
     public void testBasic() throws Exception {
         Map<String, Object> data = new HashMap<>();
         data.put("alwaysTrue", true);
@@ -19,11 +19,8 @@ public class UpdateTest extends AbstractTest {
         //data.put("doubleList", Arrays.asList(1, 2));
 
         assertQueries(NyQL.parse("updates/basic", data));
-        assertQueries(NyQL.parse("updates/basic", data));
-        assertQueries(NyQL.parse("updates/basic", data));
     }
 
-    @Test
     public void testSpecials() throws Exception {
         assertQueries(NyQL.parse("updates/specials"));
     }
