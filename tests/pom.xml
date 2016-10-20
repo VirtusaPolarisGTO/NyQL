@@ -19,7 +19,23 @@
             <artifactId>nyql-impl-profilers</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.virtusa.gto.insight.nyql</groupId>
+            <artifactId>nyql-pool-hikari</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.virtusa.gto.insight.nyql</groupId>
             <artifactId>nyql-impl-mysql</artifactId>

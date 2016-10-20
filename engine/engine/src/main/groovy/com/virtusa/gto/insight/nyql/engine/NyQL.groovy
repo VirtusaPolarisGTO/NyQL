@@ -36,22 +36,27 @@ class NyQL {
     private static final String JSON_CONFIG_FILENAME = 'nyql.json';
 
     static {
-        if (!Boolean.parseBoolean(System.getProperty(BOOTSTRAP_KEY, TRUE_STR))) {
-            LOGGER.warn('*'*100)
-            LOGGER.warn('You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!')
-            LOGGER.warn('*'*100)
-            return;
-        }
+        try {
+            if (!Boolean.parseBoolean(System.getProperty(BOOTSTRAP_KEY, TRUE_STR))) {
+                LOGGER.warn('*' * 100)
+                LOGGER.warn('You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!')
+                LOGGER.warn('*' * 100)
+                return;
+            }
 
-        configure()
+            configure()
 
-        if (Boolean.parseBoolean(System.getProperty(AUTO_SHUTDOWN_KEY, FALSE_STR)) || Configurations.instance().addShutdownHook()) {
-            LOGGER.warn('Automatically adding a NyQL shutdown hook...')
-            Runtime.runtime.addShutdownHook(new Thread({ shutdown() }));
-        } else {
-            LOGGER.warn("*"*100)
-            LOGGER.warn('You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!')
-            LOGGER.warn("*"*100)
+            if (Boolean.parseBoolean(System.getProperty(AUTO_SHUTDOWN_KEY, FALSE_STR)) || Configurations.instance().addShutdownHook()) {
+                LOGGER.warn('Automatically adding a NyQL shutdown hook...')
+                Runtime.runtime.addShutdownHook(new Thread({ shutdown() }));
+            } else {
+                LOGGER.warn('*' * 100)
+                LOGGER.warn('You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!')
+                LOGGER.warn('*' * 100)
+            }
+        } catch (Exception ex) {
+            LOGGER.error('Error occurred while initializing NyQL!', ex)
+            throw ex
         }
     }
 

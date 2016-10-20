@@ -5,6 +5,8 @@ import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QExecutorFactory
 import groovy.transform.CompileStatic
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Factory responsible of creating pooled JDBC executors per invocation or per thread.
@@ -14,6 +16,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class QJdbcExecutorFactory implements QExecutorFactory {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(QJdbcExecutorFactory)
+
     private QJdbcPool jdbcPool
 
     @Override
@@ -22,6 +26,7 @@ class QJdbcExecutorFactory implements QExecutorFactory {
             String implClz = String.valueOf(options.pooling['impl'] ?: '')
             if (!implClz.isEmpty()) {
                 try {
+                    LOGGER.debug('Initializing pool implementation: [' + implClz + ']')
                     jdbcPool = (QJdbcPool) Thread.currentThread().contextClassLoader.loadClass(implClz).newInstance()
                 } catch (ClassNotFoundException ex) {
                     throw new NyConfigurationException('JDBC pool implementation not found! ' + implClz, ex)
