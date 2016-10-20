@@ -26,4 +26,14 @@ class OracleFunctions implements QFunctions {
             return 'instr(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         }
     }
+
+    @Override
+    String cast_to_int(Object col) {
+        return null
+    }
+
+    @Override
+    String cast_to_str(Object col) {
+        return null
+    }
 }

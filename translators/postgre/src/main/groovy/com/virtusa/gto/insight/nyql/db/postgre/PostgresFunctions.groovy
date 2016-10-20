@@ -156,6 +156,16 @@ class PostgresFunctions implements QFunctions {
     }
 
     @Override
+    String cast_to_int(Object col) {
+        return 'CAST(' + ___resolveIn(col) + ' AS INTEGER)'
+    }
+
+    @Override
+    String cast_to_str(Object col) {
+        return 'CAST(' + ___resolveIn(col) + ' AS TEXT)'
+    }
+
+    @Override
     String op_bit_xor(Object it) {
         if (it instanceof List) {
             return ___resolveIn(it[0]) + ' # ' + ___resolveIn(it[1])

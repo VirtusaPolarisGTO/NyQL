@@ -249,6 +249,22 @@ trait QFunctions {
     }
 
     /**
+     * Cast the given column to integer value.
+     *
+     * @param col input column.
+     * @return string representation of cast to int.
+     */
+    abstract String cast_to_int(Object col)
+
+    /**
+     * Cast the given column to string value.
+     *
+     * @param col input column.
+     * @return string representation of cast to string.
+     */
+    abstract String cast_to_str(Object col)
+
+    /**
      * Returns the ascending representation of a column.
      *
      * @param c input column.

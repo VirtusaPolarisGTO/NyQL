@@ -28,6 +28,16 @@ class MSSqlFunctions implements QFunctions {
         }
     }
 
+    @Override
+    String cast_to_int(Object col) {
+        return 'CAST(' + ___resolveIn(col) + ' AS INT)'
+    }
+
+    @Override
+    String cast_to_str(Object col) {
+        return 'STR(' + ___resolveIn(col) + ')'
+    }
+
     String date_diff_years(c) {
         if (c instanceof List) return "DATEDIFF(year, " + ___resolveIn(c[0]) + ", " + ___resolveIn(c[1]) + ")"
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")

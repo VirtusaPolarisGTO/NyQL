@@ -30,6 +30,16 @@ class MySqlFunctions implements QFunctions {
         }
     }
 
+    @Override
+    String cast_to_int(Object col) {
+        return 'CAST(' + ___resolveIn(col) + ' AS SIGNED)'
+    }
+
+    @Override
+    String cast_to_str(Object col) {
+        return 'CAST(' + ___resolveIn(col) + ' AS CHAR)'
+    }
+
     String date_diff_years(c) {
         if (c instanceof List) return 'TIMESTAMPDIFF(YEAR, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
         else throw requireTwoParams()

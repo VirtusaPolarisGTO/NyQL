@@ -44,12 +44,16 @@ trait FunctionTraits {
 
     def CONCAT(Object... columns) { return vColumn("concat", columns) }
 
+    // cast function
+    FunctionColumn CAST_INT(Object column) { return fColumn(column, 'cast_to_int') }
+    FunctionColumn CAST_TEXT(Object column) { return fColumn(column, 'cast_to_str') }
+
     /// Date time functions
-    def NOW() { fColumn(null, 'current_timestamp') }
-    def CURDATE() { fColumn(null, 'current_date') }
-    def CURTIME() { fColumn(null, 'current_time') }
-    def CUREPOCH() { fColumn(null, 'current_epoch') }
-    def DATE_TRUNC(Column column) { fColumn(column, 'date_trunc') }
+    FunctionColumn NOW() { fColumn(null, 'current_timestamp') }
+    FunctionColumn CURDATE() { fColumn(null, 'current_date') }
+    FunctionColumn CURTIME() { fColumn(null, 'current_time') }
+    FunctionColumn CUREPOCH() { fColumn(null, 'current_epoch') }
+    FunctionColumn DATE_TRUNC(Column column) { fColumn(column, 'date_trunc') }
 
     def EPOCH_TO_DATE(Column column)     { fColumn(column, 'epoch_to_date') }
     def EPOCH_TO_DATETIME(Column column)     { fColumn(column, 'epoch_to_datetime') }

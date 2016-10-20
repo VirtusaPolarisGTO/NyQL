@@ -162,4 +162,10 @@ def innQP = $DSL.select {
         FETCH (EXISTS(innQP))
     },
     ["SELECT EXISTS(SELECT * FROM `Film` f WHERE f.film_id = ?)", ["filmId"]],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (CAST_INT(ac.age), CAST_TEXT(ac.birthYear).alias("bYear"))
+    },
+    "SELECT CAST(ac.age AS SIGNED), CAST(ac.birthYear AS CHAR) AS bYear FROM `Actor` ac",
 ]
