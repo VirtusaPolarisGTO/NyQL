@@ -93,7 +93,7 @@ class QUtils {
     @CompileStatic
     private static boolean hasWhitespace(String text) {
         if (text == null || text.isEmpty()) {
-            return false;
+            return false
         }
         for (int i = 0; i < text.length(); i++) {
             if (Character.isWhitespace(text.charAt(i))) {
@@ -289,7 +289,7 @@ class QUtils {
      */
     @CompileStatic
     static String padParamList(String name) {
-        return P_PAD + name + P_PAD
+        P_PAD + name + P_PAD
     }
 
 }

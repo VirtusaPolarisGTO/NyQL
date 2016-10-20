@@ -42,11 +42,11 @@ trait FunctionTraits {
     def CEIL(Column column) { fColumn(column, 'ceil') }
     def ABS(Column column) { fColumn(column, 'abs') }
 
-    def CONCAT(Object... columns) { return vColumn("concat", columns) }
+    def CONCAT(Object... columns) { vColumn("concat", columns) }
 
     // cast function
-    FunctionColumn CAST_INT(Object column) { return fColumn(column, 'cast_to_int') }
-    FunctionColumn CAST_TEXT(Object column) { return fColumn(column, 'cast_to_str') }
+    FunctionColumn CAST_INT(Object column) { fColumn(column, 'cast_to_int') }
+    FunctionColumn CAST_STR(Object column) { fColumn(column, 'cast_to_str') }
 
     /// Date time functions
     FunctionColumn NOW() { fColumn(null, 'current_timestamp') }

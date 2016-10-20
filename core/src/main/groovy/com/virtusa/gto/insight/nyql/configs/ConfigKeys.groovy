@@ -2,7 +2,6 @@ package com.virtusa.gto.insight.nyql.configs
 
 import groovy.transform.CompileStatic
 import groovy.transform.Immutable
-import groovy.transform.PackageScope
 
 /**
  * @author IWEERARATHNA

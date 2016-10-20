@@ -32,12 +32,12 @@ class MySqlFunctions implements QFunctions {
 
     @Override
     String cast_to_int(Object col) {
-        return 'CAST(' + ___resolveIn(col) + ' AS SIGNED)'
+        'CAST(' + ___resolveIn(col) + ' AS SIGNED)'
     }
 
     @Override
     String cast_to_str(Object col) {
-        return 'CAST(' + ___resolveIn(col) + ' AS CHAR)'
+        'CAST(' + ___resolveIn(col) + ' AS CHAR)'
     }
 
     String date_diff_years(c) {

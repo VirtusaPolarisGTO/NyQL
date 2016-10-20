@@ -23,11 +23,12 @@ import java.sql.Connection
  *
  * @author IWEERARATHNA
  */
+@SuppressWarnings('CatchException')
 class NyQL {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NyQL.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NyQL.class)
 
-    private static final Map<String, Object> EMPTY_MAP = [:];
+    private static final Map<String, Object> EMPTY_MAP = [:]
 
     private static final String BOOTSTRAP_KEY = 'com.virtusa.gto.insight.nyql.autoBootstrap'
     private static final String AUTO_SHUTDOWN_KEY = 'com.virtusa.gto.insight.nyql.addShutdownHook'
@@ -35,7 +36,7 @@ class NyQL {
     private static final String CONFIG_PATH_KEY = 'com.virtusa.gto.insight.nyql.nyConfigFile'
     private static final String TRUE_STR = 'true'
     private static final String FALSE_STR = 'false'
-    private static final String JSON_CONFIG_FILENAME = 'nyql.json';
+    private static final String JSON_CONFIG_FILENAME = 'nyql.json'
 
     static {
         try {
@@ -43,14 +44,14 @@ class NyQL {
                 LOGGER.warn('*' * 100)
                 LOGGER.warn('You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!')
                 LOGGER.warn('*' * 100)
-                return;
+                return
             }
 
             configure()
 
             if (Boolean.parseBoolean(System.getProperty(AUTO_SHUTDOWN_KEY, FALSE_STR)) || Configurations.instance().addShutdownHook()) {
                 LOGGER.warn('Automatically adding a NyQL shutdown hook...')
-                Runtime.runtime.addShutdownHook(new Thread ({ shutdown() }));
+                Runtime.runtime.addShutdownHook(new Thread ({ shutdown() }))
             } else {
                 LOGGER.warn('*' * 100)
                 LOGGER.warn('You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!')
@@ -73,7 +74,7 @@ class NyQL {
         if (!Configurations.instance().isConfigured() || force) {
             LOGGER.warn('NyQL is going to configure with default configurations using classpath...')
             if (!configFromSystemProperty() || !configFromClasspath()) {
-                File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME);
+                File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME)
                 if (!nyConfig.exists()) {
                     LOGGER.error("*" * 100)
                     LOGGER.error("No nyql.json file is found on classpath! [${nyConfig.absolutePath}]")
@@ -103,7 +104,7 @@ class NyQL {
         String path = System.getProperty(CONFIG_PATH_KEY, null)
         if (path != null) {
             LOGGER.debug('NyQL is configuring from path specified in system property: ' + path)
-            File inputConfig = new File(path);
+            File inputConfig = new File(path)
             if (inputConfig.exists()) {
                 Map configData = new JsonSlurper().parse(inputConfig, StandardCharsets.UTF_8.name()) as Map
                 configData.put(ConfigKeys.LOCATION_KEY, inputConfig.canonicalPath)
@@ -198,7 +199,7 @@ class NyQL {
      * @throws NyException any exception thrown while parsing or executing.
      */
     public static <T> T execute(String scriptName) throws NyException {
-        (T) execute(scriptName, EMPTY_MAP);
+        (T) execute(scriptName, EMPTY_MAP)
     }
 
     /**
@@ -291,8 +292,8 @@ class NyQL {
      * @throws NyException any exception thrown while executing and parsing.
      */
     public static String executeToJSON(String scriptName, Map<String, Object> data) throws NyException {
-        Object result = execute(scriptName, data);
-        JsonOutput.toJson(result);
+        Object result = execute(scriptName, data)
+        JsonOutput.toJson(result)
     }
 
     /**

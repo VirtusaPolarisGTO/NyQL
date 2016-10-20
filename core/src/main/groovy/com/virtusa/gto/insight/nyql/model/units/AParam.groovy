@@ -13,11 +13,11 @@ class AParam {
 
     AParam alias(String theAlias) {
         __alias = theAlias
-        return this
+        this
     }
 
     boolean __aliasDefined() {
-        return __alias != null && !__alias.isEmpty()
+        __alias != null && !__alias.isEmpty()
     }
 
     static enum ParamScope {

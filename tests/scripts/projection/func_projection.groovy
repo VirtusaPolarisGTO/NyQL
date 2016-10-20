@@ -165,7 +165,7 @@ def innQP = $DSL.select {
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
-        FETCH (CAST_INT(ac.age), CAST_TEXT(ac.birthYear).alias("bYear"))
+        FETCH (CAST_INT(ac.age), CAST_STR(ac.birthYear).alias("bYear"))
     },
     "SELECT CAST(ac.age AS SIGNED), CAST(ac.birthYear AS CHAR) AS bYear FROM `Actor` ac",
 ]

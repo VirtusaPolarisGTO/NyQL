@@ -108,7 +108,7 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     @Override
     String ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
-        StringBuilder qstr = new StringBuilder();
+        StringBuilder qstr = new StringBuilder()
         String jtype = invokeMethod(join.type, null)
 
         if (join.table1.__isResultOf()) {
@@ -222,9 +222,9 @@ class MySql extends MySqlFunctions implements QTranslator {
             } else {
                 return ___resolve(q, QContextType.UNKNOWN, paramList)
             }
-        });
+        })
 
-        String qStr;
+        String qStr
         if (combineType == QueryCombineType.UNION) {
             qStr = stream.collect(Collectors.joining(NL + ' UNION ALL ' + NL))
         } else if (combineType == QueryCombineType.UNION_DISTINCT) {
@@ -251,7 +251,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
             query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.DELETE_CONDITIONAL)).append(NL)
         }
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
+        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE)
     }
 
     QResultProxy ___partQuery(QueryPart q) {
@@ -306,7 +306,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append(NL)
         }
 
-        query.append('SELECT ');
+        query.append('SELECT ')
         if (q._distinct) {
             query.append('DISTINCT ')
         }
@@ -406,7 +406,7 @@ class MySql extends MySqlFunctions implements QTranslator {
                 List otherColumns = c.rawObject as List
                 finalCols.addAll(otherColumns)
             } else if (c instanceof List) {
-                finalCols.addAll(c);
+                finalCols.addAll(c)
             } else {
                 finalCols.add(c)
             }
@@ -428,7 +428,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             } else if (c instanceof Column) {
                 appendParamsFromColumn(c, paramList)
                 String cName = ___columnName(c, contextType)
-                cols.add(cName);
+                cols.add(cName)
             } else {
                 cols.add(String.valueOf(___resolve(c, contextType, paramList)))
             }
@@ -538,7 +538,7 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     String ___expandConditionGroup(Where.QConditionGroup group, List<AParam> paramOrder, QContextType contextType) {
-        String gCon = group.condConnector.isEmpty() ? '' : ' ' + group.condConnector + ' ';
+        String gCon = group.condConnector.isEmpty() ? '' : ' ' + group.condConnector + ' '
         return group.where.clauses.stream()
                 .map({ c ->
             if (c instanceof Where.QCondition) {

@@ -14,14 +14,14 @@ class QSource {
     private GroovyCodeSource codeSource
 
     String getId() {
-        return id
+        id
     }
 
     File getFile() {
-        return file
+        file
     }
 
     GroovyCodeSource getCodeSource() {
-        return codeSource
+        codeSource
     }
 }
