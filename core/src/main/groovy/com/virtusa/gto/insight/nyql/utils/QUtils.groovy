@@ -5,7 +5,6 @@ import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.blocks.AParam
 import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
 import groovy.transform.CompileStatic
-import org.apache.commons.lang3.StringUtils
 
 /**
  * @author Isuru Weerarathna
@@ -17,6 +16,7 @@ class QUtils {
     private static final String OP = '('
     private static final String CP = ')'
 
+    @CompileStatic
     static String generateErrStr(String mainError, String... helpLines) {
         StringBuilder builder = new StringBuilder().append(mainError)
         if (helpLines != null) {
@@ -45,6 +45,7 @@ class QUtils {
      * @param col collection to check.
      * @return true if it is not null nor empty.
      */
+    @CompileStatic
     static boolean notNullNorEmpty(Collection<?> col) {
         return col != null && !col.isEmpty()
     }
@@ -55,6 +56,7 @@ class QUtils {
      * @param col collection to check.
      * @return true if it is null or empty.
      */
+    @CompileStatic
     static boolean isNullOrEmpty(Map<?, ?> map) {
         return map == null || map.isEmpty()
     }
@@ -66,6 +68,7 @@ class QUtils {
      * @param c character to pad the string.
      * @return quoted string.
      */
+    @CompileStatic
     static String quote(String text, String c='`') {
         return c + text + c
     }
@@ -76,8 +79,28 @@ class QUtils {
      * @param text text to check for whitespaces.
      * @return true if whitespaces are there.
      */
+    @CompileStatic
     static boolean hasWS(String text) {
-        return StringUtils.containsWhitespace(text)
+        return hasWhitespace(text)
+    }
+
+    /**
+     * Returns true if given text has whitespaces.
+     *
+     * @param text string to check.
+     * @return true if it has whitespaces.
+     */
+    @CompileStatic
+    private static boolean hasWhitespace(String text) {
+        if (text == null || text.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < text.length(); i++) {
+            if (Character.isWhitespace(text.charAt(i))) {
+                return true
+            }
+        }
+        return false
     }
 
     /**
@@ -87,6 +110,7 @@ class QUtils {
      * @param c character to pad.
      * @return quoted string if has whitespaces. Otherwise same string.
      */
+    @CompileStatic
     static String quoteIfWS(String text, String c='`') {
         if (hasWS(text)) {
             return quote(text, c)
@@ -248,6 +272,7 @@ class QUtils {
      * @param mappingName mapping name of named param.
      * @return newly created parameter.
      */
+    @CompileStatic
     static AParam createParam(String name, AParam.ParamScope scope=null, String mappingName=null) {
         if (scope == null && mappingName == null) {
             return new AParam(__name: name)
@@ -262,6 +287,7 @@ class QUtils {
      * @param name name of parameter.
      * @return padded parameter name.
      */
+    @CompileStatic
     static String padParamList(String name) {
         return P_PAD + name + P_PAD
     }

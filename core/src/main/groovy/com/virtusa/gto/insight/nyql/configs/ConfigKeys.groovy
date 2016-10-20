@@ -1,10 +1,12 @@
 package com.virtusa.gto.insight.nyql.configs
 
+import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 @PackageScope
 final class ConfigKeys {
 

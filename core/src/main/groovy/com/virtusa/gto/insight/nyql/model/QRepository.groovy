@@ -37,7 +37,7 @@ trait QRepository implements Closeable {
      * @throws NyException any exception thrown while parsing.
      */
     QScript parse(QResultProxy resultProxy, QSession session = null) throws NyException {
-        return new QScript(id: session?.currentActiveScript() + '@' + resultProxy.hashCode(), proxy: resultProxy, qSession: session)
+        return new QScript(id: session?.currentActiveScript(), proxy: resultProxy, qSession: session)
     }
 
 }

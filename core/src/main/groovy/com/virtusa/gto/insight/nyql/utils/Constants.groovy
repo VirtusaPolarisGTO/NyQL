@@ -1,10 +1,12 @@
 package com.virtusa.gto.insight.nyql.utils
 
+import groovy.transform.CompileStatic
 import groovy.transform.Immutable
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 @Immutable
 final class Constants {
 

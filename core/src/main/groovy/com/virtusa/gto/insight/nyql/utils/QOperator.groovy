@@ -1,8 +1,11 @@
 package com.virtusa.gto.insight.nyql.utils
 
+import groovy.transform.CompileStatic
+
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 enum QOperator {
 
     EQUAL('='),

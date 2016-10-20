@@ -1,16 +1,15 @@
 package nyql.tests;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,12 +137,23 @@ public class Deps {
         } else {
             Set<String> toCalls = findCalls(src);
             String relPath = baseDir.toPath().relativize(src.toPath()).toString().replace("\\", "/");
-            relPath = StringUtils.substringBeforeLast(relPath, ".");
+            relPath = substrBeforeLast(relPath, ".");
 
             //System.out.println("Scanning: " + relPath);
             //System.out.println("   Called: " + toCalls);
             calls.put(relPath, toCalls);
         }
+    }
+
+    private static String substrBeforeLast(String text, String sep) {
+        if (text == null || text.isEmpty() || sep == null || sep.isEmpty()) {
+            return text;
+        }
+        int pos = text.lastIndexOf(sep);
+        if (pos >= 0) {
+            return text.substring(0, pos);
+        }
+        return text;
     }
 
     private static Set<String> findCalls(File file) throws Exception {
