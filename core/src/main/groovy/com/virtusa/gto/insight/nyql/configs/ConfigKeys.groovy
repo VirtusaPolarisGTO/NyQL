@@ -8,7 +8,6 @@ import groovy.transform.PackageScope
  * @author IWEERARATHNA
  */
 @CompileStatic
-@PackageScope
 @Immutable
 final class ConfigKeys {
 
@@ -25,4 +24,7 @@ final class ConfigKeys {
     static final String TRANSLATORS = 'translators'
     static final String ACTIVATE_DB = 'activate'
 
+    static final String LOCATION_KEY = '_location'
+
+    static final JDBC_DRIVER_CLASS_KEY = 'jdbcDriverClass'
 }

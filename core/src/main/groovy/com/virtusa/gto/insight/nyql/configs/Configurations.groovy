@@ -140,7 +140,7 @@ class Configurations {
                 continue
             }
 
-            r.put('jdbcDriverClass', activeFactory.driverClassName())
+            r.put(ConfigKeys.JDBC_DRIVER_CLASS_KEY, activeFactory.driverClassName())
             Class<?> clazz = classLoader.loadClass(String.valueOf(r.factory))
             QExecutorFactory executorFactory = createExecFactoryInstance(clazz, r)
 

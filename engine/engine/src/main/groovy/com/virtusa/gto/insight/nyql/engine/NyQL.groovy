@@ -2,6 +2,7 @@ package com.virtusa.gto.insight.nyql.engine
 
 import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.configs.ConfigBuilder
+import com.virtusa.gto.insight.nyql.configs.ConfigKeys
 import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.engine.impl.QExternalJdbcFactory
 import com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutor
@@ -31,6 +32,7 @@ class NyQL {
     private static final String BOOTSTRAP_KEY = 'com.virtusa.gto.insight.nyql.autoBootstrap'
     private static final String AUTO_SHUTDOWN_KEY = 'com.virtusa.gto.insight.nyql.addShutdownHook'
     private static final String LOAD_CLASSPATH_KEY = 'com.virtusa.gto.insight.nyql.classpathBootstrap'
+    private static final String CONFIG_PATH_KEY = 'com.virtusa.gto.insight.nyql.nyConfigFile'
     private static final String TRUE_STR = 'true'
     private static final String FALSE_STR = 'false'
     private static final String JSON_CONFIG_FILENAME = 'nyql.json';
@@ -48,7 +50,7 @@ class NyQL {
 
             if (Boolean.parseBoolean(System.getProperty(AUTO_SHUTDOWN_KEY, FALSE_STR)) || Configurations.instance().addShutdownHook()) {
                 LOGGER.warn('Automatically adding a NyQL shutdown hook...')
-                Runtime.runtime.addShutdownHook(new Thread({ shutdown() }));
+                Runtime.runtime.addShutdownHook(new Thread ({ shutdown() }));
             } else {
                 LOGGER.warn('*' * 100)
                 LOGGER.warn('You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!')
@@ -70,7 +72,7 @@ class NyQL {
     public static void configure(File inputJson=null, boolean force=false) {
         if (!Configurations.instance().isConfigured() || force) {
             LOGGER.warn('NyQL is going to configure with default configurations using classpath...')
-            if (!configFromClasspath()) {
+            if (!configFromSystemProperty() || !configFromClasspath()) {
                 File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME);
                 if (!nyConfig.exists()) {
                     LOGGER.error("*" * 100)
@@ -82,7 +84,7 @@ class NyQL {
                 } else {
                     LOGGER.debug("Loading configurations from ${nyConfig.canonicalPath}...")
                     Map configData = new JsonSlurper().parse(nyConfig) as Map
-                    configData.put('_location', new File('.').canonicalPath)
+                    configData.put(ConfigKeys.LOCATION_KEY, new File('.').canonicalPath)
                     ConfigBuilder.instance().setupFrom(configData).build()
                 }
             }
@@ -90,6 +92,28 @@ class NyQL {
         } else {
             LOGGER.warn('NyQL has already been configured!')
         }
+    }
+
+    /**
+     * Config NyQL from the file specified in system property.
+     *
+     * @return true if configured from system property.
+     */
+    private static boolean configFromSystemProperty() {
+        String path = System.getProperty(CONFIG_PATH_KEY, null)
+        if (path != null) {
+            LOGGER.debug('NyQL is configuring from path specified in system property: ' + path)
+            File inputConfig = new File(path);
+            if (inputConfig.exists()) {
+                Map configData = new JsonSlurper().parse(inputConfig, StandardCharsets.UTF_8.name()) as Map
+                configData.put(ConfigKeys.LOCATION_KEY, inputConfig.canonicalPath)
+                ConfigBuilder.instance().setupFrom(configData).build()
+                return true
+            } else {
+                throw new IOException('Given configuration file does not exist! ' + path)
+            }
+        }
+        false
     }
 
     /**
@@ -108,9 +132,9 @@ class NyQL {
             LOGGER.debug('Loading configurations from classpath...')
             Map configData = new JsonSlurper().parse(res, StandardCharsets.UTF_8.name()) as Map
             ConfigBuilder.instance().setupFrom(configData).build()
-        } else {
-            return false
+            return true
         }
+        false
     }
 
     /**
@@ -148,7 +172,7 @@ class NyQL {
         if (data) {
             qSession.sessionVariables.putAll(data)
         }
-        return QRepositoryRegistry.instance.defaultRepository().parse(scriptName, qSession)
+        QRepositoryRegistry.instance.defaultRepository().parse(scriptName, qSession)
     }
 
     /**
@@ -174,7 +198,7 @@ class NyQL {
      * @throws NyException any exception thrown while parsing or executing.
      */
     public static <T> T execute(String scriptName) throws NyException {
-        return (T) execute(scriptName, EMPTY_MAP);
+        (T) execute(scriptName, EMPTY_MAP);
     }
 
     /**
@@ -199,7 +223,7 @@ class NyQL {
         QScript script = null
         try {
             script = parse(scriptName, data)
-            return (T) QExecutorRegistry.instance.defaultExecutorFactory().create().execute(script)
+            (T) QExecutorRegistry.instance.defaultExecutorFactory().create().execute(script)
         } finally {
             if (script != null) {
                 script.free()
@@ -223,7 +247,7 @@ class NyQL {
      */
     public static <T> T execute(String dslSql, Map<String, Object> data, Connection connection) throws NyException {
         String scriptId = String.valueOf(System.currentTimeMillis())
-        return execute(scriptId, dslSql, data, connection)
+        execute(scriptId, dslSql, data, connection)
     }
 
     /**
@@ -251,7 +275,7 @@ class NyQL {
 
         session.sessionVariables.putAll(data ?: [:])
         QScript script = repository.parse(scriptId, session)
-        return (T) jdbcExecutor.execute(script)
+        (T) jdbcExecutor.execute(script)
     }
 
     /**
@@ -268,7 +292,7 @@ class NyQL {
      */
     public static String executeToJSON(String scriptName, Map<String, Object> data) throws NyException {
         Object result = execute(scriptName, data);
-        return JsonOutput.toJson(result);
+        JsonOutput.toJson(result);
     }
 
     /**
@@ -283,7 +307,7 @@ class NyQL {
      * @throws NyException any exception thrown while executing and parsing.
      */
     public static String executeToJSON(String scriptName) throws NyException {
-        return executeToJSON(scriptName, [:])
+        executeToJSON(scriptName, [:])
     }
 
     private static boolean asBoolean(String text) {

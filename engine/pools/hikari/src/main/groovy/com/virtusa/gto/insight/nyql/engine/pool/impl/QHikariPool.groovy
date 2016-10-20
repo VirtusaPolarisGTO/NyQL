@@ -1,5 +1,6 @@
 package com.virtusa.gto.insight.nyql.engine.pool.impl
 
+import com.virtusa.gto.insight.nyql.configs.ConfigKeys
 import com.virtusa.gto.insight.nyql.engine.pool.QJdbcPool
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.zaxxer.hikari.HikariConfig
@@ -32,13 +33,13 @@ class QHikariPool implements QJdbcPool {
     void init(Map options) throws NyException {
         HikariConfig config = new HikariConfig();
         //config.setDataSourceClassName(String.valueOf(options.dataSourceClassName))
-        if (options.containsKey("jdbcDriverClass")) {
+        if (options.containsKey(ConfigKeys.JDBC_DRIVER_CLASS_KEY)) {
             config.setDriverClassName(String.valueOf(options.jdbcDriverClass))
         }
         config.setJdbcUrl(String.valueOf(options.url))
         config.setUsername(String.valueOf(options.username))
         config.setPassword(String.valueOf(options.password))
-        config.setPoolName("NyPool")
+        config.setPoolName('NyPool')
 
         if (options.pooling) {
             Map poolingConfigs = options.pooling as Map

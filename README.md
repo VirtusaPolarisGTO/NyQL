@@ -9,7 +9,7 @@ A common query DSL for popular relational databases.
 * `QScript`: Executable entity contains a QResultProxy instance with relevant data
 * `Executor`: Entity which executes script(s)
 
-#### How to Use Through Java
+#### How to Use
 * Add the dependency `nyql-engine` to the maven project, and also corresponding nyql database translator.
 
 ```xml
@@ -30,6 +30,18 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
 </dependency>
 ```
 
+* If you are expecting to use the execution part of NyQL, then you need to specify the executor instance to be used with. By default,
+NyQL works with a pooled JDBC executor, currently equipped with a [Hikari](https://github.com/brettwooldridge/HikariCP) or [C3p0](http://www.mchange.com/projects/c3p0/) pools.
+For eg: if you expect to use hikari pool, you need to add below dependency.
+
+```xml
+<dependency>
+    <groupId>com.virtusa.gto.insight.nyql</groupId>
+    <artifactId>nyql-pool-hikari</artifactId>
+    <version>${nyql.version}</version>
+</dependency>
+```
+
 * Make sure to have correct driver classes in your classpath at the runtime through maven dependencies. For eg, if you are using mysql database use mysql jdbc driver.
 
 ```xml
@@ -37,6 +49,23 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
     <version>5.1.36</version>
+</dependency>
+```
+
+* NyQL uses [slf4j  logging](http://www.slf4j.org/). To enable logging, you need add appropriate slf4j implementation
+to the dependency as well. Say you want to use [log4j logging](https://logging.apache.org/log4j/1.2/download.html).
+
+```xml
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-log4j12</artifactId>
+    <version>${slf4j.version}</version>
+</dependency>
+
+<dependency>
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.17</version>
 </dependency>
 ```
 

@@ -1,6 +1,7 @@
 package com.virtusa.gto.insight.nyql.engine.pool.impl
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
+import com.virtusa.gto.insight.nyql.configs.ConfigKeys
 import com.virtusa.gto.insight.nyql.engine.pool.QJdbcPool
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import groovy.transform.CompileStatic
@@ -17,7 +18,7 @@ class QC3p0Pool implements QJdbcPool {
 
     @Override
     void init(Map options) throws NyException {
-        if (options.containsKey("jdbcDriverClass")) {
+        if (options.containsKey(ConfigKeys.JDBC_DRIVER_CLASS_KEY)) {
             pool.setDriverClass(String.valueOf(options.jdbcDriverClass))
         }
         pool.setJdbcUrl(String.valueOf(options.url))
