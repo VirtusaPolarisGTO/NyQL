@@ -3,7 +3,6 @@ package com.virtusa.gto.insight.nyql.engine.repo
 import com.virtusa.gto.insight.nyql.QResultProxy
 import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
-import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptParseException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.*
@@ -40,14 +39,11 @@ class QRepositoryImpl implements QRepository {
 
     public void clearCache(int level) {
         caching.clearGeneratedCache(level)
-        LOGGER.warn("All caches cleared in query repository!")
+        LOGGER.warn('All caches cleared in query repository!')
     }
 
     QScript parse(String scriptId, QSession session) throws NyException {
         QSource src = mapper.map(scriptId)
-        if (src == null || (src.file != null && !src.file.exists())) {
-            throw new NyScriptNotFoundException(scriptId)
-        }
 
         if (Configurations.instance().cacheGeneratedQueries() && caching.hasGeneratedQuery(scriptId)) {
             LOGGER.trace("Script {} served from query cache.", scriptId)

@@ -2,6 +2,7 @@ package com.virtusa.gto.insight.nyql.engine.repo
 
 import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
 
@@ -32,7 +33,7 @@ class QResourceScripts implements QScriptMapper {
     }
 
     @Override
-    QSource map(String id) {
+    QSource map(String id) throws NyScriptNotFoundException {
         if (resMap.containsKey(id)) {
             resMap[id]
         } else {
@@ -46,7 +47,7 @@ class QResourceScripts implements QScriptMapper {
         }
     }
 
-    private static String readAll(String subPath) {
+    private static String readAll(String subPath) throws NyScriptNotFoundException {
         def stream = Thread.currentThread().contextClassLoader.getResourceAsStream(subPath)
         if (stream != null) {
             try {
@@ -57,12 +58,13 @@ class QResourceScripts implements QScriptMapper {
                 }
             }
         }
-        throw new NyConfigurationException("There is no resource exist in $subPath!")
+        throw new NyScriptNotFoundException("There is no resource exist in $subPath!")
     }
 
     @Override
     Collection<QSource> allSources() {
-        throw new NyException("You can't retrieve all sources from java resource directory!")
+        throw new NyException('There is no way to retrieve all sources from java resource directory ' +
+                'WITHOUT using a third party library!')
     }
 
     @Override

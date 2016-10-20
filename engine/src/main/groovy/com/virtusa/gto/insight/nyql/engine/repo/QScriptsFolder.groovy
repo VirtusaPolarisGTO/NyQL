@@ -2,8 +2,10 @@ package com.virtusa.gto.insight.nyql.engine.repo
 
 import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -18,11 +20,11 @@ import java.util.stream.Stream
  *
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QScriptsFolder implements QScriptMapper {
 
     private static final String KEY_INCLUSIONS = 'inclusions'
     private static final String KEY_EXCLUSIONS = 'exclusions'
-    private static final String SPLIT_PATTERN = '[,]'
     private static final String GLOB_NAME = 'glob:'
     private static final Logger LOGGER = LoggerFactory.getLogger(QScriptsFolder.class)
 
@@ -102,8 +104,12 @@ class QScriptsFolder implements QScriptMapper {
     }
 
     @Override
-    QSource map(String id) {
-        fileMap[id]
+    QSource map(String id) throws NyScriptNotFoundException {
+        QSource source = fileMap[id]
+        if (source == null || source.file == null || !source.file.exists()) {
+            throw new NyScriptNotFoundException(id)
+        }
+        return source
     }
 
     @Override
@@ -128,10 +134,12 @@ class QScriptsFolder implements QScriptMapper {
         return ((int)Math.ceil(length / 1024.0)) + ' KB'
     }
 
+    @CompileStatic
     private static class ScriptVisitor extends SimpleFileVisitor<Path> {
 
-        private final List<PathMatcher> inclusions = [] as Queue
-        private final List<PathMatcher> exclusions = [] as Queue
+        private static final String SPLIT_PATTERN = '[,]'
+        private final List<PathMatcher> inclusions = new LinkedList<>()
+        private final List<PathMatcher> exclusions = new LinkedList<>()
         private final QScriptsFolder scriptsFolder
         private final Path startDir
 

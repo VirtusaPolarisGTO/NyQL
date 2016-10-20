@@ -4,12 +4,14 @@ import com.virtusa.gto.insight.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
+import groovy.transform.CompileStatic
 
 /**
  * Stores script mapping from several folders in the system.
  *
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QScriptFolders implements QScriptMapper {
 
     private final List<QScriptsFolder> scriptsFolderList = []
@@ -42,7 +44,7 @@ class QScriptFolders implements QScriptMapper {
                     'one parameter with specifying one or many directories!')
         }
 
-        List<String> paths = args.baseDirs
+        List<String> paths = (List<String>) args.baseDirs
         List<File> folders = []
         for (String path : paths) {
             File dir = new File(path)

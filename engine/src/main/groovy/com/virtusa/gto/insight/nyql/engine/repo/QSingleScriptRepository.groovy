@@ -1,7 +1,7 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptExecutionException
-import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptNotFoundException
+import com.virtusa.gto.insight.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.insight.nyql.engine.exceptions.NyScriptParseException
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScript

@@ -5,6 +5,7 @@ import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.model.QSource
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class Caching implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Caching.class)
@@ -59,7 +61,7 @@ class Caching implements Closeable {
     }
 
     private static QScript spawnScriptFrom(QScript src) {
-        QScript script = new QScript(id: src.id, qSession: null)
+        QScript script = new QScript(id: src.id, qSession: (QSession)null)
         def resultProxy = src.proxy
         if (resultProxy != null) {
             script.proxy = resultProxy.dehydrate()
@@ -88,6 +90,9 @@ class Caching implements Closeable {
     void clearGeneratedCache(int level) {
         if (level >= 0) {
             cache.clear()
+        }
+        if (level > 1) {
+            gcl.clearCache()
         }
     }
 

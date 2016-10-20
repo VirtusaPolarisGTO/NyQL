@@ -1,6 +1,7 @@
 package com.virtusa.gto.insight.nyql.configs
 
 import groovy.transform.CompileStatic
+import groovy.transform.Immutable
 import groovy.transform.PackageScope
 
 /**
@@ -8,6 +9,7 @@ import groovy.transform.PackageScope
  */
 @CompileStatic
 @PackageScope
+@Immutable
 final class ConfigKeys {
 
     static final String REPO_MAP = '__repoMap'

@@ -1,5 +1,7 @@
 package com.virtusa.gto.insight.nyql.model
 
+import com.virtusa.gto.insight.nyql.exceptions.NyScriptNotFoundException
+
 import java.util.function.Function
 
 /**
@@ -20,7 +22,7 @@ trait QScriptMapper implements Function<String, QSource> {
      * @param id script id.
      * @return corresponding source for the given id.
      */
-    abstract QSource map(String id)
+    abstract QSource map(String id) throws NyScriptNotFoundException
 
     /**
      * Returns all sources available from this mapper.

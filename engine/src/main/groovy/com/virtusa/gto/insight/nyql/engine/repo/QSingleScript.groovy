@@ -2,12 +2,14 @@ package com.virtusa.gto.insight.nyql.engine.repo
 
 import com.virtusa.gto.insight.nyql.model.QScriptMapper
 import com.virtusa.gto.insight.nyql.model.QSource
+import groovy.transform.CompileStatic
 
 /**
  * Contains a mapper for a single folder.
  *
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QSingleScript implements QScriptMapper {
 
     private final GroovyCodeSource codeSource
