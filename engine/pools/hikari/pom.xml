@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>${hikari.version}</version>
+            <version>${pool.hikari.version}</version>
         </dependency>
     </dependencies>
 

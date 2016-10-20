@@ -6,19 +6,18 @@
 
     <parent>
         <groupId>com.virtusa.gto.insight.nyql</groupId>
-        <artifactId>nyql-engine-parent</artifactId>
+        <artifactId>nyql-pools-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>nyql-engine</artifactId>
+    <artifactId>nyql-pool-c3p0</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
-            <artifactId>nyql-impl-mysql</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>${pool.c3p0.version}</version>
         </dependency>
     </dependencies>
 
