@@ -18,7 +18,7 @@
     "com.virtusa.gto.insight.nyql.utils.QueryType",
     "java.sql.JDBCType",
     "java.sql.Types",
-    "com.virtusa.gto.insight.nyql.model.blocks.AParam.ParamScope"
+    "com.virtusa.gto.insight.nyql.model.units.AParam.ParamScope"
   ],
 
   "defaultExecutor": "dummy",

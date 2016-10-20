@@ -6,7 +6,7 @@ import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptList
 import com.virtusa.gto.insight.nyql.model.QSession
-import com.virtusa.gto.insight.nyql.model.blocks.AParam
+import com.virtusa.gto.insight.nyql.model.units.AParam
 import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType

@@ -2,8 +2,8 @@ package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.QScript
-import com.virtusa.gto.insight.nyql.model.blocks.AParam
-import com.virtusa.gto.insight.nyql.model.blocks.ParamList
+import com.virtusa.gto.insight.nyql.model.units.AParam
+import com.virtusa.gto.insight.nyql.model.units.ParamList
 import com.virtusa.gto.insight.nyql.traits.DataTypeTraits
 import com.virtusa.gto.insight.nyql.traits.FunctionTraits
 import com.virtusa.gto.insight.nyql.traits.ScriptTraits

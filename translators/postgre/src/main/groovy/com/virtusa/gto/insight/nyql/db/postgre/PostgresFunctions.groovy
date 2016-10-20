@@ -5,7 +5,7 @@ import com.virtusa.gto.insight.nyql.QContextType
 import com.virtusa.gto.insight.nyql.db.QFunctions
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
-import com.virtusa.gto.insight.nyql.model.blocks.QNumber
+import com.virtusa.gto.insight.nyql.model.units.QNumber
 
 import java.util.stream.Collectors
 

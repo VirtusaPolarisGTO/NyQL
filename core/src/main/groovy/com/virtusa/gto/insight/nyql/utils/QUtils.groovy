@@ -2,8 +2,8 @@ package com.virtusa.gto.insight.nyql.utils
 
 import com.virtusa.gto.insight.nyql.*
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
-import com.virtusa.gto.insight.nyql.model.blocks.AParam
-import com.virtusa.gto.insight.nyql.model.blocks.NamedParam
+import com.virtusa.gto.insight.nyql.model.units.AParam
+import com.virtusa.gto.insight.nyql.model.units.NamedParam
 import groovy.transform.CompileStatic
 
 /**

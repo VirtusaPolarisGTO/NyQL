@@ -2,10 +2,10 @@ package com.virtusa.gto.insight.nyql.db
 
 import com.virtusa.gto.insight.nyql.*
 import com.virtusa.gto.insight.nyql.exceptions.NyException
-import com.virtusa.gto.insight.nyql.model.blocks.AParam
-import com.virtusa.gto.insight.nyql.model.blocks.ParamList
-import com.virtusa.gto.insight.nyql.model.blocks.QNumber
-import com.virtusa.gto.insight.nyql.model.blocks.QString
+import com.virtusa.gto.insight.nyql.model.units.AParam
+import com.virtusa.gto.insight.nyql.model.units.ParamList
+import com.virtusa.gto.insight.nyql.model.units.QNumber
+import com.virtusa.gto.insight.nyql.model.units.QString
 import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType

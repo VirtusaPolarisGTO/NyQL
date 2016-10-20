@@ -1,6 +1,6 @@
 package com.virtusa.gto.insight.nyql
 
-import com.virtusa.gto.insight.nyql.model.blocks.AParam
+import com.virtusa.gto.insight.nyql.model.units.AParam
 import com.virtusa.gto.insight.nyql.utils.QReturnType
 import com.virtusa.gto.insight.nyql.utils.QueryType
 import groovy.transform.ToString

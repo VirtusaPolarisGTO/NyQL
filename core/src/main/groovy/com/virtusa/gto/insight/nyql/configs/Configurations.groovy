@@ -12,6 +12,8 @@ import com.virtusa.gto.insight.nyql.utils.QUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.lang.reflect.Constructor
+
 /**
  * @author IWEERARATHNA
  */
@@ -138,15 +140,24 @@ class Configurations {
                 continue
             }
 
-            QExecutorFactory executorFactory = (QExecutorFactory) classLoader.loadClass(String.valueOf(r.factory)).newInstance()
             r.put('jdbcDriverClass', activeFactory.driverClassName())
+            Class<?> clazz = classLoader.loadClass(String.valueOf(r.factory))
+            QExecutorFactory executorFactory = createExecFactoryInstance(clazz, r)
 
             if (profEnabled) {
                 executorFactory = new QProfExecutorFactory(executorFactory)
             }
             executorFactory.init(r)
-
             QExecutorRegistry.getInstance().register(String.valueOf(r.name), executorFactory, thisDef)
+        }
+    }
+
+    private static QExecutorFactory createExecFactoryInstance(Class<?> clz, Map options) {
+        try {
+            Constructor<?> constructor = clz.getDeclaredConstructor(Map)
+            (QExecutorFactory) constructor.newInstance(options)
+        } catch (NoSuchMethodException ignored) {
+            (QExecutorFactory) clz.newInstance()
         }
     }
 
@@ -176,7 +187,7 @@ class Configurations {
     }
 
     void shutdown() {
-        LOGGER.debug("Shutting down nyql...")
+        LOGGER.debug('Shutting down nyql...')
         safeClose('Executors') { QExecutorRegistry.instance.shutdown() }
         safeClose('Repositories') { QRepositoryRegistry.instance.shutdown() }
         safeClose('Profiler') { profiler.close() }
@@ -187,7 +198,7 @@ class Configurations {
         LOGGER.debug('Shutdown completed.')
     }
 
-    @SuppressWarnings("CatchThrowable")
+    @SuppressWarnings('CatchThrowable')
     private static void safeClose(String workerName, Runnable runnable) {
         try {
             runnable.run()

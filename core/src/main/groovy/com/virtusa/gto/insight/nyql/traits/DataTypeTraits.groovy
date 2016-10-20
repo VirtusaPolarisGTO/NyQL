@@ -1,8 +1,8 @@
 package com.virtusa.gto.insight.nyql.traits
 
 import com.virtusa.gto.insight.nyql.FunctionColumn
-import com.virtusa.gto.insight.nyql.model.blocks.QNumber
-import com.virtusa.gto.insight.nyql.model.blocks.QString
+import com.virtusa.gto.insight.nyql.model.units.QNumber
+import com.virtusa.gto.insight.nyql.model.units.QString
 
 /**
  * @author IWEERARATHNA

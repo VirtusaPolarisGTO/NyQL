@@ -11,7 +11,13 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>nyql-engine</artifactId>
+    <artifactId>nyql-engine-parent</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>engine</module>
+        <module>pools</module>
+    </modules>
 
     <dependencies>
         <dependency>
@@ -19,61 +25,6 @@
             <artifactId>nyql-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
-            <artifactId>nyql-impl-mysql</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
-            <artifactId>nyql-impl-postgre</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikari.version}</version>
-        </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.gmavenplus</groupId>
-                <artifactId>gmavenplus-plugin</artifactId>
-                <version>${gmavenplus.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>addSources</goal>
-                            <goal>addTestSources</goal>
-                            <goal>generateStubs</goal>
-                            <goal>compile</goal>
-                            <goal>testGenerateStubs</goal>
-                            <goal>testCompile</goal>
-                            <goal>removeStubs</goal>
-                            <goal>removeTestStubs</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <invokeDynamic>${groovy.invoke.dynamic}</invokeDynamic>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
-                        <artifactId>groovy-all</artifactId>
-                        <version>${groovy.version}</version>
-                        <scope>runtime</scope>
-                    </dependency>
-                </dependencies>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

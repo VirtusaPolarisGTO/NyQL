@@ -14,7 +14,7 @@ import com.virtusa.gto.insight.nyql.StoredFunction
 import com.virtusa.gto.insight.nyql.Table
 import com.virtusa.gto.insight.nyql.db.QDdl
 import com.virtusa.gto.insight.nyql.db.QTranslator
-import com.virtusa.gto.insight.nyql.model.blocks.AParam
+import com.virtusa.gto.insight.nyql.model.units.AParam
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 

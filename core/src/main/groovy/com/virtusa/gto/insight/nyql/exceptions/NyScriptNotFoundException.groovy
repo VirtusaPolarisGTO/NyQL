@@ -1,6 +1,5 @@
 package com.virtusa.gto.insight.nyql.exceptions
 
-import com.virtusa.gto.insight.nyql.exceptions.NyException
 import groovy.transform.InheritConstructors
 
 /**
