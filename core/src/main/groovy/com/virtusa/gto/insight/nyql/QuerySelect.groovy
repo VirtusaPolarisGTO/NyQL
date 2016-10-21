@@ -1,7 +1,11 @@
 package com.virtusa.gto.insight.nyql
+
+import groovy.transform.CompileStatic
+
 /**
  * @author Isuru Weerarathna
  */
+@CompileStatic
 class QuerySelect extends Query {
 
     List<Object> orderBy = null
@@ -20,30 +24,30 @@ class QuerySelect extends Query {
 
     QuerySelect DISTINCT_FETCH(Object... columns) {
         _distinct = true
-        return FETCH(columns)
+        FETCH(columns)
     }
 
-    def TARGET(Table table) {
+    QuerySelect TARGET(Table table) {
         sourceTbl = table
-        return this
+        this
     }
 
-    def TARGET() {
-        return sourceTbl
+    Table TARGET() {
+        sourceTbl
     }
 
-    def INTO(Table table) {
+    QuerySelect INTO(Table table) {
         _intoTable = table
-        return this
+        this
     }
 
-    def INTO(Table table, Object... columns) {
+    QuerySelect INTO(Table table, Object... columns) {
         INTO(table)
         _intoColumns = Arrays.asList(columns)
-        return this
+        this
     }
 
-    def JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
+    QuerySelect JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
         JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
         def code = closure.rehydrate(joinClosure, this, this)
@@ -51,26 +55,26 @@ class QuerySelect extends Query {
         code()
 
         _joiningTable = joinClosure.activeTable
-        return this
+        this
     }
 
-    def ORDER_BY(Object... columns) {
+    QuerySelect ORDER_BY(Object... columns) {
         if (orderBy == null) {
             orderBy = new ArrayList<>()
         }
         orderBy.addAll(columns)
-        return this
+        this
     }
 
-    def GROUP_BY(Object... columns) {
+    QuerySelect GROUP_BY(Object... columns) {
         if (groupBy == null) {
             groupBy = new ArrayList<>()
         }
         groupBy.addAll(columns)
-        return this
+        this
     }
 
-    def HAVING(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    QuerySelect HAVING(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where whr = new Where(_ctx)
 
         def code = closure.rehydrate(whr, this, this)
@@ -78,10 +82,10 @@ class QuerySelect extends Query {
         code()
 
         groupHaving = whr
-        return this
+        this
     }
 
-    def FETCH(Object... columns) {
+    QuerySelect FETCH(Object... columns) {
         if (projection == null) {
             projection = new LinkedList<>()
         }
@@ -89,16 +93,18 @@ class QuerySelect extends Query {
         if (columns != null) {
             projection.addAll(columns)
         }
-        return this
+        this
     }
 
-    def OFFSET(Object start) {
+    QuerySelect OFFSET(Object start) {
         offset = start
-        return this
+        this
     }
 
-    def TOP(Object count) {
-        return OFFSET(0).LIMIT(count)
+    QuerySelect TOP(Object count) {
+        OFFSET(0)
+        _limit = count
+        this
     }
 
 }

@@ -1,7 +1,11 @@
 package com.virtusa.gto.insight.nyql
+
+import groovy.transform.CompileStatic
+
 /**
  * @author Isuru Weerarathna
  */
+@CompileStatic
 class QueryUpdate extends Query {
 
     Table _joiningTable = null
@@ -11,16 +15,16 @@ class QueryUpdate extends Query {
         super(contextParam)
     }
 
-    def TARGET() {
-        return sourceTbl
+    Table TARGET() {
+        sourceTbl
     }
 
-    def TARGET(Table table) {
+    QueryUpdate TARGET(Table table) {
         sourceTbl = table
-        return this
+        this
     }
 
-    def JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
+    QueryUpdate JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
         JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
         def code = closure.rehydrate(joinClosure, this, this)
@@ -28,10 +32,10 @@ class QueryUpdate extends Query {
         code()
 
         _joiningTable = joinClosure.activeTable
-        return this
+        this
     }
 
-    def SET(@DelegatesTo(value = Assign, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    QueryUpdate SET(@DelegatesTo(value = Assign, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Assign ass = new Assign(_ctx, this)
 
         def code = closure.rehydrate(ass, this, this)
@@ -39,7 +43,7 @@ class QueryUpdate extends Query {
         code()
 
         _assigns = ass
-        return this
+        this
     }
 
 }

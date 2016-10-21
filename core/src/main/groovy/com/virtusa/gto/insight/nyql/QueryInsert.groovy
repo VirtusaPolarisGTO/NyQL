@@ -1,10 +1,12 @@
 package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.utils.QReturnType
+import groovy.transform.CompileStatic
 
 /**
  * @author Isuru Weerarathna
  */
+@CompileStatic
 class QueryInsert extends QuerySelect {
 
     Map<String, Object> _data = new LinkedHashMap<>()

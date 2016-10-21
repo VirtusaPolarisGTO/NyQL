@@ -1,8 +1,12 @@
 package com.virtusa.gto.insight.nyql
 
+import com.virtusa.gto.insight.nyql.utils.QUtils
+import groovy.transform.CompileStatic
+
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QueryPart extends Query {
 
     Assign _assigns
@@ -15,31 +19,19 @@ class QueryPart extends Query {
 
     QueryPart COLUMNS(Object... columns) {
         if (_intoColumns == null) {
-            _intoColumns = [] as Queue
+            _intoColumns = [] as LinkedList
         }
 
-        for (Object col : columns) {
-            if (col instanceof List) {
-                _intoColumns.addAll(col)
-            } else {
-                _intoColumns.add(col)
-            }
-        }
+        QUtils.expandToList(_intoColumns, columns)
         this
     }
 
     QueryPart FETCH(Object... columns) {
         if (_allProjections == null) {
-            _allProjections = [] as Queue
-        }
-        for (Object col : columns) {
-            if (col instanceof List) {
-                _allProjections.addAll(col)
-            } else {
-                _allProjections.add(col)
-            }
+            _allProjections = [] as LinkedList
         }
 
+        QUtils.expandToList(_allProjections, columns)
         this
     }
 

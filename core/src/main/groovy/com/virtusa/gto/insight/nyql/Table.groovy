@@ -1,33 +1,36 @@
 package com.virtusa.gto.insight.nyql
+
+import groovy.transform.CompileStatic
+
 /**
  * @author Isuru Weerarathna
  */
-
+@CompileStatic
 class Table {
 
     private Map<String, Column> __allColumns = [:]
 
     QContext _ctx = null
 
-    def __name = ''
-    def __alias = null
+    String __name = ''
+    String __alias = null
 
     def __resultOf
 
-    def alias(String newName) {
+    Table alias(String newName) {
         __alias = newName
         if (_ctx != null) {
             _ctx.tables.rename(__name, newName)
         }
-        return this
+        this
     }
 
     boolean __isResultOf() {
         return __resultOf != null
     }
 
-    def __aliasDefined() {
-        return __alias != null
+    boolean __aliasDefined() {
+        __alias != null
     }
 
     Column COLUMN_AS(String name, String alias) {

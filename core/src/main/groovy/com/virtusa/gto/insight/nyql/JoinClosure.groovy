@@ -4,10 +4,12 @@ import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class JoinClosure extends AbstractClause {
 
     final Table startingTable
@@ -33,34 +35,34 @@ class JoinClosure extends AbstractClause {
         throw new NySyntaxException('You can only import a query part having a Table reference!')
     }
 
-    def JOIN(Table t) {
+    Table JOIN(Table t) {
         activeTable = INNER_JOIN(t)
-        return activeTable
+        activeTable
     }
 
-    def INNER_JOIN(Table t) {
+    Table INNER_JOIN(Table t) {
         activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'INNER_JOIN')
-        return activeTable
+        activeTable
     }
 
-    def LEFT_OUTER_JOIN(Table t) {
+    Table LEFT_OUTER_JOIN(Table t) {
         activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'LEFT_OUTER_JOIN')
-        return activeTable
+        activeTable
     }
 
-    def RIGHT_OUTER_JOIN(Table t) {
+    Table RIGHT_OUTER_JOIN(Table t) {
         activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'RIGHT_OUTER_JOIN')
-        return activeTable
+        activeTable
     }
 
-    def RIGHT_JOIN(Table t) {
+    Table RIGHT_JOIN(Table t) {
         activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'RIGHT_JOIN')
-        return activeTable
+        activeTable
     }
 
-    def LEFT_JOIN(Table t) {
+    Table LEFT_JOIN(Table t) {
         activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'LEFT_JOIN')
-        return activeTable
+        activeTable
     }
 
 }

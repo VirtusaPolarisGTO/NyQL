@@ -7,19 +7,19 @@ import com.virtusa.gto.insight.nyql.model.units.NamedParam
 import groovy.transform.CompileStatic
 
 import java.util.function.Function
-import java.util.stream.Collectors
 
 /**
  * @author Isuru Weerarathna
  */
-class QUtils {
+@CompileStatic
+final class QUtils {
 
     private static final String NL = '\n'
     private static final String P_PAD = '::'
     private static final String OP = '('
     private static final String CP = ')'
 
-    @CompileStatic static String join(List<Object> items, Function<Object, String> converter,
+    static String join(List<Object> items, Function<Object, String> converter,
                                       String sep, String prefix, String suffix) {
         StringJoiner joiner = new StringJoiner(sep, prefix, suffix)
         for (Object val : items) {
@@ -28,7 +28,6 @@ class QUtils {
         return joiner.toString()
     }
 
-    @CompileStatic
     static String generateErrStr(String mainError, String... helpLines) {
         StringBuilder builder = new StringBuilder().append(mainError)
         if (helpLines != null) {
@@ -46,7 +45,6 @@ class QUtils {
      * @param text input text to enclose.
      * @return text enclosed inside parenthesis.
      */
-    @CompileStatic
     static String parenthesis(String text) {
         return OP + text + CP
     }
@@ -57,7 +55,6 @@ class QUtils {
      * @param col collection to check.
      * @return true if it is not null nor empty.
      */
-    @CompileStatic
     static boolean notNullNorEmpty(Collection<?> col) {
         return col != null && !col.isEmpty()
     }
@@ -68,7 +65,6 @@ class QUtils {
      * @param col collection to check.
      * @return true if it is null or empty.
      */
-    @CompileStatic
     static boolean isNullOrEmpty(Map<?, ?> map) {
         return map == null || map.isEmpty()
     }
@@ -80,7 +76,6 @@ class QUtils {
      * @param c character to pad the string.
      * @return quoted string.
      */
-    @CompileStatic
     static String quote(String text, String c='`') {
         return c + text + c
     }
@@ -91,7 +86,6 @@ class QUtils {
      * @param text text to check for whitespaces.
      * @return true if whitespaces are there.
      */
-    @CompileStatic
     static boolean hasWS(String text) {
         return hasWhitespace(text)
     }
@@ -102,7 +96,6 @@ class QUtils {
      * @param text string to check.
      * @return true if it has whitespaces.
      */
-    @CompileStatic
     private static boolean hasWhitespace(String text) {
         if (text == null || text.isEmpty()) {
             return false
@@ -122,7 +115,6 @@ class QUtils {
      * @param c character to pad.
      * @return quoted string if has whitespaces. Otherwise same string.
      */
-    @CompileStatic
     static String quoteIfWS(String text, String c='`') {
         if (hasWS(text)) {
             return quote(text, c)
@@ -149,7 +141,7 @@ class QUtils {
         if (rmost.__name == lmost.__name && rmost.__alias == lmost.__alias) {
             if (table1 instanceof Join) {
                 if (table2 instanceof Join) {
-                    return new Join(table1: table1, table2: table2.table2, _ctx: ctx, type: type)
+                    return new Join(table1: table1, table2: ((Join)table2).table2, _ctx: ctx, type: type)
                 } else {
                     return table1
                 }
@@ -164,13 +156,13 @@ class QUtils {
 
         if (rmost instanceof TableProxy) {
             if (table1 instanceof Join) {
-                joinCond = table1.onConditions
-                table1 = table1.table1
+                joinCond = ((Join)table1).onConditions
+                table1 = ((Join)table1).table1
             }
         }
         if (lmost instanceof TableProxy) {
             if (table2 instanceof Join) {
-                replaceLeftMostTableWith(table2, table1)
+                replaceLeftMostTableWith((Join)table2, table1)
                 return table2
             }
         }
@@ -241,7 +233,7 @@ class QUtils {
      * @param clauses a list to add all found clauses.
      * @param joinStr join string when multiple clauses being add.
      */
-    static void filterAllJoinConditions(Table table, List<String> clauses, String joinStr) {
+    static void filterAllJoinConditions(Table table, List<Object> clauses, String joinStr) {
         if (table instanceof Join) {
             Join j = (Join)table
 
@@ -269,7 +261,10 @@ class QUtils {
         }
         for (def item : items) {
             if (item instanceof List) {
-                item.each { expandToList(list, it) }
+                List subList = (List)item
+                for (Object obj : subList) {
+                    expandToList(list, obj)
+                }
             } else {
                 list.add(item)
             }
@@ -284,7 +279,6 @@ class QUtils {
      * @param mappingName mapping name of named param.
      * @return newly created parameter.
      */
-    @CompileStatic
     static AParam createParam(String name, AParam.ParamScope scope=null, String mappingName=null) {
         if (scope == null && mappingName == null) {
             return new AParam(__name: name)
@@ -299,7 +293,6 @@ class QUtils {
      * @param name name of parameter.
      * @return padded parameter name.
      */
-    @CompileStatic
     static String padParamList(String name) {
         P_PAD + name + P_PAD
     }

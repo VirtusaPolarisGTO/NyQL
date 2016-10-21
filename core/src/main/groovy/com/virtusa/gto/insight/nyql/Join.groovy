@@ -1,31 +1,33 @@
 package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.utils.QOperator
+import groovy.transform.CompileStatic
 
 /**
  * @author Isuru Weerarathna
  */
+@CompileStatic
 class Join extends Table {
 
-    String type = "JOIN"
+    String type = 'JOIN'
 
     Table table1
     Table table2
     Where onConditions = null
 
-    def ON(String expr) {
+    Join ON(String expr) {
         ___initClauses()
         onConditions.RAW(expr)
-        return this
+        this
     }
 
-    def ON(Column c1, QOperator op = QOperator.EQUAL, Column c2) {
+    Join ON(Column c1, QOperator op = QOperator.EQUAL, Column c2) {
         ___initClauses()
         onConditions.ON(c1, op, c2)
-        return this
+        this
     }
 
-    def ON(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    Join ON(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where whr = new Where(_ctx)
 
         def code = closure.rehydrate(whr, this, this)
@@ -33,14 +35,14 @@ class Join extends Table {
         code()
 
         onConditions = whr
-        return this
+        this
     }
 
-    def ___hasCondition() {
-        return onConditions != null
+    boolean ___hasCondition() {
+        onConditions != null
     }
 
-    private def ___initClauses() {
+    private void ___initClauses() {
         if (onConditions == null) {
             onConditions = new Where(_ctx)
         }

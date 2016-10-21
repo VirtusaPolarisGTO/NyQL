@@ -2,10 +2,12 @@ package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.utils.QUtils
+import groovy.transform.CompileStatic
 
 /**
  * @author Isuru Weerarathna
  */
+@CompileStatic
 class Column {
 
     QContext _ctx = null
@@ -14,34 +16,34 @@ class Column {
     String __name = ''
     String __alias = null
 
-    def alias(String newName) {
+    Column alias(String newName) {
         _ctx.renameColumn(__alias, newName, this)
         __alias = newName
-        return this
+        this
     }
 
-    def __aliasDefined() {
-        return __alias != null
+    boolean __aliasDefined() {
+        __alias != null
     }
 
     Column plus(Object other) {
-        return new FunctionColumn(_columns: [this, other], _func: 'op_add', _setOfCols: true, _ctx: _ctx)
+        new FunctionColumn(_columns: [this, other], _func: 'op_add', _setOfCols: true, _ctx: _ctx)
     }
 
     Column minus(Object other) {
-        return new FunctionColumn(_columns: [this, other], _func: 'op_minus', _setOfCols: true, _ctx: _ctx)
+        new FunctionColumn(_columns: [this, other], _func: 'op_minus', _setOfCols: true, _ctx: _ctx)
     }
 
     Column multiply(Object other) {
-        return new FunctionColumn(_columns: [this, other], _func: 'op_multiply', _setOfCols: true, _ctx: _ctx)
+        new FunctionColumn(_columns: [this, other], _func: 'op_multiply', _setOfCols: true, _ctx: _ctx)
     }
 
     Column div(Object other) {
-        return new FunctionColumn(_columns: [this, other], _func: 'op_divide', _setOfCols: true, _ctx: _ctx)
+        new FunctionColumn(_columns: [this, other], _func: 'op_divide', _setOfCols: true, _ctx: _ctx)
     }
 
     Column mod(Object other) {
-        return new FunctionColumn(_columns: [this, other], _func: 'op_modulus', _setOfCols: true, _ctx: _ctx)
+        new FunctionColumn(_columns: [this, other], _func: 'op_modulus', _setOfCols: true, _ctx: _ctx)
     }
 
     Column and(Object other) {

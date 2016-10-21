@@ -173,7 +173,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
         if (q._joiningTable != null) {
             // has joining tables
             List<Table> allTables = new ArrayList<>()
-            List<String> allClauses = new ArrayList<>()
+            List<Object> allClauses = new ArrayList<>()
             QUtils.filterAllJoinConditions(q._joiningTable, allClauses, ' AND ')
             QUtils.findAlTables(q._joiningTable, allTables)
             allTables.remove(q.sourceTbl)

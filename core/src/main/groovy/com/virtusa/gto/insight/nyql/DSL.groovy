@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 /**
  * @author Isuru Weerarathna
  */
+@CompileStatic
 class DSL {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSL.class)
@@ -86,7 +87,7 @@ class DSL {
             if (q instanceof QResultProxy) {
                 list.add((QResultProxy) q)
             } else if (q instanceof QScript) {
-                list.add(q.proxy)
+                list.add(((QScript)q).proxy)
             }
         }
         return session.dbFactory.createTranslator().___combinationQuery(QueryCombineType.UNION, list);
@@ -98,7 +99,7 @@ class DSL {
             if (q instanceof QResultProxy) {
                 list.add((QResultProxy) q)
             } else if (q instanceof QScript) {
-                list.add(q.proxy)
+                list.add(((QScript)q).proxy)
             }
         }
         return session.dbFactory.createTranslator().___combinationQuery(QueryCombineType.UNION_DISTINCT, list);

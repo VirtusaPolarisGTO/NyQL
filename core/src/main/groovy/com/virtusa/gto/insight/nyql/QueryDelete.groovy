@@ -1,8 +1,11 @@
 package com.virtusa.gto.insight.nyql
 
+import groovy.transform.CompileStatic
+
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QueryDelete extends Query {
 
     Table _joiningTable = null

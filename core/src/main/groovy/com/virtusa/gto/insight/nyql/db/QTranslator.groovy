@@ -11,8 +11,6 @@ import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import groovy.transform.CompileStatic
 
-import java.util.stream.Collectors
-
 /**
  * @author Isuru Weerarathna
  */

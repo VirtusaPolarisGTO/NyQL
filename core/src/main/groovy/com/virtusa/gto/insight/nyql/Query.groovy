@@ -1,11 +1,13 @@
 package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.utils.QReturnType
+import groovy.transform.CompileStatic
 
 /**
  * @author Isuru Weerarathna
  */
-class Query extends AbstractClause {
+@CompileStatic
+abstract class Query extends AbstractClause {
 
     QReturnType returnType = QReturnType.RESULT
 
@@ -17,12 +19,12 @@ class Query extends AbstractClause {
         super(contextParam)
     }
 
-    def LIMIT(Object total) {
+    Query LIMIT(Object total) {
         _limit = total
-        return this
+        this
     }
 
-    def WHERE(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    Query WHERE(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where whr = new Where(_ctx)
 
         def code = closure.rehydrate(whr, this, this)
@@ -30,7 +32,7 @@ class Query extends AbstractClause {
         code()
 
         whereObj = whr
-        return this
+        this
     }
 
     Query EXPECT(Table table) {

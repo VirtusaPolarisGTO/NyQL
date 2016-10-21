@@ -11,6 +11,7 @@ import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
+import groovy.transform.CompileStatic
 
 /**
  * @author Isuru Weerarathna
@@ -25,141 +26,166 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         _ctx = context
     }
 
-    def ALL(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    @CompileStatic
+    Where ALL(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where inner = new Where(_ctx)
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
         clauses.add(new QConditionGroup(where: inner, condConnector: 'AND'))
-        return this
+        this
     }
 
-    def ANY(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    @CompileStatic
+    Where ANY(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where inner = new Where(_ctx)
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
         clauses.add(new QConditionGroup(where: inner, condConnector: 'OR'))
-        return this
+        this
     }
 
-    def LIKE(Object c1, Object c2) {
-        return ON(c1, LIKE(c2))
+    @CompileStatic
+    Where LIKE(Object c1, Object c2) {
+        ON(c1, LIKE(c2))
     }
 
-    def NOTLIKE(Object c1, Object c2) {
-        return ON(c1, NOTLIKE(c2))
+    @CompileStatic
+    Where NOTLIKE(Object c1, Object c2) {
+        ON(c1, NOTLIKE(c2))
     }
 
+    @CompileStatic
     AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
-        return _ctx.addParam(QUtils.createParam(name, scope, mappingName))
+        _ctx.addParam(QUtils.createParam(name, scope, mappingName))
     }
 
+    @CompileStatic
     AParam PARAMLIST(String name) {
-        return _ctx.addParam(new ParamList(__name: name))
+        _ctx.addParam(new ParamList(__name: name))
     }
 
-    def AND(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    @CompileStatic
+    Where AND(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         AND()
 
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
-        return this
+        this
     }
 
-    def OR(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    @CompileStatic
+    Where OR(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         OR()
 
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
-        return this
+        this
     }
 
-    def OR() {
+    @CompileStatic
+    Where OR() {
         clauses.add(' OR ')
-        return this
+        this
     }
 
-    def AND() {
+    @CompileStatic
+    Where AND() {
         clauses.add(' AND ')
-        return this
+        this
     }
 
-    def ON(Object c1, QOperator op = QOperator.UNKNOWN, Object c2) {
+    @CompileStatic
+    Where ON(Object c1, QOperator op = QOperator.UNKNOWN, Object c2) {
         clauses.add(new QCondition(leftOp: c1, rightOp: c2, op: op))
-        return this
+        this
     }
 
-    def ISNULL(Object c) {
+    @CompileStatic
+    Where ISNULL(Object c) {
         clauses.add(new QCondition(leftOp: c, rightOp: null, op: QOperator.IS))
-        return this
+        this
     }
 
-    def NOTNULL(Object c) {
+    @CompileStatic
+    Where NOTNULL(Object c) {
         clauses.add(new QCondition(leftOp: c, rightOp: null, op: QOperator.IS_NOT))
-        return this
+        this
     }
 
-    def EQ(Object c1, Object c2) {
+    @CompileStatic
+    Where EQ(Object c1, Object c2) {
         if (c2 == null) {
             return ISNULL(c1)
         }
-        return ON(c1, QOperator.EQUAL, c2)
+        ON(c1, QOperator.EQUAL, c2)
     }
 
-    def NEQ(Object c1, Object c2) {
+    @CompileStatic
+    Where NEQ(Object c1, Object c2) {
         if (c2 == null) {
             return NOTNULL(c1)
         }
-        return ON(c1, QOperator.NOT_EQUAL, c2)
+        ON(c1, QOperator.NOT_EQUAL, c2)
     }
 
-    def GT(Object c1, Object c2) {
-        return ON(c1, QOperator.GREATER_THAN, c2)
+    @CompileStatic
+    Where GT(Object c1, Object c2) {
+        ON(c1, QOperator.GREATER_THAN, c2)
     }
 
-    def GTE(Object c1, Object c2) {
-        return ON(c1, QOperator.GREATER_THAN_EQUAL, c2)
+    @CompileStatic
+    Where GTE(Object c1, Object c2) {
+        ON(c1, QOperator.GREATER_THAN_EQUAL, c2)
     }
 
-    def LT(Object c1, Object c2) {
-        return ON(c1, QOperator.LESS_THAN, c2)
+    @CompileStatic
+    Where LT(Object c1, Object c2) {
+        ON(c1, QOperator.LESS_THAN, c2)
     }
 
-    def LTE(Object c1, Object c2) {
-        return ON(c1, QOperator.LESS_THAN_EQUAL, c2)
+    @CompileStatic
+    Where LTE(Object c1, Object c2) {
+        ON(c1, QOperator.LESS_THAN_EQUAL, c2)
     }
 
-    def BETWEEN(Object c1, Object startValue, Object endValue) {
-        return ON(c1, BETWEEN(startValue, endValue))
+    @CompileStatic
+    Where BETWEEN(Object c1, Object startValue, Object endValue) {
+        ON(c1, BETWEEN(startValue, endValue))
     }
 
-    def NOTBETWEEN(Object c1, Object startValue, Object endValue) {
-        return ON(c1, NOT_BETWEEN(startValue, endValue))
+    @CompileStatic
+    Where NOTBETWEEN(Object c1, Object startValue, Object endValue) {
+        ON(c1, NOT_BETWEEN(startValue, endValue))
     }
 
-    def IN(Object c1, Object... cs) {
+    @CompileStatic
+    Where IN(Object c1, Object... cs) {
         if (cs != null) {
             List list = new LinkedList()
             QUtils.expandToList(list, cs)
             if (list.size() == 0) {
                 list.add(null)
             }
-            return ON(c1, QOperator.IN, list)
+            ON(c1, QOperator.IN, list)
         }
+        this
     }
 
-    def NOTIN(Object c1, Object... cs) {
+    @CompileStatic
+    Where NOTIN(Object c1, Object... cs) {
         if (cs != null) {
             List list = new LinkedList()
             QUtils.expandToList(list, cs)
             if (list.isEmpty()) {
                 list.add(null)
             }
-            return ON(c1, QOperator.NOT_IN, list)
+            ON(c1, QOperator.NOT_IN, list)
         }
+        this
     }
 
     def $IMPORT(String scriptId) {
@@ -176,51 +202,56 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         }
     }
 
-    def CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    @CompileStatic
+    Case CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Case aCase = new Case(_ctx: _ctx, _ownerQ: _ctx.ownQuery)
 
         def code = closure.rehydrate(aCase, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        return aCase
+        aCase
     }
 
-    def IFNULL(Column column, Object val) {
-        Case aCase = CASE({
+    Case IFNULL(Column column, Object val) {
+        Case aCase = CASE {
             WHEN { ISNULL(column) }
             THEN { val }
             ELSE { column }
-        })
+        }
         aCase.setCaseType(Case.CaseType.IFNULL)
-        return aCase
+        aCase
     }
 
-    def IFNOTNULL(Column column, Object val) {
-        return CASE({
+    Case IFNOTNULL(Column column, Object val) {
+        CASE {
             WHEN { NOTNULL(column) }
             THEN { val }
             ELSE { column }
-        })
+        }
     }
 
-    def EXISTS(Object subQuery) {
+    @CompileStatic
+    Where EXISTS(Object subQuery) {
         clauses.add(new QUnaryCondition(rightOp: subQuery, op: QOperator.EXISTS))
-        return this
+        this
     }
 
-    def NOTEXISTS(Object subQuery) {
+    @CompileStatic
+    Where NOTEXISTS(Object subQuery) {
         clauses.add(new QUnaryCondition(rightOp: subQuery, op: QOperator.NOT_EXISTS))
-        return this
+        this
     }
 
-    def RAW(Object val) {
+    @CompileStatic
+    Where RAW(Object val) {
         clauses.add(val)
-        return this
+        this
     }
 
-    def __hasClauses() {
-        return QUtils.notNullNorEmpty(clauses)
+    @CompileStatic
+    boolean __hasClauses() {
+        QUtils.notNullNorEmpty(clauses)
     }
 
     def propertyMissing(String name) {
@@ -257,6 +288,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         throw new NySyntaxException("Unknown function detected! [Name: '$name', params: $args]")
     }
 
+    @CompileStatic
     protected void appendOneLastBefore(String clause) {
         if (clauses.size() > 0) {
             int idx = clauses.size() - 1
@@ -266,17 +298,20 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         }
     }
 
+    @CompileStatic
     static class QConditionGroup {
         Where where
         String condConnector = 'AND'
     }
 
+    @CompileStatic
     static class QCondition {
         def leftOp
         def rightOp
         QOperator op
     }
 
+    @CompileStatic
     static class QUnaryCondition extends QCondition {
         def chooseOp() {
             return leftOp ?: rightOp
