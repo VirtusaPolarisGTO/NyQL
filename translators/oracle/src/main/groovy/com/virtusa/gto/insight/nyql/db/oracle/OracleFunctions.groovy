@@ -36,4 +36,9 @@ class OracleFunctions implements QFunctions {
     String cast_to_str(Object col) {
         return null
     }
+
+    @Override
+    String cast_to_date(Object col) {
+        return null
+    }
 }

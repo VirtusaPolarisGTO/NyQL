@@ -34,6 +34,11 @@ class MSSqlFunctions implements QFunctions {
     }
 
     @Override
+    String cast_to_date(Object col) {
+        date_trunc(col)
+    }
+
+    @Override
     String cast_to_str(Object col) {
         return 'STR(' + ___resolveIn(col) + ')'
     }

@@ -166,6 +166,11 @@ class PostgresFunctions implements QFunctions {
     }
 
     @Override
+    String cast_to_date(Object col) {
+        return 'to_date(' + ___resolveIn(col) + ', YYYY-MM-DD)'
+    }
+
+    @Override
     String op_bit_xor(Object it) {
         if (it instanceof List) {
             return ___resolveIn(it[0]) + ' # ' + ___resolveIn(it[1])
