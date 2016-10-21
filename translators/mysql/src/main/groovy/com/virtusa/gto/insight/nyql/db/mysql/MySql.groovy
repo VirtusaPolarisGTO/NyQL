@@ -12,9 +12,6 @@ import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
 import groovy.transform.CompileStatic
 
-import java.util.stream.Collectors
-import java.util.stream.Stream
-
 /**
  * @author Isuru Weerarathna
  */
@@ -209,7 +206,11 @@ class MySql extends MySqlFunctions implements QTranslator {
         StringBuilder query = new StringBuilder()
         query.append('{ CALL ').append(sp.name).append(OP)
         if (QUtils.notNullNorEmpty(sp.paramList)) {
-            query.append(sp.paramList.stream().map({ '?' }).collect(Collectors.joining(COMMA)))
+            List<String> list = new LinkedList<>()
+            for (AParam aParam : sp.paramList) {
+                list.add('?')
+            }
+            query.append(list.join(COMMA))
         }
         query.append(CP).append(' }')
 
@@ -217,30 +218,35 @@ class MySql extends MySqlFunctions implements QTranslator {
                 rawObject: sp, queryType: QueryType.DB_FUNCTION)
     }
 
+    @CompileStatic
     QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) {
         if (combineType == QueryCombineType.INTERSECT) {
             return manipulateIntersect(queries)
         }
 
-        List<AParam> paramList = new LinkedList<>()
-        Stream<Object> stream = queries.stream().map({ q ->
-            if (q instanceof QResultProxy) {
-                paramList.addAll(q.orderedParameters ?: [])
-                return QUtils.parenthesis(___resolve(q, QContextType.UNKNOWN))
-            } else {
-                return ___resolve(q, QContextType.UNKNOWN, paramList)
-            }
-        })
-
         String qStr
         if (combineType == QueryCombineType.UNION) {
-            qStr = stream.collect(Collectors.joining(NL + ' UNION ALL ' + NL))
+            qStr = NL + ' UNION ALL ' + NL
         } else if (combineType == QueryCombineType.UNION_DISTINCT) {
-            qStr = stream.collect(Collectors.joining(NL + ' UNION ' + NL))
+            qStr = NL + ' UNION ' + NL
         } else {
-            qStr = stream.collect(Collectors.joining('; '))
+            qStr = '; '
         }
-        return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT)
+
+        List<AParam> paramList = new LinkedList<>()
+        StringJoiner joiner = new StringJoiner(qStr)
+        for (Object q : queries) {
+            if (q instanceof QResultProxy) {
+                if (((QResultProxy)q).orderedParameters != null) {
+                    paramList.addAll(((QResultProxy)q).orderedParameters)
+                }
+                joiner.add(QUtils.parenthesis(___resolve(q, QContextType.UNKNOWN)))
+            } else {
+                joiner.add(___resolve(q, QContextType.UNKNOWN, paramList))
+            }
+        }
+
+        return new QResultProxy(query: joiner.toString(), orderedParameters: paramList, queryType: QueryType.SELECT)
     }
 
     QResultProxy ___deleteQuery(QueryDelete q) {
@@ -494,11 +500,11 @@ class MySql extends MySqlFunctions implements QTranslator {
     @CompileStatic
     void ___expandColumn(Column column, List<AParam> paramList) {
         if (column instanceof FunctionColumn && column._columns != null) {
-            column._columns.each {
+            for (Object it : column._columns) {
                 if (it instanceof FunctionColumn) {
-                    ___expandColumn(it, paramList)
+                    ___expandColumn((FunctionColumn)it, paramList)
                 } else if (it instanceof AParam) {
-                    paramList.add(it)
+                    paramList.add((AParam)it)
                 }
             }
         }
