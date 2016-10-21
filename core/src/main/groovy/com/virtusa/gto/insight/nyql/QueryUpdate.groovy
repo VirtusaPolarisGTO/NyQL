@@ -20,7 +20,7 @@ class QueryUpdate extends Query {
         return this
     }
 
-    def JOIN(Table startTable, closure) {
+    def JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
         JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
         def code = closure.rehydrate(joinClosure, this, this)
@@ -31,7 +31,7 @@ class QueryUpdate extends Query {
         return this
     }
 
-    def SET(closure) {
+    def SET(@DelegatesTo(value = Assign, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Assign ass = new Assign(_ctx, this)
 
         def code = closure.rehydrate(ass, this, this)

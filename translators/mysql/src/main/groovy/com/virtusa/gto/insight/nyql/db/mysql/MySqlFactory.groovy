@@ -51,16 +51,6 @@ class MySqlFactory implements QDbFactory {
     }
 
     /**
-     * List of dynamic traits to apply for translator before parsing.
-     *
-     * @return mysql does not return any traits.
-     */
-    @Override
-    List<Class<?>> createTraits() {
-        return traits
-    }
-
-    /**
      * JDBC driver class name.
      *
      * @return jdbc driver class name.

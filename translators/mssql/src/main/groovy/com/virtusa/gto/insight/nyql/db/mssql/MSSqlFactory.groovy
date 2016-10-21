@@ -18,11 +18,6 @@ class MSSqlFactory implements QDbFactory {
     }
 
     @Override
-    List<Class<?>> createTraits() {
-        return [MSSqlFunctions]
-    }
-
-    @Override
     String driverClassName() {
         return "com.microsoft.sqlserver.jdbc.SQLServerDriver"
     }

@@ -11,6 +11,7 @@ import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -37,7 +38,7 @@ class DSL {
     ////
     ///////////////////////////////////////////////////////////////////////////////////
 
-    def script(@DelegatesTo(DSL) closure) {
+    def script(@DelegatesTo(DSL) Closure closure) {
         try {
             session.beingScript()
 
@@ -126,9 +127,9 @@ class DSL {
                 orderedParameters: orderedParams)
     }
 
-    QResultProxy bulkInsert(closure) {
-        QueryInsert queryInsert = new QueryInsert(createContext())
-        Object qs = assignTraits(queryInsert)
+    QResultProxy bulkInsert(@DelegatesTo(value = QueryInsert, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QueryInsert qs = new QueryInsert(createContext())
+        //Object qs = assignTraits(queryInsert)
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -139,9 +140,9 @@ class DSL {
         return proxy
     }
 
-    QResultProxy delete(closure) {
-        QueryDelete queryDelete = new QueryDelete(createContext())
-        Object qs = assignTraits(queryDelete)
+    QResultProxy delete(@DelegatesTo(value = QueryDelete, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QueryDelete qs = new QueryDelete(createContext())
+        //Object qs = assignTraits(queryDelete)
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -150,9 +151,9 @@ class DSL {
         return qs._ctx.translator.___deleteQuery(qs)
     }
 
-    QResultProxy insert(closure) {
-        QueryInsert queryInsert = new QueryInsert(createContext())
-        Object qs = assignTraits(queryInsert)
+    QResultProxy insert(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QueryInsert qs = new QueryInsert(createContext())
+        //Object qs = assignTraits(queryInsert)
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -161,9 +162,9 @@ class DSL {
         return qs._ctx.translator.___insertQuery(qs)
     }
 
-    QResultProxy select(closure) {
-        QuerySelect querySelect = new QuerySelect(createContext())
-        Object qs = assignTraits(querySelect)
+    QResultProxy select(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QuerySelect qs = new QuerySelect(createContext())
+        //Object qs = assignTraits(querySelect)
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -172,9 +173,9 @@ class DSL {
         return qs._ctx.translator.___selectQuery(qs)
     }
 
-    QResultProxy update(closure) {
-        QueryUpdate queryUpdate = new QueryUpdate(createContext())
-        Object qs = assignTraits(queryUpdate)
+    QResultProxy update(@DelegatesTo(value = QueryUpdate, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QueryUpdate qs = new QueryUpdate(createContext())
+        //Object qs = assignTraits(queryUpdate)
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -189,9 +190,9 @@ class DSL {
     ////
     ///////////////////////////////////////////////////////////////////////////////////
 
-    QResultProxy $q(closure) {
-        QueryPart queryPart = new QueryPart(createContext())
-        Object qp = assignTraits(queryPart)
+    QResultProxy $q(@DelegatesTo(value = QueryPart, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QueryPart qp = new QueryPart(createContext())
+        //Object qp = assignTraits(queryPart)
 
         def code = closure.rehydrate(qp, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -206,7 +207,7 @@ class DSL {
     ////
     ///////////////////////////////////////////////////////////////////////////////////
 
-    QScriptList ddl(closure) {
+    QScriptList ddl(@DelegatesTo(value = DDL, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         DDL activeDDL = new DDL(session)
 
         def code = closure.rehydrate(activeDDL, this, this)
@@ -241,7 +242,7 @@ class DSL {
      * @param closure transaction content.
      * @return this same DSL instance
      */
-    DSL TRANSACTION(closure) {
+    DSL TRANSACTION(@DelegatesTo(value = DSL, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         try {
             session.executor.startTransaction()
 
@@ -321,22 +322,12 @@ class DSL {
         return QUtils.createParam(name, scope, mappingName)
     }
 
-    private def createContext(String db=null) {
+    @CompileStatic
+    private QContext createContext(String db=null) {
         String dbName = db ?: session.dbFactory.dbName()
         return new QContext(translator: session.dbFactory.createTranslator(),
                 translatorName: dbName,
                 ownerSession: session)
-    }
-
-    private Object assignTraits(Query query) {
-        //String dbName = query._ctx.translatorName
-        List<Class<?>> classes = session.dbFactory.createTraits()
-        if (QUtils.notNullNorEmpty(classes)) {
-            Class<?>[] clz = new Class<?>[classes.size()]
-            clz = classes.toArray(clz)
-            return query.withTraits(clz)
-        }
-        return query
     }
 
     def propertyMissing(String name) {

@@ -9,9 +9,9 @@ interface QExecutorFactory {
 
     void init(Map options) throws NyConfigurationException
 
-    QExecutor create();
+    QExecutor create()
 
-    QExecutor createReusable();
+    QExecutor createReusable()
 
     void shutdown()
 

@@ -22,7 +22,7 @@ class Query extends AbstractClause {
         return this
     }
 
-    def WHERE(closure) {
+    def WHERE(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where whr = new Where(_ctx)
 
         def code = closure.rehydrate(whr, this, this)

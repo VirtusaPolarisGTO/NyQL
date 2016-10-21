@@ -26,7 +26,7 @@ class OracleDb extends OracleFunctions implements QTranslator {
     static String STR_QUOTE = "'"
 
     @Override
-    def ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
+    String ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
         return null
     }
 

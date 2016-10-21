@@ -86,7 +86,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         }
     }
 
-    def CASE(closure) {
+    def CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Case aCase = new Case(_ctx: _ctx, _ownerQ: this)
 
         def code = closure.rehydrate(aCase, this, this)

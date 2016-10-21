@@ -1,11 +1,13 @@
 package com.virtusa.gto.insight.nyql.model
 
 import com.virtusa.gto.insight.nyql.QResultProxy
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 @ToString(excludes = ["qSession"])
 class QScript {
 

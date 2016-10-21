@@ -25,7 +25,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         _ctx = context
     }
 
-    def ALL(@DelegatesTo(Where) closure) {
+    def ALL(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where inner = new Where(_ctx)
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -34,7 +34,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return this
     }
 
-    def ANY(closure) {
+    def ANY(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where inner = new Where(_ctx)
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -59,7 +59,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return _ctx.addParam(new ParamList(__name: name))
     }
 
-    def AND(Closure closure) {
+    def AND(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         AND()
 
         def code = closure.rehydrate(this, this, this)
@@ -68,7 +68,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         return this
     }
 
-    def OR(Closure closure) {
+    def OR(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         OR()
 
         def code = closure.rehydrate(this, this, this)
@@ -176,7 +176,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         }
     }
 
-    def CASE(closure) {
+    def CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Case aCase = new Case(_ctx: _ctx, _ownerQ: _ctx.ownQuery)
 
         def code = closure.rehydrate(aCase, this, this)

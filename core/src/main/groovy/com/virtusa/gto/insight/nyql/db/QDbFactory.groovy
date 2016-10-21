@@ -11,33 +11,26 @@ trait QDbFactory {
      *
      * @return the database name.
      */
-    abstract String dbName();
+    abstract String dbName()
 
     /**
      * Creates a new translator. You may cache or not if it depends.
      *
      * @return a translator instance to be used by query generation.
      */
-    abstract QTranslator createTranslator();
-
-    /**
-     * List of interfaces to be injected at runtime for the translator class.
-     *
-     * @return list of interfaces to add.
-     */
-    abstract List<Class<?>> createTraits();
+    abstract QTranslator createTranslator()
 
     /**
      * JDBC driver class name for this database.
      *
      * @return full jdbc driver class name.
      */
-    abstract String driverClassName();
+    abstract String driverClassName()
 
     /**
      * JDBC data source class name for this database.
      *
      * @return full data source class name.
      */
-    abstract String dataSourceClassName();
+    abstract String dataSourceClassName()
 }

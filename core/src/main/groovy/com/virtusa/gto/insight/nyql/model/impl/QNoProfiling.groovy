@@ -3,10 +3,12 @@ package com.virtusa.gto.insight.nyql.model.impl
 import com.virtusa.gto.insight.nyql.model.QProfiling
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QSession
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QNoProfiling implements QProfiling {
 
     public static final QNoProfiling INSTANCE = new QNoProfiling()

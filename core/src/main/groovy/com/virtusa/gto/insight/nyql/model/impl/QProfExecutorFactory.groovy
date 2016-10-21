@@ -2,10 +2,12 @@ package com.virtusa.gto.insight.nyql.model.impl
 
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QExecutorFactory
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QProfExecutorFactory implements QExecutorFactory {
 
     private final QExecutorFactory qExecutorFactory

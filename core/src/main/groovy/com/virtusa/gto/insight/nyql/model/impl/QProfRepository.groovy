@@ -6,10 +6,12 @@ import com.virtusa.gto.insight.nyql.model.QRepository
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptResult
 import com.virtusa.gto.insight.nyql.model.QSession
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QProfRepository implements QRepository {
 
     private final QRepository repository

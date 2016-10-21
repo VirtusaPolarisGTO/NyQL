@@ -3,11 +3,13 @@ package com.virtusa.gto.insight.nyql
 import com.virtusa.gto.insight.nyql.model.units.AParam
 import com.virtusa.gto.insight.nyql.utils.QReturnType
 import com.virtusa.gto.insight.nyql.utils.QueryType
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 @ToString(includePackage = false)
 class QResultProxy {
 
@@ -17,7 +19,7 @@ class QResultProxy {
     QReturnType returnType = QReturnType.RESULT
 
     def rawObject
-    def qObject
+    Query qObject
 
     /**
      * Creates a new proxy result instance by removing session related entities.

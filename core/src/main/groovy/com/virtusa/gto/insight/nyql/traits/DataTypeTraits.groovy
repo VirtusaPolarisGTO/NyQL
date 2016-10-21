@@ -3,18 +3,21 @@ package com.virtusa.gto.insight.nyql.traits
 import com.virtusa.gto.insight.nyql.FunctionColumn
 import com.virtusa.gto.insight.nyql.model.units.QNumber
 import com.virtusa.gto.insight.nyql.model.units.QString
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
 trait DataTypeTraits {
 
-    def STR(String text) {
-        return new QString(text: text)
+    @CompileStatic
+    QString STR(String text) {
+        new QString(text: text)
     }
 
-    def NUM(Number number) {
-        return new QNumber(number: number)
+    @CompileStatic
+    QNumber NUM(Number number) {
+        new QNumber(number: number)
     }
 
     def BETWEEN(Object c1, Object c2) {

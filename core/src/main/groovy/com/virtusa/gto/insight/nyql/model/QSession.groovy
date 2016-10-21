@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.DSL
 import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.db.QDbFactory
 import com.virtusa.gto.insight.nyql.utils.Constants
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory
  *
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QSession)

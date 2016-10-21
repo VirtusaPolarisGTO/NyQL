@@ -25,7 +25,7 @@ class Join extends Table {
         return this
     }
 
-    def ON(closure) {
+    def ON(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where whr = new Where(_ctx)
 
         def code = closure.rehydrate(whr, this, this)

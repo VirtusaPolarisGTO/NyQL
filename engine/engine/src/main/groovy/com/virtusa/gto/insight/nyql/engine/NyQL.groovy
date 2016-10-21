@@ -12,6 +12,7 @@ import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.*
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -150,6 +151,7 @@ class NyQL {
      * @return generated query instance.
      * @throws NyException any exception thrown while parsing.
      */
+    @CompileStatic
     public static QScript parse(String scriptName) throws NyException {
         return parse(scriptName, EMPTY_MAP)
     }
@@ -168,6 +170,7 @@ class NyQL {
      * @return generated query instance.
      * @throws NyException any exception thrown while parsing.
      */
+    @CompileStatic
     public static QScript parse(String scriptName, Map<String, Object> data) throws NyException {
         QSession qSession = QSession.create(scriptName)
         if (data) {
@@ -198,6 +201,7 @@ class NyQL {
      * @return the result of the script execution.
      * @throws NyException any exception thrown while parsing or executing.
      */
+    @CompileStatic
     public static <T> T execute(String scriptName) throws NyException {
         (T) execute(scriptName, EMPTY_MAP)
     }
@@ -220,6 +224,7 @@ class NyQL {
      * @return the result of the script execution.
      * @throws NyException any exception thrown while parsing or executing.
      */
+    @CompileStatic
     public static <T> T execute(String scriptName, Map<String, Object> data) throws NyException {
         QScript script = null
         try {
@@ -246,6 +251,7 @@ class NyQL {
      * @return the result of the script execution.
      * @throws NyException any exception thrown while parsing or executing.
      */
+    @CompileStatic
     public static <T> T execute(String dslSql, Map<String, Object> data, Connection connection) throws NyException {
         String scriptId = String.valueOf(System.currentTimeMillis())
         execute(scriptId, dslSql, data, connection)
@@ -267,6 +273,7 @@ class NyQL {
      * @return the result of the script execution.
      * @throws NyException any exception thrown while executing or parsing.
      */
+    @CompileStatic
     public static <T> T execute(String scriptId, String dslSql, Map<String, Object> data, Connection connection) throws NyException {
         QJdbcExecutor jdbcExecutor = new QJdbcExecutor(connection)
         QSingleScript qSingleScript = new QSingleScript(scriptId, dslSql)
@@ -291,6 +298,7 @@ class NyQL {
      * @return result as json string.
      * @throws NyException any exception thrown while executing and parsing.
      */
+    @CompileStatic
     public static String executeToJSON(String scriptName, Map<String, Object> data) throws NyException {
         Object result = execute(scriptName, data)
         JsonOutput.toJson(result)
@@ -307,10 +315,12 @@ class NyQL {
      * @return result as json string.
      * @throws NyException any exception thrown while executing and parsing.
      */
+    @CompileStatic
     public static String executeToJSON(String scriptName) throws NyException {
         executeToJSON(scriptName, [:])
     }
 
+    @CompileStatic
     private static boolean asBoolean(String text) {
         text != null && (text.equalsIgnoreCase(TRUE_STR) || text.equalsIgnoreCase('yes'))
     }

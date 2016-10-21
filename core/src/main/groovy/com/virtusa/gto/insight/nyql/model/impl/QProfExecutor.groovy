@@ -5,10 +5,12 @@ import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptResult
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QProfExecutor implements QExecutor {
 
     private final QExecutor executor

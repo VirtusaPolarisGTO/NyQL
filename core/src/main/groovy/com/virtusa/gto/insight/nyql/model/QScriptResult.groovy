@@ -1,10 +1,12 @@
 package com.virtusa.gto.insight.nyql.model
 
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 @ToString
 class QScriptResult extends QScript {
 

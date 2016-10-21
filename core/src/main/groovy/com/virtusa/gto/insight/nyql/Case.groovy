@@ -23,8 +23,8 @@ class Case extends Column implements DataTypeTraits {
         return allConditions
     }
 
-    def ELSE(closure) {
-        def code = closure.rehydrate(_ownerQ ?: this, this, this)
+    def ELSE(@DelegatesTo(value = Query, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        def code = closure.rehydrate(_ownerQ, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         def result = code()
 
@@ -32,12 +32,12 @@ class Case extends Column implements DataTypeTraits {
         return this
     }
 
-    def THEN(closure) {
+    def THEN(@DelegatesTo(value = Query, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         if (__lastWhere == null) {
             throw new NySyntaxException('No associated WHEN condition found for this THEN!')
         }
 
-        def code = closure.rehydrate(_ownerQ ?: this, this, this)
+        def code = closure.rehydrate(_ownerQ, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         def result = code()
 
@@ -45,7 +45,7 @@ class Case extends Column implements DataTypeTraits {
         return this
     }
 
-    def WHEN(closure) {
+    def WHEN(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where whr = new Where(_ctx)
 
         def code = closure.rehydrate(whr, this, this)

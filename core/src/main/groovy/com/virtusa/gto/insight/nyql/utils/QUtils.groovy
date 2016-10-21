@@ -6,6 +6,9 @@ import com.virtusa.gto.insight.nyql.model.units.AParam
 import com.virtusa.gto.insight.nyql.model.units.NamedParam
 import groovy.transform.CompileStatic
 
+import java.util.function.Function
+import java.util.stream.Collectors
+
 /**
  * @author Isuru Weerarathna
  */
@@ -15,6 +18,15 @@ class QUtils {
     private static final String P_PAD = '::'
     private static final String OP = '('
     private static final String CP = ')'
+
+    @CompileStatic static String join(List<Object> items, Function<Object, String> converter,
+                                      String sep, String prefix, String suffix) {
+        StringJoiner joiner = new StringJoiner(sep, prefix, suffix)
+        for (Object val : items) {
+            joiner.add(converter.apply(val))
+        }
+        return joiner.toString()
+    }
 
     @CompileStatic
     static String generateErrStr(String mainError, String... helpLines) {

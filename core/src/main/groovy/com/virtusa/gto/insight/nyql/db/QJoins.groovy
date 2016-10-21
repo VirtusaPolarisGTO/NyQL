@@ -1,10 +1,12 @@
 package com.virtusa.gto.insight.nyql.db
 
 import com.virtusa.gto.insight.nyql.QContextType
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 trait QJoins {
 
     String JOIN(QContextType contextType) { ',' }

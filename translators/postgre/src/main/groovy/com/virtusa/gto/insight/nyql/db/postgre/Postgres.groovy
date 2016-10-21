@@ -27,7 +27,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
     Postgres() {}
 
     @Override
-    def ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
+    String ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
         StringBuilder query = new StringBuilder("CASE")
         List<Case.CaseCondition> conditions = aCaseCol.allConditions
         for (Case.CaseCondition cc : conditions) {

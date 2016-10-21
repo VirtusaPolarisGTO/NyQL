@@ -33,7 +33,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
         throw new NySyntaxException('You cannot use list parameters when assigning!')
     }
 
-    Case CASE(closure) {
+    Case CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Case aCase = new Case(_ctx: _ctx, _ownerQ: pQuery)
 
         def code = closure.rehydrate(aCase, this, this)

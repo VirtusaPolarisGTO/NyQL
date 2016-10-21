@@ -43,7 +43,7 @@ class QueryPart extends Query {
         this
     }
 
-    QueryPart JOIN(Table startTable, closure) {
+    QueryPart JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
         JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
         def code = closure.rehydrate(joinClosure, this, this)
@@ -54,7 +54,7 @@ class QueryPart extends Query {
         this
     }
 
-    QueryPart SET(closure) {
+    QueryPart SET(@DelegatesTo(value = Assign, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Assign ass = new Assign(_ctx, this)
 
         def code = closure.rehydrate(ass, this, this)

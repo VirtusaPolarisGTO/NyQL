@@ -9,6 +9,7 @@ import com.virtusa.gto.insight.nyql.model.units.QString
 import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
+import groovy.transform.CompileStatic
 
 import java.util.stream.Collectors
 
@@ -19,6 +20,7 @@ trait QTranslator extends QJoins {
 
     String NULL() { 'NULL' }
 
+    @CompileStatic
     String ___resolve(Object obj, QContextType contextType, List<AParam> paramOrder=null) {
         if (obj == null) {
             return NULL()
@@ -42,19 +44,21 @@ trait QTranslator extends QJoins {
             return ___convertNumeric(obj)
         } else if (obj instanceof AParam) {
             if (obj instanceof ParamList) {
-                return QUtils.padParamList(obj.__name)
+                return QUtils.padParamList((String)obj.__name)
             }
             return '?' + (obj.__aliasDefined() && contextType == QContextType.SELECT ? ' AS ' + obj.__alias : '')
         } else if (obj instanceof QResultProxy) {
             return (obj.query ?: '').trim()
         } else if (obj instanceof List) {
-            return obj.stream().map { ___resolve(it, contextType, paramOrder) }.collect(Collectors.joining(', ', '(', ')'))
+            return QUtils.join(obj, { ___resolve(it, contextType, paramOrder) }, ', ', '(', ')')
+            //return obj.stream().map { (String) }.collect(Collectors.joining(', ', '(', ')'))
         } else {
             throw new NyException('Unsupported data object to convert! [' + obj + ', type: ' + obj.class + ']')
         }
     }
 
-    abstract def ___ifColumn(Case aCaseCol, List<AParam> paramOrder)
+
+    abstract String ___ifColumn(Case aCaseCol, List<AParam> paramOrder)
 
     /**
      * Transform the given text suitable inside a query. You may add proper
@@ -174,8 +178,8 @@ trait QTranslator extends QJoins {
      * @param value numeric value.
      * @return string representation of numeric value inside a query.
      */
-    def ___convertNumeric(Number number) {
-        return String.valueOf(number)
+    String ___convertNumeric(Number number) {
+        String.valueOf(number)
     }
 
     /**

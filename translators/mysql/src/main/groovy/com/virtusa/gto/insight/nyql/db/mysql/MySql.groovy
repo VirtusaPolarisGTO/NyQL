@@ -33,7 +33,7 @@ class MySql extends MySqlFunctions implements QTranslator {
     MySql() {}
 
     @Override
-    def ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
+    String ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
         if (aCaseCol.caseType == Case.CaseType.IFNULL) {
             StringBuilder query = new StringBuilder('IFNULL').append(OP)
             def whenCondition = aCaseCol.allConditions.get(0)

@@ -3,12 +3,14 @@ package com.virtusa.gto.insight.nyql.model.impl
 import com.virtusa.gto.insight.nyql.model.QProfiling
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QSession
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QLogProfiler implements QProfiling {
 
     static final QLogProfiler INSTANCE = new QLogProfiler()

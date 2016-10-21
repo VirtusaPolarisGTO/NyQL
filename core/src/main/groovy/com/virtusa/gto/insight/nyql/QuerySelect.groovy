@@ -43,7 +43,7 @@ class QuerySelect extends Query {
         return this
     }
 
-    def JOIN(Table startTable, closure) {
+    def JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
         JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
         def code = closure.rehydrate(joinClosure, this, this)
@@ -70,7 +70,7 @@ class QuerySelect extends Query {
         return this
     }
 
-    def HAVING(closure) {
+    def HAVING(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where whr = new Where(_ctx)
 
         def code = closure.rehydrate(whr, this, this)

@@ -41,7 +41,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     private static final String NL = '\n'
 
     @Override
-    def ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
+    String ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
         if (aCaseCol.caseType == Case.CaseType.IFNULL) {
             StringBuilder query = new StringBuilder('ISNULL(')
             def whenCondition = aCaseCol.allConditions.get(0)

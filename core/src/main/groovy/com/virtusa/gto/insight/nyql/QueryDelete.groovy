@@ -20,7 +20,7 @@ class QueryDelete extends Query {
         sourceTbl
     }
 
-    def JOIN(Table startTable, closure) {
+    def JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
         def code = closure.rehydrate(joinClosure, this, this)
