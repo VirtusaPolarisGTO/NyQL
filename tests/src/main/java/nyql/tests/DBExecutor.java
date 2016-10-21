@@ -32,13 +32,14 @@ public class DBExecutor {
             data.put("filmId", 250);
             data.put("start", 100);
             data.put("cost", 200);
+            data.put("minRentals", 5);
 
             data.put("amap", inners);
 
             //data.put("hello", inners);
 
             //QScript result = NyQL.parse("insight/unmapped_users", data);
-            Object result = NyQL.execute("trans", data);
+            Object result = NyQL.execute("sakila/customer_details", data);
             System.out.println(result);
 
         } finally {

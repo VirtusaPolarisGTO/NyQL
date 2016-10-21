@@ -266,6 +266,14 @@ trait QFunctions {
     @CompileStatic abstract String cast_to_str(Object col)
 
     /**
+     * Cast the given column to date value.
+     *
+     * @param col input column.
+     * @return string representation of cast to date.
+     */
+    @CompileStatic abstract String cast_to_date(Object col)
+
+    /**
      * Returns the ascending representation of a column.
      *
      * @param c input column.

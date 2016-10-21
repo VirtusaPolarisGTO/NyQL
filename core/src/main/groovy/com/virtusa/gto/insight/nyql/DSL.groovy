@@ -2,12 +2,10 @@ package com.virtusa.gto.insight.nyql
 
 import com.virtusa.gto.insight.nyql.ddl.DDL
 import com.virtusa.gto.insight.nyql.exceptions.NyException
-import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptList
 import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.model.units.AParam
-import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryCombineType
 import com.virtusa.gto.insight.nyql.utils.QueryType
@@ -30,6 +28,7 @@ class DSL {
 
     public DSL(QSession theSession) {
         session = theSession
+        set$SESSION(session.sessionVariables)
         //dslContext = session.dslContext
     }
 
@@ -323,7 +322,6 @@ class DSL {
         return QUtils.createParam(name, scope, mappingName)
     }
 
-    @CompileStatic
     private QContext createContext(String db=null) {
         String dbName = db ?: session.dbFactory.dbName()
         return new QContext(translator: session.dbFactory.createTranslator(),
@@ -331,14 +329,8 @@ class DSL {
                 ownerSession: session)
     }
 
-    def propertyMissing(String name) {
-        if (name == Constants.DSL_SESSION_WORD) {
-            return session.sessionVariables
-        } else if (name == Constants.DSL_ENTRY_WORD) {
-            return this
-        } else {
-            throw new NySyntaxException("Unknown syntax in DSL! ('$name')")
-        }
-    }
+    DSL $DSL = this
+
+    Map $SESSION
 
 }

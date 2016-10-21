@@ -26,4 +26,6 @@ final class ConfigKeys {
     static final String LOCATION_KEY = '_location'
 
     static final JDBC_DRIVER_CLASS_KEY = 'jdbcDriverClass'
+
+    static final List<String> DEFAULT_EXTENSIONS = Collections.unmodifiableList(['groovy', 'sgroovy'])
 }

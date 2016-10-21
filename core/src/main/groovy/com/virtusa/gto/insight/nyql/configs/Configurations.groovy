@@ -212,27 +212,31 @@ class Configurations {
             return cacheVarName
         }
         cacheVarName = properties.caching.indicatorVariableName ?: Constants.DSL_CACHE_VARIABLE_NAME
-        return cacheVarName
+        cacheVarName
     }
 
     String[] defaultImports() {
-        return properties.defaultImports
+        properties.defaultImports
     }
 
     String getActivatedDb() {
-        return properties.activate
+        properties.activate
     }
 
     boolean cacheRawScripts() {
-        return (boolean) properties.caching.compiledScripts
+        (boolean) properties.caching.compiledScripts
     }
 
     boolean cacheGeneratedQueries() {
-        return (boolean) properties.caching.generatedQueries
+        (boolean) properties.caching.generatedQueries
     }
 
     List getAvailableTranslators() {
-        return properties.translators
+        properties.translators
+    }
+
+    List getSupportedScriptExtensions() {
+        properties.supportedExtensions ?: ConfigKeys.DEFAULT_EXTENSIONS
     }
 
     QProfiling getProfiler() {

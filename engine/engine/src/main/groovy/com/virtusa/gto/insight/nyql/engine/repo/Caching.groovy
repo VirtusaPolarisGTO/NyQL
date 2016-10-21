@@ -8,7 +8,11 @@ import com.virtusa.gto.insight.nyql.model.QSource
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
 import org.codehaus.groovy.control.customizers.ImportCustomizer
+import org.codehaus.groovy.control.customizers.SourceAwareCustomizer
+
+import static org.codehaus.groovy.control.customizers.builder.CompilerCustomizationBuilder.withConfig
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -106,6 +110,11 @@ class Caching implements Closeable {
         }
 
         compilerConfigurations = new CompilerConfiguration()
+
+        ASTTransformationCustomizer astStatic = new ASTTransformationCustomizer(CompileStatic)
+        SourceAwareCustomizer sac = new SourceAwareCustomizer(astStatic)
+        sac.extensionValidator = { ext -> ext == 'sgroovy' }
+        compilerConfigurations.addCompilationCustomizers(sac)
 
         String[] defImports = Configurations.instance().defaultImports()
         if (defImports != null) {

@@ -48,6 +48,7 @@ trait FunctionTraits {
     // cast function
     @CompileStatic FunctionColumn CAST_INT(Object column) { fColumn(column, 'cast_to_int') }
     @CompileStatic FunctionColumn CAST_STR(Object column) { fColumn(column, 'cast_to_str') }
+    @CompileStatic FunctionColumn CAST_DATE(Object column) { fColumn(column, 'cast_to_date') }
 
     /// Date time functions
     @CompileStatic FunctionColumn NOW() { fColumn(null, 'current_timestamp') }

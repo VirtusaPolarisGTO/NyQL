@@ -13,10 +13,7 @@ $DSL.select {
             INNER_JOIN (Film.alias("f")) ON iv.film_id, f.film_id
     }
 
-    FETCH (r.rental_date, EPOCH_TIMESTAMP(r.rental_date),
-            CAST(r.rental_date, "DATE"),
-            EPOCH_TIMESTAMP(CAST(r.rental_date, "DATE")),
-            FROM_EPOCH(EPOCH_TIMESTAMP(CAST(r.rental_date, "DATE"))))
+    FETCH ()
 
     WHERE {
         EQ (c.customer_id, PARAM("customerId"))
