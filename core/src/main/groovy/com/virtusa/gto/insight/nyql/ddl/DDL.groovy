@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.QResultProxy
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QScriptList
 import com.virtusa.gto.insight.nyql.model.QSession
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,26 +30,28 @@ class DDL {
         //dslContext = session.dslContext
     }
 
-    DDL TEMP_TABLE(String name, @DelegatesTo(DTable) Closure closure) {
+    @CompileStatic
+    DDL TEMP_TABLE(String name, @DelegatesTo(value = DTable, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         DTable dTable = new DTable(name: name, temporary: true)
 
         def code = closure.rehydrate(dTable, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        DTable rTable = code()
-        tables.put(rTable.name, rTable)
+        code()
+        tables.put(dTable.name, dTable)
 
-        return this
+        this
     }
 
-    DDL TEMP_TABLE(String name, boolean ifNotExists, @DelegatesTo(DTable) Closure closure) {
+    @CompileStatic
+    DDL TEMP_TABLE(String name, boolean ifNotExists, @DelegatesTo(value = DTable, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         DTable dTable = new DTable(name: name, temporary: true, ifNotExist: ifNotExists)
 
         def code = closure.rehydrate(dTable, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
-        DTable rTable = code()
-        tables.put(rTable.name, rTable)
+        code()
+        tables.put(dTable.name, dTable)
 
-        return this
+        this
     }
 
     DDL TABLE(String name, @DelegatesTo(DTable) Closure closure) {
@@ -58,7 +61,7 @@ class DDL {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         DTable rTable = code()
         tables.put(rTable.name, rTable)
-        return this
+        this
     }
 
     DDL TABLE(String name, boolean ifNotExists, @DelegatesTo(DTable) Closure closure) {
@@ -68,9 +71,10 @@ class DDL {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         DTable rTable = code()
         tables.put(rTable.name, rTable)
-        return this
+        this
     }
 
+    @CompileStatic
     DDL DROP_TEMP_TABLE(String name) {
         DTable rTable
         if (tables.containsKey(name)) {
@@ -81,9 +85,10 @@ class DDL {
         rTable.temporary = true
         tablesToDrop.add(rTable)
 
-        return this
+        this
     }
 
+    @CompileStatic
     DDL DROP_TEMP_TABLE(String name, boolean ifExists) {
         DTable rTable
         if (tables.containsKey(name)) {
@@ -94,7 +99,7 @@ class DDL {
         rTable.temporary = true
         tablesToDrop.add(rTable)
 
-        return this
+        this
     }
 
     DDL DROP_TABLE(String name) {
@@ -105,7 +110,7 @@ class DDL {
             rTable = new DTable(name: name)
         }
         tablesToDrop.add(rTable)
-        return this
+        this
     }
 
     DDL DROP_TABLE(String name, boolean ifExists) {
@@ -116,27 +121,30 @@ class DDL {
             rTable = new DTable(name: name, ifNotExist: ifExists)
         }
         tablesToDrop.add(rTable)
-        return this
+        this
     }
 
+    @CompileStatic
     QScriptList createScripts() {
         QScriptList scriptList = new QScriptList()
         List<QScript> list = new LinkedList<>()
         tables.each {k, t -> list.addAll(callCreateTable(t)) }
         tablesToDrop.each { list.addAll(callDropTable(it)) }
         scriptList.scripts = list
-        return scriptList
+        scriptList
     }
 
+    @CompileStatic
     private List<QScript> callCreateTable(DTable dTable) {
         LOGGER.debug('Executing table creation command...')
         List<QResultProxy> proxies = session.dbFactory.createTranslator().___ddls().___createTable(dTable)
-        return proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
+        proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
     }
 
+    @CompileStatic
     private List<QScript> callDropTable(DTable dTable) {
         LOGGER.debug('Executing table drop command...')
         List<QResultProxy> proxies = session.dbFactory.createTranslator().___ddls().___dropTable(dTable)
-        return proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
+        proxies.stream().map({ session.scriptRepo.parse(it, session) }).collect(Collectors.toList());
     }
 }

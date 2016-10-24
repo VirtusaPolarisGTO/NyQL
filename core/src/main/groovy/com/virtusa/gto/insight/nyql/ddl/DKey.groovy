@@ -1,7 +1,11 @@
 package com.virtusa.gto.insight.nyql.ddl
+
+import groovy.transform.CompileStatic
+
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class DKey extends DAbstractEntity {
 
     DKeyType type
@@ -21,16 +25,16 @@ class DKey extends DAbstractEntity {
 
         dKey.name = values['name']
         dKey.comment = values['comment']
-        dKey.type = toEnum(values, 'type', DKeyType.INDEX)
+        dKey.type = (DKeyType) toEnum(values, 'type', DKeyType.INDEX)
         dKey.unique = (boolean)(values['unique'] ?: false)
         dKey.fields = (List)(values['fields'] ?: [])
         dKey.refTable = values['refTable'] ?: null
         dKey.refFields = (List)(values['refFields'] ?: [])
 
-        dKey.indexType = toEnum(values, 'indexType', null)
-        dKey.onDelete = toEnum(values, 'onDelete', DReferenceOption.NO_ACTION)
-        dKey.onUpdate = toEnum(values, 'onUpdate', DReferenceOption.NO_ACTION)
-        return dKey
+        dKey.indexType = (DKeyIndexType) toEnum(values, 'indexType', null)
+        dKey.onDelete = (DReferenceOption) toEnum(values, 'onDelete', DReferenceOption.NO_ACTION)
+        dKey.onUpdate = (DReferenceOption) toEnum(values, 'onUpdate', DReferenceOption.NO_ACTION)
+        dKey
     }
 
 }

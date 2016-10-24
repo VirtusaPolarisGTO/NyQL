@@ -1,7 +1,11 @@
 package com.virtusa.gto.insight.nyql.ddl
+
+import groovy.transform.CompileStatic
+
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 abstract class DAbstractEntity {
 
     String name
@@ -11,9 +15,9 @@ abstract class DAbstractEntity {
 
     public static <T> T toEnum(Map map, String key, T defValue) {
         if (map.containsKey(key)) {
-            return (T) map[key]
+            (T) map[key]
         } else {
-            return defValue
+            defValue
         }
     }
 

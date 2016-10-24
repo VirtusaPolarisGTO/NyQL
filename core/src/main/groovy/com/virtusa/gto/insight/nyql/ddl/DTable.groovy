@@ -1,10 +1,12 @@
 package com.virtusa.gto.insight.nyql.ddl
 
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 @ToString
 class DTable extends DAbstractEntity {
 
@@ -19,7 +21,7 @@ class DTable extends DAbstractEntity {
         dField.type = type
         dField.name = name
         fields.add(dField)
-        return this
+        this
     }
 
     DTable PRIMARY_KEY(String fieldName, Map details=null) {
@@ -27,7 +29,7 @@ class DTable extends DAbstractEntity {
         dKey.fields = [fieldName]
         dKey.type = DKeyType.PRIMARY
         keys.add(dKey)
-        return this
+        this
     }
 
     DTable PRIMARY_KEY(List<String> fieldNames, Map details=null) {
@@ -35,15 +37,18 @@ class DTable extends DAbstractEntity {
         dKey.fields = fieldNames
         dKey.type = DKeyType.PRIMARY
         keys.add(dKey)
-        return this
+        this
     }
 
     DTable PRIMARY_KEY(String... fieldNames) {
         DKey dKey = new DKey()
-        dKey.fields = fieldNames
+
+        List<String> items = new LinkedList<>()
+        fieldNames.each { items.add((String)it) }
+        dKey.fields = items
         dKey.type = DKeyType.PRIMARY
         keys.add(dKey)
-        return this
+        this
     }
 
     DTable INDEX(String name, Map details=null) {
@@ -51,7 +56,7 @@ class DTable extends DAbstractEntity {
         dKey.type = DKeyType.INDEX
         dKey.name = name
         keys.add(dKey)
-        return this
+        this
     }
 
     DTable FOREIGN_KEY(String name, String thisTableField, Map details=null) {
@@ -60,7 +65,7 @@ class DTable extends DAbstractEntity {
         dKey.fields = [thisTableField]
         dKey.name = name
         keys.add(dKey)
-        return this
+        this
     }
 
 }

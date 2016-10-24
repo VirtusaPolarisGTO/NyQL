@@ -1,10 +1,12 @@
 package com.virtusa.gto.insight.nyql.ddl
 
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 @ToString
 class DField extends DAbstractEntity {
 
@@ -30,9 +32,9 @@ class DField extends DAbstractEntity {
         dField.notNull = (boolean)(values['notNull'] ?: false)
         dField.length = (long)(values['length'] ?: -1)
         dField.type = toEnum(values, 'type', DFieldType.TEXT)
-        dField.specifiedDefault = values.containsKey('defaultValue')
-        dField.defaultValue = values['defaultValue'] ?: null
-        return dField
+        dField.specifiedDefault = values.containsKey(DDLKeys.DEF_VALUE)
+        dField.defaultValue = values[DDLKeys.DEF_VALUE] ?: null
+        dField
     }
 
 }
