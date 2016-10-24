@@ -19,26 +19,12 @@ abstract class NyBaseScript extends Script {
 
     NyBaseScript(Binding binding) {
         super(binding)
-
-        assignNyVariables(binding)
     }
 
     void setSession(QSession session) {
         this.session = session
         $DSL = new DSL(session)
         $SESSION = session.sessionVariables
-    }
-
-    @Override
-    void setBinding(Binding binding) {
-        super.setBinding(binding)
-        assignNyVariables(binding)
-    }
-
-    private void assignNyVariables(Binding theBinding) {
-        if (theBinding.hasVariable(TEMP_SESSION_VAR)) {
-            setSession((QSession)theBinding.getVariable(TEMP_SESSION_VAR))
-        }
     }
 
     /**
