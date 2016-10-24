@@ -2,12 +2,7 @@ package com.virtusa.gto.insight.nyql.db.mysql
 
 import com.virtusa.gto.insight.nyql.QResultProxy
 import com.virtusa.gto.insight.nyql.db.QDdl
-import com.virtusa.gto.insight.nyql.ddl.DField
-import com.virtusa.gto.insight.nyql.ddl.DFieldType
-import com.virtusa.gto.insight.nyql.ddl.DKey
-import com.virtusa.gto.insight.nyql.ddl.DKeyType
-import com.virtusa.gto.insight.nyql.ddl.DReferenceOption
-import com.virtusa.gto.insight.nyql.ddl.DTable
+import com.virtusa.gto.insight.nyql.ddl.*
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.insight.nyql.utils.QUtils

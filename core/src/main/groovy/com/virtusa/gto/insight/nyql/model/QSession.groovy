@@ -1,13 +1,10 @@
 package com.virtusa.gto.insight.nyql.model
 
-import com.virtusa.gto.insight.nyql.DSL
 import com.virtusa.gto.insight.nyql.DSLContext
 import com.virtusa.gto.insight.nyql.db.QDbFactory
-import com.virtusa.gto.insight.nyql.utils.Constants
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * A context associated with a given script parsing and execution.
  *
@@ -95,8 +92,8 @@ class QSession {
         session.scriptRepo = repository
         session.executor = executor
         session.executorFactory = executorFactory
-        session.sessionVariables[Constants.DSL_ENTRY_WORD] = new DSL(session)
-        session.sessionVariables[Constants.DSL_SESSION_WORD] = session.sessionVariables
+        //session.sessionVariables[Constants.DSL_ENTRY_WORD] = new DSL(session)
+        //session.sessionVariables[Constants.DSL_SESSION_WORD] = session.sessionVariables
         return session
     }
 

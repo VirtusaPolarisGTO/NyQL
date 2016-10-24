@@ -1,7 +1,9 @@
 package com.virtusa.gto.insight.nyql.engine.repo
 
+import com.virtusa.gto.insight.nyql.QResultProxy
 import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.insight.nyql.model.NyBaseScript
 import com.virtusa.gto.insight.nyql.model.QScript
 import com.virtusa.gto.insight.nyql.model.QSession
 import com.virtusa.gto.insight.nyql.model.QSource
@@ -11,13 +13,10 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SourceAwareCustomizer
-
-import static org.codehaus.groovy.control.customizers.builder.CompilerCustomizationBuilder.withConfig
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.util.concurrent.ConcurrentHashMap
-
 /**
  * @author IWEERARATHNA
  */
@@ -64,26 +63,47 @@ class Caching implements Closeable {
         qScript
     }
 
+    /**
+     * Spawn a new script instance from already cached instance of script.
+     *
+     * @param src source script to make a clone.
+     * @return new instance of script.
+     */
     private static QScript spawnScriptFrom(QScript src) {
         QScript script = new QScript(id: src.id, qSession: (QSession)null)
-        def resultProxy = src.proxy
+        QResultProxy resultProxy = src.proxy
         if (resultProxy != null) {
             script.proxy = resultProxy.dehydrate()
         }
         script
     }
 
+    /**
+     * Add a generated query to the cache.
+     *
+     * @param scriptId script id.
+     * @param script generated query instance with result.
+     * @return the added script instance.
+     */
     QScript addGeneratedQuery(String scriptId, QScript script) {
         cache.put(scriptId, spawnScriptFrom(script))
         script
     }
 
+    /**
+     * Returns a new instance of compiled script from the cache.
+     *
+     * @param sourceScript corresponding source of the script.
+     * @param session session instance.
+     * @return newly created script instance.
+     */
     Script getCompiledScript(QSource sourceScript, QSession session) {
         Binding binding = new Binding(session?.sessionVariables ?: [:])
         if (Configurations.instance().cacheRawScripts()) {
             def clazz = gcl.parseClass(sourceScript.codeSource, true)
-            Script scr = clazz.newInstance() as Script
+            NyBaseScript scr = clazz.newInstance() as NyBaseScript
             scr.setBinding(binding)
+            scr.setSession(session)
             scr
         } else {
             GroovyShell shell = new GroovyShell(binding, makeCompilerConfigs())
@@ -91,6 +111,11 @@ class Caching implements Closeable {
         }
     }
 
+    /**
+     * CLear the generated query cache or class loader cache.
+     *
+     * @param level level of cache to clean.
+     */
     void clearGeneratedCache(int level) {
         if (level >= 0) {
             cache.clear()
@@ -100,10 +125,11 @@ class Caching implements Closeable {
         }
     }
 
-    void invalidateGeneratedCache(String scriptId) {
-        cache.remove(scriptId)
-    }
-
+    /**
+     * Create a set of configurations requires for script initial compilation.
+     *
+     * @return compiler configuration instance newly created or already created.
+     */
     CompilerConfiguration makeCompilerConfigs() {
         if (compilerConfigurations != null) {
             return compilerConfigurations
@@ -111,9 +137,10 @@ class Caching implements Closeable {
 
         compilerConfigurations = new CompilerConfiguration()
 
+        compilerConfigurations.scriptBaseClass = NyBaseScript.class.name
         ASTTransformationCustomizer astStatic = new ASTTransformationCustomizer(CompileStatic)
         SourceAwareCustomizer sac = new SourceAwareCustomizer(astStatic)
-        sac.extensionValidator = { ext -> ext == 'sgroovy' }
+        sac.extensionValidator = { ext -> ext == 'groovy' }
         compilerConfigurations.addCompilationCustomizers(sac)
 
         String[] defImports = Configurations.instance().defaultImports()
