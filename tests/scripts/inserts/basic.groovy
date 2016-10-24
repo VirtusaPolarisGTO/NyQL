@@ -62,7 +62,6 @@ def innQP = $DSL.select {
                     "film_id": TABLE(innQP),
                     "title": PARAM("title")
             )
-            RETURN_KEYS()
         },
         ["INSERT INTO `Film` (`film_id`, `title`) VALUES ((SELECT * FROM `Film` f WHERE f.film_id = ?), ?)", ["id", "title"]],
 ]

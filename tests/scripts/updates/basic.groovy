@@ -1,6 +1,20 @@
 /**
  * @author IWEERARATHNA
  */
+def innQ = $DSL.select {
+    TARGET (Film.alias("f"))
+    WHERE {
+        EQ (f.film_id, NUM(1))
+    }
+}
+
+def innQP = $DSL.select {
+    TARGET (Film.alias("f"))
+    WHERE {
+        EQ (f.film_id, PARAM("id"))
+    }
+}
+
 [
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -54,5 +68,13 @@
             }
         },
         ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = 1", ["title"]],
+
+        $DSL.update {
+            TARGET (Film.alias("f"))
+            SET {
+                EQ (f.film_id, TABLE(innQ))
+            }
+        },
+        "UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = 1)",
 
 ]

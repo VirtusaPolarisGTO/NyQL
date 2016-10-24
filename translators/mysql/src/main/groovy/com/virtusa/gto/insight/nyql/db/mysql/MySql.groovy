@@ -94,7 +94,7 @@ class MySql extends MySqlFunctions implements QTranslator {
                 return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + table.__alias : '')
             }
             return QUtils.quote(table.__name, BACK_TICK) + (table.__aliasDefined() ? ' ' + table.__alias : '')
-        } else if (contextType == QContextType.SELECT || contextType == QContextType.INSERT_DATA) {
+        } else if (contextType == QContextType.SELECT || contextType == QContextType.INSERT_DATA || contextType == QContextType.UPDATE_SET) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
                 return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? _AS_ + table.__alias : '')
