@@ -40,7 +40,7 @@ public class ScriptDDL {
     }
 
     public void testASelect() throws NyException {
-        NyQL.execute("scripts/aselect");
+        NyQL.executeToJSON("scripts/aselect");
     }
 
 

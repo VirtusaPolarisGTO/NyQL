@@ -3,7 +3,7 @@
  */
 $DSL.select {
 
-    TARGET (Film.alias("f"))
+    TARGET (TABLE("Film"))
     FETCH ()
 
 }
