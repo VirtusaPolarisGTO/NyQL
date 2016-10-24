@@ -17,17 +17,17 @@ final class QDatabaseRegistry {
 
     private QDatabaseRegistry() {}
 
-    public static QDatabaseRegistry getInstance() {
-        return Holder.INSTANCE
+    static QDatabaseRegistry getInstance() {
+        Holder.INSTANCE
     }
 
-    public QDbFactory getDbFactory(String dbName) {
-        return factoryRegistry.get(dbName);
+    QDbFactory getDbFactory(String dbName) {
+        factoryRegistry.get(dbName)
     }
 
-    public DSLContext load(String dbName) throws NyException {
+    DSLContext load(String dbName) throws NyException {
         if (dslContextMap.containsKey(dbName)) {
-            return dslContextMap[dbName]
+            dslContextMap[dbName]
         } else {
             QDbFactory factory = factoryRegistry[dbName]
             if (factory == null) {
@@ -38,11 +38,11 @@ final class QDatabaseRegistry {
             dslContext.activeFactory = factory
 
             dslContextMap.put(dbName, dslContext)
-            return dslContext
+            dslContext
         }
     }
 
-    public void register(QDbFactory factory) {
+    void register(QDbFactory factory) {
         factoryRegistry.put(factory.dbName(), factory)
     }
 

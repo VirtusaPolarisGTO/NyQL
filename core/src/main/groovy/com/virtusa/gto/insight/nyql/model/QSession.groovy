@@ -81,7 +81,7 @@ class QSession {
                 QExecutorRegistry.instance.defaultExecutorFactory())
         qSession.rootScriptId = theScriptId
         qSession.scriptStack.push(theScriptId)
-        return qSession
+        qSession
     }
 
     static QSession createSession(QDbFactory dbFactory, QRepository repository,
@@ -94,7 +94,7 @@ class QSession {
         session.executorFactory = executorFactory
         //session.sessionVariables[Constants.DSL_ENTRY_WORD] = new DSL(session)
         //session.sessionVariables[Constants.DSL_SESSION_WORD] = session.sessionVariables
-        return session
+        session
     }
 
     void intoScript(String scriptId) {
@@ -121,7 +121,7 @@ class QSession {
         }
         def stack = incrStack()
         LOGGER.debug('Session {} starting script at execution depth {}', this, stack)
-        return executor
+        executor
     }
 
     void closeScript() {
@@ -137,17 +137,17 @@ class QSession {
 
     def execute(QScript script) {
         if (executor != null) {
-            return executor.execute(script)
+            executor.execute(script)
         } else {
-            return executorFactory.create().execute(script)
+            executorFactory.create().execute(script)
         }
     }
 
     def execute(QScriptList scriptList) {
         if (executor != null) {
-            return executor.execute(scriptList)
+            executor.execute(scriptList)
         } else {
-            return executorFactory.create().execute(scriptList)
+            executorFactory.create().execute(scriptList)
         }
     }
 
@@ -165,6 +165,6 @@ class QSession {
 
     @Override
     String toString() {
-        return 'QSession@' + Integer.toHexString(hashCode())
+        'QSession@' + Integer.toHexString(hashCode())
     }
 }

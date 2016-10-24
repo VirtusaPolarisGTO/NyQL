@@ -12,23 +12,23 @@ final class QExecutorRegistry {
 
     private QExecutorRegistry() {}
 
-    public static QExecutorRegistry getInstance() {
+    static QExecutorRegistry getInstance() {
         return Holder.INSTANCE
     }
 
-    public QExecutorFactory register(String name, QExecutorFactory executorFactory, boolean makeDefault=true) {
+    QExecutorFactory register(String name, QExecutorFactory executorFactory, boolean makeDefault=true) {
         registry.put(name, executorFactory)
         if (makeDefault) {
             defExec = executorFactory
         }
-        return executorFactory
+        executorFactory
     }
 
-    public QExecutorFactory defaultExecutorFactory() {
-        return defExec
+    QExecutorFactory defaultExecutorFactory() {
+        defExec
     }
 
-    public void shutdown() {
+    void shutdown() {
         registry.values().each {
             it.shutdown()
         }

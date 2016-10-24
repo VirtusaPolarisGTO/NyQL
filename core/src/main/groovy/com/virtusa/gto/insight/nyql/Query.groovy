@@ -15,7 +15,7 @@ abstract class Query extends AbstractClause {
     Table sourceTbl = null
     def _limit
 
-    Query(QContext contextParam) {
+    protected Query(QContext contextParam) {
         super(contextParam)
     }
 

@@ -13,11 +13,11 @@ abstract class NyBaseScript extends Script {
 
     private QSession session
 
-    NyBaseScript() {
+    protected NyBaseScript() {
         super()
     }
 
-    NyBaseScript(Binding binding) {
+    protected NyBaseScript(Binding binding) {
         super(binding)
     }
 

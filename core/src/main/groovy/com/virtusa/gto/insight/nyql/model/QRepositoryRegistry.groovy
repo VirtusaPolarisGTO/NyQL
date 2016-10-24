@@ -12,26 +12,26 @@ final class QRepositoryRegistry {
 
     private QRepositoryRegistry() {}
 
-    public static QRepositoryRegistry getInstance() {
-        return Holder.INSTANCE
+    static QRepositoryRegistry getInstance() {
+        Holder.INSTANCE
     }
 
-    public QRepository register(String name, QRepository repository, boolean makeDefault=true) {
+    QRepository register(String name, QRepository repository, boolean makeDefault=true) {
         registry.put(name, repository)
         if (makeDefault) {
             defRepo = repository
         }
-        return repository
+        repository
     }
 
-    public void shutdown() {
+    void shutdown() {
         registry.values().each {
             it.close()
         }
     }
 
-    public QRepository defaultRepository() {
-        return defRepo
+    QRepository defaultRepository() {
+        defRepo
     }
 
     private static class Holder {

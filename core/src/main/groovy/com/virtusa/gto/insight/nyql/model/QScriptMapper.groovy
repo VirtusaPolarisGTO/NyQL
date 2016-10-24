@@ -13,7 +13,7 @@ trait QScriptMapper implements Function<String, QSource> {
 
     @Override
     QSource apply(String s) {
-        return map(s)
+        map(s)
     }
 
     /**
