@@ -46,7 +46,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         return _ctx.addParam(new ParamList(__name: name))
     }
 
-    def TABLE(String tblName) {
+    Table TABLE(String tblName) {
         if (_ctx.tables.containsKey(tblName)) {
             return _ctx.tables.get(tblName)
         } else {
@@ -60,13 +60,13 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         new TableProxy()
     }
 
-    def TABLE(QResultProxy resultProxy) {
+    Table TABLE(QResultProxy resultProxy) {
         Table table = new Table(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx, __resultOf: resultProxy)
         _ctx.tables.putIfAbsent(table.__name, table)
         return table
     }
 
-    def TABLE(QScript qScript) {
+    Table TABLE(QScript qScript) {
         return TABLE(qScript.proxy)
     }
 

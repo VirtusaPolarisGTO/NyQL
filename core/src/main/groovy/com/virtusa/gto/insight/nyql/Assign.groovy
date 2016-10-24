@@ -25,8 +25,18 @@ class Assign implements DataTypeTraits, ScriptTraits {
         pQuery = parentQuery
     }
 
+    Table TABLE(QResultProxy resultProxy) {
+        Table table = new Table(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx, __resultOf: resultProxy)
+        _ctx.tables.putIfAbsent(table.__name, table)
+        table
+    }
+
+    Table TABLE(QScript qScript) {
+        TABLE(qScript.proxy)
+    }
+
     AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
-        return _ctx.addParam(QUtils.createParam(name, scope, mappingName))
+        _ctx.addParam(QUtils.createParam(name, scope, mappingName))
     }
 
     AParam PARAMLIST(String name) {
@@ -50,11 +60,11 @@ class Assign implements DataTypeTraits, ScriptTraits {
             ELSE { column }
         }
         aCase.setCaseType(Case.CaseType.IFNULL)
-        return aCase
+        aCase
     }
 
     def IFNOTNULL(Column column, Object val) {
-        return CASE {
+        CASE {
             WHEN { NOTNULL(column) }
             THEN { val }
             ELSE { column }
@@ -63,16 +73,16 @@ class Assign implements DataTypeTraits, ScriptTraits {
 
     def EQ(Column c1, Object val) {
         assignments.add(new AnAssign(leftOp: c1, rightOp: val))
-        return this
+        this
     }
 
     def SET_NULL(Column c1) {
         assignments.add(new AnAssign(leftOp: c1, rightOp: null))
-        return this
+        this
     }
 
     def __hasAssignments() {
-        return QUtils.notNullNorEmpty(assignments)
+        QUtils.notNullNorEmpty(assignments)
     }
 
     def $IMPORT(String scriptId) {
@@ -83,9 +93,9 @@ class Assign implements DataTypeTraits, ScriptTraits {
             assignments.addAll(inner.assignments)
             Query q = proxy.qObject as Query
             _ctx.mergeFrom(q._ctx)
-            return this
+            this
         } else {
-            return proxy
+            proxy
         }
     }
 
