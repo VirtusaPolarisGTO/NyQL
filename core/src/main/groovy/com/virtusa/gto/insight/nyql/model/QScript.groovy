@@ -15,6 +15,15 @@ class QScript {
     QResultProxy proxy
     QSession qSession
 
+    QScript spawn() {
+        QScript script = new QScript(id: id, qSession: (QSession)null)
+        QResultProxy resultProxy = proxy
+        if (resultProxy != null) {
+            script.proxy = resultProxy.dehydrate()
+        }
+        script
+    }
+
     void free() {
         if (proxy != null) {
             proxy.free()

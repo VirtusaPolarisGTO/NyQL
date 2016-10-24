@@ -13,6 +13,17 @@ class QScriptList extends QScript {
     List<QScript> scripts
 
     @Override
+    QScript spawn() {
+        QScriptList scriptList = new QScriptList(id: id, qSession: (QSession)null)
+        if (scripts != null) {
+            for (QScript script : scripts) {
+                scriptList.scripts.add(script.spawn())
+            }
+        }
+        scriptList
+    }
+
+    @Override
     void free() {
         super.free()
         if (scripts != null) {

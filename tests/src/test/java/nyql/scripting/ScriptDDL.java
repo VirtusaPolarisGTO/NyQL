@@ -26,7 +26,7 @@ public class ScriptDDL {
         Map<String, Object> configs = (Map<String, Object>) new JsonSlurper().parse(new File("./configs/nyql-test.json"), StandardCharsets.UTF_8.name());
         ConfigBuilder configBuilder = ConfigBuilder.instance().setupFrom(configs);
 
-        configBuilder.addExecutor(TUtils.executorWithMax(1, 1));
+        configBuilder.addExecutor(TUtils.executorWithMax(2, 1));
         configBuilder.build();
     }
 
@@ -37,6 +37,10 @@ public class ScriptDDL {
 
     public void testScriptDDL() throws NyException {
         NyQL.execute("scripts/schema_script");
+    }
+
+    public void testASelect() throws NyException {
+        NyQL.execute("scripts/aselect");
     }
 
 
