@@ -1,17 +1,11 @@
 package nyql.tests;
 
-import org.apache.commons.io.FileUtils;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * @author IWEERARATHNA
@@ -157,26 +151,8 @@ public class Deps {
     }
 
     private static Set<String> findCalls(File file) throws Exception {
-        String code = FileUtils.readFileToString(file);
-        String text = code.replaceAll("(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/)|(//.*)", "");
-        //System.out.println(text);
-
-        Set<String> callers = new HashSet<>();
-        Pattern pattern = Pattern.compile("(.*?)([^A-Za-z]+[\\$]*IMPORT[\\s\\(]*)\"([^\"]*)\"");
-        Matcher matcher = pattern.matcher(text);
-        while (matcher.find()) {
-            callers.add(matcher.group(3));
-            //System.out.println(matcher.group(3));
-        }
-
-        pattern = Pattern.compile("(.*?)([^A-Za-z]+RUN[\\s\\(]*)\"([^\"]*)\"");
-        matcher = pattern.matcher(text);
-        while (matcher.find()) {
-            callers.add(matcher.group(3));
-            //System.out.println(matcher.group(3));
-        }
-
-        return callers;
+        List<String> calls = GVisitor.findCalls(file);
+        return new HashSet<>(calls);
     }
 
 }
