@@ -4,6 +4,7 @@ import com.virtusa.gto.insight.nyql.configs.Configurations
 import com.virtusa.gto.insight.nyql.exceptions.NyException
 import com.virtusa.gto.insight.nyql.model.QExecutor
 import com.virtusa.gto.insight.nyql.model.QScript
+import com.virtusa.gto.insight.nyql.model.QScriptList
 import com.virtusa.gto.insight.nyql.model.QScriptResult
 import groovy.transform.CompileStatic
 
@@ -47,7 +48,12 @@ class QProfExecutor implements QExecutor {
     @Override
     def execute(QScript script) throws Exception {
         long s = System.currentTimeMillis()
-        def result = executor.execute(script)
+        def result = null
+        if (script instanceof QScriptList) {
+            result = executor.execute((QScriptList)script)
+        } else {
+            result = executor.execute(script)
+        }
         long e = System.currentTimeMillis()
         if (!(script instanceof QScriptResult)) {
             Configurations.instance().profiler.doneExecuting(script, (e - s))

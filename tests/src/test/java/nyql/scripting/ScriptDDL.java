@@ -5,7 +5,9 @@ import com.virtusa.gto.insight.nyql.engine.NyQL;
 import com.virtusa.gto.insight.nyql.exceptions.NyException;
 import groovy.json.JsonSlurper;
 import nyql.utils.TUtils;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +17,7 @@ import java.util.Map;
  * @author IWEERARATHNA
  */
 @Test(groups = "scripts")
-public class ScriptTest {
+public class ScriptDDL {
 
     @SuppressWarnings("unchecked")
     @BeforeClass
@@ -33,8 +35,9 @@ public class ScriptTest {
         NyQL.shutdown();
     }
 
-    public void testVariables() throws NyException {
-        NyQL.execute("scripts/variable_test");
+    public void testScriptDDL() throws NyException {
+        NyQL.execute("scripts/schema_script");
     }
+
 
 }
