@@ -28,6 +28,7 @@ class DSL {
 
     public DSL(QSession theSession) {
         session = theSession
+        set$SESSION(session.sessionVariables)
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -327,8 +328,8 @@ class DSL {
                 ownerSession: session)
     }
 
-    //DSL $DSL = this
+    DSL $DSL = this
 
-    //Map $SESSION
+    Map $SESSION
 
 }
