@@ -1,0 +1,30 @@
+graph {
+    fill-color: black;
+}
+
+node {
+    text-size: 10;
+    text-alignment: right;
+    text-offset: 8px;
+    text-color: #999999;
+    size: 16px;
+    fill-color: yellow, rgba(0,0,0,255);
+    fill-mode: gradient-radial;
+}
+
+edge {
+    arrow-size: 4px, 4px;
+    fill-color: #aaaaaa;
+}
+
+node.nyscript {
+    fill-color: red, rgba(0,0,0,255);
+}
+
+node.nyddl {
+    fill-color: yellow, rgba(0,0,0,255);
+}
+
+node.nyq {
+    fill-color: green, rgba(0,0,0,255);
+}
