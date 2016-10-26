@@ -15,7 +15,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
+            <groupId>com.virtusa.gto.nyql</groupId>
             <artifactId>nyql-impl-profilers</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -32,24 +32,24 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
+            <groupId>com.virtusa.gto.nyql</groupId>
             <artifactId>nyql-pool-hikari</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
+            <groupId>com.virtusa.gto.nyql</groupId>
             <artifactId>nyql-impl-mysql</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
+            <groupId>com.virtusa.gto.nyql</groupId>
             <artifactId>nyql-impl-postgre</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
+            <groupId>com.virtusa.gto.nyql</groupId>
             <artifactId>nyql-engine</artifactId>
             <version>${project.version}</version>
         </dependency>

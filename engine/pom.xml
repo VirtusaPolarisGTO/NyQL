@@ -21,7 +21,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.virtusa.gto.insight.nyql</groupId>
+            <groupId>com.virtusa.gto.nyql</groupId>
             <artifactId>nyql-core</artifactId>
             <version>${project.version}</version>
         </dependency>
