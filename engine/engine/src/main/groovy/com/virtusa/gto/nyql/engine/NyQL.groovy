@@ -35,10 +35,10 @@ class NyQL {
 
     private static final Map<String, Object> EMPTY_MAP = [:]
 
-    private static final String BOOTSTRAP_KEY = 'com.virtusa.gto.insight.nyql.autoBootstrap'
-    private static final String AUTO_SHUTDOWN_KEY = 'com.virtusa.gto.insight.nyql.addShutdownHook'
-    private static final String LOAD_CLASSPATH_KEY = 'com.virtusa.gto.insight.nyql.classpathBootstrap'
-    private static final String CONFIG_PATH_KEY = 'com.virtusa.gto.insight.nyql.nyConfigFile'
+    private static final String BOOTSTRAP_KEY = 'com.virtusa.gto.nyql.autoBootstrap'
+    private static final String AUTO_SHUTDOWN_KEY = 'com.virtusa.gto.nyql.addShutdownHook'
+    private static final String LOAD_CLASSPATH_KEY = 'com.virtusa.gto.nyql.classpathBootstrap'
+    private static final String CONFIG_PATH_KEY = 'com.virtusa.gto.nyql.nyConfigFile'
     private static final String TRUE_STR = 'true'
     private static final String FALSE_STR = 'false'
     private static final String JSON_CONFIG_FILENAME = 'nyql.json'

@@ -14,7 +14,7 @@ A common query DSL for popular relational databases.
 
 ```xml
 <dependency>
-    <groupId>com.virtusa.gto.insight.nyql</groupId>
+    <groupId>com.virtusa.gto.nyql</groupId>
     <artifactId>nyql-engine</artifactId>
     <version>${nyql.version}</version>
 </dependency>
@@ -24,7 +24,7 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
 
 ```xml
 <dependency>
-    <groupId>com.virtusa.gto.insight.nyql</groupId>
+    <groupId>com.virtusa.gto.nyql</groupId>
     <artifactId>nyql-impl-mysql</artifactId>
     <version>${nyql.version}</version>
 </dependency>
@@ -36,7 +36,7 @@ For eg: if you expect to use hikari pool, you need to add below dependency.
 
 ```xml
 <dependency>
-    <groupId>com.virtusa.gto.insight.nyql</groupId>
+    <groupId>com.virtusa.gto.nyql</groupId>
     <artifactId>nyql-pool-hikari</artifactId>
     <version>${nyql.version}</version>
 </dependency>
@@ -72,12 +72,12 @@ to the dependency as well. Say you want to use [log4j logging](https://logging.a
 #### Note
 
 * By default, NyQL will try to configure itself automatically if classpath contains a nyql configuration file. 
-If you want to turn it off, add a system property `com.virtusa.gto.insight.nyql.autoBootstrap` value set as `false`. 
+If you want to turn it off, add a system property `com.virtusa.gto.nyql.autoBootstrap` value set as `false`. 
   * __Eg:__ your application may start with below jvm argument.
-   `-Dcom.virtusa.gto.insight.nyql.autoBootstrap=false`
+   `-Dcom.virtusa.gto.nyql.autoBootstrap=false`
 
 * Also NyQL will __not__ automatically shutdown when your application closes, but if you specified jvm property
-`com.virtusa.gto.insight.nyql.addShutdownHook=true`, then NyQL will automatically add a shutdown hook for your application.
+`com.virtusa.gto.nyql.addShutdownHook=true`, then NyQL will automatically add a shutdown hook for your application.
 
 * NyQL will first search for a configuration file in its classpath, if not found, then it will search in current working directory.
 
