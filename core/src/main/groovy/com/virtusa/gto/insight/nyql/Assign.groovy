@@ -9,6 +9,7 @@ import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QOperator
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
@@ -41,6 +42,16 @@ class Assign implements DataTypeTraits, ScriptTraits {
 
     AParam PARAMLIST(String name) {
         throw new NySyntaxException('You cannot use list parameters when assigning!')
+    }
+
+    Table QUERY(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QuerySelect querySelect = new QuerySelect(_ctx)
+
+        def code = closure.rehydrate(querySelect, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        TABLE(_ctx.translator.___selectQuery(querySelect))
     }
 
     Case CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
@@ -120,6 +131,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
         }
     }
 
+    @CompileStatic
     static class AnAssign {
         def leftOp
         def rightOp

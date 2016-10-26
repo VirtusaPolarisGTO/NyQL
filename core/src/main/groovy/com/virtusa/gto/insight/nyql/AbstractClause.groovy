@@ -10,6 +10,7 @@ import com.virtusa.gto.insight.nyql.traits.ScriptTraits
 import com.virtusa.gto.insight.nyql.utils.Constants
 import com.virtusa.gto.insight.nyql.utils.QUtils
 import com.virtusa.gto.insight.nyql.utils.QueryType
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
@@ -25,6 +26,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         }
     }
 
+    @CompileStatic
     def $IMPORT(String scriptId) {
         QScript script = _ctx.ownerSession.scriptRepo.parse(scriptId, _ctx.ownerSession)
         def proxy = script.proxy
@@ -38,39 +40,55 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         //throw new NySyntaxException("You can only import a query part having a Table reference!")
     }
 
+    @CompileStatic
     AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
-        return _ctx.addParam(QUtils.createParam(name, scope, mappingName))
+        _ctx.addParam(QUtils.createParam(name, scope, mappingName))
     }
 
+    @CompileStatic
     AParam PARAMLIST(String name) {
-        return _ctx.addParam(new ParamList(__name: name))
+        _ctx.addParam(new ParamList(__name: name))
     }
 
+    @CompileStatic
     Table TABLE(String tblName) {
         if (_ctx.tables.containsKey(tblName)) {
-            return _ctx.tables.get(tblName)
+            _ctx.tables.get(tblName)
         } else {
             Table table = new Table(__name: tblName, _ctx: _ctx)
             _ctx.tables.put(tblName, table)
-            return table
+            table
         }
     }
 
-    def OTHER() {
+    @CompileStatic
+    TableProxy OTHER() {
         new TableProxy()
     }
 
+    @CompileStatic
     Table TABLE(QResultProxy resultProxy) {
         Table table = new Table(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx, __resultOf: resultProxy)
         _ctx.tables.putIfAbsent(table.__name, table)
-        return table
+        table
     }
 
     Table TABLE(QScript qScript) {
-        return TABLE(qScript.proxy)
+        TABLE(qScript.proxy)
     }
 
-    def COLUMN(String colName) {
+    Table QUERY(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QuerySelect querySelect = new QuerySelect(_ctx)
+
+        def code = closure.rehydrate(querySelect, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        return TABLE(_ctx.translator.___selectQuery(querySelect))
+    }
+
+    @CompileStatic
+    Column COLUMN(String colName) {
         if (_ctx.columns.containsKey(colName)) {
             return _ctx.columns.get(colName)
         } else {
@@ -86,36 +104,36 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         }
     }
 
-    def CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    Case CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Case aCase = new Case(_ctx: _ctx, _ownerQ: this)
 
         def code = closure.rehydrate(aCase, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        return aCase
+        aCase
     }
 
-    def IFNULL(Column column, Object val) {
+    Case IFNULL(Column column, Object val) {
         Case aCase = CASE {
             WHEN { ISNULL(column) }
             THEN { val }
             ELSE { column }
         }
         aCase.setCaseType(Case.CaseType.IFNULL)
-        return aCase
+        aCase
     }
 
-    def IFNOTNULL(Column column, Object val) {
-        return CASE {
+    Case IFNOTNULL(Column column, Object val) {
+        CASE {
             WHEN { NOTNULL(column) }
             THEN { val }
             ELSE { column }
         }
     }
 
-    def EXISTS(QResultProxy innerQuery) {
-        return new FunctionColumn(_ctx: _ctx, _setOfCols: true, _func: 'exists', _columns: [innerQuery])
+    FunctionColumn EXISTS(QResultProxy innerQuery) {
+        new FunctionColumn(_ctx: _ctx, _setOfCols: true, _func: 'exists', _columns: [innerQuery])
     }
 
     def propertyMissing(String name) {

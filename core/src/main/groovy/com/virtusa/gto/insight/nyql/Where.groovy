@@ -188,6 +188,16 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         this
     }
 
+    QResultProxy QUERY(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QuerySelect querySelect = new QuerySelect(_ctx)
+
+        def code = closure.rehydrate(querySelect, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        _ctx.translator.___selectQuery(querySelect)
+    }
+
     def $IMPORT(String scriptId) {
         QScript script = _ctx.ownerSession.scriptRepo.parse(scriptId, _ctx.ownerSession)
         QResultProxy proxy = script.proxy

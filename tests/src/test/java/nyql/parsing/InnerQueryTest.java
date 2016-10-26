@@ -18,4 +18,8 @@ public class InnerQueryTest extends AbstractTest {
         assertQueries(NyQL.parse("innerquery/projection_innerq"));
     }
 
+    public void testInnerQuery() throws NyException {
+        assertQueries(NyQL.parse("innerquery/inner_query"));
+    }
+
 }

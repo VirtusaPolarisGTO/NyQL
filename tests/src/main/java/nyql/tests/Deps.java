@@ -20,23 +20,39 @@ import java.util.stream.Collectors;
  */
 public class Deps {
 
+    private static void printHelp() {
+        System.out.println("Help:");
+        System.out.println("  [--callers] [--table] [--graph] <script-directory> [script-id | table-name]");
+        System.out.println();
+        System.out.println("Arguments:");
+        System.out.println("    --callers          : Find all callers to the given script id.");
+        System.out.println("    --table            : Find all scripts referred to the given table.");
+        System.out.println("    --graph            : Show a graph of all script dependencies.");
+        System.out.println("    <script-directory> : Full path to the directory.");
+        System.out.println("    script-id          : Script id (relative path from the root directory).");
+        System.out.println("    table-name         : Table name to find scripts for.");
+    }
+
     public static void main(String[] args) throws Exception {
+        if (args == null || args.length == 0) {
+            printHelp();
+            return;
+        }
+
         System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-        File dir = new File("C:\\Projects\\work\\scripts\\database\\work\\scripts");
-//
-//
-//        Map<String, Set<String>> calls = new TreeMap<>();
-//        scan(dir, dir, calls);
-//
-//        //System.out.println(calls);
-//        calls.forEach((k, v) -> {
-//            System.out.println(k);
-//            v.forEach(c -> System.out.println("\t" + c));
-//        });
-//        Graph g = createGraph(calls);
-//        Viewer display = g.display();
-//        display.getDefaultView().getCamera().setViewPercent(0.75);
-//        //whoAreMyCallers(dir, "sakila/top_customers");
+        File dir = new File(args[1]);
+        if (!dir.exists()) {
+            System.out.println("Given script directory does not exist! [" + args[1] + "]");
+            return;
+        }
+
+        if (args[0].equalsIgnoreCase("--callers")) {
+            allCallers(dir, args[2]);
+        } else if (args[0].equalsIgnoreCase("--table")) {
+            tableDependency(dir, args[2]);
+        } else if (args[0].equalsIgnoreCase("--graph")) {
+            createGraph(dir);
+        }
         //allCallers(dir, "dashboard/violation_breakdown/join/violation_join_clause");
         //tableDependency(dir, "Violation");
         //printEmptyTables(dir);
