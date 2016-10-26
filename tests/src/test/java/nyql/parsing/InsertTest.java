@@ -1,6 +1,6 @@
 package nyql.parsing;
 
-import com.virtusa.gto.insight.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.engine.NyQL;
 import org.testng.annotations.Test;
 
 /**

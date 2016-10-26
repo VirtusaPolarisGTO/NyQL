@@ -1,4 +1,4 @@
-import com.virtusa.gto.insight.nyql.model.units.AParam
+import com.virtusa.gto.nyql.model.units.AParam
 
 /**
  * @author IWEERARATHNA

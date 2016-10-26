@@ -1,4 +1,4 @@
-import com.virtusa.gto.insight.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.exceptions.NyException
 
 /**
  * @author IWEERARATHNA

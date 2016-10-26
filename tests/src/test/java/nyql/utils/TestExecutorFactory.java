@@ -1,8 +1,8 @@
 package nyql.utils;
 
-import com.virtusa.gto.insight.nyql.engine.impl.QDummyExecutor;
-import com.virtusa.gto.insight.nyql.model.QExecutor;
-import com.virtusa.gto.insight.nyql.model.QExecutorFactory;
+import com.virtusa.gto.nyql.engine.impl.QDummyExecutor;
+import com.virtusa.gto.nyql.model.QExecutor;
+import com.virtusa.gto.nyql.model.QExecutorFactory;
 
 import java.util.Map;
 

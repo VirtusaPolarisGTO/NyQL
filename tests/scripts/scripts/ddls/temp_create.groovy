@@ -1,4 +1,4 @@
-import com.virtusa.gto.insight.nyql.ddl.DFieldType
+import com.virtusa.gto.nyql.ddl.DFieldType
 
 /**
  * @author IWEERARATHNA

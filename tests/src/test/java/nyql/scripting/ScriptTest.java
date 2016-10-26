@@ -1,11 +1,13 @@
 package nyql.scripting;
 
-import com.virtusa.gto.insight.nyql.configs.ConfigBuilder;
-import com.virtusa.gto.insight.nyql.engine.NyQL;
-import com.virtusa.gto.insight.nyql.exceptions.NyException;
+import com.virtusa.gto.nyql.configs.ConfigBuilder;
+import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.exceptions.NyException;
 import groovy.json.JsonSlurper;
 import nyql.utils.TUtils;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;

@@ -1,11 +1,11 @@
 package nyql.parsing;
 
-import com.virtusa.gto.insight.nyql.QResultProxy;
-import com.virtusa.gto.insight.nyql.engine.NyQL;
-import com.virtusa.gto.insight.nyql.model.QScript;
-import com.virtusa.gto.insight.nyql.model.QScriptList;
-import com.virtusa.gto.insight.nyql.model.QScriptResult;
-import com.virtusa.gto.insight.nyql.model.units.AParam;
+import com.virtusa.gto.nyql.QResultProxy;
+import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.model.QScript;
+import com.virtusa.gto.nyql.model.QScriptList;
+import com.virtusa.gto.nyql.model.QScriptResult;
+import com.virtusa.gto.nyql.model.units.AParam;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterSuite;

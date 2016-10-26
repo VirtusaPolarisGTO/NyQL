@@ -1,8 +1,8 @@
-import com.virtusa.gto.insight.nyql.QContextType;
-import com.virtusa.gto.insight.nyql.configs.ConfigBuilder;
-import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType;
-import com.virtusa.gto.insight.nyql.ddl.DKeyType;
-import com.virtusa.gto.insight.nyql.model.impl.QLogProfiler;
+import com.virtusa.gto.nyql.QContextType;
+import com.virtusa.gto.nyql.configs.ConfigBuilder;
+import com.virtusa.gto.nyql.ddl.DKeyIndexType;
+import com.virtusa.gto.nyql.ddl.DKeyType;
+import com.virtusa.gto.nyql.model.impl.QLogProfiler;
 
 import java.util.Collections;
 

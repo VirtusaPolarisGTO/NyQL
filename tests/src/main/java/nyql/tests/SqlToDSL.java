@@ -1,7 +1,6 @@
 package nyql.tests;
 
-import com.virtusa.gto.insight.nyql.utils.QUtils;
-import groovy.lang.GroovyClassLoader;
+import com.virtusa.gto.nyql.utils.QUtils;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;

@@ -1,7 +1,7 @@
 package nyql.tests;
 
-import com.virtusa.gto.insight.nyql.engine.NyQL;
-import com.virtusa.gto.insight.nyql.model.QScript;
+import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.model.QScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

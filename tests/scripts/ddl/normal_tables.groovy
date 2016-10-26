@@ -1,5 +1,5 @@
-import com.virtusa.gto.insight.nyql.ddl.DFieldType
-import com.virtusa.gto.insight.nyql.ddl.DKeyIndexType
+import com.virtusa.gto.nyql.ddl.DFieldType
+import com.virtusa.gto.nyql.ddl.DKeyIndexType
 
 /**
  * @author IWEERARATHNA
