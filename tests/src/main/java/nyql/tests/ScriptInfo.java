@@ -69,6 +69,7 @@ public class ScriptInfo {
     }
 
     void setTables(Set<String> tables) {
+        tables.remove("this");
         this.tables = tables;
     }
 

@@ -42,7 +42,7 @@ abstract class Query extends AbstractClause {
             }
         } else {
             if (!_ctx.tables.containsKey(table.__name)) {
-                _ctx.tables.containsKey(table.__name)
+                _ctx.tables.put(table.__name, table)
             }
         }
         this

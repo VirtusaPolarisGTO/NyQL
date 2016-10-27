@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +29,7 @@ public class Deps {
         System.out.println("    --callers          : Find all callers to the given script id.");
         System.out.println("    --table            : Find all scripts referred to the given table.");
         System.out.println("    --graph            : Show a graph of all script dependencies.");
+        System.out.println("    --lint             : Identify unnecessary scripts.");
         System.out.println("    <script-directory> : Full path to the directory.");
         System.out.println("    script-id          : Script id (relative path from the root directory).");
         System.out.println("    table-name         : Table name to find scripts for.");
@@ -52,26 +54,91 @@ public class Deps {
             tableDependency(dir, args[2]);
         } else if (args[0].equalsIgnoreCase("--graph")) {
             createGraph(dir);
+        } else if (args[0].equalsIgnoreCase("--lint")) {
+            printEmptyTables(dir);
+            //tableUsage(dir);
         }
         //allCallers(dir, "dashboard/violation_breakdown/join/violation_join_clause");
         //tableDependency(dir, "Violation");
         //printEmptyTables(dir);
         //createGraph(dir);
-        printEmptyTables(dir);
+        //printEmptyTables(dir);
     }
 
     public static void tableUsage(File scriptDir) throws Exception {
+        final Map<String, ScriptInfo> info = scanScriptDir(scriptDir);
+        Function<String, ScriptInfo> fetcher = info::get;
 
+        int n = info.size();
+        Map<String, Integer> tblCount = new HashMap<>();
+        for (Map.Entry<String, ScriptInfo> entry : info.entrySet()) {
+            Set<String> tables = entry.getValue().tableChain(fetcher);
+            System.out.println(entry.getKey() + " = " + tables);
+        }
+    }
+
+    private static boolean isValidTableName(String name) {
+        return name.matches("[a-zA-Z_][a-zA-Z0-9_]*");
     }
 
     public static void printEmptyTables(File scriptDir) throws Exception {
-        Map<String, ScriptInfo> info = scanScriptDir(scriptDir);
+        final Map<String, ScriptInfo> info = scanScriptDir(scriptDir);
         Map<String, Set<String>> inMap = createInMap(info);
+        Function<String, ScriptInfo> fetcher = info::get;
+
+        Map<String, Set<String>> tableMap = new TreeMap<>();
+        for (Map.Entry<String, ScriptInfo> entry : info.entrySet()) {
+            Set<String> scrTables = entry.getValue().getTables();
+            for (String t : scrTables) {
+                if (tableMap.containsKey(t)) {
+                    tableMap.get(t).add(entry.getKey());
+                } else {
+                    Set<String> temp = new HashSet<>();
+                    temp.add(entry.getKey());
+                    tableMap.put(t, temp);
+                }
+            }
+        }
+        Set<String> tableNames = tableMap.keySet();
+        for (String tbName : tableNames) {
+            if (!isValidTableName(tbName)) {
+                System.out.println("[INVALID TABLE NAME] Table name is not valid! (" + tbName + ")");
+                System.out.println("\t\t Used in " + tableMap.get(tbName));
+            }
+        }
+
+        System.out.println();
+        System.out.println("[INCONSISTENT TABLE NAMES]");
+        for (String tbName : tableNames) {
+            Set<String> bug = new HashSet<>();
+            bug.add(tbName);
+
+            for (String othName : tableNames) {
+                if (tbName.equals(othName)) {
+                    continue;
+                }
+
+                if (tbName.equalsIgnoreCase(othName)) {
+                    bug.add(othName);
+                }
+            }
+
+            if (bug.size() > 1) {
+                for (String b : bug) {
+                    System.out.println("\t" + b + "  => ");
+                    Set<String> ss = new TreeSet<>(tableMap.get(b));
+                    for (String s : ss) {
+                        System.out.println("\t\t" + s);
+                    }
+                }
+                System.out.println("----------------------------------------------------------------------------");
+            }
+        }
 
         for (Map.Entry<String, ScriptInfo> entry : info.entrySet()) {
             ScriptInfo scriptInfo = entry.getValue();
             if (!scriptInfo.getQueryType().equalsIgnoreCase("script")
-                && (scriptInfo.getTables() == null || scriptInfo.getTables().isEmpty())) {
+                && (scriptInfo.getTables() == null || scriptInfo.tableChain(fetcher).isEmpty())) {
                 System.out.println("[EMPTY TABLE] Script " + entry.getKey() + " ");
             }
         }
