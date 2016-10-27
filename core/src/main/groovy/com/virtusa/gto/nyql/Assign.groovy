@@ -26,6 +26,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
         pQuery = parentQuery
     }
 
+    @CompileStatic
     Table TABLE(QResultProxy resultProxy) {
         Table table = new Table(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx, __resultOf: resultProxy)
         _ctx.tables.putIfAbsent(table.__name, table)
@@ -36,6 +37,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
         TABLE(qScript.proxy)
     }
 
+    @CompileStatic
     AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
         _ctx.addParam(QUtils.createParam(name, scope, mappingName))
     }
@@ -44,16 +46,18 @@ class Assign implements DataTypeTraits, ScriptTraits {
         throw new NySyntaxException('You cannot use list parameters when assigning!')
     }
 
-    Table QUERY(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    @CompileStatic
+    QResultProxy QUERY(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         QuerySelect querySelect = new QuerySelect(_ctx)
 
         def code = closure.rehydrate(querySelect, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        TABLE(_ctx.translator.___selectQuery(querySelect))
+        _ctx.translator.___selectQuery(querySelect)
     }
 
+    @CompileStatic
     Case CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Case aCase = new Case(_ctx: _ctx, _ownerQ: pQuery)
 
@@ -64,7 +68,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
         aCase
     }
 
-    def IFNULL(Column column, Object val) {
+    Case IFNULL(Column column, Object val) {
         Case aCase = CASE {
             WHEN { ISNULL(column) }
             THEN { val }
@@ -74,7 +78,7 @@ class Assign implements DataTypeTraits, ScriptTraits {
         aCase
     }
 
-    def IFNOTNULL(Column column, Object val) {
+    Case IFNOTNULL(Column column, Object val) {
         CASE {
             WHEN { NOTNULL(column) }
             THEN { val }
@@ -82,17 +86,20 @@ class Assign implements DataTypeTraits, ScriptTraits {
         }
     }
 
-    def EQ(Column c1, Object val) {
+    @CompileStatic
+    Assign EQ(Column c1, Object val) {
         assignments.add(new AnAssign(leftOp: c1, rightOp: val))
         this
     }
 
-    def SET_NULL(Column c1) {
+    @CompileStatic
+    Assign SET_NULL(Column c1) {
         assignments.add(new AnAssign(leftOp: c1, rightOp: null))
         this
     }
 
-    def __hasAssignments() {
+    @CompileStatic
+    boolean __hasAssignments() {
         QUtils.notNullNorEmpty(assignments)
     }
 
@@ -117,11 +124,6 @@ class Assign implements DataTypeTraits, ScriptTraits {
 
         if (_ctx.tables.containsKey(name)) {
             return _ctx.tables[name]
-        } else if (Character.isUpperCase(name.charAt(0))) {
-            // table name
-            Table table = new Table(__name: name, _ctx: _ctx)
-            _ctx.tables.put(name, table)
-            return table
         } else {
             throw new NySyntaxException(QUtils.generateErrStr(
                     "No table by name '$name' found!",

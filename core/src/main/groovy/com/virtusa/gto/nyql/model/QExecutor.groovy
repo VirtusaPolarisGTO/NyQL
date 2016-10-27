@@ -56,7 +56,7 @@ trait QExecutor implements Closeable {
      */
     def execute(QScriptList scriptList) throws Exception {
         if (scriptList == null || scriptList.scripts == null) {
-            return null;
+            return new LinkedList<>();
         }
 
         List results = []

@@ -52,5 +52,23 @@
         },
         ["INSERT INTO `Film` (`id`, `title`) VALUES " +
                  "((SELECT otf.film_id FROM `OtherFilms` otf WHERE otf.film_id < ?), ?)",
-            ["minID", "theTitle"]]
+            ["minID", "theTitle"]],
+
+        $DSL.update {
+            TARGET (Film.alias("f"))
+            SET {
+                EQ (f.film_id, QUERY {
+                        TARGET(OtherFilms.alias("otf"))
+                        FETCH(otf.film_id)
+                        WHERE {
+                            LT(otf.film_id, PARAM("minID"))
+                        }
+                    })
+
+                EQ (f.title, PARAM("theTitle"))
+            }
+        },
+        ["UPDATE `Film` f SET f.film_id = SELECT otf.film_id FROM `OtherFilms` otf WHERE otf.film_id < ?, " +
+                 "f.title = ?",
+         ["minID", "theTitle"]]
 ]

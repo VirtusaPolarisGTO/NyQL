@@ -271,7 +271,7 @@ class QAverageProfiler implements QProfiling {
             return printCol('-', maxLen)
         }
         String nstr = String.valueOf(num)
-        return printCol(nstr, maxLen)
+        printCol(nstr, maxLen)
     }
 
     @CompileStatic
@@ -280,7 +280,7 @@ class QAverageProfiler implements QProfiling {
             return printCol('-', maxLen)
         }
         String nstr = String.valueOf(num)
-        return printCol(nstr, maxLen)
+        printCol(nstr, maxLen)
     }
 
     @CompileStatic
@@ -291,9 +291,9 @@ class QAverageProfiler implements QProfiling {
             pfx += ' '
         }
         if (left) {
-            return pfx + val + ' | '
+            pfx + val + ' | '
         } else {
-            return val + pfx + ' | '
+            val + pfx + ' | '
         }
     }
 
