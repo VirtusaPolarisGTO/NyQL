@@ -32,7 +32,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
-        clauses.add(new QConditionGroup(where: inner, condConnector: 'AND'))
+        clauses.add(new QConditionGroup(where: inner, condConnector: QOperator.AND))
         this
     }
 
@@ -42,7 +42,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         def code = closure.rehydrate(inner, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
-        clauses.add(new QConditionGroup(where: inner, condConnector: 'OR'))
+        clauses.add(new QConditionGroup(where: inner, condConnector: QOperator.OR))
         this
     }
 
@@ -88,13 +88,13 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     @CompileStatic
     Where OR() {
-        clauses.add(' OR ')
+        clauses.add(QOperator.OR)
         this
     }
 
     @CompileStatic
     Where AND() {
-        clauses.add(' AND ')
+        clauses.add(QOperator.AND)
         this
     }
 
@@ -311,7 +311,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     @CompileStatic
     static class QConditionGroup {
         Where where
-        String condConnector = 'AND'
+        QOperator condConnector = QOperator.AND
     }
 
     @CompileStatic

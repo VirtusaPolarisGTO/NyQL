@@ -35,7 +35,7 @@ class QScriptList extends QScript {
     @Override
     public String toString() {
         'QScriptList{' +
-                'scripts=\n' + scripts.stream().map({it.toString()}).collect(Collectors.joining(',\n')) +
+                'scripts=\n' + scripts.stream().map {it.toString()}.collect(Collectors.joining(',\n')) +
                 '}';
     }
 }

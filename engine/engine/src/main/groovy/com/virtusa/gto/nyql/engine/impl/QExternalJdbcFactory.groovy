@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.engine.impl
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QExecutorFactory
 
+@java.lang.SuppressWarnings('JdbcConnectionReference')
 import java.sql.Connection
 
 /**
@@ -27,12 +28,12 @@ class QExternalJdbcFactory implements QExecutorFactory {
 
     @Override
     QExecutor create() {
-        return new QJdbcExecutor(connection)
+        new QJdbcExecutor(connection)
     }
 
     @Override
     QExecutor createReusable() {
-        return new QJdbcExecutor(connection)
+        new QJdbcExecutor(connection)
     }
 
     @Override

@@ -212,7 +212,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append('WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append(' ').append(NL)
         }
 
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
+        new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
     }
 
     @Override
@@ -235,7 +235,7 @@ class MySql extends MySqlFunctions implements QTranslator {
     @CompileStatic
     QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) {
         if (combineType == QueryCombineType.INTERSECT) {
-            return manipulateIntersect(queries)
+            //return manipulateIntersect(queries)
         }
 
         String qStr
@@ -260,7 +260,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             }
         }
 
-        return new QResultProxy(query: joiner.toString(), orderedParameters: paramList, queryType: QueryType.SELECT)
+        new QResultProxy(query: joiner.toString(), orderedParameters: paramList, queryType: QueryType.SELECT)
     }
 
     QResultProxy ___deleteQuery(QueryDelete q) {
@@ -556,6 +556,8 @@ class MySql extends MySqlFunctions implements QTranslator {
         for (c in clauses) {
             if (c instanceof String) {
                 builder.append(c)
+            } else if (c instanceof QOperator) {
+                builder.append(' ').append(___convertOperator((QOperator)c)).append(' ')
             } else if (c instanceof Where.QCondition) {
                 builder.append(___expandCondition((Where.QCondition)c, paramOrder, contextType))
             } else if (c instanceof Where.QConditionGroup) {
@@ -588,7 +590,7 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     @CompileStatic
     String ___expandConditionGroup(Where.QConditionGroup group, List<AParam> paramOrder, QContextType contextType) {
-        String gCon = group.condConnector.isEmpty() ? '' : ' ' + group.condConnector + ' '
+        String gCon = group.condConnector == null ? '' : ' ' + ___convertOperator(group.condConnector) + ' '
         List<String> list = new LinkedList<>()
 
         for (Object clause : group.where.clauses) {
@@ -628,6 +630,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         return derived.join(COMMA)
     }
 
+    /*
     private QResultProxy manipulateIntersect(List<Object> queries) {
         if (queries.size() != 2) {
             throw new NySyntaxException('MySQL intersect operator exactly requires only two queries!')
@@ -687,4 +690,5 @@ class MySql extends MySqlFunctions implements QTranslator {
             return new QResultProxy(query: qStr, orderedParameters: paramList, queryType: QueryType.SELECT)
         }
     }
+    */
 }

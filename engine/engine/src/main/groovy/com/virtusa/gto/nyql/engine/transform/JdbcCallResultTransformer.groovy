@@ -3,8 +3,9 @@ package com.virtusa.gto.nyql.engine.transform
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.NamedParam
 
+@java.lang.SuppressWarnings('JdbcResultSetReference')
 import java.sql.ResultSet
-@java.lang.SuppressWarnings("JdbcStatementReference")
+@java.lang.SuppressWarnings('JdbcStatementReference')
 import java.sql.Statement
 
 /**
@@ -39,16 +40,16 @@ class JdbcCallResultTransformer implements QResultTransformer<JdbcCallTransformI
         }
 
         if (rsList.isEmpty()) {
-            return [outs: op, result: null]
+            [outs: op, result: null]
         } else if (rsList.size() == 1) {
-            return [outs: op, result: rsList[0]]
+            [outs: op, result: rsList[0]]
         } else {
-            return [outs: op, result: rsList]
+            [outs: op, result: rsList]
         }
     }
 
     @Override
     long convertUpdateResult(long val) {
-        return val
+        val
     }
 }

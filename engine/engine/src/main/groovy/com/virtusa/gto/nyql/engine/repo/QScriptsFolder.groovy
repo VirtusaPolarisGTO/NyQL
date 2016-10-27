@@ -54,7 +54,7 @@ class QScriptsFolder implements QScriptMapper {
         ScriptVisitor visitor = new ScriptVisitor(this, canPath, inclusionPatterns, exclusionPatterns)
         visitor.start()
         prettyPrintFiles()
-        return this
+        this
     }
 
     private void processScript(File file) {
@@ -70,7 +70,7 @@ class QScriptsFolder implements QScriptMapper {
     }
 
     private static String readAll(File file) {
-        return file.getText(StandardCharsets.UTF_8.name());
+        file.getText(StandardCharsets.UTF_8.name())
     }
 
     private static String captureFileName(String path) {
@@ -78,7 +78,7 @@ class QScriptsFolder implements QScriptMapper {
         if (lp > 0) {
             return path.substring(0, lp)
         }
-        return path
+        path
     }
 
     @SuppressWarnings("UnnecessaryGetter")
@@ -87,10 +87,10 @@ class QScriptsFolder implements QScriptMapper {
             throw new NyConfigurationException('To create a new QScriptsFolder requires at least one parameter with specifying base directory!')
         }
 
-        String path = args.baseDir;
-        File dir = new File(path);
+        String path = args.baseDir
+        File dir = new File(path)
         if (!dir.exists()) {
-            String configFilePath = args._location;
+            String configFilePath = args._location
             if (configFilePath != null) {
                 File activeDir = new File(configFilePath).getCanonicalFile()
                 if (activeDir.exists() && !dir.isAbsolute()) {
@@ -102,10 +102,10 @@ class QScriptsFolder implements QScriptMapper {
             }
             throw new NyConfigurationException('Given script folder does not exist! [' + args[0] + ']')
         }
-        QScriptsFolder qScriptsFolder = new QScriptsFolder(dir);
+        QScriptsFolder qScriptsFolder = new QScriptsFolder(dir)
         qScriptsFolder.inclusionPatterns = args[KEY_INCLUSIONS] ?: ''
         qScriptsFolder.exclusionPatterns = args[KEY_EXCLUSIONS] ?: ''
-        return qScriptsFolder.scanDir()
+        qScriptsFolder.scanDir()
     }
 
     @Override
@@ -114,7 +114,7 @@ class QScriptsFolder implements QScriptMapper {
         if (source == null || source.file == null || !source.file.exists()) {
             throw new NyScriptNotFoundException(id)
         }
-        return source
+        source
     }
 
     @Override
@@ -136,7 +136,7 @@ class QScriptsFolder implements QScriptMapper {
     }
 
     private static String toKB(long length) {
-        return ((int)Math.ceil(length / 1024.0)) + ' KB'
+        ((int)Math.ceil(length / 1024.0)) + ' KB'
     }
 
     @CompileStatic

@@ -18,9 +18,12 @@ import com.virtusa.gto.nyql.utils.QueryType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+@java.lang.SuppressWarnings('JdbcStatementReference')
 import java.sql.CallableStatement
+@java.lang.SuppressWarnings('JdbcConnectionReference')
 import java.sql.Connection
 import java.sql.PreparedStatement
+@java.lang.SuppressWarnings('JdbcResultSetReference')
 import java.sql.ResultSet
 import java.sql.Savepoint
 import java.sql.Statement
@@ -31,7 +34,7 @@ import java.util.stream.Collectors
  */
 class QJdbcExecutor implements QExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(QJdbcExecutor.class)
+    private static final Logger LOGGER = LoggerFactory.getLogger(QJdbcExecutor)
 
     private static final JdbcResultTransformer transformer = new JdbcResultTransformer()
     private static final JdbcCallResultTransformer callResultTransformer = new JdbcCallResultTransformer()
@@ -88,7 +91,7 @@ class QJdbcExecutor implements QExecutor {
         }
 
         if (script.proxy.queryType == QueryType.BULK_INSERT) {
-            return batchExecute(script);
+            return batchExecute(script)
         }
 
         PreparedStatement statement = null
@@ -147,14 +150,14 @@ class QJdbcExecutor implements QExecutor {
         PreparedStatement statement = null
         try {
             statement = getConnection().prepareStatement(script.proxy.query)
-            connection.setAutoCommit(false);
+            connection.setAutoCommit(false)
 
             List<AParam> parameters = script.proxy.orderedParameters
-            Object batchData = script.qSession.sessionVariables['batch'];
+            Object batchData = script.qSession.sessionVariables['batch']
             if (batchData == null) {
-                throw new NyScriptExecutionException("No batch data has been specified through session variables 'batch'!");
+                throw new NyScriptExecutionException("No batch data has been specified through session variables 'batch'!")
             } else if (!(batchData instanceof List)) {
-                throw new NyScriptExecutionException('Batch data expected to be a list of hashmaps!');
+                throw new NyScriptExecutionException('Batch data expected to be a list of hashmaps!')
             }
 
             List<Map> records = batchData as List<Map>
@@ -270,12 +273,12 @@ class QJdbcExecutor implements QExecutor {
         for (AParam param : paramList) {
             Object itemValue = deriveValue(data, param.__name)
 
-            LOGGER.trace(" Parameter #{} : {} [{}]", cp, itemValue, itemValue != null ? itemValue.class.simpleName : "")
+            LOGGER.trace(' Parameter #{} : {} [{}]', cp, itemValue, itemValue != null ? itemValue.class.simpleName : '')
             if (param instanceof ParamList) {
                 if (itemValue instanceof List) {
                     List itemList = itemValue
                     itemList.each { orderedParams.add(it) }
-                    String pStr = itemList.stream().map { return "?" }.collect(Collectors.joining(", "))
+                    String pStr = itemList.stream().map { return '?' }.collect(Collectors.joining(", "))
                     if (itemList.isEmpty()) {
                         LOGGER.warn('Empty parameter list received!')
                         pStr = 'NULL'
@@ -284,7 +287,7 @@ class QJdbcExecutor implements QExecutor {
                     cp += itemList.size()
 
                 } else {
-                    throw new NyScriptExecutionException("Parameter value of '$param.__name' expected to be a list but given " + itemValue.class.simpleName + "!");
+                    throw new NyScriptExecutionException("Parameter value of '$param.__name' expected to be a list but given " + itemValue.class.simpleName + '!')
                 }
             } else {
                 orderedParams.add(itemValue)
@@ -292,7 +295,7 @@ class QJdbcExecutor implements QExecutor {
             }
         }
 
-        PreparedStatement statement;
+        PreparedStatement statement
         if (isReturnKeys(script)) {
             statement = getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
         } else {
@@ -302,7 +305,7 @@ class QJdbcExecutor implements QExecutor {
         for (Object pValue : orderedParams) {
             statement.setObject(cp++, pValue)
         }
-        return statement
+        statement
     }
 
     private static boolean isReturnKeys(QScript script) {
@@ -312,8 +315,8 @@ class QJdbcExecutor implements QExecutor {
 
     private static Object deriveValue(Map dataMap, String name) {
         if (name.indexOf('.') > 0) {
-            String[] parts = name.split("[.]");
-            Object res = dataMap;
+            String[] parts = name.split('[.]')
+            Object res = dataMap
             for (String p : parts) {
                 res = res."$p"
             }
@@ -324,7 +327,7 @@ class QJdbcExecutor implements QExecutor {
 
         } else {
             if (dataMap.containsKey(name)) {
-                return dataMap[name];
+                return dataMap[name]
             } else {
                 throw new NyScriptExecutionException("Data for parameter '$name' cannot be found!")
             }
@@ -344,7 +347,7 @@ class QJdbcExecutor implements QExecutor {
 
     @Override
     def checkPoint() throws NyException {
-        return connection.setSavepoint()
+        connection.setSavepoint()
     }
 
     @Override
@@ -368,7 +371,7 @@ class QJdbcExecutor implements QExecutor {
         if (QUtils.notNullNorEmpty(keys)) {
             res.add([keys: keys])
         }
-        return res
+        res
     }
 
     @Override

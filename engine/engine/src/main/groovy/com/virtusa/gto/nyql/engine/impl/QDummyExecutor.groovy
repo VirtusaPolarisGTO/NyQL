@@ -30,7 +30,7 @@ class QDummyExecutor implements QExecutor {
         }
 
         LOGGER.debug('  Returning list of maps')
-        [[id: "1", title: "item-1"]]
+        [[id: '1', title: 'item-1']]
     }
 
     @Override
@@ -46,7 +46,7 @@ class QDummyExecutor implements QExecutor {
     @Override
     def checkPoint() throws NyException {
         LOGGER.debug('Adding checkpoint here. . .')
-        return new Object()
+        new Object()
     }
 
     @Override

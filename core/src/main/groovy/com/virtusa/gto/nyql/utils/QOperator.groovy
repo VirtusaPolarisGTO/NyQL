@@ -22,6 +22,9 @@ enum QOperator {
     EXISTS('EXISTS'),
     NOT_EXISTS('NOT EXISTS'),
 
+    AND('AND'),
+    OR('OR'),
+
     UNKNOWN('');
 
     private final String op

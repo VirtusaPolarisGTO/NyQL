@@ -23,7 +23,7 @@ import java.lang.reflect.Field
  */
 class QRepositoryImpl implements QRepository {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(QRepositoryImpl.class)
+    private static final Logger LOGGER = LoggerFactory.getLogger(QRepositoryImpl)
 
     protected final QScriptMapper mapper
 
@@ -45,7 +45,7 @@ class QRepositoryImpl implements QRepository {
         }
     }
 
-    public void clearCache(int level) {
+    void clearCache(int level) {
         caching.clearGeneratedCache(level)
         LOGGER.warn('All caches cleared in query repository!')
     }
@@ -54,7 +54,7 @@ class QRepositoryImpl implements QRepository {
         QSource src = mapper.map(scriptId)
 
         if (Configurations.instance().cacheGeneratedQueries() && caching.hasGeneratedQuery(scriptId)) {
-            LOGGER.trace("Script {} served from query cache.", scriptId)
+            LOGGER.trace('Script {} served from query cache.', scriptId)
             return caching.getGeneratedQuery(scriptId, session)
         }
 
@@ -96,7 +96,7 @@ class QRepositoryImpl implements QRepository {
             res.id = scriptId
             return res
         } else {
-            return new QScriptResult(id: scriptId, qSession: session, scriptResult: res)
+            new QScriptResult(id: scriptId, qSession: session, scriptResult: res)
         }
     }
 

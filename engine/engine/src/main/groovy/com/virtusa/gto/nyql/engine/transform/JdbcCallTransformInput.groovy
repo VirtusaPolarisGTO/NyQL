@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.engine.transform
 
 import com.virtusa.gto.nyql.model.QScript
 
+@java.lang.SuppressWarnings('JdbcStatementReference')
 import java.sql.CallableStatement
 
 /**

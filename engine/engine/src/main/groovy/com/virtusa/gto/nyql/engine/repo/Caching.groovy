@@ -134,7 +134,7 @@ class Caching implements Closeable {
 
         compilerConfigurations = new CompilerConfiguration()
 
-        compilerConfigurations.scriptBaseClass = NyBaseScript.class.name
+        compilerConfigurations.scriptBaseClass = NyBaseScript.name
         ASTTransformationCustomizer astStatic = new ASTTransformationCustomizer(CompileStatic)
         SourceAwareCustomizer sac = new SourceAwareCustomizer(astStatic)
         sac.extensionValidator = { ext -> ext == 'sgroovy' }

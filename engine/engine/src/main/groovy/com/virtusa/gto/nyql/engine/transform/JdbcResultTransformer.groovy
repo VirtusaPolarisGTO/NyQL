@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.transform
 
+@java.lang.SuppressWarnings('JdbcResultSetReference')
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
 
@@ -34,6 +35,6 @@ class JdbcResultTransformer implements QJdbcResultTransformer<List<Map<String, O
 
     @Override
     long convertUpdateResult(long val) {
-        return val
+        val
     }
 }

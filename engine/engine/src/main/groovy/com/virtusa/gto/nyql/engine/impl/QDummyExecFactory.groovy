@@ -14,12 +14,12 @@ class QDummyExecFactory implements QExecutorFactory {
 
     @Override
     QExecutor create() {
-        return new QDummyExecutor()
+        new QDummyExecutor()
     }
 
     @Override
     QExecutor createReusable() {
-        return new QDummyExecutor()
+        new QDummyExecutor()
     }
 
     @Override

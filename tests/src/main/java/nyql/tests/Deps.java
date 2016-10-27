@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -310,7 +311,15 @@ public class Deps {
         Map<String, ScriptInfo> map = scanScriptDir(scriptsDir);
         Graph g = new SingleGraph("nyql", false, true);
 
+        Map<String, Object> jsonMap = new HashMap<>();
+        List<Map<String, Object>> nodes = new LinkedList<>();
+        List<Map<String, Object>> edges = new LinkedList<>();
+        jsonMap.put("nodes", nodes);
+        jsonMap.put("edges", edges);
+
         map.forEach((s, strings) -> {
+            nodes.add(createNode(s, convToCSSClass(strings.getQueryType())));
+
             if (strings.getCalls().size() > 0) {
                 strings.getCalls().forEach(other -> {
                     Node fNode = g.getNode(s) == null ? g.addNode(s) : g.getNode(s);
@@ -324,6 +333,8 @@ public class Deps {
                     if (map.get(other) != null) {
                         tNode.setAttribute("ui.class", convToCSSClass(map.get(other).getQueryType()));
                     }
+
+                    edges.add(createEdge(s, other));
                 });
             } else {
                 if (g.getNode(s) == null) {
@@ -348,7 +359,28 @@ public class Deps {
 
         pic.writeAll(g, "scripts.png");
         //display.getDefaultView().getCamera().setViewPercent(0.75);
+        //System.out.println(JsonOutput.toJson(jsonMap));
         return g;
+    }
+
+    private static Map<String, Object> createNode(String id, String type) {
+        Map<String, Object> node = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", id);
+        data.put("classes", type);
+
+        node.put("data", data);
+        return node;
+    }
+
+    private static Map<String, Object> createEdge(String from, String to) {
+        Map<String, Object> node = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        data.put("source", from);
+        data.put("target", to);
+
+        node.put("data", data);
+        return node;
     }
 
     private static String convToCSSClass(String type) {
