@@ -41,7 +41,7 @@ class QResourceScripts implements QScriptMapper {
             GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, id, GroovyShell.DEFAULT_CODE_BASE)
             groovyCodeSource.setCachable(true)
 
-            def qSrc = new QSource(id: id, file: null, doCache: false, codeSource: groovyCodeSource)
+            def qSrc = new QSource(id: id, file: null, codeSource: groovyCodeSource)
             resMap[id] = qSrc
             qSrc
         }

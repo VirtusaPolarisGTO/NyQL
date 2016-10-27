@@ -18,6 +18,9 @@ import groovy.transform.CompileStatic
  */
 class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
+    private static final String STR_AND = 'AND'
+    private static final String STR_OR = 'OR'
+
     QContext _ctx = null
 
     List<Object> clauses = new ArrayList<>()
@@ -265,9 +268,9 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def propertyMissing(String name) {
-        if ('AND' == name) {
+        if (STR_AND == name) {
             return AND()
-        } else if ('OR' == name) {
+        } else if (STR_OR == name) {
             return OR()
         } else if (name == Constants.DSL_SESSION_WORD) {
             return _ctx.ownerSession.sessionVariables
@@ -289,9 +292,9 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     def methodMissing(String name, def args) {
-        if (name == 'AND' || name == 'OR') {
+        if (name == STR_AND || name == STR_OR) {
             if (args.getClass().isArray() && args[0] instanceof Where) {
-                ((Where) args[0]).appendOneLastBefore(name + ' ');
+                ((Where) args[0]).appendOneLastBefore(name + ' ')
                 return
             }
         }

@@ -32,7 +32,7 @@ import java.sql.Connection
 @SuppressWarnings('CatchException')
 class NyQL {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NyQL.class)
+    private static final Logger LOGGER = LoggerFactory.getLogger(NyQL)
 
     private static final Map<String, Object> EMPTY_MAP = [:]
 
@@ -40,6 +40,8 @@ class NyQL {
     private static final String AUTO_SHUTDOWN_KEY = 'com.virtusa.gto.nyql.addShutdownHook'
     private static final String LOAD_CLASSPATH_KEY = 'com.virtusa.gto.nyql.classpathBootstrap'
     private static final String CONFIG_PATH_KEY = 'com.virtusa.gto.nyql.nyConfigFile'
+
+    private static final int STAR_LEN = 100
     private static final String TRUE_STR = 'true'
     private static final String FALSE_STR = 'false'
     private static final String JSON_CONFIG_FILENAME = 'nyql.json'
@@ -47,9 +49,9 @@ class NyQL {
     static {
         try {
             if (!Boolean.parseBoolean(System.getProperty(BOOTSTRAP_KEY, TRUE_STR))) {
-                LOGGER.warn('*' * 100)
+                LOGGER.warn('*' * STAR_LEN)
                 LOGGER.warn('You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!')
-                LOGGER.warn('*' * 100)
+                LOGGER.warn('*' * STAR_LEN)
                 return
             }
 
@@ -59,9 +61,9 @@ class NyQL {
                 LOGGER.warn('Automatically adding a NyQL shutdown hook...')
                 Runtime.runtime.addShutdownHook(new Thread ({ shutdown() }))
             } else {
-                LOGGER.warn('*' * 100)
+                LOGGER.warn('*' * STAR_LEN)
                 LOGGER.warn('You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!')
-                LOGGER.warn('*' * 100)
+                LOGGER.warn('*' * STAR_LEN)
             }
         } catch (Exception ex) {
             LOGGER.error('Error occurred while initializing NyQL!', ex)
@@ -76,17 +78,17 @@ class NyQL {
      * @param inputJson input json file.
      * @param force if specified true, then configurations will be reloaded.
      */
-    public static void configure(File inputJson=null, boolean force=false) {
+    static void configure(File inputJson=null, boolean force=false) {
         if (!Configurations.instance().isConfigured() || force) {
             LOGGER.warn('NyQL is going to configure with default configurations using classpath...')
             if (!configFromSystemProperty() || !configFromClasspath()) {
                 File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME)
                 if (!nyConfig.exists()) {
-                    LOGGER.error("*" * 100)
+                    LOGGER.error('*' * STAR_LEN)
                     LOGGER.error("No nyql.json file is found on classpath! [${nyConfig.absolutePath}]")
-                    LOGGER.error(" " * 50)
+                    LOGGER.error(' ' * (STAR_LEN / 2))
                     LOGGER.error('Explicitly call the configure method with configuration input file!')
-                    LOGGER.error("*" * 100)
+                    LOGGER.error('*' * STAR_LEN)
                     //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
                 } else {
                     LOGGER.debug("Loading configurations from ${nyConfig.canonicalPath}...")
@@ -157,8 +159,8 @@ class NyQL {
      * @throws NyException any exception thrown while parsing.
      */
     @CompileStatic
-    public static QScript parse(String scriptName) throws NyException {
-        return parse(scriptName, EMPTY_MAP)
+    static QScript parse(String scriptName) throws NyException {
+        parse(scriptName, EMPTY_MAP)
     }
 
     /**
@@ -176,7 +178,7 @@ class NyQL {
      * @throws NyException any exception thrown while parsing.
      */
     @CompileStatic
-    public static QScript parse(String scriptName, Map<String, Object> data) throws NyException {
+    static QScript parse(String scriptName, Map<String, Object> data) throws NyException {
         QSession qSession = QSession.create(scriptName)
         if (data) {
             qSession.sessionVariables.putAll(data)
@@ -188,7 +190,7 @@ class NyQL {
      * Shutdown the nyql engine.
      * This should be called only when your application exits.
      */
-    public static void shutdown() {
+    static void shutdown() {
         Configurations.instance().shutdown()
     }
 
@@ -207,7 +209,7 @@ class NyQL {
      * @throws NyException any exception thrown while parsing or executing.
      */
     @CompileStatic
-    public static <T> T execute(String scriptName) throws NyException {
+    static <T> T execute(String scriptName) throws NyException {
         (T) execute(scriptName, EMPTY_MAP)
     }
 
@@ -230,7 +232,7 @@ class NyQL {
      * @throws NyException any exception thrown while parsing or executing.
      */
     @CompileStatic
-    public static <T> T execute(String scriptName, Map<String, Object> data) throws NyException {
+    static <T> T execute(String scriptName, Map<String, Object> data) throws NyException {
         QScript script = null
         try {
             script = parse(scriptName, data)
@@ -257,7 +259,7 @@ class NyQL {
      * @throws NyException any exception thrown while parsing or executing.
      */
     @CompileStatic
-    public static <T> T execute(String dslSql, Map<String, Object> data, Connection connection) throws NyException {
+    static <T> T execute(String dslSql, Map<String, Object> data, Connection connection) throws NyException {
         String scriptId = String.valueOf(System.currentTimeMillis())
         execute(scriptId, dslSql, data, connection)
     }
@@ -279,7 +281,7 @@ class NyQL {
      * @throws NyException any exception thrown while executing or parsing.
      */
     @CompileStatic
-    public static <T> T execute(String scriptId, String dslSql, Map<String, Object> data, Connection connection) throws NyException {
+    static <T> T execute(String scriptId, String dslSql, Map<String, Object> data, Connection connection) throws NyException {
         QJdbcExecutor jdbcExecutor = new QJdbcExecutor(connection)
         QSingleScript qSingleScript = new QSingleScript(scriptId, dslSql)
         QRepository repository = new QSingleScriptRepository(qSingleScript)
@@ -304,7 +306,7 @@ class NyQL {
      * @throws NyException any exception thrown while executing and parsing.
      */
     @CompileStatic
-    public static String executeToJSON(String scriptName, Map<String, Object> data) throws NyException {
+    static String executeToJSON(String scriptName, Map<String, Object> data) throws NyException {
         Object result = execute(scriptName, data)
         JsonOutput.toJson(result)
     }
@@ -321,7 +323,7 @@ class NyQL {
      * @throws NyException any exception thrown while executing and parsing.
      */
     @CompileStatic
-    public static String executeToJSON(String scriptName) throws NyException {
+    static String executeToJSON(String scriptName) throws NyException {
         executeToJSON(scriptName, [:])
     }
 

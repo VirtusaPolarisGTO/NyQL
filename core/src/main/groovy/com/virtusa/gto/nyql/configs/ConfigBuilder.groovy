@@ -293,6 +293,11 @@ class ConfigBuilder {
     }
 
     private static class Holder {
+        /**
+         * Suppressing unused private field because this is being used by owner class
+         * as a singleton instance.
+         */
+        @SuppressWarnings('UnusedPrivateField')
         private static final ConfigBuilder INSTANCE = new ConfigBuilder()
     }
 

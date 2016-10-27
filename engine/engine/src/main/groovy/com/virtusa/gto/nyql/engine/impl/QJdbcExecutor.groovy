@@ -218,7 +218,7 @@ class QJdbcExecutor implements QExecutor {
                 }
 
                 LOGGER.trace(' Parameter #{} : {} [{}]', param.__mappingParamName, itemValue,
-                        itemValue != null ? itemValue.class.simpleName : "")
+                        itemValue != null ? itemValue.class.simpleName : '')
                 statement.setObject(param.__mappingParamName, itemValue)
             }
 
@@ -273,12 +273,12 @@ class QJdbcExecutor implements QExecutor {
         for (AParam param : paramList) {
             Object itemValue = deriveValue(data, param.__name)
 
-            LOGGER.trace(' Parameter #{} : {} [{}]', cp, itemValue, itemValue != null ? itemValue.class.simpleName : '')
+            LOGGER.trace(' Parameter #{} : {}  [{}]', cp, itemValue, itemValue != null ? itemValue.class.simpleName : '')
             if (param instanceof ParamList) {
                 if (itemValue instanceof List) {
                     List itemList = itemValue
                     itemList.each { orderedParams.add(it) }
-                    String pStr = itemList.stream().map { return '?' }.collect(Collectors.joining(", "))
+                    String pStr = itemList.stream().map { return '?' }.collect(Collectors.joining(', '))
                     if (itemList.isEmpty()) {
                         LOGGER.warn('Empty parameter list received!')
                         pStr = 'NULL'

@@ -31,9 +31,7 @@ class QScriptsFolder implements QScriptMapper {
     private static final String KEY_INCLUSIONS = 'inclusions'
     private static final String KEY_EXCLUSIONS = 'exclusions'
     private static final String GLOB_NAME = 'glob:'
-    private static final Logger LOGGER = LoggerFactory.getLogger(QScriptsFolder.class)
-
-    private static final boolean DEF_CACHING = false
+    private static final Logger LOGGER = LoggerFactory.getLogger(QScriptsFolder)
 
     final File baseDir
     String inclusionPatterns
@@ -64,7 +62,7 @@ class QScriptsFolder implements QScriptMapper {
         GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, relPath, GroovyShell.DEFAULT_CODE_BASE)
         groovyCodeSource.setCachable(true)
 
-        def qSrc = new QSource(id: relPath, file: file, doCache: DEF_CACHING, codeSource: groovyCodeSource)
+        def qSrc = new QSource(id: relPath, file: file, codeSource: groovyCodeSource)
         fileMap[relPath] = qSrc
         maxLen = Math.max(relPath.length(), maxLen)
     }

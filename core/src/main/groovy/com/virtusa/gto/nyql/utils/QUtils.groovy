@@ -29,7 +29,7 @@ final class QUtils {
         for (Object val : items) {
             joiner.add(converter.apply(val))
         }
-        return joiner.toString()
+        joiner.toString()
     }
 
     static String generateErrStr(String mainError, String... helpLines) {
@@ -40,7 +40,7 @@ final class QUtils {
                 builder.append('\t> ').append(line).append(NL)
             }
         }
-        return builder.toString()
+        builder.toString()
     }
 
     /**
@@ -50,7 +50,7 @@ final class QUtils {
      * @return text enclosed inside parenthesis.
      */
     static String parenthesis(String text) {
-        return OP + text + CP
+        OP + text + CP
     }
 
     /**
@@ -60,7 +60,7 @@ final class QUtils {
      * @return true if it is not null nor empty.
      */
     static boolean notNullNorEmpty(Collection<?> col) {
-        return col != null && !col.isEmpty()
+        col != null && !col.isEmpty()
     }
 
     /**
@@ -70,7 +70,7 @@ final class QUtils {
      * @return true if it is null or empty.
      */
     static boolean isNullOrEmpty(Map<?, ?> map) {
-        return map == null || map.isEmpty()
+        map == null || map.isEmpty()
     }
 
     /**
@@ -81,7 +81,7 @@ final class QUtils {
      * @return quoted string.
      */
     static String quote(String text, String c='`') {
-        return c + text + c
+        c + text + c
     }
 
     /**
@@ -91,7 +91,7 @@ final class QUtils {
      * @return true if whitespaces are there.
      */
     static boolean hasWS(String text) {
-        return hasWhitespace(text)
+        hasWhitespace(text)
     }
 
     /**
@@ -109,7 +109,7 @@ final class QUtils {
                 return true
             }
         }
-        return false
+        false
     }
 
     /**
@@ -121,9 +121,9 @@ final class QUtils {
      */
     static String quoteIfWS(String text, String c='`') {
         if (hasWS(text)) {
-            return quote(text, c)
+            quote(text, c)
         } else {
-            return text
+            text
         }
     }
 
@@ -193,9 +193,9 @@ final class QUtils {
     static Table findLeftMostTable(Table table) {
         if (table instanceof Join) {
             Join j = (Join)table
-            return findLeftMostTable(j.table1)
+            findLeftMostTable(j.table1)
         } else {
-            return table
+            table
         }
     }
 
@@ -208,9 +208,9 @@ final class QUtils {
     static Table findRightMostTable(Table table) {
         if (table instanceof Join) {
             Join j = (Join)table
-            return findLeftMostTable(j.table2)
+            findLeftMostTable(j.table2)
         } else {
-            return table
+            table
         }
     }
 
@@ -285,9 +285,9 @@ final class QUtils {
      */
     static AParam createParam(String name, AParam.ParamScope scope=null, String mappingName=null) {
         if (scope == null && mappingName == null) {
-            return new AParam(__name: name)
+            new AParam(__name: name)
         } else {
-            return new NamedParam(__name: name, scope: scope, __mappingParamName: mappingName)
+            new NamedParam(__name: name, scope: scope, __mappingParamName: mappingName)
         }
     }
 

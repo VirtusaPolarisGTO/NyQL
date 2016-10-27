@@ -13,7 +13,7 @@ final class QExecutorRegistry {
     private QExecutorRegistry() {}
 
     static QExecutorRegistry getInstance() {
-        return Holder.INSTANCE
+        Holder.INSTANCE
     }
 
     QExecutorFactory register(String name, QExecutorFactory executorFactory, boolean makeDefault=true) {

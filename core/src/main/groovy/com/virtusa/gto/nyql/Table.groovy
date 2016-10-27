@@ -26,7 +26,7 @@ class Table {
     }
 
     boolean __isResultOf() {
-        return __resultOf != null
+        __resultOf != null
     }
 
     boolean __aliasDefined() {

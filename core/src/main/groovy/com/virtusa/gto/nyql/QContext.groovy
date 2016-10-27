@@ -10,14 +10,14 @@ import com.virtusa.gto.nyql.model.units.AParam
 class QContext {
 
     QSession ownerSession
-    QTranslator translator;
-    String translatorName;
+    QTranslator translator
+    String translatorName
 
     //Map<String, AParam> allParams = new HashMap<>()
     List<AParam> allParams = [] as Queue
 
     Tables tables = new Tables()
-    Map<String, Column> columns = new HashMap<>()
+    Map<String, Column> columns = [:]
     Query ownQuery
 
     QContext cloneContext() {
@@ -30,12 +30,12 @@ class QContext {
 
     Table getTheOnlyTable() {
         if (tables.size() != 1) {
-            return null;
+            return null
         }
         for (String k : tables.keySet()) {
             return tables[k]
         }
-        return null;
+        null
     }
 
     AParam addParam(AParam param) {

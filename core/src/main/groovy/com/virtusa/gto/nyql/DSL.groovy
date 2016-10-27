@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
 @CompileStatic
 class DSL {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DSL.class)
+    private static final Logger LOGGER = LoggerFactory.getLogger(DSL)
 
     final QSession session
     //final DSLContext dslContext
@@ -54,23 +54,23 @@ class DSL {
         session.intoScript(scriptName)
         QScript res = session.scriptRepo.parse(scriptName, session)
         session.outFromScript(scriptName)
-        return res
+        res
     }
 
     def RUN(QScriptList scriptList) {
-        return session.execute(scriptList)
+        session.execute(scriptList)
     }
 
     def RUN(QScript script) {
-        return session.execute(script)
+        session.execute(script)
     }
 
     def RUN(QResultProxy proxy) {
-        return RUN(session.scriptRepo.parse(proxy, session))
+        RUN(session.scriptRepo.parse(proxy, session))
     }
 
     def RUN(String scriptName) {
-        return RUN($IMPORT(scriptName))
+        RUN($IMPORT(scriptName))
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ class DSL {
                 list.add(((QScript)q).proxy)
             }
         }
-        return session.dbFactory.createTranslator().___combinationQuery(QueryCombineType.UNION, list);
+        session.dbFactory.createTranslator().___combinationQuery(QueryCombineType.UNION, list)
     }
 
     QResultProxy unionDistinct(Object... qResultProxies) {
@@ -100,17 +100,17 @@ class DSL {
                 list.add(((QScript)q).proxy)
             }
         }
-        return session.dbFactory.createTranslator().___combinationQuery(QueryCombineType.UNION_DISTINCT, list);
+        session.dbFactory.createTranslator().___combinationQuery(QueryCombineType.UNION_DISTINCT, list)
     }
 
     QResultProxy dbFunction(String name, List<AParam> paramList) {
         StoredFunction sp = new StoredFunction(name: name, paramList: new ArrayList<AParam>(paramList))
-        return session.dbFactory.createTranslator().___storedFunction(sp)
+        session.dbFactory.createTranslator().___storedFunction(sp)
     }
 
-    @SuppressWarnings("GrMethodMayBeStatic")
+    @SuppressWarnings('GrMethodMayBeStatic')
     QResultProxy nativeQuery(QueryType queryType, List<AParam> orderedParams = [], String query) {
-        return new QResultProxy(query: String.valueOf(query).trim(),
+        new QResultProxy(query: String.valueOf(query).trim(),
                 queryType: queryType,
                 orderedParameters: orderedParams)
     }
@@ -121,7 +121,7 @@ class DSL {
         if (query == null) {
             throw new NyException("No query is defined for the database '${activeDb}'!")
         }
-        return new QResultProxy(query: String.valueOf(query).trim(),
+        new QResultProxy(query: String.valueOf(query).trim(),
                 queryType: queryType,
                 orderedParameters: orderedParams)
     }
@@ -136,7 +136,7 @@ class DSL {
 
         QResultProxy proxy = qs._ctx.translator.___insertQuery(qs)
         proxy.setQueryType(QueryType.BULK_INSERT)
-        return proxy
+        proxy
     }
 
     QResultProxy delete(@DelegatesTo(value = QueryDelete, strategy = Closure.DELEGATE_ONLY) Closure closure) {
@@ -147,7 +147,7 @@ class DSL {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        return qs._ctx.translator.___deleteQuery(qs)
+        qs._ctx.translator.___deleteQuery(qs)
     }
 
     QResultProxy insert(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
@@ -158,7 +158,7 @@ class DSL {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        return qs._ctx.translator.___insertQuery(qs)
+        qs._ctx.translator.___insertQuery(qs)
     }
 
     QResultProxy select(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
@@ -169,7 +169,7 @@ class DSL {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        return qs._ctx.translator.___selectQuery(qs)
+        qs._ctx.translator.___selectQuery(qs)
     }
 
     QResultProxy update(@DelegatesTo(value = QueryUpdate, strategy = Closure.DELEGATE_ONLY) Closure closure) {
@@ -180,7 +180,7 @@ class DSL {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        return qs._ctx.translator.___updateQuery(qs)
+        qs._ctx.translator.___updateQuery(qs)
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +197,7 @@ class DSL {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        return qp._ctx.translator.___partQuery(qp)
+        qp._ctx.translator.___partQuery(qp)
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ class DSL {
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
 
-        return activeDDL.createScripts()
+        activeDDL.createScripts()
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ class DSL {
      */
     DSL AUTO_COMMIT(boolean autoCommit=true) {
         currentTransactionAutoCommit = autoCommit
-        return this
+        this
     }
 
     /**
@@ -241,6 +241,7 @@ class DSL {
      * @param closure transaction content.
      * @return this same DSL instance
      */
+    @SuppressWarnings('CatchThrowable')
     DSL TRANSACTION(@DelegatesTo(value = DSL, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         try {
             session.executor.startTransaction()
@@ -261,7 +262,7 @@ class DSL {
             session.executor.done()
             currentTransactionAutoCommit = false
         }
-        return this
+        this
     }
 
     /**
@@ -271,7 +272,7 @@ class DSL {
      */
     DSL COMMIT() {
         session.executor.commit()
-        return this
+        this
     }
 
     /**
@@ -281,7 +282,7 @@ class DSL {
      * @return a reference to the newly created checkpoint at this stage.
      */
     def CHECKPOINT() {
-        return session.executor.checkPoint()
+        session.executor.checkPoint()
     }
 
     /**
@@ -293,7 +294,7 @@ class DSL {
      */
     DSL ROLLBACK(Object checkPoint=null) {
         session.executor.rollback(checkPoint)
-        return this
+        this
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -303,12 +304,12 @@ class DSL {
     ///////////////////////////////////////////////////////////////////////////////////
 
     DSL $LOG(Object msg) {
-        return $LOG(String.valueOf(msg))
+        $LOG(String.valueOf(msg))
     }
 
     DSL $LOG(String message) {
         LOGGER.debug('[@ ' + session.currentActiveScript() + ' @]' + message)
-        return this
+        this
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -318,12 +319,12 @@ class DSL {
     ///////////////////////////////////////////////////////////////////////////////////
 
     AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
-        return QUtils.createParam(name, scope, mappingName)
+        QUtils.createParam(name, scope, mappingName)
     }
 
     private QContext createContext(String db=null) {
         String dbName = db ?: session.dbFactory.dbName()
-        return new QContext(translator: session.dbFactory.createTranslator(),
+        new QContext(translator: session.dbFactory.createTranslator(),
                 translatorName: dbName,
                 ownerSession: session)
     }

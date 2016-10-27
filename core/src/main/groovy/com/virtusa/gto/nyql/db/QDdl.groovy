@@ -33,6 +33,6 @@ trait QDdl {
      * @param obj input object to resolve.
      * @return resolved object.
      */
-    abstract def ___ddlResolve(Object obj)
+    abstract ___ddlResolve(Object obj)
 
 }

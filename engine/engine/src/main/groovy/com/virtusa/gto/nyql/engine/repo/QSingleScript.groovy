@@ -18,7 +18,7 @@ class QSingleScript implements QScriptMapper {
 
     QSingleScript(String id, String content) {
         codeSource = new GroovyCodeSource(content, id, GroovyShell.DEFAULT_CODE_BASE)
-        qSource = new QSource(id: id, file: null, doCache: false, codeSource: codeSource)
+        qSource = new QSource(id: id, file: null, codeSource: codeSource)
         allSources = Arrays.asList(qSource)
     }
 

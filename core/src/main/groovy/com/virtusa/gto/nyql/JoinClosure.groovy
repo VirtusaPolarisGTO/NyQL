@@ -12,6 +12,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class JoinClosure extends AbstractClause {
 
+    private static final String DEF_JOIN = 'INNER_JOIN'
+
     final Table startingTable
 
     Table activeTable
@@ -29,7 +31,7 @@ class JoinClosure extends AbstractClause {
         if (proxy.queryType == QueryType.PART) {
             Query q = proxy.qObject as Query
             _ctx.mergeFrom(q._ctx)
-            activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, (Table)proxy.rawObject, 'INNER_JOIN')
+            activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, (Table)proxy.rawObject, DEF_JOIN)
             return proxy.rawObject
         }
         throw new NySyntaxException('You can only import a query part having a Table reference!')
@@ -41,7 +43,7 @@ class JoinClosure extends AbstractClause {
     }
 
     Table INNER_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'INNER_JOIN')
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, DEF_JOIN)
         activeTable
     }
 

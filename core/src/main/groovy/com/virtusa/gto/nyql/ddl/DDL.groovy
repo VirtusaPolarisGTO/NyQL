@@ -14,10 +14,10 @@ import java.util.stream.Collectors
 /**
  * @author IWEERARATHNA
  */
-@ToString(includes = ["tables"])
+@ToString(includes = ['tables'])
 class DDL {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DDL.class)
+    private static final Logger LOGGER = LoggerFactory.getLogger(DDL)
 
     final QSession session
     //final DSLContext dslContext
@@ -25,7 +25,7 @@ class DDL {
     Map<String, DTable> tables = [:]
     List<DTable> tablesToDrop = []
 
-    public DDL(QSession theSession) {
+    DDL(QSession theSession) {
         session = theSession
         //dslContext = session.dslContext
     }
@@ -138,13 +138,13 @@ class DDL {
     private List<QScript> callCreateTable(DTable dTable) {
         LOGGER.debug('Executing table creation command...')
         List<QResultProxy> proxies = session.dbFactory.createTranslator().___ddls().___createTable(dTable)
-        proxies.stream().map { session.scriptRepo.parse(it, session) }.collect(Collectors.toList());
+        proxies.stream().map { session.scriptRepo.parse(it, session) }.collect(Collectors.toList())
     }
 
     @CompileStatic
     private List<QScript> callDropTable(DTable dTable) {
         LOGGER.debug('Executing table drop command...')
         List<QResultProxy> proxies = session.dbFactory.createTranslator().___ddls().___dropTable(dTable)
-        proxies.stream().map { session.scriptRepo.parse(it, session) }.collect(Collectors.toList());
+        proxies.stream().map { session.scriptRepo.parse(it, session) }.collect(Collectors.toList())
     }
 }

@@ -35,6 +35,7 @@ final class QRepositoryRegistry {
     }
 
     private static class Holder {
+        @SuppressWarnings('UnusedPrivateField')
         private static final QRepositoryRegistry INSTANCE = new QRepositoryRegistry()
     }
 

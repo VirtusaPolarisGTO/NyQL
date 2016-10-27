@@ -13,7 +13,7 @@ abstract class DAbstractEntity {
 
     Map additionalAttrs = [:]
 
-    public static <T> T toEnum(Map map, String key, T defValue) {
+    static <T> T toEnum(Map map, String key, T defValue) {
         if (map.containsKey(key)) {
             (T) map[key]
         } else {

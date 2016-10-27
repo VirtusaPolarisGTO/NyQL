@@ -7,7 +7,7 @@ import com.virtusa.gto.nyql.model.units.AParam
  */
 trait ScriptTraits {
 
-    abstract def $IMPORT(String scriptId)
+    abstract $IMPORT(String scriptId)
 
     abstract AParam PARAM(String name, AParam.ParamScope scope, String mappingName)
 
