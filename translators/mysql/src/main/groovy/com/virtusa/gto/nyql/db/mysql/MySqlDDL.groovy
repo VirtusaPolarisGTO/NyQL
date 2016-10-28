@@ -50,7 +50,7 @@ class MySqlDDL implements QDdl {
         }
 
         QResultProxy resultProxy = new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
-        return Arrays.asList(resultProxy)
+        Arrays.asList(resultProxy)
     }
 
     @Override
@@ -61,7 +61,7 @@ class MySqlDDL implements QDdl {
         if (dTable.ifNotExist) query.append("IF EXISTS ")
         query.append(___ddlResolve(dTable))
         def rProxy = new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.SCHEMA_CHANGE)
-        return Arrays.asList(rProxy)
+        Arrays.asList(rProxy)
     }
 
     private static String ___ddlExpandKey(DKey key) {
@@ -97,17 +97,17 @@ class MySqlDDL implements QDdl {
             q.append('DEFAULT ').append(_describeDefaultVal(dField)).append(' ')
         }
 
-        return q.toString().trim()
+        q.toString().trim()
     }
 
     @Override
     def ___ddlResolve(Object obj) {
         if (obj instanceof DTable) {
-            return tblName(obj)
+            tblName(obj)
         } else if (obj instanceof DField) {
-            return colName(obj)
+            colName(obj)
         } else {
-            return String.valueOf(obj)
+            String.valueOf(obj)
         }
     }
 
@@ -126,9 +126,9 @@ class MySqlDDL implements QDdl {
             }
         }
         if (isNumber(dField.type)) {
-            return String.valueOf(dField.defaultValue)
+            String.valueOf(dField.defaultValue)
         } else {
-            return QUtils.quote(dField.defaultValue, "'")
+            QUtils.quote(dField.defaultValue, "'")
         }
     }
 
@@ -154,26 +154,26 @@ class MySqlDDL implements QDdl {
     }
 
     private static String _chkUnsigned(DField field) {
-        return field.unsigned ? ' UNSIGNED' : ''
+        field.unsigned ? ' UNSIGNED' : ''
     }
 
     private static String _chkLength(DField field) {
         if (field.length > 0) {
             return '(' + String.valueOf(field.length) + ')'
         }
-        return ''
+        ''
     }
 
     private static String tblName(DTable table) {
-        return QUtils.quote(table.name, MySql.BACK_TICK)
+        QUtils.quote(table.name, MySql.BACK_TICK)
     }
 
     private static String colName(DField field) {
-        return QUtils.quote(field.name, MySql.BACK_TICK)
+        QUtils.quote(field.name, MySql.BACK_TICK)
     }
 
     private static boolean isNumber(DFieldType type) {
-        return type == DFieldType.INT || type == DFieldType.BIGINT || type == DFieldType.DOUBLE ||
+        type == DFieldType.INT || type == DFieldType.BIGINT || type == DFieldType.DOUBLE ||
                 type == DFieldType.FLOAT || type == DFieldType.NUMBER || type == DFieldType.SMALLINT
     }
 }

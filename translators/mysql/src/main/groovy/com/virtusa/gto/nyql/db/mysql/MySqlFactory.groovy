@@ -17,7 +17,6 @@ class MySqlFactory implements QDbFactory {
     private static final String DATA_SOURCE_CLASS_NAME = 'com.mysql.jdbc.jdbc2.optional.MysqlDataSource'
     private static final String JDBC_CLASS_NAME = 'com.mysql.jdbc.Driver'
     private final MySql mySql = new MySql()
-    private final List<Class<?>> traits = []
 
     /**
      * Returns text 'mysql'.
@@ -26,7 +25,7 @@ class MySqlFactory implements QDbFactory {
      */
     @Override
     String dbName() {
-        return DB_NAME
+        DB_NAME
     }
 
     /**
@@ -36,7 +35,7 @@ class MySqlFactory implements QDbFactory {
      */
     @Override
     String dataSourceClassName() {
-        return DATA_SOURCE_CLASS_NAME
+        DATA_SOURCE_CLASS_NAME
     }
 
     /**
@@ -47,7 +46,7 @@ class MySqlFactory implements QDbFactory {
      */
     @Override
     QTranslator createTranslator() {
-        return mySql
+        mySql
     }
 
     /**
@@ -57,6 +56,6 @@ class MySqlFactory implements QDbFactory {
      */
     @Override
     String driverClassName() {
-        return JDBC_CLASS_NAME
+        JDBC_CLASS_NAME
     }
 }
