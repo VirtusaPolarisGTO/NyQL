@@ -234,9 +234,9 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     @CompileStatic
     QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) {
-        if (combineType == QueryCombineType.INTERSECT) {
+        //if (combineType == QueryCombineType.INTERSECT) {
             //return manipulateIntersect(queries)
-        }
+        //}
 
         String qStr
         if (combineType == QueryCombineType.UNION) {

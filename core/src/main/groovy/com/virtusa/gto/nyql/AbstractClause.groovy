@@ -7,11 +7,9 @@ import com.virtusa.gto.nyql.model.units.ParamList
 import com.virtusa.gto.nyql.traits.DataTypeTraits
 import com.virtusa.gto.nyql.traits.FunctionTraits
 import com.virtusa.gto.nyql.traits.ScriptTraits
-import com.virtusa.gto.nyql.utils.Constants
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
-
 /**
  * @author IWEERARATHNA
  */
@@ -24,6 +22,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         if (this instanceof Query) {
             _ctx.ownQuery = this
         }
+        set$SESSION(_ctx.ownerSession.sessionVariables)
     }
 
     @CompileStatic
@@ -136,10 +135,14 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         new FunctionColumn(_ctx: _ctx, _setOfCols: true, _func: 'exists', _columns: [innerQuery])
     }
 
+    String ALL = '*'
+
+    Map $SESSION
+
     def propertyMissing(String name) {
-        if (name == Constants.DSL_SESSION_WORD) {
-            return _ctx.ownerSession.sessionVariables
-        }
+        //if (name == Constants.DSL_SESSION_WORD) {
+        //    return _ctx.ownerSession.sessionVariables
+        //}
 
         Column col = _ctx.getColumnIfExist(name)
         if (col != null) {

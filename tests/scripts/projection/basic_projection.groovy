@@ -16,6 +16,18 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (ac)
+    },
+    "SELECT ac.* FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (TABLE("Actor").alias("ac"))
+        FETCH (ac)
+    },
+    "SELECT ac.* FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (ac.id, ac.name.alias("aliased Name"), ac.title)
     },
     "SELECT ac.id, ac.name AS `aliased Name`, ac.title FROM `Actor` ac",
