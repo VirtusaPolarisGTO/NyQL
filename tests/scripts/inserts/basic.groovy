@@ -40,10 +40,11 @@ def innQP = $DSL.select {
             TARGET (Film.alias("f"))
             DATA (
                     "film_id": PARAM("id"),
-                    "title": PARAM("title")
+                    "title": PARAM("title"),
+                    "createdAt": CUREPOCH()
             )
         },
-        ["INSERT INTO `Film` (`film_id`, `title`) VALUES (?, ?)",
+        ["INSERT INTO `Film` (`film_id`, `title`, `createdAt`) VALUES (?, ?, UNIX_TIMESTAMP() * 1000)",
          ["id", "title"]],
 
         $DSL.insert {
