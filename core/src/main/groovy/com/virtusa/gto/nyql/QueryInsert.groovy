@@ -15,12 +15,12 @@ class QueryInsert extends QuerySelect {
         super(contextParam)
     }
 
-    def DATA(Map args) {
+    QueryInsert DATA(Map args) {
         args.each { k, v -> _data.put(String.valueOf(k), v) }
         return this
     }
 
-    def RETURN_KEYS() {
+    QueryInsert RETURN_KEYS() {
         returnType = QReturnType.KEYS
         return this
     }

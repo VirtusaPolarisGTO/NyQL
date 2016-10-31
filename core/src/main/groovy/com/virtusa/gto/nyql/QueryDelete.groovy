@@ -14,16 +14,16 @@ class QueryDelete extends Query {
         super(contextParam)
     }
 
-    def TARGET(Table table) {
+    QueryDelete TARGET(Table table) {
         sourceTbl = table
         this
     }
 
-    def TARGET() {
+    Table TARGET() {
         sourceTbl
     }
 
-    def JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    QueryDelete JOIN(Table startTable, @DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         JoinClosure joinClosure = new JoinClosure(_ctx, startTable)
 
         def code = closure.rehydrate(joinClosure, this, this)
