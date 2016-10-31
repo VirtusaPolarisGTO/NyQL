@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.traits.DataTypeTraits
+import com.virtusa.gto.nyql.traits.FunctionTraits
 import com.virtusa.gto.nyql.traits.ScriptTraits
 import com.virtusa.gto.nyql.utils.Constants
 import com.virtusa.gto.nyql.utils.QOperator
@@ -14,7 +15,7 @@ import groovy.transform.CompileStatic
 /**
  * @author IWEERARATHNA
  */
-class Assign implements DataTypeTraits, ScriptTraits {
+class Assign implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     QContext _ctx = null
     Query pQuery
