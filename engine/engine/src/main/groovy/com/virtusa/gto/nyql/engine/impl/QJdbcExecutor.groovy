@@ -150,7 +150,7 @@ class QJdbcExecutor implements QExecutor {
         PreparedStatement statement = null
         try {
             statement = getConnection().prepareStatement(script.proxy.query)
-            connection.setAutoCommit(false)
+            //connection.setAutoCommit(false)
 
             List<AParam> parameters = script.proxy.orderedParameters
             Object batchData = script.qSession.sessionVariables['batch']
@@ -167,13 +167,13 @@ class QJdbcExecutor implements QExecutor {
             }
 
             int[] counts = statement.executeBatch()
-            connection.commit()
+            //connection.commit()
             return [count: counts]
 
         } finally {
-            if (connection != null) {
-                connection.setAutoCommit(true)
-            }
+            //if (connection != null) {
+            //    connection.setAutoCommit(true)
+            //}
 
             if (statement != null) {
                 statement.close()
