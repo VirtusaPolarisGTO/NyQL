@@ -171,6 +171,10 @@ class QJdbcExecutor implements QExecutor {
             return [count: counts]
 
         } finally {
+            if (connection != null) {
+                connection.setAutoCommit(true)
+            }
+
             if (statement != null) {
                 statement.close()
             }
