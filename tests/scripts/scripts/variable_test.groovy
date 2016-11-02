@@ -14,6 +14,12 @@ $DSL.script {
     }
 
     RUN (innQ)
+    RUN ($DSL.select {
+        TARGET (Film.alias("f"))
+
+        FETCH (f.film_id, $SESSION.manProperty)
+
+    })
     def result = RUN ("scripts/other_query")
     $LOG result
 

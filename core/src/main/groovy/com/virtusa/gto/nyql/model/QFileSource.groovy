@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class QFileSource extends QSource {
 
-    private File file
+    private final File file
 
     QFileSource(String id, File theFile, GroovyCodeSource codeSource) {
         super(id, codeSource)

@@ -7,8 +7,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class QSource {
 
-    private String id
-    private GroovyCodeSource codeSource
+    private final String id
+    private final GroovyCodeSource codeSource
 
     QSource(String theId, GroovyCodeSource theCode) {
         id = theId

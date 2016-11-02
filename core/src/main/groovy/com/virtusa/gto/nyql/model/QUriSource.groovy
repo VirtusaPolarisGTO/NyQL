@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class QUriSource extends QSource {
 
-    private URI uri
+    private final URI uri
 
     QUriSource(String theId, URI theUrl, GroovyCodeSource theCode) {
         super(theId, theCode)

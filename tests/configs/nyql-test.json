@@ -6,7 +6,7 @@
   ],
 
   "caching": {
-    "compiledScripts": true,
+    "compiledScripts": false,
     "generatedQueries": true
   },
 
