@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.engine.repo
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
+import com.virtusa.gto.nyql.model.QFileSource
 import com.virtusa.gto.nyql.model.QScriptMapper
 import com.virtusa.gto.nyql.model.QSource
 import groovy.transform.CompileStatic
@@ -62,7 +63,7 @@ class QScriptsFolder implements QScriptMapper {
         GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, relPath, GroovyShell.DEFAULT_CODE_BASE)
         groovyCodeSource.setCachable(true)
 
-        def qSrc = new QSource(id: relPath, file: file, codeSource: groovyCodeSource)
+        def qSrc = new QFileSource(relPath, file, groovyCodeSource)
         fileMap[relPath] = qSrc
         maxLen = Math.max(relPath.length(), maxLen)
     }
@@ -109,7 +110,7 @@ class QScriptsFolder implements QScriptMapper {
     @Override
     QSource map(String id) throws NyScriptNotFoundException {
         QSource source = fileMap[id]
-        if (source == null || source.file == null || !source.file.exists()) {
+        if (source == null || !source.isValid()) {
             throw new NyScriptNotFoundException(id)
         }
         source
@@ -127,7 +128,7 @@ class QScriptsFolder implements QScriptMapper {
 
     private void prettyPrintFiles() {
         fileMap.keySet().sort().each {
-            String kb = toKB(fileMap[it].file.length())
+            String kb = toKB((fileMap[it] as QFileSource).file.length())
             LOGGER.debug(' > ' + it.padRight(maxLen + 5) + "${kb.padLeft(6)}")
         }
         LOGGER.debug("Found ${fileMap.size()} script(s).")

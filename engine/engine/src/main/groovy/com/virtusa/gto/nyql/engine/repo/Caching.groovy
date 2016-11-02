@@ -95,14 +95,14 @@ class Caching implements Closeable {
     Script getCompiledScript(QSource sourceScript, QSession session) {
         Binding binding = new Binding(session?.sessionVariables ?: [:])
         if (Configurations.instance().cacheRawScripts()) {
-            def clazz = gcl.parseClass(sourceScript.codeSource, true)
+            Class<?> clazz = gcl.parseClass(sourceScript.codeSource, true)
             NyBaseScript scr = clazz.newInstance() as NyBaseScript
             scr.setBinding(binding)
             scr.setSession(session)
             scr
         } else {
             GroovyShell shell = new GroovyShell(binding, makeCompilerConfigs())
-            Script parsedScript = shell.parse(sourceScript.file) as NyBaseScript
+            Script parsedScript = sourceScript.parseIn(shell)
             parsedScript.setSession(session)
             parsedScript
         }

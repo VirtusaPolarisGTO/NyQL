@@ -5,9 +5,10 @@ import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.model.QScriptMapper
 import com.virtusa.gto.nyql.model.QSource
+import com.virtusa.gto.nyql.model.QUriSource
+import groovy.transform.CompileStatic
 
 import java.nio.charset.StandardCharsets
-
 /**
  * Loads scripts from a resource folder.
  *
@@ -28,7 +29,7 @@ class QResourceScripts implements QScriptMapper {
             throw new NyConfigurationException('To create a new QResourceScripts requires at least one parameter with specifying a resource directory!')
         }
 
-        String path = args.resourceDir ?: '/'
+        String path = args.resourceDir ?: ''
         new QResourceScripts(path)
     }
 
@@ -41,14 +42,16 @@ class QResourceScripts implements QScriptMapper {
             GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, id, GroovyShell.DEFAULT_CODE_BASE)
             groovyCodeSource.setCachable(true)
 
-            def qSrc = new QSource(id: id, file: null, codeSource: groovyCodeSource)
+            def qSrc = new QUriSource(id, null, groovyCodeSource)
             resMap[id] = qSrc
             qSrc
         }
     }
 
+    @CompileStatic
     private static String readAll(String subPath) throws NyScriptNotFoundException {
-        def stream = Thread.currentThread().contextClassLoader.getResourceAsStream(subPath)
+        URL url = Thread.currentThread().contextClassLoader.getResource(subPath)
+        InputStream stream = openSafe(url)
         if (stream != null) {
             try {
                 return stream.readLines(StandardCharsets.UTF_8.name()).join('\n')
@@ -59,6 +62,15 @@ class QResourceScripts implements QScriptMapper {
             }
         }
         throw new NyScriptNotFoundException("There is no resource exist in $subPath!")
+    }
+
+    @CompileStatic
+    private static InputStream openSafe(URL url) {
+        try {
+            url != null ? url.openStream() : null
+        } catch (IOException ignored) {
+            null
+        }
     }
 
     @Override
