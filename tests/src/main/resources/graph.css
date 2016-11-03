@@ -1,12 +1,14 @@
 graph {
     fill-color: black;
+    text-color: rgba(220, 200, 220, 0);
+    text-mode: hidden;
 }
 
 node {
     text-size: 10;
     text-alignment: right;
     text-offset: 8px;
-    text-color: #999999;
+    text-color: rgba(220, 200, 220, 80);
     size: 15px;
     fill-color: yellow, rgba(0,0,0,0);
     fill-mode: gradient-radial;

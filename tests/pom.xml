@@ -15,6 +15,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
+            <version>3.5.0.201409260305-r</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gitective</groupId>
+            <artifactId>gitective-core</artifactId>
+            <version>0.9.9</version>
+        </dependency>
+        <dependency>
             <groupId>com.virtusa.gto.nyql</groupId>
             <artifactId>nyql-impl-profilers</artifactId>
             <version>${project.version}</version>

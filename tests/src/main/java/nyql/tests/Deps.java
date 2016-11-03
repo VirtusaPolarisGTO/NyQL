@@ -99,6 +99,9 @@ public class Deps {
     }
 
     public static void printEmptyTables(File scriptDir) throws Exception {
+        SCMCache scmCache = new SCMCache();
+        scmCache.init(scriptDir);
+
         final Map<String, ScriptInfo> info = scanScriptDir(scriptDir);
         Map<String, Set<String>> inMap = createInMap(info);
         Function<String, ScriptInfo> fetcher = info::get;
@@ -127,6 +130,8 @@ public class Deps {
         System.out.println();
         System.out.println("[INCONSISTENT TABLE NAMES]");
         for (String tbName : tableNames) {
+            String correctName = tbName;
+            boolean incorrect = !isProperCase(tbName);
             Set<String> bug = new HashSet<>();
             bug.add(tbName);
 
@@ -137,18 +142,30 @@ public class Deps {
 
                 if (tbName.equalsIgnoreCase(othName)) {
                     bug.add(othName);
+                    if (isProperCase(othName)) {
+                        correctName = othName;
+                    }
                 }
             }
 
             if (bug.size() > 1) {
+                System.out.println("Table '" + correctName + "' name is inconsistent in below scripts!");
                 for (String b : bug) {
-                    System.out.println("\t" + b + "  => ");
-                    Set<String> ss = new TreeSet<>(tableMap.get(b));
-                    for (String s : ss) {
-                        System.out.println("\t\t" + s);
+                    if (!b.equals(correctName)) {
+                        System.out.println("\t" + b + "  => ");
+                        Set<String> ss = new TreeSet<>(tableMap.get(b));
+                        for (String s : ss) {
+                            System.out.println("\t\t" + s + "\t\t[" + scmCache.lastCommitAuthor(new File(scriptDir, s)) + "]");
+                        }
                     }
                 }
                 System.out.println("----------------------------------------------------------------------------");
+            } else if (bug.size() == 1 && incorrect) {
+                System.out.println("Table '" + tbName + "' does not follow proper-case convention! Ignore this if this is an alias.");
+                Set<String> ss = new TreeSet<>(tableMap.get(tbName));
+                for (String s : ss) {
+                    System.out.println("\t\t" + s + "\t\t[" + scmCache.lastCommitAuthor(new File(scriptDir, s)) + "]");
+                }
             }
         }
 
@@ -156,7 +173,7 @@ public class Deps {
             ScriptInfo scriptInfo = entry.getValue();
             if (!scriptInfo.getQueryType().equalsIgnoreCase("script")
                 && (scriptInfo.getTables() == null || scriptInfo.tableChain(fetcher).isEmpty())) {
-                System.out.println("[EMPTY TABLE] Script " + entry.getKey() + " ");
+                //System.out.println("[EMPTY TABLE] Script " + entry.getKey() + " ");
             }
         }
 
@@ -165,11 +182,28 @@ public class Deps {
                 if (entry.getValue().getCalls() == null || entry.getValue().getCalls().isEmpty()) {
                     Set<String> callees = inMap.get(entry.getKey());
                     if (callees == null || callees.isEmpty()) {
-                        System.out.println("[UNUSED] " + entry.getKey());
+                        System.out.println("[UNUSED] " + entry.getKey() + "\t\t[" + scmCache.lastCommitAuthor(new File(scriptDir, entry.getKey())) + "]");
                     }
                 }
             }
         }
+    }
+
+    private static boolean isProperCase(String theName) {
+        String name = theName;
+        if (name.startsWith("_")) {
+            name = name.substring(1);
+        }
+        String[] split = name.split("[_]");
+        for (int i = 0; i < split.length; i++) {
+            if (split[i].isEmpty()) {
+                return false;
+            }
+            if (!Character.isUpperCase(split[i].charAt(0))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void tableDependency(File scriptDir, String tableName) throws Exception {
@@ -326,6 +360,8 @@ public class Deps {
     private static Graph createGraph(File scriptsDir) throws Exception {
         Map<String, ScriptInfo> map = scanScriptDir(scriptsDir);
         Graph g = new SingleGraph("nyql", false, true);
+        g.addAttribute("ui.quality");
+        g.addAttribute("ui.antialias");
 
         Map<String, Object> jsonMap = new HashMap<>();
         List<Map<String, Object>> nodes = new LinkedList<>();
@@ -342,8 +378,8 @@ public class Deps {
                     Node tNode = g.getNode(other) == null ? g.addNode(other) : g.getNode(other);
 
                     Edge edge = g.addEdge(s + other, fNode, tNode, true);
-                    //fNode.setAttribute("label", captureName(s));
-                    //tNode.setAttribute("label", captureName(other));
+                    fNode.setAttribute("label", captureName(s));
+                    tNode.setAttribute("label", captureName(other));
 
                     fNode.setAttribute("ui.class", convToCSSClass(strings.getQueryType()));
                     if (map.get(other) != null) {
@@ -355,7 +391,7 @@ public class Deps {
             } else {
                 if (g.getNode(s) == null) {
                     Node node = g.addNode(s);
-                    //node.setAttribute("label", captureName(s));
+                    node.setAttribute("label", captureName(s));
                     node.setAttribute("ui.class", convToCSSClass(strings.getQueryType()));
                 }
 
