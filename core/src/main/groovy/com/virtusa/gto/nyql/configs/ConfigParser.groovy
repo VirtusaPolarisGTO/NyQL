@@ -13,15 +13,42 @@ class ConfigParser {
     private static final String BASE_CONF_KEY = '$baseConfiguration'
     private static final String REF_KEY = '$ref'
 
-    public static Map parseAndResolve(final File inputFile) {
+    static Map parseAndResolve(final File inputFile) {
         Map result = parse(inputFile)
         resolve(result, result) as Map
     }
 
+    static Map parseAndResolve(final InputStream stream) {
+        Map result = parse(stream)
+        resolve(result, result) as Map
+    }
+
+    static Map parse(InputStream inputConfigStream) {
+        Map thisConf = directParse(inputConfigStream)
+        String baseConfRef = (String) thisConf[BASE_CONF_KEY]
+        if (baseConfRef == null || baseConfRef.isEmpty()) {
+            return thisConf
+        }
+
+        thisConf.remove(BASE_CONF_KEY)
+
+        InputStream baseRes = Thread.currentThread().contextClassLoader.getResourceAsStream(baseConfRef)
+        if (baseRes != null) {
+            try {
+                Map baseConf = parse(baseRes)
+                baseConf.putAll(thisConf)
+                return baseConf
+            } finally {
+                baseRes.close()
+            }
+        }
+        throw new NyConfigurationException('No base configuration is found in classpath location ' + baseConfRef + '!')
+    }
+
     @CompileStatic
-    public static Map parse(final File inputFile) {
+    static Map parse(final File inputFile) {
         File resolvedInputFile = inputFile.getCanonicalFile()
-        Map thisConf = new JsonSlurper().parse(resolvedInputFile, StandardCharsets.UTF_8.name()) as Map
+        Map thisConf = directParse(resolvedInputFile)
         String baseConfRef = (String) thisConf[BASE_CONF_KEY]
         if (baseConfRef == null || baseConfRef.isEmpty()) {
             return thisConf
@@ -36,6 +63,16 @@ class ConfigParser {
         Map baseConf = parse(baseFile)
         baseConf.putAll(thisConf)
         baseConf
+    }
+
+    @CompileStatic
+    private static Map directParse(InputStream inputStream) {
+        new JsonSlurper().parse(inputStream, StandardCharsets.UTF_8.name()) as Map
+    }
+
+    @CompileStatic
+    private static Map directParse(File inputFile) {
+        new JsonSlurper().parse(inputFile, StandardCharsets.UTF_8.name()) as Map
     }
 
     @CompileStatic

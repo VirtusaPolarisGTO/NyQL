@@ -1,0 +1,40 @@
+{
+  "$baseConfiguration": "nyql.json",
+
+  "caching": {
+    "compiledScripts": false,
+    "generatedQueries": true
+  },
+
+  "defaultExecutor": "test",
+
+  "repositories": [
+    {
+      "name": "default",
+      "repo": "com.virtusa.gto.nyql.engine.repo.QRepositoryImpl",
+      "mapper": "com.virtusa.gto.nyql.engine.repo.QScriptsFolder",
+      "mapperArgs": {
+        "baseDir": "./scripts",
+        "inclusions": "scripts/**"
+      }
+    }
+  ],
+
+  "executors": [
+    {
+      "name": "jdbc2",
+      "factory": "com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory",
+
+      "$ref": "#/definitions/database",
+
+      "pooling": {
+        "$ref": "#/definitions/pooling-extra"
+      }
+    },
+    {
+      "name": "dummy",
+      "factory": "com.virtusa.gto.nyql.engine.impl.QDummyExecFactory"
+    }
+  ]
+
+}
