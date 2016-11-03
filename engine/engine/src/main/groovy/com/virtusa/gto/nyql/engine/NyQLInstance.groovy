@@ -87,7 +87,7 @@ class NyQLInstance {
      * This should be called only when your application exits.
      */
     void shutdown() {
-        Configurations.instance().shutdown()
+        configurations.shutdown()
     }
 
     /**
