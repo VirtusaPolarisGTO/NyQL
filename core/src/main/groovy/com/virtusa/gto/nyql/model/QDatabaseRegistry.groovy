@@ -17,10 +17,6 @@ final class QDatabaseRegistry {
 
     private QDatabaseRegistry() {}
 
-    static QDatabaseRegistry getInstance() {
-        Holder.INSTANCE
-    }
-
     QDbFactory getDbFactory(String dbName) {
         factoryRegistry.get(dbName)
     }
@@ -46,9 +42,7 @@ final class QDatabaseRegistry {
         factoryRegistry.put(factory.dbName(), factory)
     }
 
-    private static class Holder {
-        private static final QDatabaseRegistry INSTANCE = new QDatabaseRegistry()
+    static QDatabaseRegistry newInstance() {
+        new QDatabaseRegistry()
     }
-
-
 }

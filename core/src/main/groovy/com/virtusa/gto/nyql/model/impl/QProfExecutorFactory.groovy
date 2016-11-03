@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.model.impl
 
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QExecutorFactory
 import groovy.transform.CompileStatic
@@ -11,8 +12,10 @@ import groovy.transform.CompileStatic
 class QProfExecutorFactory implements QExecutorFactory {
 
     private final QExecutorFactory qExecutorFactory
+    private final Configurations configurations
 
-    QProfExecutorFactory(QExecutorFactory executorFactory) {
+    QProfExecutorFactory(Configurations theConfigs, QExecutorFactory executorFactory) {
+        configurations = theConfigs
         qExecutorFactory = executorFactory
     }
 
@@ -23,12 +26,12 @@ class QProfExecutorFactory implements QExecutorFactory {
 
     @Override
     QExecutor create() {
-        new QProfExecutor(qExecutorFactory.create())
+        new QProfExecutor(configurations, qExecutorFactory.create())
     }
 
     @Override
     QExecutor createReusable() {
-        new QProfExecutor(qExecutorFactory.createReusable())
+        new QProfExecutor(configurations, qExecutorFactory.createReusable())
     }
 
     @Override

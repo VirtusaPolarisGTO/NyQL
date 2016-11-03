@@ -274,7 +274,7 @@ class ConfigBuilder {
         synchronized (lock) {
             hasInitialized = true
         }
-        Configurations.instance().configure(props)
+        new Configurations().configure(props)
     }
 
     /**

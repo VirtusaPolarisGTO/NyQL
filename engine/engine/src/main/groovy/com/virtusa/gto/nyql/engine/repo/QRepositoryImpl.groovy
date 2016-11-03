@@ -31,10 +31,10 @@ class QRepositoryImpl implements QRepository {
 
     protected Configurations configurations
 
-    QRepositoryImpl(QScriptMapper scriptMapper) {
-        caching = new Caching()
+    QRepositoryImpl(Configurations theConfigs, QScriptMapper scriptMapper) {
+        caching = new Caching(theConfigs)
         mapper = scriptMapper
-        configurations = Configurations.instance()
+        configurations = theConfigs
 
         initCache()
     }
@@ -53,7 +53,7 @@ class QRepositoryImpl implements QRepository {
     QScript parse(String scriptId, QSession session) throws NyException {
         QSource src = mapper.map(scriptId)
 
-        if (Configurations.instance().cacheGeneratedQueries() && caching.hasGeneratedQuery(scriptId)) {
+        if (configurations.cacheGeneratedQueries() && caching.hasGeneratedQuery(scriptId)) {
             LOGGER.trace('Script {} served from query cache.', scriptId)
             return caching.getGeneratedQuery(scriptId, session)
         }

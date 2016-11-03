@@ -1,7 +1,7 @@
 package nyql.scripting;
 
 import com.virtusa.gto.nyql.configs.ConfigBuilder;
-import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import groovy.json.JsonSlurper;
 import nyql.utils.TUtils;
@@ -19,6 +19,8 @@ import java.util.Map;
 @Test(groups = "scripts")
 public class ScriptDDL {
 
+    private NyQLInstance nyQLInstance;
+
     @SuppressWarnings("unchecked")
     @BeforeClass
     public void startup() {
@@ -27,20 +29,20 @@ public class ScriptDDL {
         ConfigBuilder configBuilder = ConfigBuilder.instance().setupFrom(configs);
 
         configBuilder.addExecutor(TUtils.executorWithMax(2, 1));
-        configBuilder.build();
+        nyQLInstance = NyQLInstance.create(configBuilder.build());
     }
 
     @AfterClass
     public void teardown() {
-        NyQL.shutdown();
+        nyQLInstance.shutdown();
     }
 
     public void testScriptDDL() throws NyException {
-        NyQL.execute("scripts/schema_script");
+        nyQLInstance.execute("scripts/schema_script");
     }
 
     public void testASelect() throws NyException {
-        NyQL.executeToJSON("scripts/aselect");
+        nyQLInstance.executeToJSON("scripts/aselect");
     }
 
 

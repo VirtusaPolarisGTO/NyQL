@@ -15,11 +15,11 @@ import com.virtusa.gto.nyql.model.impl.QProfExecutorFactory
 import com.virtusa.gto.nyql.model.impl.QProfRepository
 import com.virtusa.gto.nyql.utils.Constants
 import com.virtusa.gto.nyql.utils.QUtils
+import groovy.transform.PackageScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.lang.reflect.Constructor
-
 /**
  * @author IWEERARATHNA
  */
@@ -35,7 +35,11 @@ class Configurations {
     private ClassLoader classLoader
     private QProfiling profiler
 
-    private Configurations() {}
+    private QDatabaseRegistry databaseRegistry
+    private QExecutorRegistry executorRegistry
+    private QRepositoryRegistry repositoryRegistry
+
+    @PackageScope Configurations() {}
 
     Configurations configure(Map configProps) throws NyException {
         properties = configProps
@@ -55,6 +59,10 @@ class Configurations {
     }
 
     private void doConfig() throws NyException {
+        databaseRegistry = QDatabaseRegistry.newInstance()
+        executorRegistry = QExecutorRegistry.newInstance()
+        repositoryRegistry = QRepositoryRegistry.newInstance()
+
         boolean profileEnabled = loadProfiler()
         if (!profileEnabled) {
             LOGGER.warn('Query profiling has been disabled! You might not be able to figure out timing of executions.')
@@ -72,7 +80,7 @@ class Configurations {
         String activeDb = getActivatedDb()
         if (activeDb != null) {
             LOGGER.debug("Activating DB: $activeDb")
-            QDatabaseRegistry.instance.load(activeDb)
+            databaseRegistry.load(activeDb)
         } else {
             throw new NyException('No database has been activated!')
         }
@@ -115,27 +123,28 @@ class Configurations {
 
             boolean thisDef = r.name == defRepo
             QScriptMapper scriptMapper = classLoader.loadClass(String.valueOf(r.mapper)).createNew(args)
-            QRepository qRepository = (QRepository) classLoader.loadClass(String.valueOf(r.repo)).newInstance([scriptMapper].toArray())
+            QRepository qRepository = (QRepository) classLoader.loadClass(String.valueOf(r.repo))
+                    .newInstance([this, scriptMapper].toArray())
 
             if (profEnabled) {
-                qRepository = new QProfRepository(qRepository)
+                qRepository = new QProfRepository(this, qRepository)
             }
-            QRepositoryRegistry.getInstance().register(String.valueOf(r.name), qRepository, thisDef)
+            repositoryRegistry.register(String.valueOf(r.name), qRepository, thisDef)
             added++
         }
 
         if (properties[ConfigKeys.REPO_MAP]) {
             Map<String, QRepository> repositoryMap = (Map<String, QRepository>) properties[ConfigKeys.REPO_MAP]
             repositoryMap.each {
-                QRepository qRepository = profEnabled ? new QProfRepository(it.value) : it.value
-                QRepositoryRegistry.instance.register(it.key, qRepository, it.key == defRepo)
+                QRepository qRepository = profEnabled ? new QProfRepository(this, it.value) : it.value
+                repositoryRegistry.register(it.key, qRepository, it.key == defRepo)
                 added++
             }
         }
     }
 
     private void loadExecutors(String activeDb, boolean profEnabled=false) {
-        QDbFactory activeFactory = QDatabaseRegistry.instance.getDbFactory(activeDb)
+        QDbFactory activeFactory = databaseRegistry.getDbFactory(activeDb)
         boolean loadDefOnly = properties.loadDefaultExecutorOnly ?: false
         String defExec = properties.defaultExecutor ?: Constants.DEFAULT_EXECUTOR_NAME
         List execs = properties.executors ?: []
@@ -151,10 +160,10 @@ class Configurations {
             QExecutorFactory executorFactory = createExecFactoryInstance(clazz, r)
 
             if (profEnabled) {
-                executorFactory = new QProfExecutorFactory(executorFactory)
+                executorFactory = new QProfExecutorFactory(this, executorFactory)
             }
             executorFactory.init(r)
-            QExecutorRegistry.getInstance().register(String.valueOf(r.name), executorFactory, thisDef)
+            executorRegistry.register(String.valueOf(r.name), executorFactory, thisDef)
         }
     }
 
@@ -175,17 +184,17 @@ class Configurations {
         }
     }
 
-    private static void loadDBFactory(Class factoryClz) throws NyConfigurationException {
+    private void loadDBFactory(Class factoryClz) throws NyConfigurationException {
         try {
-            def factory = factoryClz.newInstance() as QDbFactory
+            QDbFactory factory = factoryClz.newInstance() as QDbFactory
             loadDBFactory(factory)
         } catch (ReflectiveOperationException ex) {
             throw new NyConfigurationException("Failed to initialize database factory class by name '${factoryClz.name}'!", ex)
         }
     }
 
-    private static void loadDBFactory(QDbFactory qDbFactory) {
-        QDatabaseRegistry.instance.register(qDbFactory)
+    private void loadDBFactory(QDbFactory qDbFactory) {
+        databaseRegistry.register(qDbFactory)
     }
 
     boolean addShutdownHook() {
@@ -194,8 +203,8 @@ class Configurations {
 
     void shutdown() {
         LOGGER.debug('Shutting down nyql...')
-        safeClose('Executors') { QExecutorRegistry.instance.shutdown() }
-        safeClose('Repositories') { QRepositoryRegistry.instance.shutdown() }
+        safeClose('Executors') { executorRegistry.shutdown() }
+        safeClose('Repositories') { repositoryRegistry.shutdown() }
         safeClose('Profiler') { profiler.close() }
         synchronized (lock) {
             configured = false
@@ -247,6 +256,18 @@ class Configurations {
 
     QProfiling getProfiler() {
         profiler
+    }
+
+    QDatabaseRegistry getDatabaseRegistry() {
+        databaseRegistry
+    }
+
+    QExecutorRegistry getExecutorRegistry() {
+        executorRegistry
+    }
+
+    QRepositoryRegistry getRepositoryRegistry() {
+        repositoryRegistry
     }
 
     static Configurations instance() {

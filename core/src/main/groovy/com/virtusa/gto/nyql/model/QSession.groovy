@@ -1,6 +1,7 @@
 package com.virtusa.gto.nyql.model
 
 import com.virtusa.gto.nyql.DSLContext
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.db.QDbFactory
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
@@ -74,11 +75,11 @@ class QSession {
         executor = null
     }
 
-    static QSession create(String theScriptId) {
+    static QSession create(Configurations configurations, String theScriptId) {
         QSession qSession = createSession(DSLContext.getActiveDSLContext().activeFactory,
-                QRepositoryRegistry.instance.defaultRepository(),
+                configurations.repositoryRegistry.defaultRepository(),
                 null,
-                QExecutorRegistry.instance.defaultExecutorFactory())
+                configurations.executorRegistry.defaultExecutorFactory())
         qSession.rootScriptId = theScriptId
         qSession.scriptStack.push(theScriptId)
         qSession

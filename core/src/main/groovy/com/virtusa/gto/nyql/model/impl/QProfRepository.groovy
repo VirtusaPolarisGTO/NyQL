@@ -15,8 +15,10 @@ import groovy.transform.CompileStatic
 class QProfRepository implements QRepository {
 
     private final QRepository repository
+    private final Configurations configurations
 
-    QProfRepository(QRepository theRepository) {
+    QProfRepository(Configurations theConfigs, QRepository theRepository) {
+        configurations = theConfigs
         repository = theRepository
     }
 
@@ -32,9 +34,9 @@ class QProfRepository implements QRepository {
         long e = System.currentTimeMillis()
 
         if (result instanceof QScriptResult) {
-            Configurations.instance().profiler.doneExecuting(result, (e - s))
+            configurations.profiler.doneExecuting(result, (e - s))
         } else {
-            Configurations.instance().profiler.doneParsing(scriptId, (e - s), session)
+            configurations.profiler.doneParsing(scriptId, (e - s), session)
         }
         result
     }

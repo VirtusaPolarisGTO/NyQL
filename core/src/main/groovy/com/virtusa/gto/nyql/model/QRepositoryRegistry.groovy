@@ -12,10 +12,6 @@ final class QRepositoryRegistry {
 
     private QRepositoryRegistry() {}
 
-    static QRepositoryRegistry getInstance() {
-        Holder.INSTANCE
-    }
-
     QRepository register(String name, QRepository repository, boolean makeDefault=true) {
         registry.put(name, repository)
         if (makeDefault) {
@@ -34,9 +30,7 @@ final class QRepositoryRegistry {
         defRepo
     }
 
-    private static class Holder {
-        @SuppressWarnings('UnusedPrivateField')
-        private static final QRepositoryRegistry INSTANCE = new QRepositoryRegistry()
+    static QRepositoryRegistry newInstance() {
+        new QRepositoryRegistry()
     }
-
 }

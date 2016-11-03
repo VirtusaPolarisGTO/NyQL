@@ -29,13 +29,16 @@ class Caching implements Closeable {
 
     private CompilerConfiguration compilerConfigurations
     private final GroovyClassLoader gcl
+    private final Configurations configurations
 
-    Caching() {
+    Caching(Configurations theConfigs) {
+        configurations = theConfigs
+
         gcl = new GroovyClassLoader(Thread.currentThread().contextClassLoader, makeCompilerConfigs())
     }
 
     void compileAllScripts(Collection<QSource> sources) throws NyException {
-        if (Configurations.instance().cacheRawScripts()) {
+        if (configurations.cacheRawScripts()) {
             LOGGER.debug("Compiling all ${sources.size()} dsl script(s)...")
             for (QSource qSource : sources) {
                 String id = qSource.id
@@ -94,7 +97,7 @@ class Caching implements Closeable {
      */
     Script getCompiledScript(QSource sourceScript, QSession session) {
         Binding binding = new Binding(session?.sessionVariables ?: [:])
-        if (Configurations.instance().cacheRawScripts()) {
+        if (configurations.cacheRawScripts()) {
             Class<?> clazz = gcl.parseClass(sourceScript.codeSource, true)
             NyBaseScript scr = clazz.newInstance() as NyBaseScript
             scr.setBinding(binding)
@@ -140,7 +143,7 @@ class Caching implements Closeable {
         sac.extensionValidator = { ext -> ext == 'sgroovy' }
         compilerConfigurations.addCompilationCustomizers(sac)
 
-        String[] defImports = Configurations.instance().defaultImports()
+        String[] defImports = configurations.defaultImports()
         if (defImports != null) {
             ImportCustomizer importCustomizer = new ImportCustomizer()
             importCustomizer.addImports(defImports)

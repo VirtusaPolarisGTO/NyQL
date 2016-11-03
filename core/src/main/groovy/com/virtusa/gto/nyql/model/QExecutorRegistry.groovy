@@ -12,10 +12,6 @@ final class QExecutorRegistry {
 
     private QExecutorRegistry() {}
 
-    static QExecutorRegistry getInstance() {
-        Holder.INSTANCE
-    }
-
     QExecutorFactory register(String name, QExecutorFactory executorFactory, boolean makeDefault=true) {
         registry.put(name, executorFactory)
         if (makeDefault) {
@@ -34,9 +30,7 @@ final class QExecutorRegistry {
         }
     }
 
-    private static class Holder {
-        private static final QExecutorRegistry INSTANCE = new QExecutorRegistry()
+    static QExecutorRegistry newInstance() {
+        new QExecutorRegistry()
     }
-
-
 }

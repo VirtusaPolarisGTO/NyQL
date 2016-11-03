@@ -1,20 +1,10 @@
 package com.virtusa.gto.nyql.engine
 
-import com.virtusa.gto.nyql.DSLContext
 import com.virtusa.gto.nyql.configs.ConfigBuilder
 import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.configs.Configurations
-import com.virtusa.gto.nyql.engine.impl.QExternalJdbcFactory
-import com.virtusa.gto.nyql.engine.impl.QJdbcExecutor
-import com.virtusa.gto.nyql.engine.repo.QSingleScript
-import com.virtusa.gto.nyql.engine.repo.QSingleScriptRepository
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.QExecutorRegistry
-import com.virtusa.gto.nyql.model.QRepository
-import com.virtusa.gto.nyql.model.QRepositoryRegistry
 import com.virtusa.gto.nyql.model.QScript
-import com.virtusa.gto.nyql.model.QSession
-import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
@@ -23,7 +13,6 @@ import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 @java.lang.SuppressWarnings('JdbcConnectionReference')
 import java.sql.Connection
-
 /**
  * Main interface to interact with NyQL queries.
  *
@@ -34,8 +23,6 @@ class NyQL {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NyQL)
 
-    private static final Map<String, Object> EMPTY_MAP = [:]
-
     private static final String BOOTSTRAP_KEY = 'com.virtusa.gto.nyql.autoBootstrap'
     private static final String AUTO_SHUTDOWN_KEY = 'com.virtusa.gto.nyql.addShutdownHook'
     private static final String LOAD_CLASSPATH_KEY = 'com.virtusa.gto.nyql.classpathBootstrap'
@@ -45,6 +32,8 @@ class NyQL {
     private static final String TRUE_STR = 'true'
     private static final String FALSE_STR = 'false'
     private static final String JSON_CONFIG_FILENAME = 'nyql.json'
+
+    private static NyQLInstance nyQLInstance
 
     static {
         try {
@@ -57,7 +46,7 @@ class NyQL {
 
             configure()
 
-            if (Boolean.parseBoolean(System.getProperty(AUTO_SHUTDOWN_KEY, FALSE_STR)) || Configurations.instance().addShutdownHook()) {
+            if (Boolean.parseBoolean(System.getProperty(AUTO_SHUTDOWN_KEY, FALSE_STR))) {
                 LOGGER.warn('Automatically adding a NyQL shutdown hook...')
                 Runtime.runtime.addShutdownHook(new Thread ({ shutdown() }))
             } else {
@@ -94,7 +83,8 @@ class NyQL {
                     LOGGER.debug("Loading configurations from ${nyConfig.canonicalPath}...")
                     Map configData = new JsonSlurper().parse(nyConfig) as Map
                     configData.put(ConfigKeys.LOCATION_KEY, new File('.').canonicalPath)
-                    ConfigBuilder.instance().setupFrom(configData).build()
+                    Configurations configurations = ConfigBuilder.instance().setupFrom(configData).build()
+                    nyQLInstance = NyQLInstance.create(configurations)
                 }
             }
 
@@ -116,7 +106,8 @@ class NyQL {
             if (inputConfig.exists()) {
                 Map configData = new JsonSlurper().parse(inputConfig, StandardCharsets.UTF_8.name()) as Map
                 configData.put(ConfigKeys.LOCATION_KEY, inputConfig.canonicalPath)
-                ConfigBuilder.instance().setupFrom(configData).build()
+                Configurations configInst = ConfigBuilder.instance().setupFrom(configData).build()
+                nyQLInstance = NyQLInstance.create(configInst)
                 return true
             } else {
                 throw new IOException('Given configuration file does not exist! ' + path)
@@ -140,7 +131,8 @@ class NyQL {
         if (res != null) {
             LOGGER.debug('Loading configurations from classpath...')
             Map configData = new JsonSlurper().parse(res, StandardCharsets.UTF_8.name()) as Map
-            ConfigBuilder.instance().setupFrom(configData).build()
+            Configurations configInst = ConfigBuilder.instance().setupFrom(configData).build()
+            nyQLInstance = NyQLInstance.create(configInst)
             return true
         }
         false
@@ -160,7 +152,7 @@ class NyQL {
      */
     @CompileStatic
     static QScript parse(String scriptName) throws NyException {
-        parse(scriptName, EMPTY_MAP)
+        nyQLInstance.parse(scriptName)
     }
 
     /**
@@ -179,11 +171,7 @@ class NyQL {
      */
     @CompileStatic
     static QScript parse(String scriptName, Map<String, Object> data) throws NyException {
-        QSession qSession = QSession.create(scriptName)
-        if (data) {
-            qSession.sessionVariables.putAll(data)
-        }
-        QRepositoryRegistry.instance.defaultRepository().parse(scriptName, qSession)
+        nyQLInstance.parse(scriptName, data)
     }
 
     /**
@@ -191,7 +179,7 @@ class NyQL {
      * This should be called only when your application exits.
      */
     static void shutdown() {
-        Configurations.instance().shutdown()
+        nyQLInstance.shutdown()
     }
 
     /**
@@ -210,7 +198,7 @@ class NyQL {
      */
     @CompileStatic
     static <T> T execute(String scriptName) throws NyException {
-        (T) execute(scriptName, EMPTY_MAP)
+        nyQLInstance.execute(scriptName)
     }
 
     /**
@@ -233,15 +221,7 @@ class NyQL {
      */
     @CompileStatic
     static <T> T execute(String scriptName, Map<String, Object> data) throws NyException {
-        QScript script = null
-        try {
-            script = parse(scriptName, data)
-            (T) QExecutorRegistry.instance.defaultExecutorFactory().create().execute(script)
-        } finally {
-            if (script != null) {
-                script.free()
-            }
-        }
+        nyQLInstance.execute(scriptName, data)
     }
 
     /**
@@ -260,8 +240,7 @@ class NyQL {
      */
     @CompileStatic
     static <T> T execute(String dslSql, Map<String, Object> data, Connection connection) throws NyException {
-        String scriptId = String.valueOf(System.currentTimeMillis())
-        execute(scriptId, dslSql, data, connection)
+        nyQLInstance.execute(dslSql, data, connection)
     }
 
     /**
@@ -282,15 +261,7 @@ class NyQL {
      */
     @CompileStatic
     static <T> T execute(String scriptId, String dslSql, Map<String, Object> data, Connection connection) throws NyException {
-        QJdbcExecutor jdbcExecutor = new QJdbcExecutor(connection)
-        QSingleScript qSingleScript = new QSingleScript(scriptId, dslSql)
-        QRepository repository = new QSingleScriptRepository(qSingleScript)
-        QSession session = QSession.createSession(DSLContext.getActiveDSLContext().activeFactory,
-                            repository, jdbcExecutor, new QExternalJdbcFactory(connection))
-
-        session.sessionVariables.putAll(data ?: [:])
-        QScript script = repository.parse(scriptId, session)
-        (T) jdbcExecutor.execute(script)
+        nyQLInstance.execute(scriptId, dslSql, data, connection)
     }
 
     /**
@@ -307,8 +278,7 @@ class NyQL {
      */
     @CompileStatic
     static String executeToJSON(String scriptName, Map<String, Object> data) throws NyException {
-        Object result = execute(scriptName, data)
-        JsonOutput.toJson(result)
+        nyQLInstance.executeToJSON(scriptName, data)
     }
 
     /**
@@ -324,7 +294,7 @@ class NyQL {
      */
     @CompileStatic
     static String executeToJSON(String scriptName) throws NyException {
-        executeToJSON(scriptName, [:])
+        nyQLInstance.executeToJSON(scriptName)
     }
 
     @CompileStatic

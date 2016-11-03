@@ -15,8 +15,10 @@ import groovy.transform.CompileStatic
 class QProfExecutor implements QExecutor {
 
     private final QExecutor executor
+    private final Configurations configurations
 
-    QProfExecutor(QExecutor qExecutor) {
+    QProfExecutor(Configurations theConfigs, QExecutor qExecutor) {
+        configurations = theConfigs
         executor = qExecutor
     }
 
@@ -56,7 +58,7 @@ class QProfExecutor implements QExecutor {
         }
         long e = System.currentTimeMillis()
         if (!(script instanceof QScriptResult)) {
-            Configurations.instance().profiler.doneExecuting(script, (e - s))
+            configurations.profiler.doneExecuting(script, (e - s))
         }
         result
     }
