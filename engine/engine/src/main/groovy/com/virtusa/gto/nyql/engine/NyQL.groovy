@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.engine
 
 import com.virtusa.gto.nyql.configs.ConfigBuilder
 import com.virtusa.gto.nyql.configs.ConfigKeys
+import com.virtusa.gto.nyql.configs.ConfigParser
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.QScript
@@ -81,7 +82,7 @@ class NyQL {
                     //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
                 } else {
                     LOGGER.debug("Loading configurations from ${nyConfig.canonicalPath}...")
-                    Map configData = new JsonSlurper().parse(nyConfig) as Map
+                    Map configData = ConfigParser.parseAndResolve(nyConfig)
                     configData.put(ConfigKeys.LOCATION_KEY, new File('.').canonicalPath)
                     Configurations configurations = ConfigBuilder.instance().setupFrom(configData).build()
                     nyQLInstance = NyQLInstance.create(configurations)
@@ -104,7 +105,7 @@ class NyQL {
             LOGGER.debug('NyQL is configuring from path specified in system property: ' + path)
             File inputConfig = new File(path)
             if (inputConfig.exists()) {
-                Map configData = new JsonSlurper().parse(inputConfig, StandardCharsets.UTF_8.name()) as Map
+                Map configData = ConfigParser.parseAndResolve(inputConfig)
                 configData.put(ConfigKeys.LOCATION_KEY, inputConfig.canonicalPath)
                 Configurations configInst = ConfigBuilder.instance().setupFrom(configData).build()
                 nyQLInstance = NyQLInstance.create(configInst)
@@ -129,11 +130,15 @@ class NyQL {
 
         def res = Thread.currentThread().contextClassLoader.getResourceAsStream(JSON_CONFIG_FILENAME)
         if (res != null) {
-            LOGGER.debug('Loading configurations from classpath...')
-            Map configData = new JsonSlurper().parse(res, StandardCharsets.UTF_8.name()) as Map
-            Configurations configInst = ConfigBuilder.instance().setupFrom(configData).build()
-            nyQLInstance = NyQLInstance.create(configInst)
-            return true
+            try {
+                LOGGER.debug('Loading configurations from classpath...')
+                Map configData = new JsonSlurper().parse(res, StandardCharsets.UTF_8.name()) as Map
+                Configurations configInst = ConfigBuilder.instance().setupFrom(configData).build()
+                nyQLInstance = NyQLInstance.create(configInst)
+                return true
+            } finally {
+                res.close()
+            }
         }
         false
     }

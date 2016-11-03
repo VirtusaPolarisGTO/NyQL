@@ -31,6 +31,7 @@ public class Deps {
         System.out.println("    --table            : Find all scripts referred to the given table.");
         System.out.println("    --graph            : Show a graph of all script dependencies.");
         System.out.println("    --lint             : Identify unnecessary scripts.");
+        System.out.println("    --group            : Group scripts sccording to type.");
         System.out.println("    <script-directory> : Full path to the directory.");
         System.out.println("    script-id          : Script id (relative path from the root directory).");
         System.out.println("    table-name         : Table name to find scripts for.");
@@ -58,6 +59,8 @@ public class Deps {
         } else if (args[0].equalsIgnoreCase("--lint")) {
             printEmptyTables(dir);
             //tableUsage(dir);
+        } else if (args[0].equalsIgnoreCase("--group")) {
+            scriptGroups(dir);
         }
         //allCallers(dir, "dashboard/violation_breakdown/join/violation_join_clause");
         //tableDependency(dir, "Violation");
@@ -75,6 +78,19 @@ public class Deps {
         for (Map.Entry<String, ScriptInfo> entry : info.entrySet()) {
             Set<String> tables = entry.getValue().tableChain(fetcher);
             System.out.println(entry.getKey() + " = " + tables);
+        }
+    }
+
+    private static void scriptGroups(File scriptDir) throws Exception {
+        final Map<String, ScriptInfo> info = scanScriptDir(scriptDir);
+        Map<String, List<ScriptInfo>> g = info.values().stream().collect(Collectors.groupingBy(ScriptInfo::getQueryType));
+
+        for (Map.Entry<String, List<ScriptInfo>> entry : g.entrySet()) {
+            System.out.println(entry.getKey());
+            System.out.println("---------------------------------------------------------------------------------");
+
+            entry.getValue().stream().sorted((o1, o2) -> o1.getName().compareTo(o2.getName()))
+                    .forEach(t -> System.out.println("\t" + t.getName()));
         }
     }
 

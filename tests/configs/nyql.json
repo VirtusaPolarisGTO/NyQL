@@ -28,9 +28,7 @@
       "name": "jdbc",
       "factory": "com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory",
 
-      "url": "jdbc:mysql://localhost/sakila",
-      "username": "root",
-      "password": "",
+      "$ref": "#/definitions/database",
 
       "pooling": {
         "maximumPoolSize": 1,
@@ -65,6 +63,20 @@
       "writeIntervalMS": 10000,
       "autoWriteOnClose": true
     }
-  }
+  },
 
+  "definitions": {
+    "database": {
+      "url": "jdbc:mysql://localhost/sakila",
+      "username": "root",
+      "password": ""
+    },
+
+    "pooling-extra": {
+      "maximumPoolSize": 100,
+      "prepStmtCacheSize": 300,
+      "prepStmtCacheSqlLimit": 2048,
+      "useServerPrepStmts": true
+    }
+  }
 }

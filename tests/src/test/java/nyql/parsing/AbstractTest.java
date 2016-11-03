@@ -118,7 +118,7 @@ public class AbstractTest {
     public static void setupTests() {
         //if (NyQL.hasConfigured()) {
             //System.setProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true");
-            NyQL.configure(new File("./nyql.json"));
+            NyQL.configure(new File("./configs/nyql.json"));
         //}
     }
 

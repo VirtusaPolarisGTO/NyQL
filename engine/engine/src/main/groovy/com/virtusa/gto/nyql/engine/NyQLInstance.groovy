@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.engine
 import com.virtusa.gto.nyql.DSLContext
 import com.virtusa.gto.nyql.configs.ConfigBuilder
 import com.virtusa.gto.nyql.configs.ConfigKeys
+import com.virtusa.gto.nyql.configs.ConfigParser
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.engine.impl.QExternalJdbcFactory
 import com.virtusa.gto.nyql.engine.impl.QJdbcExecutor
@@ -13,7 +14,6 @@ import com.virtusa.gto.nyql.model.QRepository
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QSession
 import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
 import java.sql.Connection
@@ -32,13 +32,10 @@ class NyQLInstance {
     }
 
     static NyQLInstance create(File configFile) {
-        (NyQLInstance) configFile.withInputStream {
-            return create(it)
-        }
+        create(ConfigParser.parseAndResolve(configFile))
     }
 
-    static NyQLInstance create(InputStream configInputStream) {
-        Map configData = new JsonSlurper().parse(configInputStream) as Map
+    static NyQLInstance create(Map configData) {
         configData.put(ConfigKeys.LOCATION_KEY, new File('.').canonicalPath)
         Configurations configInst = ConfigBuilder.instance().setupFrom(configData).build()
         create(configInst)
