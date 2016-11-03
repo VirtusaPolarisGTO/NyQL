@@ -101,30 +101,65 @@ If you want to turn it off, add a system property `com.virtusa.gto.nyql.autoBoot
       * **profiler**: full class name for the profiler to activate.
       * **options**: a set of options for the profiler.
 
-3. If you want to see the db specific query, then use below code piece.
+3. There are two ways of configuring and running NyQL from a java application.
+  * __Per-process configuration__: Use this method if you are absolutely sure that you use only one instance of NyQL in the 
+   application process. Here you should be able to use static methods provided by `NyQL` class. See below example code.
+   
+   ```java 
+   public class Main {
+       
+       public static void main(String[] args) throws Exception {
+           // configure NyQL somewhere in starting point
+           // of your application lifecycle.
+           NyQL.configure(jsonFile);
+           
+           try {
+               // your session variables or parameter values...
+               Map<String, Object> data = new HashMap<>();
+               
+               // to parse and see the query
+               NyQL.parse("<script-name>", data);
+               
+               // to execute and get results
+               NyQL.execute("<script-name>", data);
+               
+           } finally {
+               // call shutdown at the end of your application.
+               NyQL.shutdown();
+           }
+       }
+   }
+   ```
 
-```java 
-public class Main {
-    
-    public static void main(String[] args) throws Exception {
-        // configure NyQL somewhere in starting point
-        // of your application lifecycle.
-        NyQL.configure(jsonFile);
-        
-        try {
-            // your session variables or parameter values...
-            Map<String, Object> data = new HashMap<>();
-            
-            // to parse and see the query
-            NyQL.parse("<script-name>", data);
-            
-            // to execute and get results
-            NyQL.execute("<script-name>", data);
-            
-        } finally {
-            // call shutdown at the end of your application.
-            NyQL.shutdown();
-        }
-    }
-}
-```
+   
+  * __Multi-instances per-process configuration__: In this method, you may initialize several instances of NyQL in your application
+  process and use them separately. This is applicable if your application has several components and each component
+  may need to use separate executors with different configurations (specially JDBC pools). __Note:__ NyQL never store the 
+  created NyQL instance in its configuration space, and application should take responsibility of storing returned nyql instance.
+
+    ```java 
+       public class Main {
+           
+           public static void main(String[] args) throws Exception {
+               // create a new nyql instance from input configuration file.
+               // save this instance somewhere in your application, and 
+               // this does never stored by NyQL internally.
+               NyQLInstance nyInstance = NyQLInstance.create(jsonFile);
+               
+               try {
+                   // your session variables or parameter values...
+                   Map<String, Object> data = new HashMap<>();
+                   
+                   // use the instance to parse and see the query
+                   nyInstance.parse("<script-name>", data);
+                   
+                   // use the instance to execute and get results
+                   nyInstance.execute("<script-name>", data);
+                   
+               } finally {
+                   // call shutdown at the end of your application.
+                   nyInstance.shutdown();
+               }
+           }
+       }
+       ```

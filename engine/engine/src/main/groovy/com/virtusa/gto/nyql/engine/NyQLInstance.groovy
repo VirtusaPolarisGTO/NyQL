@@ -32,7 +32,13 @@ class NyQLInstance {
     }
 
     static NyQLInstance create(File configFile) {
-        Map configData = new JsonSlurper().parse(configFile) as Map
+        (NyQLInstance) configFile.withInputStream {
+            return create(it)
+        }
+    }
+
+    static NyQLInstance create(InputStream configInputStream) {
+        Map configData = new JsonSlurper().parse(configInputStream) as Map
         configData.put(ConfigKeys.LOCATION_KEY, new File('.').canonicalPath)
         Configurations configInst = ConfigBuilder.instance().setupFrom(configData).build()
         create(configInst)
