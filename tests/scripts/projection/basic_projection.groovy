@@ -58,6 +58,12 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (BOOLEAN(true).alias("constantColumn"), BOOLEAN(false))
+    },
+    "SELECT 1 AS constantColumn, 0 FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (STR("hello").alias("constantColumn"), STR("yeah"))
     },
     "SELECT \"hello\" AS constantColumn, \"yeah\" FROM `Actor` ac",

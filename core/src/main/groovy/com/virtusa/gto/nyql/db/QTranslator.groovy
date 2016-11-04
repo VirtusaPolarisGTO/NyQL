@@ -15,6 +15,7 @@ import com.virtusa.gto.nyql.Table
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.ParamList
+import com.virtusa.gto.nyql.model.units.QBoolean
 import com.virtusa.gto.nyql.model.units.QNumber
 import com.virtusa.gto.nyql.model.units.QString
 import com.virtusa.gto.nyql.utils.QOperator
@@ -39,6 +40,8 @@ trait QTranslator extends QJoins {
             return ___quoteString(obj.text) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? ' AS ' + obj.__alias : '')
         } else if (obj instanceof QNumber) {
             return ___convertNumeric(obj.number) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? ' AS ' + obj.__alias : '')
+        } else if (obj instanceof QBoolean) {
+            return ___convertBool(obj.value) + (obj.__aliasDefined() && contextType == QContextType.SELECT ? ' AS ' + obj.__alias : '')
         } else if (obj instanceof Join) {
             return ___tableJoinName(obj, contextType, paramOrder)
         } else if (obj instanceof Table) {

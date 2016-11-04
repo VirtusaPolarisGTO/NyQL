@@ -1,6 +1,7 @@
 package com.virtusa.gto.nyql.traits
 
 import com.virtusa.gto.nyql.FunctionColumn
+import com.virtusa.gto.nyql.model.units.QBoolean
 import com.virtusa.gto.nyql.model.units.QNumber
 import com.virtusa.gto.nyql.model.units.QString
 import groovy.transform.CompileStatic
@@ -18,6 +19,11 @@ trait DataTypeTraits {
     @CompileStatic
     QNumber NUM(Number number) {
         new QNumber(number: number)
+    }
+
+    @CompileStatic
+    QBoolean BOOLEAN(boolean value) {
+        new QBoolean(value: value)
     }
 
     def BETWEEN(Object c1, Object c2) {
