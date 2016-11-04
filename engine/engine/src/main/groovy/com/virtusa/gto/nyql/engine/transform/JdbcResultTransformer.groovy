@@ -1,12 +1,14 @@
 package com.virtusa.gto.nyql.engine.transform
 
+import groovy.transform.CompileStatic
+
 @java.lang.SuppressWarnings('JdbcResultSetReference')
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
-
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class JdbcResultTransformer implements QJdbcResultTransformer<List<Map<String, Object>>> {
 
     List<Map<String, Object>> apply(ResultSet resultSet) {

@@ -1,5 +1,5 @@
 {
-  "$baseConfiguration": "nyql.json",
+  "$baseConfiguration": "test/nyql.json",
 
   "caching": {
     "compiledScripts": false,

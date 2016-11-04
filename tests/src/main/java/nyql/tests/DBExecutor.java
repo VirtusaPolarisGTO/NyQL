@@ -39,7 +39,7 @@ public class DBExecutor {
             //data.put("hello", inners);
 
             //QScript result = NyQL.parse("insight/unmapped_users", data);
-            Object result = NyQL.execute("sakila/customer_details", data);
+            Object result = NyQL.execute("sakila/top_customers", data);
             System.out.println(result);
 
         } finally {

@@ -16,7 +16,7 @@ class SUtils {
     @SuppressWarnings("unchecked")
     static NyQLInstance createNyQL(int maxExecutors, int maxReuseExecutors) {
         System.setProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "false");
-        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("nyql-test.json")) {
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("test/nyql-test.json")) {
             //Map<String, Object> configs = ConfigParser.parseAndResolve(new File("./configs/nyql-test.json"));
             Map<String, Object> configs = ConfigParser.parseAndResolve(inputStream);
             ConfigBuilder configBuilder = ConfigBuilder.instance().setupFrom(configs);

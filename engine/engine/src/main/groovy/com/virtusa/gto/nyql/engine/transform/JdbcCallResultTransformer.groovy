@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.engine.transform
 
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.NamedParam
+import groovy.transform.CompileStatic
 
 @java.lang.SuppressWarnings('JdbcResultSetReference')
 import java.sql.ResultSet
@@ -11,6 +12,7 @@ import java.sql.Statement
 /**
  * @author IWEERARATHNA
  */
+@CompileStatic
 class JdbcCallResultTransformer implements QResultTransformer<JdbcCallTransformInput, Map> {
 
     private final JdbcResultTransformer rsTransformer = new JdbcResultTransformer()
