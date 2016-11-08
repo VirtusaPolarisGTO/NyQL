@@ -59,6 +59,7 @@
     "enabled": true,
     "profiler": "com.virtusa.gto.nyql.profilers.QAverageProfiler",
     "options": {
+      "url": "http://192.168.99.100:5000/nyql",
       "port": 9009,
       "writeIntervalMS": 10000,
       "autoWriteOnClose": true

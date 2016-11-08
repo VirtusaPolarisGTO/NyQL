@@ -141,7 +141,7 @@ class ConfigParser {
                 readPropertyContent(it)
             }
         }
-        throw new NyConfigurationException('Configuration file does not exist in ' + file.getAbsolutePath() + '!')
+        throw new NyConfigurationException("Configuration file does not exist in '${file.getAbsolutePath()}'!")
     }
 
     @CompileStatic
@@ -150,7 +150,7 @@ class ConfigParser {
         if (baseRes != null) {
             return readPropertyContent(baseRes)
         }
-        throw new NyConfigurationException('Configuration file does not exist in resources ' + rPath + '!')
+        throw new NyConfigurationException("Configuration file does not exist in resources '$rPath'!")
     }
 
     @CompileStatic

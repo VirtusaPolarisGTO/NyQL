@@ -17,22 +17,24 @@ class QLogProfiler implements QProfiling {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QLogProfiler)
     private static final String TAG = '[NyPROFILE]'
+    private static final String TOOK = ' took ('
+    private static final String TIME = ' ms) time.'
 
     private QLogProfiler() {}
 
     @Override
     void start(Map options) {
-        LOGGER.info("$TAG Log profiler started.")
+        LOGGER.info(TAG + ' Log profiler started.')
     }
 
     @Override
     void doneParsing(String scriptId, long elapsed, QSession session) {
-        LOGGER.info("$TAG Script parsing '$scriptId' took ($elapsed ms) time.")
+        LOGGER.info(TAG + ' Script parsing ' + scriptId + TOOK + elapsed + TIME)
     }
 
     @Override
     void doneExecuting(QScript script, long elapsed) {
-        LOGGER.info("$TAG Script execution '${script.id}' took ($elapsed ms) time.")
+        LOGGER.info(TAG + ' Script execution ' + script.id + TOOK + elapsed + TIME)
     }
 
     @Override
