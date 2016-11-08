@@ -77,4 +77,12 @@ def innQP = $DSL.select {
         },
         "UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = 1)",
 
+        $DSL.update {
+            TARGET (Film.alias("f"))
+            SET {
+                EQ (f.film_id, TABLE(innQP))
+            }
+        },
+        ["UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = ?)", ["id"]],
+
 ]

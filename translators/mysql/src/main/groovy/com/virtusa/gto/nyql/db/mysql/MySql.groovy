@@ -452,7 +452,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             if (c instanceof String) {
                 cols.add((String)c)
             } else if (c instanceof Table) {
-                appendParamsFromTable((Table)c, paramList)
+                //appendParamsFromTable((Table)c, paramList)
                 String tbName = ___tableName((Table)c, contextType)
                 if (((Table)c).__isResultOf()) {
                     cols.add(tbName)
@@ -534,6 +534,12 @@ class MySql extends MySqlFunctions implements QTranslator {
             }
             if (expression instanceof QResultProxy) {
                 QResultProxy resultProxy = (QResultProxy)expression
+                if (resultProxy.orderedParameters != null) {
+                    paramOrder?.addAll(resultProxy.orderedParameters)
+                }
+            }
+            if (expression instanceof Table && ((Table)expression).__isResultOf()) {
+                QResultProxy resultProxy = (QResultProxy)(((Table)expression).__resultOf)
                 if (resultProxy.orderedParameters != null) {
                     paramOrder?.addAll(resultProxy.orderedParameters)
                 }

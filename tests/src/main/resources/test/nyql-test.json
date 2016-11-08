@@ -25,7 +25,7 @@
       "name": "jdbc2",
       "factory": "com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory",
 
-      "$ref": "#/definitions/database",
+      "$ref": "##test/jdbc-test.properties",
 
       "pooling": {
         "$ref": "#/definitions/pooling-extra"

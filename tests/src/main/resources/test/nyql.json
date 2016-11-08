@@ -28,7 +28,7 @@
       "name": "jdbc",
       "factory": "com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory",
 
-      "$ref": "#/definitions/database",
+      "$ref": "##test/jdbc-test.properties",
 
       "pooling": {
         "maximumPoolSize": 1,
@@ -66,12 +66,6 @@
   },
 
   "definitions": {
-    "database": {
-      "url": "jdbc:mysql://localhost/sakila",
-      "username": "root",
-      "password": ""
-    },
-
     "pooling-extra": {
       "maximumPoolSize": 100,
       "prepStmtCacheSize": 300,
