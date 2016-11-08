@@ -12,7 +12,6 @@ import com.virtusa.gto.nyql.utils.QOperator
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
-
 /**
  * @author Isuru Weerarathna
  */

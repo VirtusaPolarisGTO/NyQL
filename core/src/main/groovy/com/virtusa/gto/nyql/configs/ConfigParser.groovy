@@ -49,6 +49,9 @@ class ConfigParser {
     static Map parse(final File inputFile) {
         File resolvedInputFile = inputFile.getCanonicalFile()
         Map thisConf = directParse(resolvedInputFile)
+        if (!thisConf.containsKey(ConfigKeys.LOCATION_KEY)) {
+            thisConf.put(ConfigKeys.LOCATION_KEY, resolvedInputFile.getParentFile().getAbsolutePath())
+        }
         String baseConfRef = (String) thisConf[BASE_CONF_KEY]
         if (baseConfRef == null || baseConfRef.isEmpty()) {
             return thisConf
@@ -102,7 +105,17 @@ class ConfigParser {
 
     private static Object resolvePath(Map data, String path) {
         String p = path
-        if (p.startsWith('#')) {
+        if (p.startsWith('##')) {
+            p = p.substring(2)
+            String loc = data[ConfigKeys.LOCATION_KEY]
+            if (loc != null) {
+                File f = new File(new File(loc), p)
+                return readPropertyContent(f)
+            } else {
+                return readPropertyContent(p)
+            }
+
+        } else if (p.startsWith('#')) {
             p = p.substring(1)
         }
 
@@ -118,7 +131,35 @@ class ConfigParser {
             }
             tmp = tmp."$k"
         }
-
         tmp
+    }
+
+    @CompileStatic
+    private static Map readPropertyContent(File file) {
+        if (file.exists()) {
+            return (Map) file.withInputStream {
+                readPropertyContent(it)
+            }
+        }
+        throw new NyConfigurationException('Configuration file does not exist in ' + file.getAbsolutePath() + '!')
+    }
+
+    @CompileStatic
+    private static Map readPropertyContent(String rPath) {
+        InputStream baseRes = Thread.currentThread().contextClassLoader.getResourceAsStream(rPath)
+        if (baseRes != null) {
+            return readPropertyContent(baseRes)
+        }
+        throw new NyConfigurationException('Configuration file does not exist in resources ' + rPath + '!')
+    }
+
+    @CompileStatic
+    private static Map readPropertyContent(InputStream inputStream) {
+        Properties properties = new Properties()
+        properties.load(inputStream)
+
+        Map propSet = [:]
+        propSet.putAll(properties)
+        propSet
     }
 }
