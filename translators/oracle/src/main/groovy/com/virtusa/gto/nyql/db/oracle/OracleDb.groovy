@@ -9,6 +9,7 @@ import com.virtusa.gto.nyql.QueryDelete
 import com.virtusa.gto.nyql.QueryInsert
 import com.virtusa.gto.nyql.QueryPart
 import com.virtusa.gto.nyql.QuerySelect
+import com.virtusa.gto.nyql.QueryTruncate
 import com.virtusa.gto.nyql.QueryUpdate
 import com.virtusa.gto.nyql.StoredFunction
 import com.virtusa.gto.nyql.Table
@@ -62,6 +63,11 @@ class OracleDb extends OracleFunctions implements QTranslator {
 
     @Override
     QResultProxy ___deleteQuery(QueryDelete q) {
+        return null
+    }
+
+    @Override
+    QResultProxy ___truncateQuery(QueryTruncate q) {
         return null
     }
 

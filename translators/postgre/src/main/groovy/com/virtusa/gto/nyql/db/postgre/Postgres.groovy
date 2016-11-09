@@ -11,6 +11,7 @@ import com.virtusa.gto.nyql.QueryDelete
 import com.virtusa.gto.nyql.QueryInsert
 import com.virtusa.gto.nyql.QueryPart
 import com.virtusa.gto.nyql.QuerySelect
+import com.virtusa.gto.nyql.QueryTruncate
 import com.virtusa.gto.nyql.QueryUpdate
 import com.virtusa.gto.nyql.StoredFunction
 import com.virtusa.gto.nyql.Table
@@ -208,6 +209,14 @@ class Postgres extends PostgresFunctions implements QTranslator {
             query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append('\n')
         }
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
+    }
+
+    @Override
+    QResultProxy ___truncateQuery(QueryTruncate q) {
+        StringBuilder query = new StringBuilder()
+        query.append('TRUNCATE TABLE ').append(___tableName(q.sourceTbl, QContextType.TRUNCATE))
+
+        new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.TRUNCATE)
     }
 
     @Override

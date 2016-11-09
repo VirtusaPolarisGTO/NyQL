@@ -11,6 +11,7 @@ import com.virtusa.gto.nyql.QueryDelete
 import com.virtusa.gto.nyql.QueryInsert
 import com.virtusa.gto.nyql.QueryPart
 import com.virtusa.gto.nyql.QuerySelect
+import com.virtusa.gto.nyql.QueryTruncate
 import com.virtusa.gto.nyql.QueryUpdate
 import com.virtusa.gto.nyql.StoredFunction
 import com.virtusa.gto.nyql.Table
@@ -90,7 +91,8 @@ class MSSql extends MSSqlFunctions implements QTranslator {
 
     @Override
     String ___tableName(final Table table, final QContextType contextType) {
-        if (contextType == QContextType.DELETE_FROM || contextType == QContextType.DELETE_CONDITIONAL) {
+        if (contextType == QContextType.DELETE_FROM || contextType == QContextType.DELETE_CONDITIONAL
+                || contextType == QContextType.TRUNCATE) {
             return QUtils.quote(table.__name)
         } else if (contextType == QContextType.INTO) {
             return QUtils.quote(table.__name)
@@ -253,6 +255,14 @@ class MSSql extends MSSqlFunctions implements QTranslator {
             query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.DELETE_CONDITIONAL)).append(NL)
         }
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE);
+    }
+
+    @Override
+    QResultProxy ___truncateQuery(QueryTruncate q) {
+        StringBuilder query = new StringBuilder()
+        query.append('TRUNCATE TABLE ').append(___tableName(q.sourceTbl, QContextType.TRUNCATE))
+
+        new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.TRUNCATE)
     }
 
     QResultProxy ___partQuery(QueryPart q) {

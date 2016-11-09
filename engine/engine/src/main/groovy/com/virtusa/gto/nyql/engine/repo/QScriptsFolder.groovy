@@ -99,7 +99,7 @@ class QScriptsFolder implements QScriptMapper {
                     return qScriptsFolder.scanDir()
                 }
             }
-            throw new NyConfigurationException('Given script folder does not exist! [' + args[0] + ']')
+            throw new NyConfigurationException('Given script folder does not exist! [' + path + ']')
         }
         QScriptsFolder qScriptsFolder = new QScriptsFolder(dir)
         qScriptsFolder.inclusionPatterns = args[KEY_INCLUSIONS] ?: ''

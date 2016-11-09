@@ -29,6 +29,8 @@ enum QContextType {
     INSERT_DATA,
     INTO,
 
+    TRUNCATE,
+
     UNKNOWN
 
 }

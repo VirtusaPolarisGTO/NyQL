@@ -9,6 +9,7 @@ import com.virtusa.gto.nyql.QueryDelete
 import com.virtusa.gto.nyql.QueryInsert
 import com.virtusa.gto.nyql.QueryPart
 import com.virtusa.gto.nyql.QuerySelect
+import com.virtusa.gto.nyql.QueryTruncate
 import com.virtusa.gto.nyql.QueryUpdate
 import com.virtusa.gto.nyql.StoredFunction
 import com.virtusa.gto.nyql.Table
@@ -132,6 +133,14 @@ trait QTranslator extends QJoins {
      * @return generated query.
      */
     abstract QResultProxy ___deleteQuery(QueryDelete q)
+
+    /**
+     * Generate a truncate query using given query model.
+     *
+     * @param q truncate query model.
+     * @return generated query
+     */
+    abstract QResultProxy ___truncateQuery(QueryTruncate q)
 
     /**
      * Generate q query composed of several queries with combinators like

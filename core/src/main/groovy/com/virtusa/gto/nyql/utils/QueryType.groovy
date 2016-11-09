@@ -34,6 +34,11 @@ enum QueryType {
     DELETE,
 
     /**
+     * Truncate query.
+     */
+    TRUNCATE,
+
+    /**
      * Call of stored procedure or function.
      */
     DB_FUNCTION,

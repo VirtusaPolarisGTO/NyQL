@@ -79,6 +79,14 @@ class DSL {
     ////
     ///////////////////////////////////////////////////////////////////////////////////
 
+    QResultProxy truncate(String tableName) {
+        QueryTruncate queryTruncate = new QueryTruncate(createContext())
+        Table table = new Table(__name: tableName)
+        queryTruncate.sourceTbl = table
+
+        session.dbFactory.createTranslator().___truncateQuery(queryTruncate)
+    }
+
     QResultProxy union(Object... qResultProxies) {
         List list = []
         for (def q : qResultProxies) {
