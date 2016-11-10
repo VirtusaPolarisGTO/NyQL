@@ -35,10 +35,14 @@ public class GVisitor {
         int n = "C:\\Projects\\work\\scripts\\database\\".length();
         if (!content.contains("$SESSION") && !visitor.cached) {
             if (visitor.queryType != null && visitor.queryType.equals("script")) {
-                System.out.println("[NON_CACHED_SCRIPT]  " + file.getAbsolutePath().substring(n));
+                //System.out.println("[NON_CACHED_SCRIPT]  " + file.getAbsolutePath().substring(n));
             } else {
                 System.out.println("[CAN_CACHE]  " + file.getAbsolutePath().substring(n));
             }
+        }
+
+        if (content.contains("$SESSION") && visitor.cached) {
+            //System.out.println("[INVALID_CACHE] " + file.getAbsolutePath().substring(n));
         }
 
         //System.out.println(visitor.tables);

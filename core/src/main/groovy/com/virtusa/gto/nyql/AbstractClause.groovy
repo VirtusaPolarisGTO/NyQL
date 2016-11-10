@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql
 
+import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.units.AParam
@@ -37,6 +38,15 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
             return script.proxy
         }
         //throw new NySyntaxException("You can only import a query part having a Table reference!")
+    }
+
+    @CompileStatic
+    def $IMPORT_UNSAFE(String scriptId) {
+        try {
+            return this.$IMPORT(scriptId)
+        } catch (NyScriptNotFoundException ignored) {
+            return null
+        }
     }
 
     @CompileStatic
