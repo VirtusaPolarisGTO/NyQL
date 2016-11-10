@@ -169,15 +169,22 @@ public class Deps {
             }
         }
 
-        for (Map.Entry<String, ScriptInfo> entry : info.entrySet()) {
-            ScriptInfo scriptInfo = entry.getValue();
-            if (!scriptInfo.getQueryType().equalsIgnoreCase("script")
-                && (scriptInfo.getTables() == null || scriptInfo.tableChain(fetcher).isEmpty())) {
-                //System.out.println("[EMPTY TABLE] Script " + entry.getKey() + " ");
-            }
-        }
+//        for (Map.Entry<String, ScriptInfo> entry : info.entrySet()) {
+//            ScriptInfo scriptInfo = entry.getValue();
+//            if (!scriptInfo.getQueryType().equalsIgnoreCase("script")
+//                && (scriptInfo.getTables() == null || scriptInfo.tableChain(fetcher).isEmpty())) {
+//                //System.out.println("[EMPTY TABLE] Script " + entry.getKey() + " ");
+//            }
+//        }
 
         for (Map.Entry<String, ScriptInfo> entry : info.entrySet()) {
+            if (entry.getValue().getQueryType() == null) {
+                System.out.println("-------------------------------------------");
+                System.out.println("[WHAT_IS_THIS_SCRIPT?] " + entry.getValue().getName());
+                System.out.println("-------------------------------------------");
+                continue;
+            }
+
             if (entry.getValue().getQueryType().equalsIgnoreCase("$q")) {
                 if (entry.getValue().getCalls() == null || entry.getValue().getCalls().isEmpty()) {
                     Set<String> callees = inMap.get(entry.getKey());
@@ -436,6 +443,9 @@ public class Deps {
     }
 
     private static String convToCSSClass(String type) {
+        if (type == null) {
+            return "nyscript";
+        }
         return "ny" + type.replace("$", "").toLowerCase();
     }
 

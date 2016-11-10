@@ -60,6 +60,8 @@ class QHttpProfiler implements QProfiling {
                     os = con.getOutputStream()
                     os.write(data.getBytes())
                     os.flush()
+
+                    con.getResponseCode()
                 } catch (Exception ex) {
                     LOGGER.error("Error occurred while", ex)
                 } finally {
@@ -93,6 +95,8 @@ class QHttpProfiler implements QProfiling {
                     os = con.getOutputStream()
                     os.write(data.getBytes())
                     os.flush()
+
+                    con.getResponseCode()
                 } finally {
                     if (os != null) {
                         os.close()
