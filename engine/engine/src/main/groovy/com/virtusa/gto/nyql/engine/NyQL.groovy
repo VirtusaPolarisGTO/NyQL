@@ -1,5 +1,5 @@
 package com.virtusa.gto.nyql.engine
-
+@java.lang.SuppressWarnings('JdbcConnectionReference')
 import com.virtusa.gto.nyql.configs.ConfigBuilder
 import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.configs.ConfigParser
@@ -12,8 +12,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.nio.charset.StandardCharsets
-@java.lang.SuppressWarnings('JdbcConnectionReference')
-import java.sql.Connection
 /**
  * Main interface to interact with NyQL queries.
  *
@@ -227,46 +225,6 @@ class NyQL {
     @CompileStatic
     static <T> T execute(String scriptName, Map<String, Object> data) throws NyException {
         nyQLInstance.execute(scriptName, data)
-    }
-
-    /**
-     * <p>
-     * Executes a given file indicated by the script name and returns the final result
-     * which was output of the last statement in the script ran.
-     * </p>
-     * <p>
-     * This method will automatically parse the script and execute using internally
-     * configured executor.
-     * </p>
-     *
-     * @param scriptName name of the script to be run.
-     * @return the result of the script execution.
-     * @throws NyException any exception thrown while parsing or executing.
-     */
-    @CompileStatic
-    static <T> T execute(String dslSql, Map<String, Object> data, Connection connection) throws NyException {
-        nyQLInstance.execute(dslSql, data, connection)
-    }
-
-    /**
-     * <p>
-     * Executes a script by providing its content and a jdbc connection at the runtime.
-     * The given connection will be used to execute the script. </p>
-     * <b>WARNING:</b>
-     * There is no guarantee that it will cache your given script if you invoked this
-     * with multiple times with the same content, since it is all about caching in <code>GroovyShell</code>.
-     * NyQL <b>does not do</b> any caching at this level and unable to do so.
-     *
-     * @param scriptId a unique script id for.
-     * @param dslSql dsl script content.
-     * @param data set of variables required for the script.
-     * @param connection jdbc connection to execute after parsing the script.
-     * @return the result of the script execution.
-     * @throws NyException any exception thrown while executing or parsing.
-     */
-    @CompileStatic
-    static <T> T execute(String scriptId, String dslSql, Map<String, Object> data, Connection connection) throws NyException {
-        nyQLInstance.execute(scriptId, dslSql, data, connection)
     }
 
     /**
