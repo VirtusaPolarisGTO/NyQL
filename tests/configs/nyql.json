@@ -57,7 +57,7 @@
 
   "profiling": {
     "enabled": true,
-    "profiler": "com.virtusa.gto.nyql.profilers.QHttpProfiler",
+    "profiler": "com.virtusa.gto.nyql.model.impl.QLogProfiler",
     "options": {
       "url": "http://172.22.228.227:5000/nyql",
       "port": 9009,

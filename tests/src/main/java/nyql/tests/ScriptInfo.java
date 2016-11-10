@@ -15,6 +15,7 @@ public class ScriptInfo {
     private Set<String> tables;
     private String queryType;
 
+
     public Set<String> tableChain(Function<String, ScriptInfo> fetcher) {
         if (calls == null || calls.isEmpty()) {
             return tables;

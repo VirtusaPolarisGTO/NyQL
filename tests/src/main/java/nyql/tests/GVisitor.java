@@ -31,6 +31,16 @@ public class GVisitor {
                 node.visit(visitor);
             }
         }
+
+        int n = "C:\\Projects\\work\\scripts\\database\\".length();
+        if (!content.contains("$SESSION") && !visitor.cached) {
+            if (visitor.queryType != null && visitor.queryType.equals("script")) {
+                System.out.println("[NON_CACHED_SCRIPT]  " + file.getAbsolutePath().substring(n));
+            } else {
+                System.out.println("[CAN_CACHE]  " + file.getAbsolutePath().substring(n));
+            }
+        }
+
         //System.out.println(visitor.tables);
         ScriptInfo scriptInfo = new ScriptInfo();
         scriptInfo.setCalls(new HashSet<>(visitor.callList));
@@ -45,6 +55,7 @@ public class GVisitor {
         private String queryType;
         private final List<String> callList = new LinkedList<>();
         private boolean insideMCall = false;
+        private boolean cached = false;
 
         public List<String> getCallList() {
             return callList;
@@ -62,6 +73,23 @@ public class GVisitor {
         public void visitPropertyExpression(PropertyExpression expression) {
             super.visitPropertyExpression(expression);
             //System.out.println(expression.getObjectExpression() + "." + expression.getPropertyAsString());
+        }
+
+
+
+        @Override
+        public void visitDeclarationExpression(DeclarationExpression expression) {
+            super.visitDeclarationExpression(expression);
+            if (!cached) {
+                cached = expression.getVariableExpression().getName().equals("do_cache")
+                        && expression.getAnnotations().size() > 0;
+            }
+        }
+
+        @Override
+        public void visitFieldExpression(FieldExpression expression) {
+            super.visitFieldExpression(expression);
+            System.out.println("[XXX] " + expression.getFieldName());
         }
 
         @Override

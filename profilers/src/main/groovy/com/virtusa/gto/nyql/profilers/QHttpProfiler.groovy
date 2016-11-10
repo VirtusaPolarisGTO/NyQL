@@ -27,7 +27,7 @@ class QHttpProfiler implements QProfiling {
 
     private URL url
     private String httpMethod
-
+    private boolean isCached = false
 
 
     @Override
@@ -39,6 +39,7 @@ class QHttpProfiler implements QProfiling {
         POOL = Executors.newFixedThreadPool((int)(options[POOL_SIZE] == null ? DEF_POOL : options[POOL_SIZE]))
         url = new URL(options['url'].toString())
         httpMethod = options['httpMethod'] ?: POST
+        isCached = options['isCached']
     }
 
     @Override
@@ -55,7 +56,7 @@ class QHttpProfiler implements QProfiling {
                     con.setRequestMethod(httpMethod)
                     con.setRequestProperty('Content-Type', 'application/json')
 
-                    String data = new JsonBuilder([operation: 'parsing', scriptId: scriptId,
+                    String data = new JsonBuilder([operation: 'parsing', scriptId: scriptId, cached: isCached,
                                                    elapsed: elapsed, time: System.currentTimeMillis()]).toString()
                     os = con.getOutputStream()
                     os.write(data.getBytes())
@@ -90,7 +91,7 @@ class QHttpProfiler implements QProfiling {
                     con.setRequestMethod(httpMethod)
                     con.setRequestProperty('Content-Type', 'application/json')
 
-                    String data = new JsonBuilder([operation: 'execution', scriptId: script.id,
+                    String data = new JsonBuilder([operation: 'execution', scriptId: script.id, cached: isCached,
                                                    elapsed: elapsed, time: System.currentTimeMillis()]).toString()
                     os = con.getOutputStream()
                     os.write(data.getBytes())
