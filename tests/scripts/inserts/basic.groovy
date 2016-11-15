@@ -65,4 +65,24 @@ def innQP = $DSL.select {
             )
         },
         ["INSERT INTO `Film` (`film_id`, `title`) VALUES ((SELECT * FROM `Film` f WHERE f.film_id = ?), ?)", ["id", "title"]],
+
+        $DSL.insert {
+            TARGET (Film.alias("f"))
+            DATA (
+                    "film_id": TABLE(innQP),
+                    "title": PARAM("title")
+            )
+            DATA ($IMPORT("inserts/data_imports"))
+        },
+        ["INSERT INTO `Film` (`film_id`, `title`, `importedCol1`, `importedCol2`, `importedCol3`) VALUES " +
+                 "((SELECT * FROM `Film` f WHERE f.film_id = ?), ?, ?, \"const\", ?)",
+         ["id", "title", "iparam1", "iparam2"]],
+
+        $DSL.insert {
+            TARGET (Film.alias("f"))
+            DATA (["film_id": TABLE(innQP), "title": PARAM("title")], $IMPORT("inserts/data_imports"))
+        },
+        ["INSERT INTO `Film` (`film_id`, `title`, `importedCol1`, `importedCol2`, `importedCol3`) VALUES " +
+                 "((SELECT * FROM `Film` f WHERE f.film_id = ?), ?, ?, \"const\", ?)",
+         ["id", "title", "iparam1", "iparam2"]],
 ]

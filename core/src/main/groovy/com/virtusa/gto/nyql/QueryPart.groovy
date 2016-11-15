@@ -12,6 +12,7 @@ class QueryPart extends Query {
     Assign _assigns
     List<Object> _allProjections
     List<Object> _intoColumns
+    Map<String, Object> _dataColumns
 
     QueryPart(QContext contextParam) {
         super(contextParam)
@@ -54,6 +55,14 @@ class QueryPart extends Query {
         code()
 
         _assigns = ass
+        this
+    }
+
+    QueryPart DATA(Map<String, Object> map) {
+        if (_dataColumns == null) {
+            _dataColumns = [:] as LinkedHashMap
+        }
+        _dataColumns.putAll(map)
         this
     }
 }

@@ -20,6 +20,15 @@ class QueryInsert extends QuerySelect {
         return this
     }
 
+    QueryInsert DATA(Map... args) {
+        if (args != null) {
+            for (Map map : args) {
+                DATA(map)
+            }
+        }
+        this
+    }
+
     QueryInsert RETURN_KEYS() {
         returnType = QReturnType.KEYS
         return this

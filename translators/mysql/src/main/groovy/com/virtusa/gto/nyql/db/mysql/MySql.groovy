@@ -320,6 +320,10 @@ class MySql extends MySqlFunctions implements QTranslator {
                     orderedParameters: paramList, rawObject: q._intoColumns, qObject: q)
         }
 
+        if (!QUtils.isNullOrEmpty(q._dataColumns)) {
+            return new QResultProxy(query: '', queryType: queryType,
+                    orderedParameters: paramList, rawObject: q._dataColumns, qObject: q)
+        }
         throw new NyException('Parts are no longer supports to reuse other than WHERE and JOINING!')
     }
 
