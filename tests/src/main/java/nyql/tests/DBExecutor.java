@@ -1,10 +1,12 @@
 package nyql.tests;
 
 import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.model.QScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -15,6 +17,7 @@ public class DBExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBExecutor.class);
 
     public static void main(String[] args) throws Exception {
+        NyQLInstance nyQLInstance = null;
         try {
             Map<String, Object> data = new HashMap<>();
             List<Integer> teams = asList(1410, 1234);
@@ -38,12 +41,16 @@ public class DBExecutor {
 
             //data.put("hello", inners);
 
+            nyQLInstance = NyQLInstance.create(new File("./nyql.json"));
+
             //QScript result = NyQL.parse("insight/unmapped_users", data);
-            Object result = NyQL.execute("sakila/top_customers", data);
+            Object result = nyQLInstance.execute("temp_table_test", data);
             System.out.println(result);
 
         } finally {
-            NyQL.shutdown();
+            if (nyQLInstance != null) {
+                nyQLInstance.shutdown();
+            }
         }
         //NyQL.execute("")
         //Quickly.configOnce();
