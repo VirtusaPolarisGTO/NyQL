@@ -104,7 +104,7 @@ class Caching implements Closeable {
             scr.setSession(session)
             scr
         } else {
-            GroovyShell shell = new GroovyShell(binding, makeCompilerConfigs())
+            GroovyShell shell = new GroovyShell(Thread.currentThread().contextClassLoader, binding, makeCompilerConfigs())
             Script parsedScript = sourceScript.parseIn(shell)
             parsedScript.setSession(session)
             parsedScript
