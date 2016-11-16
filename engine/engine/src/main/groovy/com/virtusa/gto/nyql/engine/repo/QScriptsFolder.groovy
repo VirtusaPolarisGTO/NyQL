@@ -47,7 +47,7 @@ class QScriptsFolder implements QScriptMapper {
 
     QScriptsFolder scanDir() {
         // scans the given directory
-        LOGGER.debug("Loading script files from directory '{}'", baseDir.canonicalPath)
+        LOGGER.info("Loading script files from directory '{}'", baseDir.canonicalPath)
 
         Path canPath = baseDir.toPath()
         ScriptVisitor visitor = new ScriptVisitor(this, canPath, inclusionPatterns, exclusionPatterns)
@@ -129,9 +129,9 @@ class QScriptsFolder implements QScriptMapper {
     private void prettyPrintFiles() {
         fileMap.keySet().sort().each {
             String kb = toKB((fileMap[it] as QFileSource).file.length())
-            LOGGER.debug(' > ' + it.padRight(maxLen + 5) + "${kb.padLeft(6)}")
+            LOGGER.info(' > ' + it.padRight(maxLen + 5) + "${kb.padLeft(6)}")
         }
-        LOGGER.debug("Found ${fileMap.size()} script(s).")
+        LOGGER.info("Found ${fileMap.size()} script(s).")
     }
 
     private static String toKB(long length) {

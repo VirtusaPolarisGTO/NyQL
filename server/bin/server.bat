@@ -1,11 +1,16 @@
 @echo off
 
-set CURRENT_DIR=%cd%
+call .\env.bat
+IF %ERRORLEVEL%==0 goto okJava
+goto end
 
-if exist "%JAVA_HOME:"=%\bin\java.exe" goto setJavaHome
-set JAVA=java
-goto okJava
+:okJava
+SET CURRENT_DIR=%CD%
+cd %CURRENT_DIR%\..
+SET CLSPATH=".;lib\*"
+SET NY_ARGS=
+CALL "%JAVA%" %NY_ARGS% -classpath %CLSPATH% com.virtusa.gto.nyql.server.NyServer %*
+goto end
 
-:setJavaHome
-set JAVA="%JAVA_HOME:"=%\bin\java"
-
+:end
+exit /B %ERRORLEVEL%

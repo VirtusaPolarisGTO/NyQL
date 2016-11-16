@@ -20,25 +20,56 @@ class QLogProfiler implements QProfiling {
     private static final String TOOK = ' took ('
     private static final String TIME = ' ms) time.'
 
+    /**
+     * Default logging level for profiles: INFO
+     *    0 = INFO
+     *    1 = DEBUG
+     *    2 = TRACE
+     */
+    private int defaultLevel = 0;
+
     private QLogProfiler() {}
 
     @Override
     void start(Map options) {
-        LOGGER.info(TAG + ' Log profiler started.')
+        String level = (options['level'] ?: 'info').toString().toLowerCase()
+        LOGGER.info(TAG + ' Log profiler started. Logging level: ' + level)
+
+        if (level == 'debug') {
+            defaultLevel = 1
+        } else if (level == 'trace') {
+            defaultLevel = 2
+        } else {
+            defaultLevel = 0
+        }
     }
 
     @Override
     void doneParsing(String scriptId, long elapsed, QSession session) {
-        LOGGER.info(TAG + ' Script parsing ' + scriptId + TOOK + elapsed + TIME)
+        String msg = TAG + ' Script parsing ' + scriptId + TOOK + elapsed + TIME
+        if (defaultLevel < 1) {
+            LOGGER.info(msg)
+        } else if (defaultLevel == 1) {
+            LOGGER.debug(msg)
+        } else {
+            LOGGER.trace(msg)
+        }
     }
 
     @Override
     void doneExecuting(QScript script, long elapsed) {
-        LOGGER.info(TAG + ' Script execution ' + script.id + TOOK + elapsed + TIME)
+        String msg = TAG + ' Script execution ' + script.id + TOOK + elapsed + TIME
+        if (defaultLevel < 1) {
+            LOGGER.info(msg)
+        } else if (defaultLevel == 1) {
+            LOGGER.debug(msg)
+        } else {
+            LOGGER.trace(msg)
+        }
     }
 
     @Override
     void close() throws IOException {
-        LOGGER.debug('Closing log profile.')
+        LOGGER.info('Closing log profile.')
     }
 }

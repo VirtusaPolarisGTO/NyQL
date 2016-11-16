@@ -2,7 +2,7 @@
   "activate": "mysql",
 
   "translators": [
-    "com.virtusa.gto.insight.nyql.db.mysql.MySqlFactory"
+    "com.virtusa.gto.nyql.db.mysql.MySqlFactory"
   ],
 
   "caching": {
@@ -10,38 +10,39 @@
     "generatedQueries": true
   },
 
-  "addAutoShutdownHook": true,
-
   "defaultImports": [
     "groovy.transform.Field",
-    "com.virtusa.gto.insight.nyql.ddl.DKeyIndexType",
-    "com.virtusa.gto.insight.nyql.ddl.DFieldType",
-    "com.virtusa.gto.insight.nyql.ddl.DReferenceOption",
-    "com.virtusa.gto.insight.nyql.utils.QueryType",
-    "java.sql.JDBCType"
+    "com.virtusa.gto.nyql.ddl.DKeyIndexType",
+    "com.virtusa.gto.nyql.ddl.DFieldType",
+    "com.virtusa.gto.nyql.ddl.DReferenceOption",
+    "com.virtusa.gto.nyql.utils.QueryType",
+    "java.sql.JDBCType",
+    "java.sql.Types",
+    "com.virtusa.gto.nyql.model.units.AParam.ParamScope"
   ],
 
-  "defaultExecutor": "dummy",
-  "loadDefaultExecutorOnly": true,
+  "defaultExecutor": "jdbc",
   "executors": [
     {
       "name": "jdbc",
-      "factory": "com.virtusa.gto.insight.nyql.engine.impl.QJdbcExecutorFactory",
+      "factory": "com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory",
 
       "url": "jdbc:mysql://localhost/sakila",
       "username": "root",
       "password": "",
 
       "pooling": {
+        "impl": "com.virtusa.gto.nyql.engine.pool.impl.QHikariPool",
+
         "maximumPoolSize": 1,
         "prepStmtCacheSize": 300,
         "prepStmtCacheSqlLimit": 2048,
-        "useServerPrepStmts": true
+        "useServerPrepStmts": true,
+
+        "connectionTimeout": 30000,
+        "idleTimeout": 0,
+        "maxLifetime": 0
       }
-    },
-    {
-      "name": "dummy",
-      "factory": "com.virtusa.gto.insight.nyql.engine.impl.QDummyExecFactory"
     }
   ],
 
@@ -49,22 +50,16 @@
   "repositories": [
     {
       "name": "default",
-      "repo": "com.virtusa.gto.insight.nyql.engine.repo.QRepositoryImpl",
-      "mapper": "com.virtusa.gto.insight.nyql.engine.repo.QScriptsFolder",
+      "repo": "com.virtusa.gto.nyql.engine.repo.QRepositoryImpl",
+      "mapper": "com.virtusa.gto.nyql.engine.repo.QScriptsFolder",
       "mapperArgs": {
-        "baseDir": "../examples"
+        "baseDir": "./scripts"
       }
     }
   ],
 
   "profiling": {
     "enabled": true,
-    "profiler": "com.virtusa.gto.insight.nyql.server.NyServerProfile",
-    "options": {
-      "port": 9009,
-      "writeIntervalMS": 10000,
-      "autoWriteOnClose": true
-    }
+    "profiler": "com.virtusa.gto.nyql.model.impl.QLogProfiler"
   }
-
 }

@@ -39,7 +39,7 @@ class Caching implements Closeable {
 
     void compileAllScripts(Collection<QSource> sources) throws NyException {
         if (configurations.cacheRawScripts()) {
-            LOGGER.debug("Compiling all ${sources.size()} dsl script(s)...")
+            LOGGER.info("Compiling all ${sources.size()} dsl script(s)...")
             for (QSource qSource : sources) {
                 String id = qSource.id
                 try {
@@ -50,7 +50,7 @@ class Caching implements Closeable {
                     throw new NyException("Compilation error in script '$id'!", ex)
                 }
             }
-            LOGGER.debug('Compilation successful!')
+            LOGGER.info('Compilation successful!')
         }
     }
 

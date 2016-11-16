@@ -15,6 +15,7 @@ import com.virtusa.gto.nyql.model.units.ParamList
 import com.virtusa.gto.nyql.utils.QReturnType
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryType
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -74,6 +75,16 @@ class QJdbcExecutor implements QExecutor {
         return connection
     }
 
+    @CompileStatic
+    private static void logScript(QScript script) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" +
+                    script.proxy.query.trim())
+            LOGGER.trace('------------------------------------------------------------')
+        }
+    }
+
+    @CompileStatic
     @Override
     def execute(QScript script) throws Exception {
         if (script instanceof QScriptResult) {
@@ -84,11 +95,7 @@ class QJdbcExecutor implements QExecutor {
             return executeCall(script)
         }
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" +
-                    script.proxy.query.trim())
-            LOGGER.trace('------------------------------------------------------------')
-        }
+        logScript(script)
 
         if (script.proxy.queryType == QueryType.BULK_INSERT) {
             return batchExecute(script)
