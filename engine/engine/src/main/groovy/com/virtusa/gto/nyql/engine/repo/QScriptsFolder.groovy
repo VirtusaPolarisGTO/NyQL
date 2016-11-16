@@ -56,7 +56,7 @@ class QScriptsFolder implements QScriptMapper {
         this
     }
 
-    private void processScript(File file) {
+    private QSource processScript(File file) {
         String relPath = captureFileName(baseDir.toPath().relativize(file.toPath()).toString()).replace('\\', '/')
 
         String content = readAll(file)
@@ -66,6 +66,7 @@ class QScriptsFolder implements QScriptMapper {
         def qSrc = new QFileSource(relPath, file, groovyCodeSource)
         fileMap[relPath] = qSrc
         maxLen = Math.max(relPath.length(), maxLen)
+        qSrc
     }
 
     private static String readAll(File file) {
@@ -80,7 +81,7 @@ class QScriptsFolder implements QScriptMapper {
         path
     }
 
-    @SuppressWarnings("UnnecessaryGetter")
+    @SuppressWarnings('UnnecessaryGetter')
     static QScriptsFolder createNew(Map args) throws NyException {
         if (args == null || args.size() == 0 || !args.baseDir) {
             throw new NyConfigurationException('To create a new QScriptsFolder requires at least one parameter with specifying base directory!')
@@ -110,7 +111,16 @@ class QScriptsFolder implements QScriptMapper {
     @Override
     QSource map(String id) throws NyScriptNotFoundException {
         QSource source = fileMap[id]
-        if (source == null || !source.isValid()) {
+        if (source == null) {
+            File scriptFresh = baseDir.toPath().resolve(id).toFile()
+            if (scriptFresh.exists()) {
+                LOGGER.debug('Loading a fresh script from ' + id + '...')
+                source = processScript(scriptFresh)
+            } else {
+                throw new NyScriptNotFoundException(id)
+            }
+        }
+        if (!source.isValid()) {
             throw new NyScriptNotFoundException(id)
         }
         source

@@ -26,7 +26,7 @@ class QLogProfiler implements QProfiling {
      *    1 = DEBUG
      *    2 = TRACE
      */
-    private int defaultLevel = 0;
+    private int defaultLevel = 0
 
     private QLogProfiler() {}
 
