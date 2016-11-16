@@ -23,6 +23,10 @@ class NyQLInstance {
         this.configurations = theConfigInstance
     }
 
+    static NyQLInstance create(InputStream inputStream) {
+        create(ConfigParser.parseAndResolve(inputStream))
+    }
+
     static NyQLInstance create(File configFile) {
         create(ConfigParser.parseAndResolve(configFile))
     }

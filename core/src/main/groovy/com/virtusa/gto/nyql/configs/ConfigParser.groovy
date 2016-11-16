@@ -23,6 +23,7 @@ class ConfigParser {
         resolve(result, result) as Map
     }
 
+    @CompileStatic
     static Map parse(InputStream inputConfigStream) {
         Map thisConf = directParse(inputConfigStream)
         String baseConfRef = (String) thisConf[BASE_CONF_KEY]
