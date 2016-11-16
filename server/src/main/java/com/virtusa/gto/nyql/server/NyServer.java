@@ -3,7 +3,9 @@ package com.virtusa.gto.nyql.server;
 
 import com.google.gson.Gson;
 import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.exceptions.NyException;
 import com.virtusa.gto.nyql.model.QScript;
+import com.virtusa.gto.nyql.model.QScriptResult;
 import com.virtusa.gto.nyql.model.units.AParam;
 import groovy.json.JsonSlurper;
 import org.slf4j.Logger;
@@ -38,7 +40,7 @@ public class NyServer {
     @SuppressWarnings("unchecked")
     private void init() {
         String serverJson = System.getProperty("NYSERVER_CONFIG_PATH", DEF_SERVER_JSON);
-        String nyqlJson = System.getProperty("NYSERVER_NYCONFIG_PATH", DEF_NYQL_JSON);
+        String nyqlJson = System.getProperty("NYSERVER_NYJSON_PATH", DEF_NYQL_JSON);
 
         // read server config file
         File confFile = new File(serverJson);
@@ -73,6 +75,9 @@ public class NyServer {
 
         Spark.post(basePath + "/parse", this::epParse, GSON::toJson);
         Spark.post(basePath + "/execute", this::epExecute, GSON::toJson);
+
+        // handle exceptions
+        Spark.exception(NyException.class, this::anyError);
     }
 
     @SuppressWarnings("unchecked")
@@ -88,9 +93,16 @@ public class NyServer {
         QScript result = NyQL.parse(scriptId, data);
 
         Map<String, Object> r = new HashMap<>();
-        r.put("query", result.getProxy().getQuery());
-        r.put("params", result.getProxy().getOrderedParameters().stream()
-                .map(AParam::get__name).collect(Collectors.toList()));
+        if (result instanceof QScriptResult) {
+            r.put("result", ((QScriptResult) result).getScriptResult());
+            r.put("query", null);
+            r.put("params", null);
+        } else {
+            r.put("result", null);
+            r.put("query", result.getProxy().getQuery());
+            r.put("params", result.getProxy().getOrderedParameters().stream()
+                    .map(AParam::get__name).collect(Collectors.toList()));
+        }
         return r;
     }
 
@@ -106,6 +118,10 @@ public class NyServer {
         }
 
         return NyQL.execute(scriptId, data);
+    }
+
+    private void anyError(Exception ex, Request req, Response res) {
+        res.status(500);
     }
 
     @SuppressWarnings("unchecked")
