@@ -3,7 +3,7 @@
  */
 $DSL.$q {
 
-    EXPECT (Actor.alias("ac"))
+    EXPECT (OTHER().alias("ac"))
 
     FETCH (ac.id,
             IFNULL(ac.year, 2016).alias("thisYear"),

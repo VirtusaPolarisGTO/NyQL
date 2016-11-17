@@ -72,7 +72,9 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
 
     @CompileStatic
     TableProxy OTHER() {
-        new TableProxy()
+        TableProxy tableProxy = new TableProxy(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx)
+        _ctx.tables.putIfAbsent(tableProxy.__name, tableProxy)
+        tableProxy
     }
 
     @CompileStatic
