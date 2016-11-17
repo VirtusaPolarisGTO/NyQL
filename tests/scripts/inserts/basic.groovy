@@ -85,4 +85,36 @@ def innQP = $DSL.select {
         ["INSERT INTO `Film` (`film_id`, `title`, `importedCol1`, `importedCol2`, `importedCol3`) VALUES " +
                  "((SELECT * FROM `Film` f WHERE f.film_id = ?), ?, ?, \"const\", ?)",
          ["id", "title", "iparam1", "iparam2"]],
+
+        $DSL.insert {
+            TARGET (Film.alias("f"))
+            DATA (
+                    "film_id": PARAM("id"),
+                    "releaseDate": PARAM_DATE("relDate")
+            )
+        },
+        ["INSERT INTO `Film` (`film_id`, `releaseDate`) VALUES (?, ?)",
+         ["id", "relDate"]],
+
+        $DSL.insert {
+            TARGET (Film.alias("f"))
+            DATA (
+                    "film_id": PARAM("id"),
+                    "debutScreenTime": PARAM_TIMESTAMP("debutTime")
+            )
+        },
+        ["INSERT INTO `Film` (`film_id`, `debutScreenTime`) VALUES (?, ?)",
+         ["id", "debutTime"]],
+
+        $DSL.insert {
+            TARGET (Film.alias("f"))
+            DATA (
+                    "film_id": PARAM("id"),
+                    "debutScreenTime": PARAM_TIMESTAMP("debutTime"),
+                    "debutScreenTime2": PARAM_TIMESTAMP("debutTime2", "YYYY-MM-DDThh:mm:ssTZD"),
+                    "releaseDate": PARAM_DATE("relDate")
+            )
+        },
+        ["INSERT INTO `Film` (`film_id`, `debutScreenTime`, `debutScreenTime2`, `releaseDate`) VALUES (?, ?, ?, ?)",
+         ["id", "debutTime", "debutTime2", "relDate"]],
 ]

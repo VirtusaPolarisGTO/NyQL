@@ -3,6 +3,8 @@ package com.virtusa.gto.nyql
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.units.AParam
+import com.virtusa.gto.nyql.model.units.ParamDate
+import com.virtusa.gto.nyql.model.units.ParamTimestamp
 import com.virtusa.gto.nyql.traits.DataTypeTraits
 import com.virtusa.gto.nyql.traits.FunctionTraits
 import com.virtusa.gto.nyql.traits.ScriptTraits
@@ -41,6 +43,23 @@ class Assign implements DataTypeTraits, FunctionTraits, ScriptTraits {
     @CompileStatic
     AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
         _ctx.addParam(QUtils.createParam(name, scope, mappingName))
+    }
+
+    @CompileStatic
+    @Override
+    AParam PARAM_DATE(String name) {
+        _ctx.addParam(new ParamDate(__name: name))
+    }
+
+    @CompileStatic
+    @Override
+    AParam PARAM_TIMESTAMP(String name, String format) {
+        _ctx.addParam(new ParamTimestamp(__name: name, __tsFormat: format))
+    }
+
+    @CompileStatic
+    AParam PARAM_TIMESTAMP(String name) {
+        PARAM_TIMESTAMP(name, null)
     }
 
     AParam PARAMLIST(String name) {

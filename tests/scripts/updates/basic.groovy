@@ -85,4 +85,16 @@ def innQP = $DSL.select {
         },
         ["UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = ?)", ["id"]],
 
+        $DSL.update {
+            TARGET (Film.alias("f"))
+            SET {
+                EQ (f.film_id, 1234)
+                EQ (f.releaseDate, PARAM_DATE("relDate"))
+                EQ (f.debutTime, PARAM_TIMESTAMP("debutTime"))
+                EQ (f.debutTime2, PARAM_TIMESTAMP("debutTime2", "YYYY-MM-DDThh:mm:ssTZD"))
+                SET_NULL (f.language_id)
+            }
+        },
+        ["UPDATE `Film` f SET f.film_id = 1234, f.releaseDate = ?, f.debutTime = ?, f.debutTime2 = ?, f.language_id = NULL",
+         ["relDate", "debutTime", "debutTime2"]],
 ]

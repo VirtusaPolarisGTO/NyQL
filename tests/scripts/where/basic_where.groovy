@@ -236,4 +236,23 @@ def innQ = $DSL.select {
         }
     },
     "SELECT * FROM `Film` f WHERE  AND f.description = \"hello\"",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            ALL {
+                EQ (f.film_id, 123)
+                GT (f.releaseDate, PARAM_DATE("relDate"))
+                GT (f.debutTime, PARAM_TIMESTAMP("debutTime"))
+            }
+            OR
+            IN (f.language_id, PARAM("langId"))
+            OR
+            EQ (f.debutTime2, PARAM_TIMESTAMP("debutTime2", "YYYY-MM-DDThh:mm:ssTZD"))
+        }
+    },
+    ["SELECT * FROM `Film` f " +
+             "WHERE (f.film_id = 123 AND f.releaseDate > ? AND f.debutTime > ?) OR f.language_id IN (?) OR f.debutTime2 = ?",
+     ["relDate", "debutTime", "langId", "debutTime2"]],
 ]

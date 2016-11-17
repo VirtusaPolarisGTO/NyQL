@@ -22,6 +22,10 @@ class AParam {
         __alias != null && !__alias.isEmpty()
     }
 
+    boolean __shouldValueConvert() {
+        false
+    }
+
     static enum ParamScope {
         IN, OUT, INOUT
     }

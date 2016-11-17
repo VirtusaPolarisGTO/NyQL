@@ -11,7 +11,9 @@ import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QScriptResult
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.NamedParam
+import com.virtusa.gto.nyql.model.units.ParamDate
 import com.virtusa.gto.nyql.model.units.ParamList
+import com.virtusa.gto.nyql.model.units.ParamTimestamp
 import com.virtusa.gto.nyql.utils.QReturnType
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryType
@@ -29,7 +31,6 @@ import java.sql.ResultSet
 import java.sql.Savepoint
 import java.sql.Statement
 import java.util.stream.Collectors
-
 /**
  * @author IWEERARATHNA
  */
@@ -44,6 +45,7 @@ class QJdbcExecutor implements QExecutor {
     private Connection connection
     private final boolean returnRaw
     private final boolean reusable
+    private QJdbcExecutorFactory owner
 
     /**
      * Creates an executor with custom connection.
@@ -66,6 +68,11 @@ class QJdbcExecutor implements QExecutor {
         poolFetcher = jdbcPoolFetcher
         reusable = canReusable
         returnRaw = false
+    }
+
+    QJdbcExecutor setOwner(QJdbcExecutorFactory owner) {
+        this.owner = owner
+        this
     }
 
     private Connection getConnection() {
@@ -299,7 +306,7 @@ class QJdbcExecutor implements QExecutor {
                     throw new NyScriptExecutionException("Parameter value of '$param.__name' expected to be a list but given " + itemValue.class.simpleName + '!')
                 }
             } else {
-                orderedParams.add(itemValue)
+                orderedParams.add(convertValue(itemValue, param))
                 cp++
             }
         }
@@ -317,6 +324,22 @@ class QJdbcExecutor implements QExecutor {
         statement
     }
 
+    @CompileStatic
+    private Object convertValue(Object value, AParam param) {
+        if (param.__shouldValueConvert()) {
+            if (param instanceof ParamTimestamp) {
+                owner.convertTimestamp(String.valueOf(value), param.__tsFormat)
+            } else if (param instanceof ParamDate) {
+                owner.convertToDate(String.valueOf(value))
+            } else {
+                throw new NyScriptExecutionException('Unknown parameter type specified in script!')
+            }
+        } else {
+            value
+        }
+    }
+
+    @CompileStatic
     private static boolean isReturnKeys(QScript script) {
         script.proxy != null && script.proxy.queryType == QueryType.INSERT &&
                 script.proxy.returnType == QReturnType.KEYS
@@ -385,6 +408,7 @@ class QJdbcExecutor implements QExecutor {
 
     @Override
     void close() throws IOException {
+        owner = null
         if (connection != null) {
             connection.close()
         }

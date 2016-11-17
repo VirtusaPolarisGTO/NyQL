@@ -3,7 +3,9 @@ package com.virtusa.gto.nyql
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.units.AParam
+import com.virtusa.gto.nyql.model.units.ParamDate
 import com.virtusa.gto.nyql.model.units.ParamList
+import com.virtusa.gto.nyql.model.units.ParamTimestamp
 import com.virtusa.gto.nyql.traits.DataTypeTraits
 import com.virtusa.gto.nyql.traits.FunctionTraits
 import com.virtusa.gto.nyql.traits.ScriptTraits
@@ -66,6 +68,23 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     @CompileStatic
     AParam PARAMLIST(String name) {
         _ctx.addParam(new ParamList(__name: name))
+    }
+
+    @CompileStatic
+    @Override
+    AParam PARAM_DATE(String name) {
+        _ctx.addParam(new ParamDate(__name: name))
+    }
+
+    @CompileStatic
+    @Override
+    AParam PARAM_TIMESTAMP(String name, String format) {
+        _ctx.addParam(new ParamTimestamp(__name: name, __tsFormat: format))
+    }
+
+    @CompileStatic
+    AParam PARAM_TIMESTAMP(String name) {
+        PARAM_TIMESTAMP(name, null)
     }
 
     @CompileStatic
