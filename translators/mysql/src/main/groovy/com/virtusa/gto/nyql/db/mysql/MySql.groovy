@@ -104,7 +104,8 @@ class MySql extends MySqlFunctions implements QTranslator {
             return QUtils.quote(table.__name)
         } else if (contextType == QContextType.INTO) {
             return QUtils.quote(table.__name)
-        } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM) {
+        } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
+                || contextType == QContextType.DELETE_JOIN) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
                 return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + table.__alias : '')
@@ -153,7 +154,8 @@ class MySql extends MySqlFunctions implements QTranslator {
     @CompileStatic
     private static boolean isInsideDelete(QContextType contextType) {
         return contextType == QContextType.DELETE_CONDITIONAL ||
-                contextType == QContextType.DELETE_FROM
+                contextType == QContextType.DELETE_FROM ||
+                contextType == QContextType.DELETE_JOIN
     }
 
     @CompileStatic
@@ -174,6 +176,9 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
 
         if (contextType == QContextType.DELETE_CONDITIONAL) {
+            if (column._owner.__isResultOf()) {
+                return QUtils.quoteIfWS(column._owner.__alias, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
+            }
             return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
         }
 
@@ -206,7 +211,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append(' ').append(NL)
         }
 
-        if (q._assigns.__hasAssignments()) {
+        if (q._assigns != null && q._assigns.__hasAssignments()) {
             query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(' ').append(NL)
         }
 
@@ -273,7 +278,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         query.append('DELETE ')
         if (q._joiningTable != null) {
             query.append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append(' ').append(NL)
-            query.append('FROM ').append(___deriveSource(q._joiningTable, paramList, QContextType.DELETE_FROM)).append(NL)
+            query.append('FROM ').append(___deriveSource(q._joiningTable, paramList, QContextType.DELETE_JOIN)).append(NL)
         } else {
             query.append('FROM ').append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append(NL)
         }
