@@ -53,6 +53,11 @@ class QSession {
     QExecutor executor
 
     /**
+     * configuration instance associated with this instance.
+     */
+    Configurations configurations
+
+    /**
      * current execution depth.
      */
     private int execDepth = 0
@@ -73,6 +78,7 @@ class QSession {
         executorFactory = null
         dbFactory = null
         executor = null
+        configurations = null
     }
 
     static QSession create(Configurations configurations, String theScriptId) {
@@ -82,10 +88,11 @@ class QSession {
                 configurations.executorRegistry.defaultExecutorFactory())
         qSession.rootScriptId = theScriptId
         qSession.scriptStack.push(theScriptId)
+        qSession.configurations = configurations
         qSession
     }
 
-    static QSession createSession(QDbFactory dbFactory, QRepository repository,
+    private static QSession createSession(QDbFactory dbFactory, QRepository repository,
                                   QExecutor executor, QExecutorFactory executorFactory) {
         QSession session = new QSession()
 
@@ -121,7 +128,7 @@ class QSession {
             executor = executorFactory.createReusable()
         }
         def stack = incrStack()
-        LOGGER.debug('Session {} starting script at execution depth {}', this, stack)
+        LOGGER.trace('Session {} starting script at execution depth {}', this, stack)
         executor
     }
 
@@ -132,7 +139,7 @@ class QSession {
             executor.close()
             executor = null
         } else if (stack > 0) {
-            LOGGER.debug('Session {} ended script at execution depth {}', this, stack)
+            LOGGER.trace('Session {} ended script at execution depth {}', this, stack)
         }
     }
 

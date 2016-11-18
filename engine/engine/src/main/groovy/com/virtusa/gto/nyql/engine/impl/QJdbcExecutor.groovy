@@ -45,7 +45,6 @@ class QJdbcExecutor implements QExecutor {
     private Connection connection
     private final boolean returnRaw
     private final boolean reusable
-    private QJdbcExecutorFactory owner
 
     /**
      * Creates an executor with custom connection.
@@ -68,11 +67,6 @@ class QJdbcExecutor implements QExecutor {
         poolFetcher = jdbcPoolFetcher
         reusable = canReusable
         returnRaw = false
-    }
-
-    QJdbcExecutor setOwner(QJdbcExecutorFactory owner) {
-        this.owner = owner
-        this
     }
 
     private Connection getConnection() {
@@ -306,7 +300,7 @@ class QJdbcExecutor implements QExecutor {
                     throw new NyScriptExecutionException("Parameter value of '$param.__name' expected to be a list but given " + itemValue.class.simpleName + '!')
                 }
             } else {
-                orderedParams.add(convertValue(itemValue, param))
+                orderedParams.add(convertValue(itemValue, param, script))
                 cp++
             }
         }
@@ -325,12 +319,12 @@ class QJdbcExecutor implements QExecutor {
     }
 
     @CompileStatic
-    private Object convertValue(Object value, AParam param) {
+    private static Object convertValue(Object value, AParam param, QScript qScript) {
         if (param.__shouldValueConvert()) {
             if (param instanceof ParamTimestamp) {
-                owner.convertTimestamp(String.valueOf(value), param.__tsFormat)
+                JdbcHelperUtils.convertTimestamp(value, qScript.qSession.configurations, param.__tsFormat)
             } else if (param instanceof ParamDate) {
-                owner.convertToDate(String.valueOf(value))
+                JdbcHelperUtils.convertToDate(String.valueOf(value))
             } else {
                 throw new NyScriptExecutionException('Unknown parameter type specified in script!')
             }
@@ -406,9 +400,9 @@ class QJdbcExecutor implements QExecutor {
         res
     }
 
+    @CompileStatic
     @Override
     void close() throws IOException {
-        owner = null
         if (connection != null) {
             connection.close()
         }

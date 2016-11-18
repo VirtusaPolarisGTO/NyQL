@@ -15,17 +15,22 @@ import com.virtusa.gto.nyql.model.impl.QProfExecutorFactory
 import com.virtusa.gto.nyql.model.impl.QProfRepository
 import com.virtusa.gto.nyql.utils.Constants
 import com.virtusa.gto.nyql.utils.QUtils
+import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.lang.reflect.Constructor
+import java.time.format.DateTimeFormatter
+
 /**
  * @author IWEERARATHNA
  */
 class Configurations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurations)
+
+    private DateTimeFormatter timestampFormatter = DateTimeFormatter.ISO_INSTANT
 
     private Map properties = [:]
 
@@ -63,6 +68,9 @@ class Configurations {
         executorRegistry = QExecutorRegistry.newInstance()
         repositoryRegistry = QRepositoryRegistry.newInstance()
 
+        // load query related configurations
+        loadQueryInfo(properties.queries as Map)
+
         boolean profileEnabled = loadProfiler()
         if (!profileEnabled) {
             LOGGER.warn('Query profiling has been disabled! You might not be able to figure out timing of executions.')
@@ -92,6 +100,23 @@ class Configurations {
 
         // load executors
         loadExecutors(activeDb, profileEnabled)
+    }
+
+    @CompileStatic
+    private void loadQueryInfo(Map options) {
+        if (options != null && options.parameters) {
+            Map paramConfig = options.parameters as Map
+            String tsFormat = paramConfig[ConfigKeys.QUERY_TIMESTAMP_FORMAT]
+            if (tsFormat != null && !tsFormat.isEmpty()) {
+                String tsLocale = paramConfig[ConfigKeys.QUERY_TIMESTAMP_LOCALE]
+                timestampFormatter = DateTimeFormatter.ofPattern(tsFormat,
+                        tsLocale == null ? Locale.default : Locale.forLanguageTag(tsLocale))
+
+                LOGGER.debug('JDBC executor uses time-format ' + tsFormat + ' in ' + (tsLocale ?: 'system default') + ' locale.')
+            }
+        } else {
+            LOGGER.info('JDBC executor uses Java ISO Instant time-format in system default locale.')
+        }
     }
 
     private boolean loadProfiler() throws NyConfigurationException {
@@ -271,6 +296,10 @@ class Configurations {
 
     QRepositoryRegistry getRepositoryRegistry() {
         repositoryRegistry
+    }
+
+    DateTimeFormatter getTimestampFormatter() {
+        timestampFormatter
     }
 
     static Configurations instance() {

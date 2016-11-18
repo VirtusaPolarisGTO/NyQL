@@ -28,5 +28,8 @@ final class ConfigKeys {
     static final JDBC_DRIVER_CLASS_KEY = 'jdbcDriverClass'
     static final JDBC_DATASOURCE_CLASS_KEY = 'jdbcDataSourceClass'
 
+    static final QUERY_TIMESTAMP_FORMAT = 'inputTimestampFormat'
+    static final QUERY_TIMESTAMP_LOCALE = 'inputTimestampLocale'
+
     static final List<String> DEFAULT_EXTENSIONS = Collections.unmodifiableList(['groovy', 'sgroovy'])
 }
