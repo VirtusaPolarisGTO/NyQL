@@ -17,4 +17,8 @@ public class DeleteTest extends AbstractTest {
     public void testJoins() throws NyException {
         assertQueries(NyQL.parse("delete/joins"));
     }
+
+    public void testTruncate() throws NyException {
+        assertQueries(NyQL.parse("delete/truncate"));
+    }
 }

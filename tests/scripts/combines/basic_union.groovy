@@ -53,7 +53,7 @@ def aUnion = $DSL.union(q1, q2)
             INNER_JOIN (TABLE(aUnion).alias("t")) ON p.id, t.id
         }
     },
-    "DELETE `Payment` FROM `Payment` p " +
-            "INNER JOIN ((SELECT f.film_id, f.title FROM `Film` f) UNION ALL (SELECT ff.film_id, ff.title FROM `ForeignFilms` ff)) t ON `Payment`.id = t.id"
+    "DELETE p FROM `Payment` p " +
+            "INNER JOIN ((SELECT f.film_id, f.title FROM `Film` f) UNION ALL (SELECT ff.film_id, ff.title FROM `ForeignFilms` ff)) t ON p.id = t.id"
 
 ]
