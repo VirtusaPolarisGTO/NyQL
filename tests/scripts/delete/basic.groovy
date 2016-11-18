@@ -10,6 +10,11 @@
         },
         "DELETE FROM `Film` WHERE `Film`.film_id = 1234",
 
-        $DSL.truncate("Film"),
-        "TRUNCATE TABLE `Film`"
+        $DSL.delete {
+            TARGET (Film)
+            WHERE {
+                EQ (Film.film_id, 1234)
+            }
+        },
+        "DELETE FROM `Film` WHERE `Film`.film_id = 1234",
 ]

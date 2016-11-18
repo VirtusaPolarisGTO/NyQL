@@ -99,10 +99,8 @@ class MySql extends MySqlFunctions implements QTranslator {
     @CompileStatic
     @Override
     String ___tableName(final Table table, final QContextType contextType) {
-        if (contextType == QContextType.DELETE_FROM || contextType == QContextType.DELETE_CONDITIONAL
-                || contextType == QContextType.TRUNCATE) {
-            return QUtils.quote(table.__name)
-        } else if (contextType == QContextType.INTO) {
+        if (contextType == QContextType.INTO || contextType == QContextType.TRUNCATE
+            || contextType == QContextType.DELETE_FROM) {
             return QUtils.quote(table.__name)
         } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
                 || contextType == QContextType.DELETE_JOIN) {
@@ -145,17 +143,22 @@ class MySql extends MySqlFunctions implements QTranslator {
         qstr.append(___resolve(join.table2, contextType, paramOrder))
 
         if (join.___hasCondition()) {
-            qstr.append(' ON ').append(___expandConditions(join.onConditions, paramOrder,
-                    isInsideDelete(contextType) ? QContextType.DELETE_CONDITIONAL : QContextType.CONDITIONAL))
+            qstr.append(' ON ').append(___expandConditions(join.onConditions, paramOrder, findDeleteContext(contextType)))
         }
         return qstr
     }
 
     @CompileStatic
-    private static boolean isInsideDelete(QContextType contextType) {
-        return contextType == QContextType.DELETE_CONDITIONAL ||
-                contextType == QContextType.DELETE_FROM ||
-                contextType == QContextType.DELETE_JOIN
+    private static QContextType findDeleteContext(QContextType contextType) {
+        if (contextType == QContextType.DELETE_CONDITIONAL || contextType == QContextType.DELETE_CONDITIONAL_JOIN) {
+            contextType
+        } else if (contextType == QContextType.DELETE_FROM) {
+            QContextType.DELETE_CONDITIONAL
+        } else if (contextType == QContextType.DELETE_JOIN || contextType == QContextType.DELETE_FROM_JOIN) {
+            QContextType.DELETE_CONDITIONAL_JOIN
+        } else {
+            QContextType.CONDITIONAL
+        }
     }
 
     @CompileStatic
@@ -175,10 +178,12 @@ class MySql extends MySqlFunctions implements QTranslator {
             return QUtils.quote(column.__name, BACK_TICK)
         }
 
-        if (contextType == QContextType.DELETE_CONDITIONAL) {
-            if (column._owner.__isResultOf()) {
+        if (contextType == QContextType.DELETE_CONDITIONAL_JOIN) {
+            if (column._owner.__aliasDefined()) {
                 return QUtils.quoteIfWS(column._owner.__alias, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
             }
+            return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
+        } else if (contextType == QContextType.DELETE_CONDITIONAL) {
             return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
         }
 
@@ -274,17 +279,19 @@ class MySql extends MySqlFunctions implements QTranslator {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
         Table mainTable =  q.sourceTbl
+        QContextType delContext = QContextType.DELETE_CONDITIONAL
 
         query.append('DELETE ')
         if (q._joiningTable != null) {
-            query.append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append(' ').append(NL)
+            query.append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM_JOIN)).append(' ').append(NL)
             query.append('FROM ').append(___deriveSource(q._joiningTable, paramList, QContextType.DELETE_JOIN)).append(NL)
+            delContext = QContextType.DELETE_CONDITIONAL_JOIN
         } else {
             query.append('FROM ').append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append(NL)
         }
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
-            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.DELETE_CONDITIONAL)).append(NL)
+            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, delContext)).append(NL)
         }
         return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE)
     }
