@@ -30,6 +30,7 @@ def result_right = $DSL.select {
     }
 }
 
+def aUnion = $DSL.union(q1, q2)
 
 [
     $DSL.union (q1, q2),
@@ -43,5 +44,16 @@ def result_right = $DSL.select {
             "FROM (SELECT f.film_id, f.title FROM `Film` f) q11 LEFT JOIN `org_unit_role_query` q22 ON q11.user_id = q22.userId) " +
             "UNION ALL " +
             "(SELECT *, IFNULL(q11.user_id, q22.userId) AS user_id " +
-            "FROM (SELECT f.film_id, f.title FROM `Film` f) q11 RIGHT JOIN `org_unit_role_query` q22 ON q11.user_id = q22.userId WHERE q11.user_id IS NULL)"
+            "FROM (SELECT f.film_id, f.title FROM `Film` f) q11 RIGHT JOIN `org_unit_role_query` q22 ON q11.user_id = q22.userId WHERE q11.user_id IS NULL)",
+
+
+    $DSL.delete {
+        TARGET(Payment.alias("p"))
+        JOIN (TARGET()) {
+            INNER_JOIN (TABLE(aUnion).alias("t")) ON p.id, t.id
+        }
+    },
+    "DELETE `Payment` FROM `Payment` p " +
+            "INNER JOIN ((SELECT f.film_id, f.title FROM `Film` f) UNION ALL (SELECT ff.film_id, ff.title FROM `ForeignFilms` ff)) t ON `Payment`.id = t.id"
+
 ]

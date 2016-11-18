@@ -19,6 +19,7 @@ enum QContextType {
     UPDATE_SET,
 
     DELETE_FROM,
+    DELETE_JOIN,
     DELETE_CONDITIONAL,
 
     FROM,
