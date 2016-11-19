@@ -14,7 +14,8 @@ trait QDbFactory {
     abstract String dbName()
 
     /**
-     * Creates a new translator. You may cache or not if it depends.
+     * Creates a new translator. Depending on your situation you may return the same
+     * instance or not in subsequent calls.
      *
      * @return a translator instance to be used by query generation.
      */

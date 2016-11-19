@@ -19,6 +19,7 @@ import java.util.concurrent.Executors
  *
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QAverageProfiler implements QProfiling {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QAverageProfiler)
@@ -61,7 +62,7 @@ class QAverageProfiler implements QProfiling {
 
     @Override
     void start(Map options) {
-        writeInterval = options['writeIntervalMS'] ?: DUMP_INTERVAL
+        writeInterval = (int) (options['writeIntervalMS'] ?: DUMP_INTERVAL)
         autoWriteOnClose = options['autoWriteOnClose'] ?: true
         outputFilePath = options['outputFilePath'] ?: OUTPUT_FILE
         synchronized (timeLock) {
@@ -312,8 +313,8 @@ class QAverageProfiler implements QProfiling {
             synchronized (calcLock) {
                 invocationCount++
                 totalTime += elapsed
-                maxTime = Math.max(maxTime, elapsed)
-                minTime = Math.min(minTime, elapsed)
+                maxTime = (int) Math.max(maxTime, elapsed)
+                minTime = (int) Math.min(minTime, elapsed)
             }
         }
 

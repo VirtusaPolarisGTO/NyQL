@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.profilers
 import com.virtusa.gto.nyql.model.QProfiling
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QSession
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory
  *
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QProfileAggregator implements QProfiling {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QProfileAggregator)

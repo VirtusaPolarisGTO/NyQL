@@ -45,6 +45,7 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     MySql() {}
 
+    @CompileStatic
     @Override
     String ___ifColumn(Case aCaseCol, List<AParam> paramOrder) {
         if (aCaseCol.caseType == Case.CaseType.IFNULL) {
@@ -204,6 +205,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
     }
 
+    @CompileStatic
     @Override
     QResultProxy ___updateQuery(QueryUpdate q) {
         List<AParam> paramList = new LinkedList<>()
@@ -227,6 +229,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
     }
 
+    @CompileStatic
     @Override
     QResultProxy ___storedFunction(StoredFunction sp) {
         StringBuilder query = new StringBuilder()
@@ -275,6 +278,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         new QResultProxy(query: joiner.toString(), orderedParameters: paramList, queryType: QueryType.SELECT)
     }
 
+    @CompileStatic
     QResultProxy ___deleteQuery(QueryDelete q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()

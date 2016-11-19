@@ -5,6 +5,7 @@ import com.virtusa.gto.nyql.model.QProfiling
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QSession
 import groovy.json.JsonBuilder
+import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors
  *
  * @author IWEERARATHNA
  */
+@CompileStatic
 class QHttpProfiler implements QProfiling {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QHttpProfiler)

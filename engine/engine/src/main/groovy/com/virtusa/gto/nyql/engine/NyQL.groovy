@@ -181,6 +181,7 @@ class NyQL {
      * Shutdown the nyql engine.
      * This should be called only when your application exits.
      */
+    @CompileStatic
     static void shutdown() {
         nyQLInstance.shutdown()
     }

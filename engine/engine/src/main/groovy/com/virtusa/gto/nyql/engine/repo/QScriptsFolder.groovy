@@ -173,9 +173,18 @@ class QScriptsFolder implements QScriptMapper {
             }
         }
 
+        private static boolean isEndsWithAny(String text, String... checks) {
+            for (String s : checks) {
+                if (text.endsWith(s)) {
+                    return true
+                }
+            }
+            false
+        }
+
         @Override
         FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            if (!attrs.directory && !file.getFileName().toString().toLowerCase().endsWith('.groovy')) {
+            if (!attrs.directory && !isEndsWithAny(file.getFileName().toString().toLowerCase(), '.groovy')) {
                 return FileVisitResult.SKIP_SUBTREE
             }
 
