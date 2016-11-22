@@ -142,7 +142,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     }
 
     @Override
-    String ___columnName(final Column column, final QContextType contextType) {
+    String ___columnName(final Column column, final QContextType contextType, List<AParam> paramList) {
         if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY) {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, QUOTE)

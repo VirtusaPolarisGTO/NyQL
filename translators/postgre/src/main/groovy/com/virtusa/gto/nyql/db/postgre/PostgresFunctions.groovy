@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.db.postgre
 
 import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.QContextType
+import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
@@ -12,7 +13,7 @@ import java.util.stream.Collectors
 /**
  * @author IWEERARATHNA
  */
-class PostgresFunctions implements QFunctions {
+abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunctions {
 
     String current_date(c) { return "CURRENT_TIME" }
     String current_time(c) { return "CURRENT_DATE" }

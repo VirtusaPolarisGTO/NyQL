@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.db.mysql
 import com.virtusa.gto.nyql.Column
 import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.QContextType
+import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
@@ -10,7 +11,7 @@ import com.virtusa.gto.nyql.exceptions.NySyntaxException
 /**
  * @author Isuru Weerarathna
  */
-class MySqlFunctions implements QFunctions {
+abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunctions {
 
     @Override
     String date_trunc(it) { 'DATE(' + ___resolveIn(it) + ')' }

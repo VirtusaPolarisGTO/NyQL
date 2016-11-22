@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>base</module>
         <module>mysql</module>
         <module>postgre</module>
         <module>mssql</module>

@@ -1,6 +1,5 @@
 package com.virtusa.gto.nyql.db.mysql
 
-import com.virtusa.gto.nyql.Assign
 import com.virtusa.gto.nyql.Case
 import com.virtusa.gto.nyql.Column
 import com.virtusa.gto.nyql.FunctionColumn
@@ -19,14 +18,11 @@ import com.virtusa.gto.nyql.Where
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.units.AParam
-import com.virtusa.gto.nyql.utils.QOperator
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
-
 /**
  * @author Isuru Weerarathna
  */
@@ -144,27 +140,14 @@ class MySql extends MySqlFunctions implements QTranslator {
         qstr.append(___resolve(join.table2, contextType, paramOrder))
 
         if (join.___hasCondition()) {
-            qstr.append(' ON ').append(___expandConditions(join.onConditions, paramOrder, findDeleteContext(contextType)))
+            qstr.append(' ON ').append(___expandConditions(join.onConditions, paramOrder, QUtils.findDeleteContext(contextType)))
         }
-        return qstr
-    }
-
-    @CompileStatic
-    private static QContextType findDeleteContext(QContextType contextType) {
-        if (contextType == QContextType.DELETE_CONDITIONAL || contextType == QContextType.DELETE_CONDITIONAL_JOIN) {
-            contextType
-        } else if (contextType == QContextType.DELETE_FROM) {
-            QContextType.DELETE_CONDITIONAL
-        } else if (contextType == QContextType.DELETE_JOIN || contextType == QContextType.DELETE_FROM_JOIN) {
-            QContextType.DELETE_CONDITIONAL_JOIN
-        } else {
-            QContextType.CONDITIONAL
-        }
+        qstr
     }
 
     @CompileStatic
     @Override
-    String ___columnName(final Column column, final QContextType contextType) {
+    String ___columnName(final Column column, final QContextType contextType, List<AParam> paramList) {
         if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY || contextType == QContextType.HAVING) {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, BACK_TICK)
@@ -172,7 +155,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
 
         if (column instanceof Case) {
-            return ___ifColumn(column, null)
+            return ___ifColumn(column, paramList)
         }
 
         if (contextType == QContextType.INTO || contextType == QContextType.INSERT_PROJECTION) {
@@ -307,7 +290,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         QueryType queryType = QueryType.PART
 
         if (q._allProjections != null) {
-            query.append(___expandProjection(q._allProjections, paramList))
+            query.append(___expandProjection(q._allProjections, paramList, QContextType.SELECT))
             return new QResultProxy(query: query.toString(), queryType: queryType,
                     orderedParameters: paramList, rawObject: q._allProjections, qObject: q)
         }
@@ -362,7 +345,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         if (q._distinct) {
             query.append('DISTINCT ')
         }
-        query.append(___expandProjection(q.projection, paramList)).append(NL)
+        query.append(___expandProjection(q.projection, paramList, QContextType.SELECT)).append(NL)
         // target is optional
         if (q._joiningTable ?: q.sourceTbl) {
             query.append(' FROM ').append(___deriveSource(q._joiningTable ?: q.sourceTbl, paramList, QContextType.FROM)).append(NL)
@@ -454,51 +437,6 @@ class MySql extends MySqlFunctions implements QTranslator {
         DDL
     }
 
-    @CompileStatic
-    String ___expandProjection(List<Object> columns, List<AParam> paramList, QContextType contextType = QContextType.SELECT) {
-        List<String> cols = new ArrayList<>()
-        if (columns == null || columns.isEmpty()) {
-            return '*'
-        }
-
-        List<Object> finalCols = new LinkedList<>()
-        for (c in columns) {
-            if (c instanceof QResultProxy) {
-                if (((QResultProxy)c).queryType != QueryType.PART) {
-                    throw new NyException('Only query parts allowed to import within sql projection!')
-                }
-                List otherColumns = ((QResultProxy)c).rawObject as List
-                finalCols.addAll(otherColumns)
-            } else if (c instanceof List) {
-                finalCols.addAll((List)c)
-            } else {
-                finalCols.add(c)
-            }
-        }
-
-        for (c in finalCols) {
-            ___scanForParameters(c, paramList)
-
-            if (c instanceof Table) {
-                //appendParamsFromTable((Table)c, paramList)
-                String tbName = ___tableName((Table)c, contextType)
-                if (((Table)c).__isResultOf()) {
-                    cols.add(tbName)
-                } else {
-                    cols.add(tbName + '.*')
-                }
-            } else if (c instanceof Column) {
-                appendParamsFromColumn((Column)c, paramList)
-                String cName = ___columnName((Column)c, contextType)
-                cols.add(cName)
-            } else if (c instanceof String) {
-                cols.add((String)c)
-            } else {
-                cols.add(String.valueOf(___resolve(c, contextType, paramList)))
-            }
-        }
-        return cols.join(COMMA)
-    }
 
     @CompileStatic
     private static void appendParamsFromTable(Table table, List<AParam> paramList) {
@@ -506,24 +444,6 @@ class MySql extends MySqlFunctions implements QTranslator {
             QResultProxy proxy = table.__resultOf as QResultProxy
             if (proxy.orderedParameters != null) {
                 paramList.addAll(proxy.orderedParameters)
-            }
-        }
-    }
-
-    @CompileStatic
-    private static void appendParamsFromColumn(Column column, List<AParam> paramList) {
-        if (column instanceof FunctionColumn) {
-            if (column._setOfCols) {
-                for (Object it : column._columns) {
-                    if (it instanceof QResultProxy && ((QResultProxy)it).orderedParameters != null) {
-                        paramList.addAll(((QResultProxy)it).orderedParameters)
-                    }
-                }
-            } else {
-                Object wrap = column._wrapper
-                if (wrap instanceof QResultProxy && ((QResultProxy)wrap).orderedParameters != null) {
-                    paramList.addAll(((QResultProxy)wrap).orderedParameters)
-                }
             }
         }
     }
@@ -541,129 +461,6 @@ class MySql extends MySqlFunctions implements QTranslator {
             }
             return ___tableName(table, contextType)
         }
-    }
-
-    @CompileStatic
-    void ___expandColumn(Column column, List<AParam> paramList) {
-        if (column instanceof FunctionColumn && column._columns != null) {
-            for (Object it : column._columns) {
-                if (it instanceof FunctionColumn) {
-                    ___expandColumn((FunctionColumn)it, paramList)
-                } else if (it instanceof AParam) {
-                    paramList.add((AParam)it)
-                }
-            }
-        }
-    }
-
-    @CompileStatic
-    void ___scanForParameters(def expression, List<AParam> paramOrder) {
-        if (expression != null) {
-            if (expression instanceof AParam) {
-                paramOrder?.add((AParam) expression)
-            }
-            if (expression instanceof QResultProxy) {
-                QResultProxy resultProxy = (QResultProxy)expression
-                if (resultProxy.orderedParameters != null) {
-                    paramOrder?.addAll(resultProxy.orderedParameters)
-                }
-            }
-            if (expression instanceof Table && ((Table)expression).__isResultOf()) {
-                QResultProxy resultProxy = (QResultProxy)(((Table)expression).__resultOf)
-                if (resultProxy.orderedParameters != null) {
-                    paramOrder?.addAll(resultProxy.orderedParameters)
-                }
-            }
-            if (expression instanceof FunctionColumn) {
-                ___expandColumn((FunctionColumn) expression, paramOrder)
-            }
-            if (expression instanceof List) {
-                for (Object it : (List)expression) {
-                    ___scanForParameters(it, paramOrder)
-                }
-            }
-        }
-    }
-
-    @CompileStatic
-    String ___expandConditions(Where where, List<AParam> paramOrder, QContextType contextType=QContextType.UNKNOWN) {
-        StringBuilder builder = new StringBuilder()
-        List<Object> clauses = where.clauses
-        for (c in clauses) {
-            if (c instanceof String) {
-                builder.append(c)
-            } else if (c instanceof QOperator) {
-                builder.append(' ').append(___convertOperator((QOperator)c)).append(' ')
-            } else if (c instanceof Where.QCondition) {
-                builder.append(___expandCondition((Where.QCondition)c, paramOrder, contextType))
-            } else if (c instanceof Where.QConditionGroup) {
-                builder.append(QUtils.parenthesis(
-                        ___expandConditionGroup((Where.QConditionGroup)c, paramOrder, contextType)))
-            }
-        }
-
-        return builder.toString()
-    }
-
-    @CompileStatic
-    String ___expandCondition(Where.QCondition c, List<AParam> paramOrder, QContextType contextType) {
-        if (c.leftOp instanceof AParam) {
-            paramOrder?.add((AParam)c.leftOp)
-        }
-        ___scanForParameters(c.rightOp, paramOrder)
-        boolean parenthesis = (c.rightOp instanceof QResultProxy)
-
-        if (c instanceof Where.QUnaryCondition) {
-            return ___convertOperator(c.op) + ' ' +
-                    (parenthesis ? QUtils.parenthesis(
-                            ___resolve(c.chooseOp(), contextType, paramOrder)) : ___resolve(c.chooseOp(), contextType, paramOrder))
-        } else {
-            return ___resolve(c.leftOp, contextType) +
-                    (c.op != QOperator.UNKNOWN ? ' ' + ___convertOperator(c.op) + ' ' : ' ') +
-                    (!parenthesis ? ___resolve(c.rightOp, contextType) : QUtils.parenthesis(___resolve(c.rightOp, contextType)))
-        }
-    }
-
-    @CompileStatic
-    String ___expandConditionGroup(Where.QConditionGroup group, List<AParam> paramOrder, QContextType contextType) {
-        String gCon = group.condConnector == null ? '' : ' ' + ___convertOperator(group.condConnector) + ' '
-        List<String> list = new LinkedList<>()
-
-        for (Object clause : group.where.clauses) {
-            if (clause instanceof Where.QCondition) {
-                list.add(___expandCondition((Where.QCondition)clause, paramOrder, contextType))
-            } else if (clause instanceof Where.QConditionGroup) {
-                list.add(QUtils.parenthesis(
-                        ___expandConditionGroup((Where.QConditionGroup)clause, paramOrder, contextType)))
-            } else {
-                list.add(___resolve(clause, contextType, paramOrder))
-            }
-        }
-        return list.join(gCon)
-    }
-
-    @CompileStatic
-    String ___expandAssignments(Assign assign, List<AParam> paramOrder, QContextType contextType=QContextType.UNKNOWN) {
-        List<Object> clauses = assign.assignments
-        List<String> derived = new ArrayList<>()
-        for (c in clauses) {
-            if (c instanceof String) {
-                derived.add((String)c)
-            } else if (c instanceof Assign.AnAssign) {
-                Assign.AnAssign anAssign = (Assign.AnAssign)c
-                if (anAssign.leftOp instanceof AParam) {
-                    paramOrder.add((AParam)anAssign.leftOp)
-                }
-                ___scanForParameters(anAssign.rightOp, paramOrder)
-
-                String val = ___resolve(anAssign.leftOp, contextType, paramOrder) +
-                        ' ' + ___convertOperator(anAssign.op) + ' ' +
-                        ___resolve(anAssign.rightOp, contextType, paramOrder)
-                derived.add(val)
-            }
-        }
-
-        return derived.join(COMMA)
     }
 
     /*

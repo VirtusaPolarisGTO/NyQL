@@ -48,7 +48,7 @@ trait QTranslator extends QJoins {
         } else if (obj instanceof Table) {
             return ___tableName(obj, contextType)
         } else if (obj instanceof Column) {
-            return ___columnName(obj, contextType)
+            return ___columnName(obj, contextType, paramOrder)
         } else if (obj instanceof Boolean) {
             return ___convertBool(obj)
         } else if (obj instanceof String || obj instanceof GString) {
@@ -116,7 +116,7 @@ trait QTranslator extends QJoins {
      * @param contextType context type.
      * @return string representation of the column.
      */
-    abstract String ___columnName(Column column, QContextType contextType)
+    abstract String ___columnName(Column column, QContextType contextType, List<AParam> paramList = null)
 
     /**
      * Generate a query part which could be reusable among other queries.

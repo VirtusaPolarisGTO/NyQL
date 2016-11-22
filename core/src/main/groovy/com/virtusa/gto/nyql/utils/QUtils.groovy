@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.utils
 
 import com.virtusa.gto.nyql.Join
 import com.virtusa.gto.nyql.QContext
+import com.virtusa.gto.nyql.QContextType
 import com.virtusa.gto.nyql.Table
 import com.virtusa.gto.nyql.TableProxy
 import com.virtusa.gto.nyql.Where
@@ -22,6 +23,19 @@ final class QUtils {
     private static final String P_PAD = '::'
     private static final String OP = '('
     private static final String CP = ')'
+
+    @CompileStatic
+    static QContextType findDeleteContext(QContextType contextType) {
+        if (contextType == QContextType.DELETE_CONDITIONAL || contextType == QContextType.DELETE_CONDITIONAL_JOIN) {
+            contextType
+        } else if (contextType == QContextType.DELETE_FROM) {
+            QContextType.DELETE_CONDITIONAL
+        } else if (contextType == QContextType.DELETE_JOIN || contextType == QContextType.DELETE_FROM_JOIN) {
+            QContextType.DELETE_CONDITIONAL_JOIN
+        } else {
+            QContextType.CONDITIONAL
+        }
+    }
 
     static String join(List<Object> items, Function<Object, String> converter,
                                       String sep, String prefix, String suffix) {

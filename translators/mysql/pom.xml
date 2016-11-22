@@ -13,6 +13,13 @@
 
     <artifactId>nyql-impl-mysql</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.virtusa.gto.nyql</groupId>
+            <artifactId>nyql-impl-base-translator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
