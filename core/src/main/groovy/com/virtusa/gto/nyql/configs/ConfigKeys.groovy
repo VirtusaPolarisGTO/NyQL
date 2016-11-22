@@ -32,4 +32,11 @@ final class ConfigKeys {
     static final QUERY_TIMESTAMP_LOCALE = 'inputTimestampLocale'
 
     static final List<String> DEFAULT_EXTENSIONS = Collections.unmodifiableList(['groovy', 'sgroovy'])
+
+    static final String SYS_JDBC_URL = 'com.virtusa.gto.nyql.JDBC_URL'
+    static final String SYS_JDBC_USERNAME = 'com.virtusa.gto.nyql.JDBC_USERNAME'
+    static final String SYS_JDBC_PASSWORD = 'com.virtusa.gto.nyql.JDBC_PASSWORD'
+    static final String SYS_JDBC_DRIVER = 'com.virtusa.gto.nyql.JDBC_DRIVER'
+    static final String SYS_ACTIVE_DB = 'com.virtusa.gto.nyql.ACTIVE_DB'
+
 }

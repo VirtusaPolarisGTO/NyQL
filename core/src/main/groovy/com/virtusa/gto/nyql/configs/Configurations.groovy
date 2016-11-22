@@ -87,7 +87,7 @@ class Configurations {
         }
 
         // mark active database
-        String activeDb = getActivatedDb()
+        String activeDb = System.getProperty(ConfigKeys.SYS_ACTIVE_DB, getActivatedDb())
         if (activeDb != null) {
             LOGGER.debug("Activating DB: $activeDb")
             databaseRegistry.load(activeDb)

@@ -19,6 +19,8 @@ import java.sql.Connection
  */
 class QHikariPool implements QJdbcPool {
 
+    private static final String DEF_POOL_NAME = 'NyPool'
+
     private static final Logger LOGGER =  LoggerFactory.getLogger(QHikariPool)
     private HikariDataSource hikari = null
     private final Object hikariLock = new Object()
@@ -33,13 +35,18 @@ class QHikariPool implements QJdbcPool {
     void init(Map options) throws NyException {
         HikariConfig config = new HikariConfig();
         //config.setDataSourceClassName(String.valueOf(options.dataSourceClassName))
-        if (options.containsKey(ConfigKeys.JDBC_DRIVER_CLASS_KEY)) {
+        if (System.getProperty(ConfigKeys.SYS_JDBC_DRIVER) != null) {
+            config.setDriverClassName(System.getProperty(ConfigKeys.SYS_JDBC_DRIVER))
+        } else if (options.containsKey(ConfigKeys.JDBC_DRIVER_CLASS_KEY)) {
             config.setDriverClassName(String.valueOf(options.jdbcDriverClass))
         }
-        config.setJdbcUrl(String.valueOf(options.url))
-        config.setUsername(String.valueOf(options.username))
-        config.setPassword(String.valueOf(options.password))
-        config.setPoolName('NyPool')
+        config.setJdbcUrl(System.getProperty(ConfigKeys.SYS_JDBC_URL, String.valueOf(options.url)))
+        config.setUsername(System.getProperty(ConfigKeys.SYS_JDBC_USERNAME, String.valueOf(options.username)))
+        config.setPassword(System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD, String.valueOf(options.password)))
+        config.setPoolName(DEF_POOL_NAME)
+
+        LOGGER.debug('JDBC Hikari Pool Configurations:')
+        LOGGER.debug('  - JDBC ' + config.getJdbcUrl() + ', @user: ' + config.getUsername())
 
         if (options.pooling) {
             Map poolingConfigs = options.pooling as Map
