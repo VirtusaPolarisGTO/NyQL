@@ -14,18 +14,24 @@ import org.testng.annotations.BeforeSuite;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author IWEERARATHNA
  */
 public class AbstractTest {
 
+    private String activeDb;
+
     public void assertQueries(Object objects) {
+        activeDb = NyQL.getConfigurations().getActivatedDb();
+
         Object val = objects;
         if (objects instanceof QScriptResult) {
             val = ((QScriptResult) objects).getScriptResult();
         }
 
+        System.out.println(" >>> Testing against " + activeDb + " >>>");
         if (val instanceof List) {
             assertScript((List<Object>)val);
         } else {
@@ -33,7 +39,7 @@ public class AbstractTest {
         }
     }
 
-    public void assertScript(List<Object> objects) {
+    private void assertScript(List<Object> objects) {
         for (int i = 0; i < objects.size(); i += 2) {
             deriveProxy(objects.get(i), objects.get(i + 1));
         }
@@ -50,18 +56,27 @@ public class AbstractTest {
             List res = (List)gen;
             for (int i = 0; i < ((QScriptList) obj).getScripts().size(); i++) {
                 QScript qScript = ((QScriptList) obj).getScripts().get(i);
-                compare(qScript.getProxy(), String.valueOf(res.get(i)));
+                compare(qScript.getProxy(), res.get(i));
             }
 
         } else if (obj instanceof QScript) {
-            compare (((QScript) obj).getProxy(), String.valueOf(gen));
+            compare (((QScript) obj).getProxy(), gen);
         } else {
             throw new RuntimeException("Unknown result type from test script!");
         }
     }
 
-    private void compare(QResultProxy proxy, Object query) {
+    private void compare(QResultProxy proxy, final Object queryComp) {
         String q1 = proxy.getQuery().replace("\n", "").replace("\t", "").trim();
+
+        Object query = queryComp;
+        if (queryComp instanceof Map) {
+            query = ((Map)queryComp).get(activeDb);
+        }
+
+        if (query == null) {
+            throw new AssertionError("No expected query is found for database " + activeDb);
+        }
 
         String q2;
         List pList = null;

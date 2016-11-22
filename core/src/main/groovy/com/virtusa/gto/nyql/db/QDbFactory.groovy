@@ -1,10 +1,23 @@
 package com.virtusa.gto.nyql.db
+
+import com.virtusa.gto.nyql.configs.Configurations
+import com.virtusa.gto.nyql.exceptions.NyConfigurationException
+
 /**
  * Interface to implement by all supporting database vendors for NyQL.
  *
  * @author IWEERARATHNA
  */
 trait QDbFactory {
+
+    /**
+     * This method will be called once after nyql is configured, but just before any
+     * query is executed.
+     *
+     * @param nyConfigs ny configuration instance.
+     * @throws NyConfigurationException any exception thrown while initializing this factory.
+     */
+    abstract void init(Configurations nyConfigs) throws NyConfigurationException
 
     /**
      * Returns the database name of vendor.

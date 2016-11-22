@@ -9,8 +9,9 @@
             }
             FETCH ()
         },
-        "SELECT * FROM `Film` f " +
-                "INNER JOIN `Actor` ac ON f.actor_id = ac.actor_id",
+        [
+            mysql: "SELECT * FROM `Film` f INNER JOIN `Actor` ac ON f.actor_id = ac.actor_id"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -19,9 +20,11 @@
             }
             FETCH ()
         },
-         "SELECT * FROM `Film` f " +
+         [
+            mysql:  "SELECT * FROM `Film` f " +
                  "INNER JOIN `Actor` ac ON f.actor_id = ac.actor_id " +
-                 "INNER JOIN `Payment` p ON ac.payment_id = p.payment_id",
+                 "INNER JOIN `Payment` p ON ac.payment_id = p.payment_id"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -31,7 +34,9 @@
             }
             FETCH ()
         },
-        "SELECT * FROM `Film` f INNER JOIN `Payment` p ON p.payment_id = f.payment_id",
+        [
+            mysql: "SELECT * FROM `Film` f INNER JOIN `Payment` p ON p.payment_id = f.payment_id"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -40,5 +45,7 @@
             }
             FETCH ()
         },
-        "SELECT * FROM `Film` f"
+        [
+            mysql: "SELECT * FROM `Film` f"
+        ]
 ]

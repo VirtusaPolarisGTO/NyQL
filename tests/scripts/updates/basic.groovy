@@ -24,7 +24,9 @@ def innQP = $DSL.select {
                 SET_NULL (f.language_id)
             }
         },
-        ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL", ["title"]],
+        [
+            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL", ["title"]]
+        ],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -39,7 +41,9 @@ def innQP = $DSL.select {
                 EQ (f.year, 2016)
             }
         },
-        ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL WHERE f.year = 2016", ["title"]],
+        [
+            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL WHERE f.year = 2016", ["title"]]
+        ],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -57,8 +61,11 @@ def innQP = $DSL.select {
                 EQ (f.year, 2016)
             }
         },
-        ["UPDATE `Film` f LEFT JOIN `Actor` ac ON f.actor_id = ac.actor_id SET f.film_id = 1234, f.title = ? WHERE f.year = 2016",
-         ["title"]],
+        [
+            mysql: ["UPDATE `Film` f LEFT JOIN `Actor` ac ON f.actor_id = ac.actor_id SET f.film_id = 1234, f.title = ? " +
+                    "WHERE f.year = 2016",
+                    ["title"]]
+        ],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -67,7 +74,9 @@ def innQP = $DSL.select {
                 $IMPORT "updates/import_part"
             }
         },
-        ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = 1", ["title"]],
+        [
+            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = 1", ["title"]]
+        ],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -75,7 +84,9 @@ def innQP = $DSL.select {
                 EQ (f.film_id, TABLE(innQ))
             }
         },
-        "UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = 1)",
+        [
+            mysql: "UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = 1)"
+        ],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -83,7 +94,9 @@ def innQP = $DSL.select {
                 EQ (f.film_id, TABLE(innQP))
             }
         },
-        ["UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = ?)", ["id"]],
+        [
+            mysql: ["UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = ?)", ["id"]]
+        ],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -95,6 +108,8 @@ def innQP = $DSL.select {
                 SET_NULL (f.language_id)
             }
         },
-        ["UPDATE `Film` f SET f.film_id = 1234, f.releaseDate = ?, f.debutTime = ?, f.debutTime2 = ?, f.language_id = NULL",
-         ["relDate", "debutTime", "debutTime2"]],
+        [
+            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.releaseDate = ?, f.debutTime = ?, f.debutTime2 = ?, f.language_id = NULL",
+                    ["relDate", "debutTime", "debutTime2"]]
+        ],
 ]

@@ -1,7 +1,9 @@
 package com.virtusa.gto.nyql.db.mysql
 
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.db.QTranslator
+import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 
 /**
  * MySQL factory responsible of creating translator instances.
@@ -17,6 +19,11 @@ class MySqlFactory implements QDbFactory {
     private static final String DATA_SOURCE_CLASS_NAME = 'com.mysql.jdbc.jdbc2.optional.MysqlDataSource'
     private static final String JDBC_CLASS_NAME = 'com.mysql.jdbc.Driver'
     private final MySql mySql = new MySql()
+
+    @Override
+    void init(Configurations nyConfigs) throws NyConfigurationException {
+        // nothing to pre-configure mysql
+    }
 
     /**
      * Returns text 'mysql'.

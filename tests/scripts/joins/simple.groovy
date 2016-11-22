@@ -10,9 +10,11 @@
             }
             FETCH ()
         },
-        "SELECT * FROM `Film` f " +
+        [
+            mysql: "SELECT * FROM `Film` f " +
                 "INNER JOIN `Film_Actor` fa ON f.film_id = fa.film_id " +
-                "LEFT JOIN `Actor` a ON fa.actor_id = a.actor_id",
+                "LEFT JOIN `Actor` a ON fa.actor_id = a.actor_id"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -22,9 +24,11 @@
             }
             FETCH ()
         },
-        "SELECT * FROM `Film` f " +
+        [
+            mysql: "SELECT * FROM `Film` f " +
                 "LEFT OUTER JOIN `Film_Actor` fa ON f.film_id = fa.film_id " +
-                "RIGHT JOIN `Actor` a ON fa.actor_id = a.actor_id",
+                "RIGHT JOIN `Actor` a ON fa.actor_id = a.actor_id"
+        ],
 
         $DSL.select {
             TARGET (TABLE("Film").alias("f"))
@@ -38,9 +42,11 @@
             }
             FETCH ()
         },
-        "SELECT * FROM `Film` f " +
+        [
+            mysql: "SELECT * FROM `Film` f " +
                 "RIGHT OUTER JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id = fa.second_film_id " +
-                "INNER JOIN `Actor` a ON fa.actor_id = a.actor_id",
+                "INNER JOIN `Actor` a ON fa.actor_id = a.actor_id"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -49,8 +55,9 @@
             }
             FETCH ()
         },
-        "SELECT * FROM `Film` f " +
-                "INNER JOIN `Actor` ac ON f.actor_id = ac.actor_id",
+        [
+            mysql: "SELECT * FROM `Film` f INNER JOIN `Actor` ac ON f.actor_id = ac.actor_id"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -59,7 +66,9 @@
             }
             FETCH ()
         },
-        "SELECT * FROM `Film` f " +
+        [
+            mysql: "SELECT * FROM `Film` f " +
                 "INNER JOIN `Actor` ac ON f.actor_id = ac.actor_id " +
-                "RIGHT JOIN `Payment` p ON p.actor_id = ac.actor_id",
+                "RIGHT JOIN `Payment` p ON p.actor_id = ac.actor_id"
+        ],
 ]

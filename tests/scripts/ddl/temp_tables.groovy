@@ -14,24 +14,24 @@ import com.virtusa.gto.nyql.ddl.DKeyIndexType
                 FIELD ("movieId", DFieldType.BIGINT)
             }
         },
-        ["CREATE TEMPORARY TABLE `Film`(" +
-                 "`id` INT NOT NULL AUTO_INCREMENT, " +
-                 "`title` TINYINT(1) NOT NULL, " +
-                 "`mainLanguage` TEXT DEFAULT 'English', " +
-                 "`ticketPrice` DOUBLE, " +
-                 "`movieId` BIGINT" +
-                 ")"
-        ],
+        [[   mysql:  "CREATE TEMPORARY TABLE `Film`(" +
+                     "`id` INT NOT NULL AUTO_INCREMENT, " +
+                     "`title` TINYINT(1) NOT NULL, " +
+                     "`mainLanguage` TEXT DEFAULT 'English', " +
+                     "`ticketPrice` DOUBLE, " +
+                     "`movieId` BIGINT" +
+                     ")"
+        ]],
 
         $DSL.ddl {
             DROP_TEMP_TABLE ("Film")
         },
-        ["DROP TEMPORARY TABLE `Film`"],
+        [[mysql: "DROP TEMPORARY TABLE `Film`"]],
 
         $DSL.ddl {
             DROP_TEMP_TABLE ("Film", true)
         },
-        ["DROP TEMPORARY TABLE IF EXISTS `Film`"],
+        [[mysql: "DROP TEMPORARY TABLE IF EXISTS `Film`"]],
 
         $DSL.ddl {
             TEMP_TABLE ("Film") {
@@ -47,7 +47,7 @@ import com.virtusa.gto.nyql.ddl.DKeyIndexType
                 FOREIGN_KEY ("fk_film_movie_movieId", "movieId", [refTable: "Movie", refFields: ["id"]])
             }
         },
-        ["CREATE TEMPORARY TABLE `Film`(" +
+        [[mysql: "CREATE TEMPORARY TABLE `Film`(" +
                  "`id` INT NOT NULL AUTO_INCREMENT, " +
                  "`title` TINYINT(1) NOT NULL, " +
                  "`mainLanguage` TEXT DEFAULT 'English', " +
@@ -57,7 +57,7 @@ import com.virtusa.gto.nyql.ddl.DKeyIndexType
                  "KEY `idx_film_title` (`title`) USING BTREE, " +
                  "CONSTRAINT `fk_film_movie_movieId` FOREIGN KEY (`movieId`) REFERENCES Movie(`id`)" +
                  ")"
-        ],
+        ]],
 
         $DSL.ddl {
             TEMP_TABLE ("Film", true) {
@@ -70,7 +70,7 @@ import com.virtusa.gto.nyql.ddl.DKeyIndexType
                 PRIMARY_KEY (["id", "movieId"])
             }
         },
-        ["CREATE TEMPORARY TABLE IF NOT EXISTS `Film`(" +
+        [[mysql: "CREATE TEMPORARY TABLE IF NOT EXISTS `Film`(" +
                  "`id` INT NOT NULL AUTO_INCREMENT, " +
                  "`title` TINYINT(1) NOT NULL, " +
                  "`mainLanguage` TEXT DEFAULT 'English', " +
@@ -78,5 +78,5 @@ import com.virtusa.gto.nyql.ddl.DKeyIndexType
                  "`movieId` BIGINT, " +
                  "PRIMARY KEY (`id`, `movieId`)" +
                  ")"
-        ],
+        ]],
 ]

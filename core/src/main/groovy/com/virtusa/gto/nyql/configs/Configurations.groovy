@@ -100,6 +100,9 @@ class Configurations {
 
         // load executors
         loadExecutors(activeDb, profileEnabled)
+
+        // finally, initialize factory
+        databaseRegistry.getDbFactory(activeDb).init(this)
     }
 
     @CompileStatic

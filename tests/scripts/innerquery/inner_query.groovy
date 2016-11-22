@@ -15,9 +15,12 @@
                 FETCH ()
             })
         },
-        ["SELECT (SELECT COUNT(*) AS totalFilms FROM `Film` f WHERE f.film_id = ?), " +
-                 "(SELECT * FROM `Actor` ac) FROM `Payment` p",
-         ["filmId"]],
+        [
+            mysql: ["SELECT (SELECT COUNT(*) AS totalFilms FROM `Film` f WHERE f.film_id = ?), " +
+                    "(SELECT * FROM `Actor` ac) FROM `Payment` p",
+                        ["filmId"]
+                    ]
+        ],
 
 
         $DSL.select {
@@ -32,9 +35,12 @@
                 })
             }
         },
-        ["SELECT * FROM `Payment` p WHERE p.payment_id IN " +
-                "(SELECT p2.payment_id FROM `Payment` p2 WHERE p2.payment_id > ?)",
-                ["thresholdPaymentId"]],
+        [
+                mysql: ["SELECT * FROM `Payment` p WHERE p.payment_id IN " +
+                        "(SELECT p2.payment_id FROM `Payment` p2 WHERE p2.payment_id > ?)",
+                            ["thresholdPaymentId"]
+                        ]
+        ],
 
         $DSL.insert {
             TARGET (Film.alias("f"))
@@ -50,9 +56,11 @@
                     "title": PARAM("theTitle")
             )
         },
-        ["INSERT INTO `Film` (`id`, `title`) VALUES " +
-                 "((SELECT otf.film_id FROM `OtherFilms` otf WHERE otf.film_id < ?), ?)",
-            ["minID", "theTitle"]],
+        [
+                mysql: ["INSERT INTO `Film` (`id`, `title`) VALUES " +
+                        "((SELECT otf.film_id FROM `OtherFilms` otf WHERE otf.film_id < ?), ?)",
+                        ["minID", "theTitle"]]
+        ],
 
         $DSL.update {
             TARGET (Film.alias("f"))
@@ -68,7 +76,9 @@
                 EQ (f.title, PARAM("theTitle"))
             }
         },
-        ["UPDATE `Film` f SET f.film_id = SELECT otf.film_id FROM `OtherFilms` otf WHERE otf.film_id < ?, " +
-                 "f.title = ?",
-         ["minID", "theTitle"]]
+        [
+            mysql: ["UPDATE `Film` f SET f.film_id = SELECT otf.film_id FROM `OtherFilms` otf WHERE otf.film_id < ?, " +
+                    "f.title = ?",
+                    ["minID", "theTitle"]]
+        ]
 ]

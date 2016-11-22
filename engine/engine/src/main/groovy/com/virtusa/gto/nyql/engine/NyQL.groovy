@@ -186,6 +186,10 @@ class NyQL {
         nyQLInstance.shutdown()
     }
 
+    static Configurations getConfigurations() {
+        nyQLInstance.configurations
+    }
+
     /**
      * <p>
      * Executes a given file indicated by the script name and returns the final result

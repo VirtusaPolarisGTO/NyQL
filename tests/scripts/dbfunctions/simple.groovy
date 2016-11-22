@@ -11,5 +11,7 @@ import com.virtusa.gto.nyql.model.units.AParam
                         $DSL.PARAM("thirdP", AParam.ParamScope.OUT, "mapper3")
                 ]
         ),
-        ["{ CALL MyProcedure(?, ?, ?) }", ["firstP", "secondP", "thirdP"]]
+        [
+            mysql: ["{ CALL MyProcedure(?, ?, ?) }", ["firstP", "secondP", "thirdP"]]
+        ]
 ]

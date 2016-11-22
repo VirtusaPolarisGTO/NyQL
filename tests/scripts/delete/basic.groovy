@@ -8,7 +8,7 @@
                 EQ (f.film_id, 1234)
             }
         },
-        "DELETE FROM `Film` WHERE `Film`.film_id = 1234",
+        [mysql: "DELETE FROM `Film` WHERE `Film`.film_id = 1234"],
 
         $DSL.delete {
             TARGET (Film)
@@ -16,5 +16,5 @@
                 EQ (Film.film_id, 1234)
             }
         },
-        "DELETE FROM `Film` WHERE `Film`.film_id = 1234",
+        [mysql: "DELETE FROM `Film` WHERE `Film`.film_id = 1234"],
 ]

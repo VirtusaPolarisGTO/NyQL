@@ -14,9 +14,11 @@
                 $IMPORT ("where/import_wpart")
             }
         },
-        ["SELECT * FROM `Film` f " +
-                "WHERE f.film_id = 123 AND f.rental_duration = ? AND f.replacement_cost >= 20.0",
-         ["duration"]],
+        [
+            mysql: ["SELECT * FROM `Film` f " +
+                    "WHERE f.film_id = 123 AND f.rental_duration = ? AND f.replacement_cost >= 20.0",
+                    ["duration"]]
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -27,5 +29,7 @@
                 $IMPORT_UNSAFE ("where/import_wpartxxx")
             }
         },
-        "SELECT * FROM `Film` f WHERE f.film_id = 123 AND",
+        [
+            mysql: "SELECT * FROM `Film` f WHERE f.film_id = 123 AND"
+        ],
 ]

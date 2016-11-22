@@ -17,13 +17,17 @@ def payQ2 = $DSL.select {
             TARGET (Film.alias("f"))
             INTO (OtherFilms.alias("of"), $IMPORT("inserts/into_imports"))
         },
-        "INSERT INTO `OtherFilms` (`film_id`, `title`) SELECT * FROM `Film` f",
+        [
+            mysql: "INSERT INTO `OtherFilms` (`film_id`, `title`) SELECT * FROM `Film` f"
+        ],
 
         $DSL.insert {
             TARGET (Film.alias("f"))
             INTO (OtherFilms.alias("of"), $IMPORT("inserts/into_imports"))
         },
-        "INSERT INTO `OtherFilms` (`film_id`, `title`) SELECT * FROM `Film` f",
+        [
+            mysql: "INSERT INTO `OtherFilms` (`film_id`, `title`) SELECT * FROM `Film` f"
+        ],
 
         $DSL.insert {
             TARGET (Film.alias("f"))
@@ -32,7 +36,9 @@ def payQ2 = $DSL.select {
                     "title": STR("Logan")
             )
         },
-        "INSERT INTO `Film` (`payments`, `title`) VALUES ((SELECT * FROM `Payment` p), \"Logan\")",
+        [
+            mysql: "INSERT INTO `Film` (`payments`, `title`) VALUES ((SELECT * FROM `Payment` p), \"Logan\")"
+        ],
 
         $DSL.insert {
             TARGET (Film.alias("f"))
@@ -41,7 +47,9 @@ def payQ2 = $DSL.select {
                     "title": STR("Logan")
             )
         },
-        ["INSERT INTO `Film` (`payments`, `title`) VALUES ((SELECT * FROM `Payment` p WHERE p.payment_id = ?), \"Logan\")",
-                ["payId"]]
+        [
+            mysql: ["INSERT INTO `Film` (`payments`, `title`) VALUES ((SELECT * FROM `Payment` p WHERE p.payment_id = ?), \"Logan\")",
+                    ["payId"]]
+        ]
 
 ]

@@ -3,6 +3,6 @@
  */
 [
     $DSL.truncate ("Film"),
-    "TRUNCATE TABLE `Film`"
+    [mysql: "TRUNCATE TABLE `Film`"]
 
 ]

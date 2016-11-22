@@ -20,9 +20,11 @@ def innQ = $DSL.select {
             IN (f.language_id, PARAM("langId"))
         }
     },
-    ["SELECT * FROM `Film` f " +
-            "WHERE f.film_id = 123 AND f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (2006) OR f.language_id IN (?)",
-     ["langId"]],
+    [
+        mysql: ["SELECT * FROM `Film` f " +
+                "WHERE f.film_id = 123 AND f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (2006) OR f.language_id IN (?)",
+                ["langId"]]
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -38,9 +40,11 @@ def innQ = $DSL.select {
             GTE (f.rental_duration, PARAM("y2017"))
         }
     },
-    ["SELECT * FROM `Film` f " +
-            "WHERE (f.film_id = 123 AND f.title <> \"ACE GOLDFINDER\") AND f.release_year > 2004 OR f.rental_duration >= ?",
-     ["y2017"]],
+    [
+        mysql: ["SELECT * FROM `Film` f " +
+                "WHERE (f.film_id = 123 AND f.title <> \"ACE GOLDFINDER\") AND f.release_year > 2004 OR f.rental_duration >= ?",
+                ["y2017"]]
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -57,9 +61,11 @@ def innQ = $DSL.select {
             }
         }
     },
-    ["SELECT * FROM `Film` f " +
-            "WHERE (f.film_id = 123 OR f.title <> \"AIRPLANE SIERRA\") AND f.release_year < 2015 OR f.length <= ?",
-     ["y2017"]],
+    [
+        mysql: ["SELECT * FROM `Film` f " +
+                "WHERE (f.film_id = 123 OR f.title <> \"AIRPLANE SIERRA\") AND f.release_year < 2015 OR f.length <= ?",
+                ["y2017"]]
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -77,8 +83,12 @@ def innQ = $DSL.select {
             ISNULL (f.original_language_id)
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE 1 = 1 AND (f.film_id = 123 AND f.title <> \"POND SEATTLE\") AND f.rating IS NOT NULL AND f.original_language_id IS NULL",
+    [
+        mysql: "SELECT * FROM `Film` f " +
+                "WHERE 1 = 1 " +
+                "AND (f.film_id = 123 AND f.title <> \"POND SEATTLE\") " +
+                "AND f.rating IS NOT NULL AND f.original_language_id IS NULL"
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -97,8 +107,10 @@ def innQ = $DSL.select {
             NOTLIKE (f.title, STR("%Fairy"))
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE 2 <> 1 AND (f.film_id = 123 OR f.title <> \"MOULIN WAKE\") AND f.description LIKE \"%Dragon%\" AND f.title NOT LIKE \"%Fairy\"",
+    [
+        mysql: "SELECT * FROM `Film` f " +
+            "WHERE 2 <> 1 AND (f.film_id = 123 OR f.title <> \"MOULIN WAKE\") AND f.description LIKE \"%Dragon%\" AND f.title NOT LIKE \"%Fairy\""
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -109,8 +121,9 @@ def innQ = $DSL.select {
             GT (f.film_id, 1)
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate BETWEEN 2.99 AND 5.0 AND f.film_id > 1",
+    [
+        mysql: "SELECT * FROM `Film` f WHERE f.rental_rate BETWEEN 2.99 AND 5.0 AND f.film_id > 1"
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -120,8 +133,9 @@ def innQ = $DSL.select {
             AND (NOTIN (f.language_id, 1))
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id NOT IN (1)",
+    [
+        mysql: "SELECT * FROM `Film` f WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id NOT IN (1)"
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -131,8 +145,10 @@ def innQ = $DSL.select {
             OR (IN (f.language_id, PARAMLIST("singleList")))
         }
     },
-    ["SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 OR f.language_id IN (::singleList::)", ["singleList"]],
+    [
+        mysql: ["SELECT * FROM `Film` f " +
+                "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 OR f.language_id IN (::singleList::)", ["singleList"]]
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -142,8 +158,10 @@ def innQ = $DSL.select {
             AND (IN (f.language_id, PARAMLIST("doubleList")))
         }
     },
-    ["SELECT * FROM `Film` f " +
-            "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id IN (::doubleList::)", ["doubleList"]],
+    [
+        mysql: ["SELECT * FROM `Film` f " +
+                "WHERE f.rental_rate NOT BETWEEN 2.99 AND 5.0 AND f.language_id IN (::doubleList::)", ["doubleList"]]
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -154,8 +172,9 @@ def innQ = $DSL.select {
             NEQ (f.language_id, null)
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE f.language_id IS NULL AND f.language_id IS NOT NULL",
+    [
+        mysql: "SELECT * FROM `Film` f WHERE f.language_id IS NULL AND f.language_id IS NOT NULL"
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -166,8 +185,9 @@ def innQ = $DSL.select {
             IN (f.release_year, $SESSION.emptyList)
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (NULL)",
+    [
+        mysql: "SELECT * FROM `Film` f WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (NULL)"
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -178,8 +198,9 @@ def innQ = $DSL.select {
             NOTIN (f.release_year, $SESSION.emptyList)
         }
     },
-    "SELECT * FROM `Film` f " +
-            "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year NOT IN (NULL)",
+    [
+        mysql: "SELECT * FROM `Film` f WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year NOT IN (NULL)"
+    ],
 
     $DSL.select {
         TARGET (Address.alias("ad"))
@@ -188,7 +209,9 @@ def innQ = $DSL.select {
             EQ (ad.city_id, ad.city_id + 1)
         }
     },
-    "SELECT * FROM `Address` ad WHERE ad.city_id = (ad.city_id + 1)",
+    [
+        mysql: "SELECT * FROM `Address` ad WHERE ad.city_id = (ad.city_id + 1)"
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -197,7 +220,9 @@ def innQ = $DSL.select {
             LIKE (f.description, CONCAT(STR("%"), POSITION(f.title, STR("a")), STR("-%")))
         }
     },
-    "SELECT * FROM `Film` f WHERE f.description LIKE CONCAT(\"%\", POSITION(\"a\" IN f.title), \"-%\")",
+    [
+        mysql: "SELECT * FROM `Film` f WHERE f.description LIKE CONCAT(\"%\", POSITION(\"a\" IN f.title), \"-%\")"
+    ],
 
     $DSL.select {
         TARGET (Address.alias("ad"))
@@ -207,7 +232,9 @@ def innQ = $DSL.select {
             NOTEXISTS (innQ)
         }
     },
-    "SELECT * FROM `Address` ad WHERE EXISTS (SELECT * FROM `Film` f) AND NOT EXISTS (SELECT * FROM `Film` f)",
+    [
+        mysql: "SELECT * FROM `Address` ad WHERE EXISTS (SELECT * FROM `Film` f) AND NOT EXISTS (SELECT * FROM `Film` f)"
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -218,8 +245,10 @@ def innQ = $DSL.select {
             IN (f.release_year, PARAMLIST("years"))
         }
     },
-    ["SELECT * FROM `Film` f " +
-            "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (::years::)", ["years"]],
+    [
+        mysql: ["SELECT * FROM `Film` f " +
+                "WHERE f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (::years::)", ["years"]]
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -227,7 +256,9 @@ def innQ = $DSL.select {
             EQ (f.description, IFNOTNULL(f.alternative_title, STR("")))
         }
     },
-    "SELECT * FROM `Film` f WHERE f.description = CASE WHEN f.alternative_title IS NOT NULL THEN \"\" ELSE f.alternative_title END",
+    [
+        mysql: "SELECT * FROM `Film` f WHERE f.description = CASE WHEN f.alternative_title IS NOT NULL THEN \"\" ELSE f.alternative_title END"
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -235,7 +266,9 @@ def innQ = $DSL.select {
             AND (EQ (f.description, STR("hello")))
         }
     },
-    "SELECT * FROM `Film` f WHERE  AND f.description = \"hello\"",
+    [
+        mysql: "SELECT * FROM `Film` f WHERE  AND f.description = \"hello\""
+    ],
 
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -252,7 +285,9 @@ def innQ = $DSL.select {
             EQ (f.debutTime2, PARAM_TIMESTAMP("debutTime2", "YYYY-MM-DDThh:mm:ssTZD"))
         }
     },
-    ["SELECT * FROM `Film` f " +
-             "WHERE (f.film_id = 123 AND f.releaseDate > ? AND f.debutTime > ?) OR f.language_id IN (?) OR f.debutTime2 = ?",
-     ["relDate", "debutTime", "langId", "debutTime2"]],
+    [
+        mysql: ["SELECT * FROM `Film` f " +
+                "WHERE (f.film_id = 123 AND f.releaseDate > ? AND f.debutTime > ?) OR f.language_id IN (?) OR f.debutTime2 = ?",
+                ["relDate", "debutTime", "langId", "debutTime2"]]
+    ],
 ]

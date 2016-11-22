@@ -6,13 +6,17 @@
             TARGET (Film.alias("f"))
             DISTINCT_FETCH (f.title)
         },
-        "SELECT DISTINCT f.title FROM `Film` f",
+        [
+            mysql: "SELECT DISTINCT f.title FROM `Film` f"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
             DISTINCT_FETCH (f.title, f.description)
         },
-        "SELECT DISTINCT f.title, f.description FROM `Film` f",
+        [
+            mysql: "SELECT DISTINCT f.title, f.description FROM `Film` f"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -22,8 +26,9 @@
                 GT (COUNT(), 200)
             }
         },
-        "SELECT f.rental_duration, COUNT(*) FROM `Film` f GROUP BY f.rental_duration " +
-                "HAVING COUNT(*) > 200",
+        [
+            mysql: "SELECT f.rental_duration, COUNT(*) FROM `Film` f GROUP BY f.rental_duration HAVING COUNT(*) > 200"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -33,8 +38,9 @@
                 GT (total, 200)
             }
         },
-        "SELECT f.rental_duration, COUNT(*) AS total FROM `Film` f GROUP BY f.rental_duration " +
-                "HAVING total > 200",
+        [
+            mysql: "SELECT f.rental_duration, COUNT(*) AS total FROM `Film` f GROUP BY f.rental_duration HAVING total > 200"
+        ],
 
         $DSL.select {
             TARGET (Film.alias("f"))
@@ -44,6 +50,7 @@
                 GT (total, 200)
             }
         },
-        "SELECT f.rental_duration, COUNT(*) AS total FROM `Film` f GROUP BY f.rental_duration " +
-                "HAVING total > 200"
+        [
+            mysql: "SELECT f.rental_duration, COUNT(*) AS total FROM `Film` f GROUP BY f.rental_duration HAVING total > 200"
+        ]
 ]

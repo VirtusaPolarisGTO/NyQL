@@ -41,6 +41,10 @@ class NyQLInstance {
         new NyQLInstance(configInst)
     }
 
+    Configurations getConfigurations() {
+        return configurations
+    }
+
     /**
      * <p>
      * Parse the given file indicated from given script name and returns the generated query
