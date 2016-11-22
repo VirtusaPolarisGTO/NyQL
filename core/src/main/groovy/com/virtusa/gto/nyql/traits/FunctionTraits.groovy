@@ -57,8 +57,8 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn CUREPOCH() { fColumn(null, 'current_epoch') }
     @CompileStatic FunctionColumn DATE_TRUNC(Column column) { fColumn(column, 'date_trunc') }
 
-    @CompileStatic FunctionColumn EPOCH_TO_DATE(Column column)     { fColumn(column, 'epoch_to_date') }
-    @CompileStatic FunctionColumn EPOCH_TO_DATETIME(Column column)     { fColumn(column, 'epoch_to_datetime') }
+    @CompileStatic FunctionColumn EPOCH_TO_DATE(Object column)     { fColumn(column, 'epoch_to_date') }
+    @CompileStatic FunctionColumn EPOCH_TO_DATETIME(Object column)     { fColumn(column, 'epoch_to_datetime') }
 
     @CompileStatic FunctionColumn DATE_DIFF_YEARS(Object sDate, Object eDate) { vColumn('date_diff_years', sDate, eDate) }
     @CompileStatic FunctionColumn DATE_DIFF_MONTHS(Object sDate, Object eDate) { vColumn('date_diff_months', sDate, eDate) }

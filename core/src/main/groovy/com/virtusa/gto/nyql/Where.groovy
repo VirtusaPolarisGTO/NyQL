@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql
 
+import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.units.AParam
@@ -230,6 +231,14 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             return this
         } else {
             return proxy
+        }
+    }
+
+    def $IMPORT_UNSAFE(String scriptId) {
+        try {
+            return this.$IMPORT(scriptId)
+        } catch (NyScriptNotFoundException ignored) {
+            return null
         }
     }
 

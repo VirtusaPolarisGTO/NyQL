@@ -168,4 +168,10 @@ def innQP = $DSL.select {
         FETCH (CAST_INT(ac.age), CAST_STR(ac.birthYear).alias("bYear"))
     },
     "SELECT CAST(ac.age AS SIGNED), CAST(ac.birthYear AS CHAR) AS bYear FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH (DATE_DIFF_SECONDS(EPOCH_TO_DATETIME(NUM(0)), f.release_date).alias("releaseDate"))
+    },
+    "SELECT TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(0 / 1000), f.release_date) AS releaseDate FROM `Film` f"
 ]
