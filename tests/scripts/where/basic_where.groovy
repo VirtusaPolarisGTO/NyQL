@@ -255,4 +255,13 @@ def innQ = $DSL.select {
     ["SELECT * FROM `Film` f " +
              "WHERE (f.film_id = 123 AND f.releaseDate > ? AND f.debutTime > ?) OR f.language_id IN (?) OR f.debutTime2 = ?",
      ["relDate", "debutTime", "langId", "debutTime2"]],
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH (ADD(SUM(f.gross), SUM(f.int_gross)).alias("totalGross"))
+        WHERE {
+            EQ (totalGross, 20)
+        }
+    },
+    "SELECT (SUM(f.gross) + SUM(f.int_gross)) AS totalGross FROM `Film` f WHERE totalGross = 20"
 ]

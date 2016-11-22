@@ -188,6 +188,10 @@ class MySql extends MySqlFunctions implements QTranslator {
             return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
         }
 
+        if (column.__aliasDefined() && contextType == QContextType.CONDITIONAL) {
+            return QUtils.quoteIfWS(column.__alias)
+        }
+
         if (column instanceof FunctionColumn) {
             return String.valueOf(this.invokeMethod(column._func, column._setOfCols ? column._columns : column._wrapper)) +
                     (column.__aliasDefined() ? _AS_ + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
