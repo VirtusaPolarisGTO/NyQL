@@ -235,14 +235,5 @@ def innQ = $DSL.select {
             AND (EQ (f.description, STR("hello")))
         }
     },
-    "SELECT * FROM `Film` f WHERE  AND f.description = \"hello\"",
-
-    $DSL.select {
-        TARGET (Film.alias("f"))
-        FETCH (ADD(SUM(f.gross), SUM(f.int_gross)).alias("totalGross"))
-        WHERE {
-            EQ (totalGross, 20)
-        }
-    },
-    "SELECT (SUM(f.gross) + SUM(f.int_gross)) AS totalGross FROM `Film` f WHERE totalGross = 20"
+    "SELECT * FROM `Film` f WHERE  AND f.description = \"hello\""
 ]
