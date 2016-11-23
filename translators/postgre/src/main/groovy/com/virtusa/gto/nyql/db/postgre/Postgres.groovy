@@ -8,7 +8,6 @@ import com.virtusa.gto.nyql.QContextType
 import com.virtusa.gto.nyql.QResultProxy
 import com.virtusa.gto.nyql.QueryDelete
 import com.virtusa.gto.nyql.QueryInsert
-import com.virtusa.gto.nyql.QueryPart
 import com.virtusa.gto.nyql.QuerySelect
 import com.virtusa.gto.nyql.QueryTruncate
 import com.virtusa.gto.nyql.QueryUpdate
@@ -142,7 +141,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
         }
 
         if (column instanceof Case) {
-            return ___ifColumn(column, null)
+            return ___ifColumn(column, paramList)
         }
 
         if (contextType == QContextType.INTO || contextType == QContextType.INSERT_PROJECTION) {
@@ -173,50 +172,6 @@ class Postgres extends PostgresFunctions implements QTranslator {
                                 _AS_ + QUtils.quoteIfWS(column.__alias, DOUBLE_QUOTE) : '')
             }
         }
-    }
-
-    @CompileStatic
-    @Override
-    QResultProxy ___partQuery(QueryPart q) {
-        List<AParam> paramList = new LinkedList<>()
-        StringBuilder query = new StringBuilder()
-        QueryType queryType = QueryType.PART
-
-        if (q._allProjections != null) {
-            query.append(___expandProjection(q._allProjections, paramList))
-            return new QResultProxy(query: query.toString(), queryType: queryType,
-                    orderedParameters: paramList, rawObject: q._allProjections, qObject: q)
-        }
-
-        if (q.sourceTbl != null) {
-            query.append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM))
-            return new QResultProxy(query: query.toString(), queryType: queryType,
-                    orderedParameters: paramList, rawObject: q.sourceTbl, qObject: q)
-        }
-
-        if (q.whereObj != null) {
-            query.append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL))
-            return new QResultProxy(query: query.toString(), queryType: queryType,
-                    orderedParameters: paramList, rawObject: q.whereObj, qObject: q)
-        }
-
-        if (q._assigns != null) {
-            query.append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET))
-            return new QResultProxy(query: query.toString(), queryType: queryType,
-                    orderedParameters: paramList, rawObject: q._assigns, qObject: q)
-        }
-
-        if (QUtils.notNullNorEmpty(q._intoColumns)) {
-            //query.append(___expandProjection(q._intoColumns, paramList, QContextType.INSERT_PROJECTION))
-            return new QResultProxy(query: query.toString(), queryType: queryType,
-                    orderedParameters: paramList, rawObject: q._intoColumns, qObject: q)
-        }
-
-        if (!QUtils.isNullOrEmpty(q._dataColumns)) {
-            return new QResultProxy(query: '', queryType: queryType,
-                    orderedParameters: paramList, rawObject: q._dataColumns, qObject: q)
-        }
-        throw new NyException('Parts are no longer supports to reuse other than WHERE and JOINING!')
     }
 
     @Override
@@ -464,18 +419,6 @@ class Postgres extends PostgresFunctions implements QTranslator {
             }
         }
         return cols.stream().collect(Collectors.joining(", "))
-    }
-
-    private def ___deriveSource(Table table, List<AParam> paramOrder, QContextType contextType) {
-        if (table instanceof Join) {
-            return ___tableJoinName(table, contextType, paramOrder)
-        } else {
-            if (table.__isResultOf()) {
-                QResultProxy proxy = table.__resultOf as QResultProxy
-                paramOrder.addAll(proxy.orderedParameters ?: [])
-            }
-            return ___tableName(table, contextType)
-        }
     }
 
 }

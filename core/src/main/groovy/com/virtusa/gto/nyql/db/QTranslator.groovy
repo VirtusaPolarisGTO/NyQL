@@ -124,7 +124,7 @@ trait QTranslator extends QJoins {
      * @param q input query part model.
      * @return generated query.
      */
-    abstract QResultProxy ___partQuery(QueryPart q)
+    abstract QResultProxy ___partQuery(QueryPart q) throws NyException
 
     /**
      * Generate a delete query using given query model.

@@ -18,6 +18,66 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractSQLTranslator implements QTranslator {
 
+    @Override
+    public QResultProxy ___partQuery(QueryPart q) throws NyException {
+        List<AParam> paramList = new LinkedList<>();
+        StringBuilder query = new StringBuilder();
+        QueryType queryType = QueryType.PART;
+
+        if (q.get_allProjections() != null) {
+            query.append(___expandProjection(q.get_allProjections(), paramList, QContextType.SELECT));
+            return createProxy(query.toString(), queryType, paramList, q.get_allProjections(), q);
+//            return new QResultProxy(query: query.toString(), queryType: queryType,
+//                    orderedParameters: paramList, rawObject: q._allProjections, qObject: q)
+        }
+
+        if (q.getSourceTbl() != null) {
+            query.append(___deriveSource(q.getSourceTbl(), paramList, QContextType.FROM));
+            return createProxy(query.toString(), queryType, paramList, q.getSourceTbl(), q);
+//            return new QResultProxy(query: query.toString(), queryType: queryType,
+//                    orderedParameters: paramList, rawObject: q.sourceTbl, qObject: q)
+        }
+
+        if (q.getWhereObj() != null) {
+            query.append(___expandConditions(q.getWhereObj(), paramList, QContextType.CONDITIONAL));
+            return createProxy(query.toString(), queryType, paramList, q.getWhereObj(), q);
+//            return new QResultProxy(query: query.toString(), queryType: queryType,
+//                    orderedParameters: paramList, rawObject: q.whereObj, qObject: q)
+        }
+
+        if (q.get_assigns() != null) {
+            query.append(___expandAssignments(q.get_assigns(), paramList, QContextType.UPDATE_SET));
+            return createProxy(query.toString(), queryType, paramList, q.get_assigns(), q);
+//            return new QResultProxy(query: query.toString(), queryType: queryType,
+//                    orderedParameters: paramList, rawObject: q._assigns, qObject: q)
+        }
+
+        if (QUtils.notNullNorEmpty(q.get_intoColumns())) {
+            query.append(___expandProjection(q.get_intoColumns(), paramList, QContextType.INSERT_PROJECTION));
+            return createProxy(query.toString(), queryType, paramList, q.get_intoColumns(), q);
+//            return new QResultProxy(query: query.toString(), queryType: queryType,
+//                    orderedParameters: paramList, rawObject: q._intoColumns, qObject: q)
+        }
+
+        if (!QUtils.isNullOrEmpty(q.get_dataColumns())) {
+            return createProxy("", queryType, paramList, q.get_dataColumns(), q);
+//            return new QResultProxy(query: '', queryType: queryType,
+//                    orderedParameters: paramList, rawObject: q._dataColumns, qObject: q)
+        }
+        throw new NyException("Parts are no longer supports to reuse other than WHERE and JOINING!");
+    }
+
+    private static QResultProxy createProxy(String query, QueryType queryType, List<AParam> params,
+                                            Object raw, Query queryObject) {
+        QResultProxy proxy = new QResultProxy();
+        proxy.setQuery(query);
+        proxy.setQueryType(queryType);
+        proxy.setOrderedParameters(params);
+        proxy.setRawObject(raw);
+        proxy.setqObject(queryObject);
+        return proxy;
+    }
+
     @CompileStatic
     protected String ___expandProjection(List<Object> columns, List<AParam> paramList, QContextType contextType) throws NyException {
         List<String> cols = new ArrayList<>();
@@ -62,6 +122,17 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             }
         }
         return cols.stream().collect(Collectors.joining(", "));
+    }
+
+
+    @CompileStatic
+    protected void appendParamsFromTable(Table table, List<AParam> paramList) {
+        if (table.__isResultOf()) {
+            QResultProxy proxy = (QResultProxy) table.get__resultOf();
+            if (proxy.getOrderedParameters() != null) {
+                paramList.addAll(proxy.getOrderedParameters());
+            }
+        }
     }
 
     @CompileStatic
@@ -109,6 +180,21 @@ public abstract class AbstractSQLTranslator implements QTranslator {
                     ___scanForParameters(it, paramOrder);
                 }
             }
+        }
+    }
+
+    @CompileStatic
+    protected String ___deriveSource(Table table, List<AParam> paramOrder, QContextType contextType) {
+        if (table instanceof Join) {
+            return ___tableJoinName((Join)table, contextType, paramOrder);
+        } else {
+            if (table.__isResultOf()) {
+                QResultProxy proxy = (QResultProxy) table.get__resultOf();
+                if (proxy.getOrderedParameters() != null) {
+                    paramOrder.addAll(proxy.getOrderedParameters());
+                }
+            }
+            return ___tableName(table, contextType);
         }
     }
 
