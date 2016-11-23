@@ -1,12 +1,45 @@
 package com.virtusa.gto.nyql.db.mssql
 
 import com.virtusa.gto.nyql.db.QFunctions
+import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 
 /**
  * @author IWEERARATHNA
  */
 class MSSqlFunctions implements QFunctions {
+
+    @Override
+    String str_lpad(Object c) {
+        if (c instanceof List) {
+            if (c.size() == 3) {
+                return String.format('RIGHT(%s, %s)',
+                        String.format('REPLICATE(%s, %s) + %s', ___resolveIn(c.get(2)), ___resolveIn(c.get(1)), ___resolveIn(c.get(0))),
+                        ___resolveIn(c.get(1)))
+            } else if (c.size() == 2) {
+                return String.format('RIGHT(%s, %s)',
+                        String.format('REPLICATE(\' \', %s) + %s', ___resolveIn(c.get(2)), ___resolveIn(c.get(1)), ___resolveIn(c.get(0))),
+                        ___resolveIn(c.get(1)))
+            }
+        }
+        throw new NyException('Insufficient parameters for right pad function!')
+    }
+
+    @Override
+    String str_rpad(Object c) {
+        if (c instanceof List) {
+            if (c.size() == 3) {
+                return String.format('LEFT(%s, %s)',
+                        String.format('REPLICATE(%s, %s) + %s', ___resolveIn(c.get(2)), ___resolveIn(c.get(1)), ___resolveIn(c.get(0))),
+                        ___resolveIn(c.get(1)))
+            } else if (c.size() == 2) {
+                return String.format('LEFT(%s, %s)',
+                        String.format('REPLICATE(\' \', %s) + %s', ___resolveIn(c.get(2)), ___resolveIn(c.get(1)), ___resolveIn(c.get(0))),
+                        ___resolveIn(c.get(1)))
+            }
+        }
+        throw new NyException('Insufficient parameters for left pad function!')
+    }
 
     @Override
     String date_trunc(Object it) {

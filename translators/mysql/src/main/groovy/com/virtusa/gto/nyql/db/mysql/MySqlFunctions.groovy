@@ -6,137 +6,189 @@ import com.virtusa.gto.nyql.QContextType
 import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import groovy.transform.CompileStatic
 
 /**
  * @author Isuru Weerarathna
  */
 class MySqlFunctions implements QFunctions {
 
+    @CompileStatic
     @Override
-    String date_trunc(it) { 'DATE(' + ___resolveIn(it) + ')' }
+    String date_trunc(it) { String.format('DATE(%s)', ___resolveIn(it)) }
 
+    @CompileStatic
     @Override
     String substr(Object c) {
         if (c instanceof List) {
-            return 'SUBSTRING(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) +
-                    (c.size() > 2 ? ', ' + ___resolveIn(c[2]) : '') + ')'
+            return 'SUBSTRING(' + ___resolveIn(c.get(0)) + ', ' + ___resolveIn(c.get(1)) +
+                    (c.size() > 2 ? ', ' + ___resolveIn(c.get(2)) : '') + ')'
+        } else {
+            throw new NyException('Insufficient parameters for SUBSTRING function!')
         }
     }
 
+    @CompileStatic
     @Override
     String position(Object c) {
         if (c instanceof List) {
-            return 'POSITION(' + ___resolveIn(c[1]) + ' IN ' + ___resolveIn(c[0]) + ')'
+            return String.format('POSITION(%s IN %s)', ___resolveIn(c.get(1)), ___resolveIn(c.get(0)))
         }
+        throw new NyException('Insufficient parameters for POSITION function!')
     }
 
+    @CompileStatic
     @Override
     String cast_to_int(Object col) {
-        'CAST(' + ___resolveIn(col) + ' AS SIGNED)'
+        String.format('CAST(%s AS SIGNED)', ___resolveIn(col))
     }
 
+    @CompileStatic
     @Override
     String cast_to_str(Object col) {
-        'CAST(' + ___resolveIn(col) + ' AS CHAR)'
+        String.format('CAST(%s AS CHAR)', ___resolveIn(col))
     }
 
+    @CompileStatic
     @Override
     String cast_to_date(Object col) {
-        'CAST(' + ___resolveIn(col) + ' AS DATE)'
+        String.format('CAST(%s AS DATE)', ___resolveIn(col))
     }
 
+    @CompileStatic
     String date_diff_years(c) {
-        if (c instanceof List) return 'TIMESTAMPDIFF(YEAR, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        if (c instanceof List) String.format('TIMESTAMPDIFF(YEAR, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw requireTwoParams()
     }
+
+    @CompileStatic
     String date_diff_months(c) {
-        if (c instanceof List) return 'TIMESTAMPDIFF(MONTH, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        if (c instanceof List) String.format('TIMESTAMPDIFF(MONTH, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw requireTwoParams()
     }
+
+    @CompileStatic
     String date_diff_days(c) {
-        if (c instanceof List) return 'TIMESTAMPDIFF(DAY, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        if (c instanceof List) String.format('TIMESTAMPDIFF(DAY, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw requireTwoParams()
     }
+
+    @CompileStatic
     String date_diff_weeks(c) {
-        if (c instanceof List) return 'TIMESTAMPDIFF(WEEK, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        if (c instanceof List) String.format('TIMESTAMPDIFF(WEEK, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw requireTwoParams()
     }
+
+    @CompileStatic
     String date_diff_hours(c) {
-        if (c instanceof List) return 'TIMESTAMPDIFF(HOUR, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        if (c instanceof List) String.format('TIMESTAMPDIFF(HOUR, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw requireTwoParams()
     }
+
+    @CompileStatic
     String date_diff_minutes(c) {
-        if (c instanceof List) return 'TIMESTAMPDIFF(MINUTE, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        if (c instanceof List) String.format('TIMESTAMPDIFF(MINUTE, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw requireTwoParams()
     }
+
+    @CompileStatic
     String date_diff_seconds(c) {
-        if (c instanceof List) return 'TIMESTAMPDIFF(SECOND, ' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ')'
+        if (c instanceof List) String.format('TIMESTAMPDIFF(SECOND, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw requireTwoParams()
     }
 
+    @CompileStatic
     String date_add_days(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' DAY)'
+        if (c instanceof List) String.format('(%s + INTERVAL %s DAY)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateAddSyntax()
     }
+
+    @CompileStatic
     String date_add_months(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' MONTH)'
+        if (c instanceof List) String.format('(%s + INTERVAL %s MONTH)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateAddSyntax()
     }
+
+    @CompileStatic
     String date_add_years(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' YEAR)'
+        if (c instanceof List) String.format('(%s + INTERVAL %s YEAR)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateAddSyntax()
     }
+
+    @CompileStatic
     String date_add_weeks(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' WEEK)'
+        if (c instanceof List) String.format('(%s + INTERVAL %s WEEK)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateAddSyntax()
     }
+
+    @CompileStatic
     String date_add_hours(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' HOUR)'
+        if (c instanceof List) String.format('(%s + INTERVAL %s HOUR)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateAddSyntax()
     }
+
+    @CompileStatic
     String date_add_minutes(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' MINUTE)'
+        if (c instanceof List) String.format('(%s + INTERVAL %s MINUTE)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateAddSyntax()
     }
+
+    @CompileStatic
     String date_add_seconds(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' + INTERVAL ' + ___resolveIn(c[1]) + ' SECOND)'
+        if (c instanceof List) String.format('(%s + INTERVAL %s SECOND)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateAddSyntax()
     }
 
+    @CompileStatic
     String date_sub_days(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' DAY)'
+        if (c instanceof List) String.format('(%s - INTERVAL %s DAY)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateSubSyntax()
     }
+
+    @CompileStatic
     String date_sub_months(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' MONTH)'
+        if (c instanceof List) String.format('(%s - INTERVAL %s MONTH)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateSubSyntax()
     }
+
+    @CompileStatic
     String date_sub_years(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' YEAR)'
+        if (c instanceof List) String.format('(%s - INTERVAL %s YEAR)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateSubSyntax()
     }
+
+    @CompileStatic
     String date_sub_weeks(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' WEEK)'
+        if (c instanceof List) String.format('(%s - INTERVAL %s WEEK)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateSubSyntax()
     }
+
+    @CompileStatic
     String date_sub_hours(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' HOUR)'
+        if (c instanceof List) String.format('(%s - INTERVAL %s HOUR)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateSubSyntax()
     }
+
+    @CompileStatic
     String date_sub_minutes(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' MINUTE)'
+        if (c instanceof List) String.format('(%s - INTERVAL %s MINUTE)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateSubSyntax()
     }
+
+    @CompileStatic
     String date_sub_seconds(c) {
-        if (c instanceof List) return '(' + ___resolveIn(c[0]) + ' - INTERVAL ' + ___resolveIn(c[1]) + ' SECOND)'
+        if (c instanceof List) String.format('(%s - INTERVAL %s SECOND)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         else throw invalidDateSubSyntax()
     }
 
-    String current_epoch(it) { return 'UNIX_TIMESTAMP() * 1000' }
-    String current_epoch() { current_epoch(null) }
+    @CompileStatic String current_epoch(it) { 'UNIX_TIMESTAMP() * 1000' }
+    @CompileStatic String current_epoch() { current_epoch(null) }
 
-    String epoch_to_date(it) { return 'DATE(FROM_UNIXTIME(' + ___resolveIn(it) + ' / 1000))' }
-    String epoch_to_datetime(it) { return 'FROM_UNIXTIME(' + ___resolveIn(it) + ' / 1000)' }
+    @CompileStatic
+    String epoch_to_date(it) { String.format('DATE(FROM_UNIXTIME(%s / 1000))', ___resolveIn(it)) }
+
+    @CompileStatic
+    String epoch_to_datetime(it) { String.format('FROM_UNIXTIME(%s / 1000)', ___resolveIn(it)) }
 
     String mysql_cast(it) {
             if (it instanceof List)
@@ -145,6 +197,7 @@ class MySqlFunctions implements QFunctions {
                 throw new NyException('CAST function expects two parameters!')
     }
 
+    @CompileStatic
     FunctionColumn CAST(Column source, Object toType) {
         return vColumn('mysql_cast', source, toType)
     }
@@ -161,18 +214,22 @@ class MySqlFunctions implements QFunctions {
     }
     */
 
+    @CompileStatic
     private static NyException requireTwoParams() {
         new NySyntaxException('DATE DIFF function requires exactly two parameters!')
     }
 
+    @CompileStatic
     private static NySyntaxException invalidSyntax(String func='') {
         new NySyntaxException('Invalid syntax for ' + func + ' function!')
     }
 
+    @CompileStatic
     private static NySyntaxException invalidDateAddSyntax() {
         invalidSyntax('DATE_ADD')
     }
 
+    @CompileStatic
     private static NySyntaxException invalidDateSubSyntax() {
         invalidSyntax('DATE_SUB')
     }
