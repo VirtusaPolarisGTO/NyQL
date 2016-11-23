@@ -168,4 +168,13 @@ def innQP = $DSL.select {
         FETCH (CAST_INT(ac.age), CAST_STR(ac.birthYear).alias("bYear"))
     },
     "SELECT CAST(ac.age AS SIGNED), CAST(ac.birthYear AS CHAR) AS bYear FROM `Actor` ac",
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH (STR_REPLACE(f.title, STR("w"), STR("www")),
+                STR_REPLACE(f.description, f.title, STR("movie")),
+                STR_REPLACE(f.description, STR("pholder"), f.place))
+    },
+    "SELECT REPLACE(f.title, \"w\", \"www\"), REPLACE(f.description, f.title, \"movie\"), " +
+            "REPLACE(f.description, \"pholder\", f.place) FROM `Film` f"
 ]

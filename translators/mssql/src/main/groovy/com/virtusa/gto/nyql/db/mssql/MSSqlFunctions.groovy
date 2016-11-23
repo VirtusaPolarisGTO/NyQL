@@ -1,12 +1,21 @@
 package com.virtusa.gto.nyql.db.mssql
 
 import com.virtusa.gto.nyql.db.QFunctions
+import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 
 /**
  * @author IWEERARATHNA
  */
 class MSSqlFunctions implements QFunctions {
+
+    @Override
+    String str_replace(Object c) {
+        if (c instanceof List) {
+            return 'REPLACE(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ', ' + ___resolveIn(c[2]) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for string replace function!')
+    }
 
     @Override
     String date_trunc(Object it) {
