@@ -77,7 +77,14 @@ class QJdbcExecutor implements QExecutor {
     }
 
     @CompileStatic
-    private static void logScript(QScript script) {
+    private static void logScript(QScript script) throws NyScriptExecutionException {
+        if (script.proxy.query == null) {
+            throw new NyScriptExecutionException(QUtils.generateErrStr(
+                    'Generated query for execution is empty! [SCRIPT: ' + script.id + ']',
+                    'Did you accidentally set cache true to this script?',
+                    'Did you happen to send incorrect data variables to the script?'))
+        }
+
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" +
                     script.proxy.query.trim())
@@ -156,8 +163,10 @@ class QJdbcExecutor implements QExecutor {
     private def batchExecute(QScript script) throws Exception {
         LOGGER.debug('Executing as batch...')
         PreparedStatement statement = null
+        boolean prevCommitStatus = true
         try {
             statement = getConnection().prepareStatement(script.proxy.query)
+            prevCommitStatus = connection.getAutoCommit()
             connection.setAutoCommit(false)
 
             List<AParam> parameters = script.proxy.orderedParameters
@@ -179,7 +188,9 @@ class QJdbcExecutor implements QExecutor {
             return [count: counts]
 
         } finally {
-            connection.setAutoCommit(true)
+            if (prevCommitStatus) {
+                connection.setAutoCommit(true)
+            }
 
             if (statement != null) {
                 statement.close()
