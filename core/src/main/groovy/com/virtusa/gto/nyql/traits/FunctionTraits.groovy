@@ -37,11 +37,25 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn SUBSTRING(Object column, Object start, Object length) { vColumn('substr', column, start, length) }
     @CompileStatic FunctionColumn SUBSTRING(Object column, Object start) { vColumn('substr', column, start) }
     @CompileStatic FunctionColumn POSITION(Object column, Object substr) { vColumn('position', column, substr) }
+    @CompileStatic FunctionColumn REVERSE(Object column) { fColumn(column, 'str_reverse') }
+    @CompileStatic FunctionColumn STR_LEFT(Object column, Object length) { vColumn('str_left', column, length) }
+    @CompileStatic FunctionColumn STR_RIGHT(Object column, Object length) { vColumn('str_right', column, length) }
+    @CompileStatic FunctionColumn LEFT_TRIM(Object column) { fColumn(column, 'str_ltrim') }
+    @CompileStatic FunctionColumn RIGHT_TRIM(Object column) { fColumn(column, 'str_rtrim') }
+    @CompileStatic FunctionColumn LEFT_PAD(Object column, Object length, Object text) { vColumn('str_lpad', column, length, text) }
+    @CompileStatic FunctionColumn LEFT_PAD(Object column, Object length) { vColumn('str_lpad', column, length) }
+    @CompileStatic FunctionColumn RIGHT_PAD(Object column, Object length, Object text) { vColumn('str_rpad', column, length, text) }
+    @CompileStatic FunctionColumn RIGHT_PAD(Object column, Object length) { vColumn('str_rpad', column, length) }
 
-    @CompileStatic FunctionColumn ROUND(Column column, Object decimalPlaces)    { vColumn('round', column, decimalPlaces) }
-    @CompileStatic FunctionColumn FLOOR(Column column) { fColumn(column, 'floor') }
-    @CompileStatic FunctionColumn CEIL(Column column) { fColumn(column, 'ceil') }
-    @CompileStatic FunctionColumn ABS(Column column) { fColumn(column, 'abs') }
+    @CompileStatic FunctionColumn ROUND(Object column, Object decimalPlaces)    { vColumn('round', column, decimalPlaces) }
+    @CompileStatic FunctionColumn FLOOR(Object column) { fColumn(column, 'floor') }
+    @CompileStatic FunctionColumn CEIL(Object column) { fColumn(column, 'ceil') }
+    @CompileStatic FunctionColumn ABS(Object column) { fColumn(column, 'abs') }
+    @CompileStatic FunctionColumn POWER(Object column, Object magnitude) { vColumn('power', column, magnitude) }
+    @CompileStatic FunctionColumn SIGN(Object column) { fColumn(column, 'num_sign') }
+    @CompileStatic FunctionColumn SQRT(Object column) { fColumn(column, 'sqrt') }
+    @CompileStatic FunctionColumn DEGREES(Object column) { fColumn(column, 'num_degrees') }
+    @CompileStatic FunctionColumn RADIANS(Object column) { fColumn(column, 'num_radians') }
 
     @CompileStatic FunctionColumn CONCAT(Object... columns) { vColumn("concat", columns) }
 
