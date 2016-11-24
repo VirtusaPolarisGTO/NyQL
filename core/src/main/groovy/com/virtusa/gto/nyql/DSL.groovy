@@ -58,11 +58,15 @@ class DSL {
     }
 
     def RUN(QScriptList scriptList) {
-        session.execute(scriptList)
+        session.execute((QScriptList)scriptList)
     }
 
     def RUN(QScript script) {
-        session.execute(script)
+        if (script instanceof QScriptList) {
+            RUN((QScriptList)script)
+        } else {
+            session.execute(script)
+        }
     }
 
     def RUN(QResultProxy proxy) {
