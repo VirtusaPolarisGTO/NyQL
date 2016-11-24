@@ -7,29 +7,37 @@
         TARGET (Actor.alias("ac"))
         FETCH (NOW(), CURDATE(), CURRENT_DATE())
     },
-    "SELECT NOW(), CURDATE(), CURDATE() FROM `Actor` ac",
+    [
+        mysql: "SELECT NOW(), CURDATE(), CURDATE() FROM `Actor` ac"
+    ],
 
     $DSL.select {
         FETCH (CURTIME(), CURRENT_TIME(), CURTIME().alias("nowTime"),
                 CUREPOCH(), CURRENT_EPOCH())
     },
-    "SELECT CURTIME(), CURTIME(), CURTIME() AS nowTime, " +
-            "UNIX_TIMESTAMP() * 1000, UNIX_TIMESTAMP() * 1000",
+    [
+        mysql: "SELECT CURTIME(), CURTIME(), CURTIME() AS nowTime, " +
+            "UNIX_TIMESTAMP() * 1000, UNIX_TIMESTAMP() * 1000"
+    ],
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
         FETCH (DATE_TRUNC(ac.birthTimestamp), DATE_TRUNC(ac.updatedAt).alias("lastUpdated"))
     },
-    "SELECT DATE(ac.birthTimestamp), DATE(ac.updatedAt) AS lastUpdated FROM `Actor` ac",
+    [
+        mysql: "SELECT DATE(ac.birthTimestamp), DATE(ac.updatedAt) AS lastUpdated FROM `Actor` ac"
+    ],
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
         FETCH (EPOCH_TO_DATE(ac.birthEpoch), EPOCH_TO_DATETIME(ac.updatedAt).alias("lastUpdated"),
             EPOCH_TO_DATE(PARAM("birthTimeEpoch")))
     },
-    ["SELECT DATE(FROM_UNIXTIME(ac.birthEpoch / 1000)), FROM_UNIXTIME(ac.updatedAt / 1000) AS lastUpdated, " +
-             "DATE(FROM_UNIXTIME(? / 1000)) " +
-             "FROM `Actor` ac", ["birthTimeEpoch"]],
+    [
+        mysql: ["SELECT DATE(FROM_UNIXTIME(ac.birthEpoch / 1000)), FROM_UNIXTIME(ac.updatedAt / 1000) AS lastUpdated, " +
+                "DATE(FROM_UNIXTIME(? / 1000)) " +
+                "FROM `Actor` ac", ["birthTimeEpoch"]]
+    ],
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
@@ -41,14 +49,16 @@
         FETCH (DATE_DIFF_MINUTES(ac.birthDate, PARAM("otherDate")))
         FETCH (DATE_DIFF_SECONDS(ac.birthDate, CURDATE()))
     },
-    ["SELECT TIMESTAMPDIFF(YEAR, ac.birthDate, CURDATE()), " +
-            "TIMESTAMPDIFF(MONTH, ac.birthDate, ac.updatedAt), " +
-            "TIMESTAMPDIFF(WEEK, ac.birthDate, CURDATE()), " +
-            "TIMESTAMPDIFF(DAY, ac.birthDate, ac.updatedAt), " +
-            "TIMESTAMPDIFF(HOUR, ac.birthDate, CURDATE()), " +
-            "TIMESTAMPDIFF(MINUTE, ac.birthDate, ?), " +
-            "TIMESTAMPDIFF(SECOND, ac.birthDate, CURDATE()) " +
-            "FROM `Actor` ac", ["otherDate"]],
+    [
+        mysql: ["SELECT TIMESTAMPDIFF(YEAR, ac.birthDate, CURDATE()), " +
+                "TIMESTAMPDIFF(MONTH, ac.birthDate, ac.updatedAt), " +
+                "TIMESTAMPDIFF(WEEK, ac.birthDate, CURDATE()), " +
+                "TIMESTAMPDIFF(DAY, ac.birthDate, ac.updatedAt), " +
+                "TIMESTAMPDIFF(HOUR, ac.birthDate, CURDATE()), " +
+                "TIMESTAMPDIFF(MINUTE, ac.birthDate, ?), " +
+                "TIMESTAMPDIFF(SECOND, ac.birthDate, CURDATE()) " +
+                "FROM `Actor` ac", ["otherDate"]]
+    ],
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
@@ -60,14 +70,16 @@
         FETCH (DATE_ADD_MONTHS(ac.birthDate, PARAM("addMonths")))
         FETCH (DATE_ADD_YEARS(ac.birthDate, NUM(1)))
     },
-    ["SELECT (ac.birthDate + INTERVAL ac.error DAY), " +
+    [
+        mysql: ["SELECT (ac.birthDate + INTERVAL ac.error DAY), " +
              "(ac.birthDate + INTERVAL 24 HOUR), " +
              "(ac.birthDate + INTERVAL ac.error MINUTE), " +
              "(ac.birthDate + INTERVAL ac.error SECOND), " +
              "(ac.birthDate + INTERVAL 7 WEEK), " +
              "(ac.birthDate + INTERVAL ? MONTH), " +
              "(ac.birthDate + INTERVAL 1 YEAR) " +
-             "FROM `Actor` ac", ["addMonths"]],
+             "FROM `Actor` ac", ["addMonths"]]
+    ],
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
@@ -79,12 +91,14 @@
         FETCH (DATE_SUB_MONTHS(ac.birthDate, PARAM("addMonths")))
         FETCH (DATE_SUB_YEARS(ac.birthDate, NUM(1)))
     },
-    ["SELECT (ac.birthDate - INTERVAL ac.error DAY), " +
+    [
+        mysql: ["SELECT (ac.birthDate - INTERVAL ac.error DAY), " +
              "(ac.birthDate - INTERVAL 24 HOUR), " +
              "(ac.birthDate - INTERVAL ac.error MINUTE), " +
              "(ac.birthDate - INTERVAL ac.error SECOND), " +
              "(ac.birthDate - INTERVAL 7 WEEK), " +
              "(ac.birthDate - INTERVAL ? MONTH), " +
              "(ac.birthDate - INTERVAL 1 YEAR) " +
-             "FROM `Actor` ac", ["addMonths"]],
+             "FROM `Actor` ac", ["addMonths"]]
+    ],
 ]

@@ -291,14 +291,4 @@ def innQ = $DSL.select {
                 ["relDate", "debutTime", "langId", "debutTime2"]]
     ],
 
-    $DSL.select {
-        TARGET (Film.alias("f"))
-        FETCH (ADD(SUM(f.gross), SUM(f.int_gross)).alias("totalGross"))
-        WHERE {
-            EQ (totalGross, 20)
-        }
-    },
-    [
-        mysql: "SELECT (SUM(f.gross) + SUM(f.int_gross)) AS totalGross FROM `Film` f WHERE totalGross = 20"
-    ]
 ]

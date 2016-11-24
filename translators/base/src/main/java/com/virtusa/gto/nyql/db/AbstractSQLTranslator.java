@@ -6,7 +6,6 @@ import com.virtusa.gto.nyql.model.units.AParam;
 import com.virtusa.gto.nyql.utils.QOperator;
 import com.virtusa.gto.nyql.utils.QUtils;
 import com.virtusa.gto.nyql.utils.QueryType;
-import groovy.transform.CompileStatic;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,42 +26,30 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         if (q.get_allProjections() != null) {
             query.append(___expandProjection(q.get_allProjections(), paramList, QContextType.SELECT));
             return createProxy(query.toString(), queryType, paramList, q.get_allProjections(), q);
-//            return new QResultProxy(query: query.toString(), queryType: queryType,
-//                    orderedParameters: paramList, rawObject: q._allProjections, qObject: q)
         }
 
         if (q.getSourceTbl() != null) {
             query.append(___deriveSource(q.getSourceTbl(), paramList, QContextType.FROM));
             return createProxy(query.toString(), queryType, paramList, q.getSourceTbl(), q);
-//            return new QResultProxy(query: query.toString(), queryType: queryType,
-//                    orderedParameters: paramList, rawObject: q.sourceTbl, qObject: q)
         }
 
         if (q.getWhereObj() != null) {
             query.append(___expandConditions(q.getWhereObj(), paramList, QContextType.CONDITIONAL));
             return createProxy(query.toString(), queryType, paramList, q.getWhereObj(), q);
-//            return new QResultProxy(query: query.toString(), queryType: queryType,
-//                    orderedParameters: paramList, rawObject: q.whereObj, qObject: q)
         }
 
         if (q.get_assigns() != null) {
             query.append(___expandAssignments(q.get_assigns(), paramList, QContextType.UPDATE_SET));
             return createProxy(query.toString(), queryType, paramList, q.get_assigns(), q);
-//            return new QResultProxy(query: query.toString(), queryType: queryType,
-//                    orderedParameters: paramList, rawObject: q._assigns, qObject: q)
         }
 
         if (QUtils.notNullNorEmpty(q.get_intoColumns())) {
             query.append(___expandProjection(q.get_intoColumns(), paramList, QContextType.INSERT_PROJECTION));
             return createProxy(query.toString(), queryType, paramList, q.get_intoColumns(), q);
-//            return new QResultProxy(query: query.toString(), queryType: queryType,
-//                    orderedParameters: paramList, rawObject: q._intoColumns, qObject: q)
         }
 
         if (!QUtils.isNullOrEmpty(q.get_dataColumns())) {
             return createProxy("", queryType, paramList, q.get_dataColumns(), q);
-//            return new QResultProxy(query: '', queryType: queryType,
-//                    orderedParameters: paramList, rawObject: q._dataColumns, qObject: q)
         }
         throw new NyException("Parts are no longer supports to reuse other than WHERE and JOINING!");
     }
@@ -78,7 +65,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         return proxy;
     }
 
-    @CompileStatic
     protected String ___expandProjection(List<Object> columns, List<AParam> paramList, QContextType contextType) throws NyException {
         List<String> cols = new ArrayList<>();
         if (columns == null || columns.isEmpty()) {
@@ -125,7 +111,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
     }
 
 
-    @CompileStatic
     protected void appendParamsFromTable(Table table, List<AParam> paramList) {
         if (table.__isResultOf()) {
             QResultProxy proxy = (QResultProxy) table.get__resultOf();
@@ -135,7 +120,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
     }
 
-    @CompileStatic
     private static void appendParamsFromColumn(Column column, List<AParam> paramList) {
         if (column instanceof FunctionColumn) {
             if (((FunctionColumn) column).get_setOfCols()) {
@@ -148,12 +132,13 @@ public abstract class AbstractSQLTranslator implements QTranslator {
                 Object wrap = ((FunctionColumn) column).get_wrapper();
                 if (wrap instanceof QResultProxy && ((QResultProxy)wrap).getOrderedParameters() != null) {
                     paramList.addAll(((QResultProxy)wrap).getOrderedParameters());
+                } else if (wrap instanceof AParam) {
+                    paramList.add((AParam)wrap);
                 }
             }
         }
     }
 
-    @CompileStatic
     protected void ___scanForParameters(Object expression, List<AParam> paramOrder) {
         if (expression != null) {
             if (expression instanceof AParam) {
@@ -183,7 +168,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
     }
 
-    @CompileStatic
     protected String ___deriveSource(Table table, List<AParam> paramOrder, QContextType contextType) {
         if (table instanceof Join) {
             return ___tableJoinName((Join)table, contextType, paramOrder);
@@ -198,7 +182,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
     }
 
-    @CompileStatic
     protected void ___expandColumn(Column column, List<AParam> paramList) {
         if (column instanceof FunctionColumn && ((FunctionColumn) column).get_columns() != null) {
             for (Object it : ((FunctionColumn) column).get_columns()) {
@@ -211,7 +194,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
     }
 
-    @CompileStatic
     protected String ___expandConditions(Where where, List<AParam> paramOrder, QContextType contextType) {
         StringBuilder builder = new StringBuilder();
         List<Object> clauses = where.getClauses();
@@ -231,7 +213,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         return builder.toString();
     }
 
-    @CompileStatic
     protected String ___expandCondition(Where.QCondition c, List<AParam> paramOrder, QContextType contextType) {
         if (c.getLeftOp() instanceof AParam) {
             paramOrder.add((AParam)c.getLeftOp());
@@ -252,7 +233,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
     }
 
-    @CompileStatic
     protected String ___expandConditionGroup(Where.QConditionGroup group, List<AParam> paramOrder, QContextType contextType) {
         String gCon = group.getCondConnector() == null ? "" : " " + ___convertOperator(group.getCondConnector()) + " ";
         List<String> list = new LinkedList<>();
@@ -270,7 +250,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         return list.stream().collect(Collectors.joining(gCon));
     }
 
-    @CompileStatic
     protected String ___expandAssignments(Assign assign, List<AParam> paramOrder, QContextType contextType) {
         List<Object> clauses = assign.getAssignments();
         List<String> derived = new ArrayList<>();
