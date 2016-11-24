@@ -97,4 +97,13 @@ def innQP = $DSL.select {
         },
         ["UPDATE `Film` f SET f.film_id = 1234, f.releaseDate = ?, f.debutTime = ?, f.debutTime2 = ?, f.language_id = NULL",
          ["relDate", "debutTime", "debutTime2"]],
+
+        $DSL.update {
+            TARGET (Film.alias("f"))
+            SET {
+                EQ (f.film_id, 1234)
+                $IMPORT_UNSAFE ("updates/non-existing-script")
+            }
+        },
+        "UPDATE `Film` f SET f.film_id = 1234",
 ]

@@ -103,7 +103,7 @@ trait QFunctions {
      */
     @CompileStatic String str_left(c) {
         if (c instanceof List) {
-            String.format('LEFT(%s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
+            return String.format('LEFT(%s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         }
         throw new NyException('Insufficient parameters for LEFT function!')
     }
@@ -115,7 +115,7 @@ trait QFunctions {
      */
     @CompileStatic String str_right(c) {
         if (c instanceof List) {
-            String.format('RIGHT(%s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
+            return String.format('RIGHT(%s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
         }
         throw new NyException('Insufficient parameters for RIGHT function!')
     }
@@ -144,7 +144,7 @@ trait QFunctions {
             if (c.size() == 3) {
                 return String.format('LPAD(%s, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)), ___resolveIn(c.get(2)))
             } else if (c.size() == 2) {
-                return String.format('LPAD(%s, %s, \' \')', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
+                return String.format('LPAD(%s, %s, \" \")', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
             }
         }
         throw new NyException('Insufficient parameters for left pad function!')
@@ -160,7 +160,7 @@ trait QFunctions {
             if (c.size() == 3) {
                 return String.format('RPAD(%s, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)), ___resolveIn(c.get(2)))
             } else if (c.size() == 2) {
-                return String.format('RPAD(%s, %s, \' \')', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
+                return String.format('RPAD(%s, %s, \" \")', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
             }
         }
         throw new NyException('Insufficient parameters for right pad function!')
@@ -406,16 +406,6 @@ trait QFunctions {
      */
     @CompileStatic String count(c) {
         String.format('COUNT(%s)', ___resolveIn(c ?: '*'))
-    }
-
-    /**
-     * Returns the distinct count value of given column.
-     *
-     * @param c input column.
-     * @return string representation of function
-     */
-    @CompileStatic String count_distinct(c) {
-        c == null ? 'COUNT(DISTINCT)' : String.format('COUNT(%s)', distinct(c))
     }
 
     /**

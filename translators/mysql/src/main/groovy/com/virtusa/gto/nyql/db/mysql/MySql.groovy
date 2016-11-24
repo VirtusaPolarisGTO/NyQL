@@ -527,6 +527,8 @@ class MySql extends MySqlFunctions implements QTranslator {
                 Object wrap = column._wrapper
                 if (wrap instanceof QResultProxy && ((QResultProxy)wrap).orderedParameters != null) {
                     paramList.addAll(((QResultProxy)wrap).orderedParameters)
+                } else if (wrap instanceof AParam) {
+                    paramList.add((AParam)wrap)
                 }
             }
         }

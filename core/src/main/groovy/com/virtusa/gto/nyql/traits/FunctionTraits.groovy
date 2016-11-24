@@ -51,7 +51,7 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn FLOOR(Object column) { fColumn(column, 'floor') }
     @CompileStatic FunctionColumn CEIL(Object column) { fColumn(column, 'ceil') }
     @CompileStatic FunctionColumn ABS(Object column) { fColumn(column, 'abs') }
-    @CompileStatic FunctionColumn POWER(Object column) { fColumn(column, 'power') }
+    @CompileStatic FunctionColumn POWER(Object column, Object magnitude) { vColumn('power', column, magnitude) }
     @CompileStatic FunctionColumn SIGN(Object column) { fColumn(column, 'num_sign') }
     @CompileStatic FunctionColumn SQRT(Object column) { fColumn(column, 'sqrt') }
     @CompileStatic FunctionColumn DEGREES(Object column) { fColumn(column, 'num_degrees') }
