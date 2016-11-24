@@ -1,14 +1,11 @@
 package com.virtusa.gto.nyql.db.mysql
 
-import com.virtusa.gto.nyql.Column
-import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.QContextType
 import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import groovy.transform.CompileStatic
-
 /**
  * @author Isuru Weerarathna
  */
@@ -197,23 +194,6 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
             else
                 throw new NyException('CAST function expects two parameters!')
     }
-
-    @CompileStatic
-    FunctionColumn CAST(Column source, Object toType) {
-        return vColumn('mysql_cast', source, toType)
-    }
-
-    private FunctionColumn vColumn(String fName, Object... columns) {
-        List<Object> vals = new ArrayList<>()
-        vals.addAll(columns)
-        return new FunctionColumn(_columns: vals, _func: fName, _setOfCols: true, _ctx: _ctx)
-    }
-
-    /*
-    private FunctionColumn fColumn(Column column, String fName) {
-        return new FunctionColumn(_wrapper: column, _func: fName, _ctx: _ctx)
-    }
-    */
 
     @CompileStatic
     private static NyException requireTwoParams() {

@@ -7,6 +7,7 @@ import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.units.QNumber
+import groovy.transform.CompileStatic
 
 import java.util.stream.Collectors
 
@@ -15,122 +16,129 @@ import java.util.stream.Collectors
  */
 abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunctions {
 
-    String current_date(c) { return "CURRENT_TIME" }
-    String current_time(c) { return "CURRENT_DATE" }
+    @CompileStatic String current_date(c) { 'CURRENT_TIME' }
+    @CompileStatic String current_time(c) { 'CURRENT_DATE' }
 
-    String date_trunc(c) { return "DATE_TRUNC('day', " + ___resolveIn(c) + ")" }
+    @CompileStatic String date_trunc(c) { String.format("DATE_TRUNC('day', %s)", ___resolveIn(c)) }
 
     @Override
     String substr(Object c) {
         if (c instanceof List) {
-            return 'SUBSTRING(' + ___resolveIn(c[0]) + ', FROM ' + ___resolveIn(c[1]) +
+            'SUBSTRING(' + ___resolveIn(c[0]) + ', FROM ' + ___resolveIn(c[1]) +
                     (c.size() > 2 ? ', FOR ' + ___resolveIn(c[2]) : '') + ')'
+        } else {
+            throw new NyException('Insufficient parameters for SUBSTRING function!')
         }
     }
 
     @Override
     String position(Object c) {
         if (c instanceof List) {
-            return 'POSITION(' + ___resolveIn(c[1]) + ' IN ' + ___resolveIn(c[0]) + ')'
+            String.format('POSITION(%s IN %s)', ___resolveIn(c.get(1)), ___resolveIn(c.get(0)))
+        } else {
+            throw new NyException('Insufficient parameters for POSITION function!')
         }
     }
 
     String date_diff_years(c) {
-        if (c instanceof List) return "DATE_PART('year', " + ___resolveIn(c[0]) + ") - DATE_PART('year', " + ___resolveIn(c[1]) + ")"
+        if (c instanceof List) String.format("DATE_PART('year', %s) - DATE_PART('year', %s)", ___resolveIn(c[1]), ___resolveIn(c[0]))
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
     String date_diff_months(c) {
-        if (c instanceof List) return date_diff_years(c) + "* 12 + DATE_PART('month', " + ___resolveIn(c[0]) + ") - DATE_PART('month', " + ___resolveIn(c[1]) + ")"
-        else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
+        if (c instanceof List) {
+            String.format("%s * 12 + (DATE_PART('month', %s) - DATE_PART('month', %s))", date_diff_years(c), ___resolveIn(c[1]), ___resolveIn(c[0]))
+        } else {
+            throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
+        }
     }
     String date_diff_days(c) {
-        if (c instanceof List) return "DATE_PART('day', " + ___resolveIn(c[1]) + " - " + ___resolveIn(c[0]) + ")"
+        if (c instanceof List) String.format("DATE_PART('day', %s - %s)", ___resolveIn(c[1]), ___resolveIn(c[0]))
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
     String date_diff_weeks(c) {
-        if (c instanceof List) return "TRUNC(DATE_PART('day', " + ___resolveIn(c[1]) + " - " + ___resolveIn(c[0]) + ") / 7)"
+        if (c instanceof List) String.format("TRUNC(DATE_PART('day', %s - %s) / 7)", ___resolveIn(c[1]), ___resolveIn(c[0]))
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
     String date_diff_hours(c) {
-        if (c instanceof List) return date_diff_days(c) + " * 24 + DATE_PART('hour', " + ___resolveIn(c[1]) + " - " + ___resolveIn(c[0]) + ")"
+        if (c instanceof List) String.format("%s * 24 + DATE_PART('hour', %s - %s)", date_diff_days(c), ___resolveIn(c[1]), ___resolveIn(c[0]))
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
     String date_diff_minutes(c) {
-        if (c instanceof List) return date_diff_hours(c) + " * 60 + DATE_PART('minute', " + ___resolveIn(c[1]) + " - " + ___resolveIn(c[0]) + ")"
+        if (c instanceof List) String.format("%s * 60 + DATE_PART('minute', %s - %s)", date_diff_hours(c), ___resolveIn(c[1]), ___resolveIn(c[0]))
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
     String date_diff_seconds(c) {
-        if (c instanceof List) return date_diff_minutes(c) + " * 60 + DATE_PART('minute', " + ___resolveIn(c[1]) + " - " + ___resolveIn(c[0]) + ")"
+        if (c instanceof List) String.format("%s * 60 + DATE_PART('minute', %s - %s)", date_diff_minutes(c), ___resolveIn(c[1]), ___resolveIn(c[0]))
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
     }
 
     String date_add_days(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL '" + ___resolveIn(c[1]) + " day')"
+        if (c instanceof List) String.format("(%s + INTERVAL '%s day'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_ADD function!")
     }
     String date_add_months(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL '" + ___resolveIn(c[1]) + " month')"
+        if (c instanceof List) String.format("(%s + INTERVAL '%s month'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_ADD function!")
     }
     String date_add_years(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL '" + ___resolveIn(c[1]) + " year')"
+        if (c instanceof List) String.format("(%s + INTERVAL '%s year'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_ADD function!")
     }
     String date_add_weeks(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL '" + ___resolveIn(c[1]) + " week')"
+        if (c instanceof List) String.format("(%s + INTERVAL '%s week'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_ADD function!")
     }
     String date_add_hours(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL '" + ___resolveIn(c[1]) + " hour')"
+        if (c instanceof List) String.format("(%s + INTERVAL '%s hour'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_ADD function!")
     }
     String date_add_minutes(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL '" + ___resolveIn(c[1]) + " minute')"
+        if (c instanceof List) String.format("(%s + INTERVAL '%s minute'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_ADD function!")
     }
     String date_add_seconds(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " + INTERVAL '" + ___resolveIn(c[1]) + " second')"
+        if (c instanceof List) String.format("(%s + INTERVAL '%s second'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_ADD function!")
     }
 
     String date_sub_days(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL '" + ___resolveIn(c[1]) + " day')"
+        if (c instanceof List) String.format("(%s - INTERVAL '%s day'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
     String date_sub_months(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL '" + ___resolveIn(c[1]) + " month')"
+        if (c instanceof List) String.format("(%s - INTERVAL '%s month'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
     String date_sub_years(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL '" + ___resolveIn(c[1]) + " year')"
+        if (c instanceof List) String.format("(%s - INTERVAL '%s year'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
     String date_sub_weeks(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL '" + ___resolveIn(c[1]) + " week')"
+        if (c instanceof List) String.format("(%s - INTERVAL '%s week'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
     String date_sub_hours(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL '" + ___resolveIn(c[1]) + " hour')"
+        if (c instanceof List) String.format("(%s - INTERVAL '%s hour'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
     String date_sub_minutes(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL '" + ___resolveIn(c[1]) + " minute')"
+        if (c instanceof List) String.format("(%s - INTERVAL '%s minute'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
     String date_sub_seconds(c) {
-        if (c instanceof List) return "(" + ___resolveIn(c[0]) + " - INTERVAL '" + ___resolveIn(c[1]) + " second')"
+        if (c instanceof List) String.format("(%s - INTERVAL '%s second'", ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NyException("Invalid syntax for DATE_SUB function!")
     }
 
-    String current_epoch(it) { return "extract(epoch from now()) * 1000" }
-    String current_epoch() { current_epoch(null) }
+    @CompileStatic String current_epoch(it) { 'extract(epoch from now()) * 1000' }
+    @CompileStatic String current_epoch() { current_epoch(null) }
 
-    String epoch_to_date(it) { return epoch_to_datetime(it) + "::date" }
-    String epoch_to_datetime(it) {
+    @CompileStatic String epoch_to_date(it) { epoch_to_datetime(it) + '::date' }
+    @CompileStatic String epoch_to_datetime(it) {
         if (it instanceof QNumber || it instanceof Number) {
-            return "to_timestamp(" + ___resolveIn(it) + " / 1000)"
+            String.format('to_timestamp(%s / 1000)', ___resolveIn(it))
         } else {
-            return "to_timestamp(extract(epoch from " + ___resolveIn(it) + "))"
+            String.format('to_timestamp(extract(epoch from %s))', ___resolveIn(it))
         }
     }
 
@@ -156,25 +164,25 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
         }
     }
 
-    @Override
+    @CompileStatic @Override
     String cast_to_int(Object col) {
-        return 'CAST(' + ___resolveIn(col) + ' AS INTEGER)'
+        String.format('CAST(%s AS INTEGER)', ___resolveIn(col))
     }
 
-    @Override
+    @CompileStatic @Override
     String cast_to_str(Object col) {
-        return 'CAST(' + ___resolveIn(col) + ' AS TEXT)'
+        String.format('CAST(%s AS TEXT)', ___resolveIn(col))
     }
 
-    @Override
+    @CompileStatic @Override
     String cast_to_date(Object col) {
-        return 'to_date(' + ___resolveIn(col) + ', YYYY-MM-DD)'
+        String.format('to_date(%s, YYYY-MM-DD)', ___resolveIn(col))
     }
 
-    @Override
+    @CompileStatic @Override
     String op_bit_xor(Object it) {
         if (it instanceof List) {
-            return ___resolveIn(it[0]) + ' # ' + ___resolveIn(it[1])
+            String.format('%s # %s', ___resolveIn(it.get(0)), ___resolveIn(it.get(1)))
         } else {
             throw new NySyntaxException('Bitwise Xor operation requires at least two operands!')
         }

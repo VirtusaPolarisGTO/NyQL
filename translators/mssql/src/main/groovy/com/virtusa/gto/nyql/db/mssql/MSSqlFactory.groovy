@@ -9,6 +9,12 @@ import com.virtusa.gto.nyql.exceptions.NyConfigurationException
  * @author IWEERARATHNA
  */
 class MSSqlFactory implements QDbFactory {
+
+    private static final String MSSQL = 'mssql'
+    private static final String MSSQL_JDBC_CLASS = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+    private static final String MSSQL_JDBC_SOURCE = 'com.microsoft.sqlserver.jdbc.SQLServerDataSource'
+    private static final MSSql INSTANCE = new MSSql()
+
     @Override
     void init(Configurations nyConfigs) throws NyConfigurationException {
         // nothing to pre-configure in mssql
@@ -16,21 +22,21 @@ class MSSqlFactory implements QDbFactory {
 
     @Override
     String dbName() {
-        return "mssql"
+        MSSQL
     }
 
     @Override
     QTranslator createTranslator() {
-        return new MSSql()
+        INSTANCE
     }
 
     @Override
     String driverClassName() {
-        return "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+        MSSQL_JDBC_CLASS
     }
 
     @Override
     String dataSourceClassName() {
-        return "com.microsoft.sqlserver.jdbc.SQLServerDataSource"
+        MSSQL_JDBC_SOURCE
     }
 }

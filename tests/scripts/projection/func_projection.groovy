@@ -24,11 +24,11 @@ def innQP = $DSL.select {
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
-        FETCH (ac.id, MAX(ac.income), MIN(ac.performances), AVG(ac.income))
+        FETCH (ac.id, MAX(ac.income), MIN(ac.performances), AVG(ac.income), ROUND(AVG(ac.income), 2))
         GROUP_BY (ac.id)
     },
     [
-        mysql: "SELECT ac.id, MAX(ac.income), MIN(ac.performances), AVG(ac.income) FROM `Actor` ac GROUP BY ac.id"
+        mysql: "SELECT ac.id, MAX(ac.income), MIN(ac.performances), AVG(ac.income), ROUND(AVG(ac.income), 2) FROM `Actor` ac GROUP BY ac.id"
     ],
 
     $DSL.select {
