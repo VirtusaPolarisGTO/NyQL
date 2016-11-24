@@ -79,6 +79,21 @@ class MSSqlFunctions implements QFunctions {
         String.format('STR(%s)', ___resolveIn(col))
     }
 
+    @Override
+    String current_epoch() {
+        'CAST(DATEDIFF(SECOND, \'19700101\', GETUTCDATE()) AS BIGINT) * 1000'
+    }
+
+    @Override
+    String epoch_to_date(Object col) {
+        String.format('CAST(DATEADD(s, %s, \'19700101\') AS DATE)', ___resolveIn(col))
+    }
+
+    @Override
+    String epoch_to_datetime(Object col) {
+        String.format('DATEADD(s, %s, \'19700101\')', ___resolveIn(col))
+    }
+
     String date_diff_years(c) {
         if (c instanceof List) String.format('DATEDIFF(year, %s, %s)', ___resolveIn(c[0]), ___resolveIn(c[1]))
         else throw new NySyntaxException("DATE DIFF function requires exactly two parameters!")
@@ -155,6 +170,56 @@ class MSSqlFunctions implements QFunctions {
             String.format('DATEADD(second, %s, %s)', ___resolveIn(c[1]), ___resolveIn(c[0]))
         } else {
             throw new NySyntaxException('Date add function requires exactly two parameters!')
+        }
+    }
+
+    String date_sub_days(c) {
+        if (c instanceof List) {
+            String.format('DATEADD(day, -%s, %s)', ___resolveIn(c[1]), ___resolveIn(c[0]))
+        } else {
+            throw new NySyntaxException('Date subtract function requires exactly two parameters!')
+        }
+    }
+    String date_sub_months(c) {
+        if (c instanceof List) {
+            String.format('DATEADD(month, -%s, %s)', ___resolveIn(c[1]), ___resolveIn(c[0]))
+        } else {
+            throw new NySyntaxException('Date subtract function requires exactly two parameters!')
+        }
+    }
+    String date_sub_years(c) {
+        if (c instanceof List) {
+            String.format('DATEADD(year, -%s, %s)', ___resolveIn(c[1]), ___resolveIn(c[0]))
+        } else {
+            throw new NySyntaxException('Date subtract function requires exactly two parameters!')
+        }
+    }
+    String date_sub_weeks(c) {
+        if (c instanceof List) {
+            String.format('DATEADD(week, -%s, %s)', ___resolveIn(c[1]), ___resolveIn(c[0]))
+        } else {
+            throw new NySyntaxException('Date subtract function requires exactly two parameters!')
+        }
+    }
+    String date_sub_hours(c) {
+        if (c instanceof List) {
+            String.format('DATEADD(hour, -%s, %s)', ___resolveIn(c[1]), ___resolveIn(c[0]))
+        } else {
+            throw new NySyntaxException('Date subtract function requires exactly two parameters!')
+        }
+    }
+    String date_sub_minutes(c) {
+        if (c instanceof List) {
+            String.format('DATEADD(minute, -%s, %s)', ___resolveIn(c[1]), ___resolveIn(c[0]))
+        } else {
+            throw new NySyntaxException('Date subtract function requires exactly two parameters!')
+        }
+    }
+    String date_sub_seconds(c) {
+        if (c instanceof List) {
+            String.format('DATEADD(second, -%s, %s)', ___resolveIn(c[1]), ___resolveIn(c[0]))
+        } else {
+            throw new NySyntaxException('Date subtract function requires exactly two parameters!')
         }
     }
 }

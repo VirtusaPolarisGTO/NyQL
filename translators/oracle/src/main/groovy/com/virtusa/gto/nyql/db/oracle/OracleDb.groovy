@@ -22,7 +22,7 @@ import com.virtusa.gto.nyql.utils.QueryCombineType
 /**
  * @author IWEERARATHNA
  */
-class OracleDb extends OracleFunctions implements QTranslator {
+abstract class OracleDb extends OracleFunctions implements QTranslator {
 
     static String STR_QUOTE = "'"
 

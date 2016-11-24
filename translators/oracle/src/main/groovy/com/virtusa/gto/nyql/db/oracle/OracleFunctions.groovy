@@ -5,7 +5,7 @@ import com.virtusa.gto.nyql.db.QFunctions
 /**
  * @author IWEERARATHNA
  */
-class OracleFunctions implements QFunctions {
+abstract class OracleFunctions implements QFunctions {
 
     @Override
     String date_trunc(Object it) {

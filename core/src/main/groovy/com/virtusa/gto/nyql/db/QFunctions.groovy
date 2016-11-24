@@ -48,6 +48,32 @@ trait QFunctions {
      */
     @CompileStatic String current_time() { 'CURTIME()' }
 
+    abstract String current_epoch()
+    abstract String epoch_to_date(Object col)
+    abstract String epoch_to_datetime(Object col)
+    abstract String date_diff_years(Object dates)
+    abstract String date_diff_months(Object dates)
+    abstract String date_diff_days(Object dates)
+    abstract String date_diff_weeks(Object dates)
+    abstract String date_diff_hours(Object dates)
+    abstract String date_diff_minutes(Object dates)
+    abstract String date_diff_seconds(Object dates)
+
+    abstract String date_add_days(Object dateBy)
+    abstract String date_add_months(Object dateBy)
+    abstract String date_add_years(Object dateBy)
+    abstract String date_add_weeks(Object dateBy)
+    abstract String date_add_hours(Object dateBy)
+    abstract String date_add_minutes(Object dateBy)
+    abstract String date_add_seconds(Object dateBy)
+    abstract String date_sub_days(Object dateBy)
+    abstract String date_sub_months(Object dateBy)
+    abstract String date_sub_years(Object dateBy)
+    abstract String date_sub_weeks(Object dateBy)
+    abstract String date_sub_hours(Object dateBy)
+    abstract String date_sub_minutes(Object dateBy)
+    abstract String date_sub_seconds(Object dateBy)
+
     /**
      * Returns date part from datetime or timestamp.
      *
