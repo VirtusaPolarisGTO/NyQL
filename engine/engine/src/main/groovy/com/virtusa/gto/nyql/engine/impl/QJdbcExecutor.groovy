@@ -284,7 +284,7 @@ class QJdbcExecutor implements QExecutor {
     }
 
     private PreparedStatement prepareStatement(QScript script, List<AParam> paramList, Map data) {
-        List orderedParams = [] as LinkedList
+        List orderedValues = [] as LinkedList
         String query = script.proxy.query
         int cp = 1
 
@@ -295,7 +295,7 @@ class QJdbcExecutor implements QExecutor {
             if (param instanceof ParamList) {
                 if (itemValue instanceof List) {
                     List itemList = itemValue
-                    itemList.each { orderedParams.add(it) }
+                    itemList.each { orderedValues.add(it) }
                     String pStr = itemList.stream().map { return '?' }.collect(Collectors.joining(', '))
                     if (itemList.isEmpty()) {
                         LOGGER.warn('Empty parameter list received!')
@@ -308,7 +308,7 @@ class QJdbcExecutor implements QExecutor {
                     throw new NyScriptExecutionException("Parameter value of '$param.__name' expected to be a list but given " + itemValue.class.simpleName + '!')
                 }
             } else {
-                orderedParams.add(convertValue(itemValue, param, script))
+                orderedValues.add(convertValue(itemValue, param, script))
                 cp++
             }
         }
@@ -320,7 +320,7 @@ class QJdbcExecutor implements QExecutor {
             statement = getConnection().prepareStatement(query)
         }
         cp = 1
-        for (Object pValue : orderedParams) {
+        for (Object pValue : orderedValues) {
             statement.setObject(cp++, pValue)
         }
         statement
@@ -329,6 +329,10 @@ class QJdbcExecutor implements QExecutor {
     @CompileStatic
     private static Object convertValue(Object value, AParam param, QScript qScript) {
         if (param.__shouldValueConvert()) {
+            if (value == null) {
+                return null
+            }
+
             if (param instanceof ParamTimestamp) {
                 JdbcHelperUtils.convertTimestamp(value, qScript.qSession.configurations, param.__tsFormat)
             } else if (param instanceof ParamDate) {
