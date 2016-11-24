@@ -278,9 +278,6 @@ class QJdbcExecutor implements QExecutor {
         for (int i = 0; i < parameters.size(); i++) {
             AParam param = parameters[i]
             Object itemValue = deriveValue(data, param.__name)
-            if (itemValue == null) {
-                throw new NyException("Data for parameter '$param.__name' cannot be found!")
-            }
 
             statement.setObject(cp++, itemValue)
         }
@@ -358,7 +355,7 @@ class QJdbcExecutor implements QExecutor {
                 res = res."$p"
             }
             if (res == dataMap) {
-                return null
+                throw new NyScriptExecutionException("The dot-notated parameter '$name' creates a circular reference in session!")
             }
             return res
 
