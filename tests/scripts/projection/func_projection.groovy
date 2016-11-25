@@ -171,6 +171,15 @@ def innQP = $DSL.select {
 
     $DSL.select {
         TARGET (Film.alias("f"))
+        FETCH (STR_REPLACE(f.title, STR("w"), STR("www")),
+                STR_REPLACE(f.description, f.title, STR("movie")),
+                STR_REPLACE(f.description, STR("pholder"), f.place))
+    },
+    "SELECT REPLACE(f.title, \"w\", \"www\"), REPLACE(f.description, f.title, \"movie\"), " +
+            "REPLACE(f.description, \"pholder\", f.place) FROM `Film` f"
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
         FETCH (DATE_DIFF_SECONDS(EPOCH_TO_DATETIME(NUM(0)), f.release_date).alias("releaseDate"))
     },
     "SELECT TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(0 / 1000), f.release_date) AS releaseDate FROM `Film` f"

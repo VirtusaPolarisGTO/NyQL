@@ -42,6 +42,14 @@ class MSSqlFunctions implements QFunctions {
     }
 
     @Override
+    String str_replace(Object c) {
+        if (c instanceof List) {
+            return 'REPLACE(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ', ' + ___resolveIn(c[2]) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for string replace function!')
+    }
+
+    @Override
     String date_trunc(Object it) {
         return 'CAST(' + ___resolveIn(it) + ' AS DATE)'
     }

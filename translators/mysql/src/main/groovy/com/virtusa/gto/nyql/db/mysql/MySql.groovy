@@ -164,7 +164,7 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     @CompileStatic
     @Override
-    String ___columnName(final Column column, final QContextType contextType) {
+    String ___columnName(final Column column, final QContextType contextType, List<AParam> paramList) {
         if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY || contextType == QContextType.HAVING) {
             if (column.__aliasDefined()) {
                 return QUtils.quoteIfWS(column.__alias, BACK_TICK)
@@ -172,7 +172,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
 
         if (column instanceof Case) {
-            return ___ifColumn(column, null)
+            return ___ifColumn(column, paramList)
         }
 
         if (contextType == QContextType.INTO || contextType == QContextType.INSERT_PROJECTION) {
@@ -493,7 +493,7 @@ class MySql extends MySqlFunctions implements QTranslator {
                 }
             } else if (c instanceof Column) {
                 appendParamsFromColumn((Column)c, paramList)
-                String cName = ___columnName((Column)c, contextType)
+                String cName = ___columnName((Column)c, contextType, paramList)
                 cols.add(cName)
             } else if (c instanceof String) {
                 cols.add((String)c)

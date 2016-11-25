@@ -115,9 +115,9 @@ class Postgres extends PostgresFunctions implements QTranslator {
     }
 
     @Override
-    String ___columnName(final Column column, final QContextType contextType) {
+    String ___columnName(final Column column, final QContextType contextType, List<AParam> paramList) {
         if (column instanceof Case) {
-            return ___ifColumn(column, null)
+            return ___ifColumn(column, paramList)
         }
 
         if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY) {
