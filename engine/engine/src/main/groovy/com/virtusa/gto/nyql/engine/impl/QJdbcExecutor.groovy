@@ -170,7 +170,7 @@ class QJdbcExecutor implements QExecutor {
             connection.setAutoCommit(false)
 
             List<AParam> parameters = script.proxy.orderedParameters
-            Object batchData = script.qSession.sessionVariables['batch']
+            Object batchData = script.qSession.sessionVariables[JDBCConstants.BATCH_KEY]
             if (batchData == null) {
                 throw new NyScriptExecutionException("No batch data has been specified through session variables 'batch'!")
             } else if (!(batchData instanceof List)) {
@@ -185,7 +185,7 @@ class QJdbcExecutor implements QExecutor {
 
             int[] counts = statement.executeBatch()
             connection.commit()
-            return [count: counts]
+            return new NyQLResult().appendCounts(counts)
 
         } finally {
             if (prevCommitStatus) {
@@ -404,12 +404,7 @@ class QJdbcExecutor implements QExecutor {
     }
 
     private static List<Map> toMap(int count, List keys = null) {
-        List<Map> res = []
-        res.add([count: count])
-        if (QUtils.notNullNorEmpty(keys)) {
-            res.add([keys: keys])
-        }
-        res
+        new NyQLResult().appendCount(count, keys)
     }
 
     @CompileStatic

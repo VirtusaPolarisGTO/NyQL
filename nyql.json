@@ -27,10 +27,10 @@
       "name": "jdbc",
       "factory": "com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory",
 
-      "url": "jdbc:mysql://192.168.99.100/sakila",
+      "url": "jdbc:mysql://localhost/sakila",
       "username": "root",
       "password": "",
-      "passwordEnc": "c2FraWxh",
+      "passwordEnc": "",
 
       "pooling": {
         "impl": "com.virtusa.gto.nyql.engine.pool.impl.QHikariPool",

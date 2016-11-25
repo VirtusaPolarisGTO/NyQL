@@ -25,9 +25,9 @@ def selQ = $DSL.select {
 $DSL.script {
 
     RUN('ddl/createTemp')
-    RUN(selIns)
+    def r2 = RUN(selIns)
+    $LOG r2.affectedCount()
     def r = RUN(selQ)
-    $LOG r
     RUN('ddl/dropTemp')
 
 

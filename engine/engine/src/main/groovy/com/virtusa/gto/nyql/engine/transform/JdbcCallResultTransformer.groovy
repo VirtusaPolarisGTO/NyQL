@@ -13,12 +13,12 @@ import java.sql.Statement
  * @author IWEERARATHNA
  */
 @CompileStatic
-class JdbcCallResultTransformer implements QResultTransformer<JdbcCallTransformInput, Map> {
+class JdbcCallResultTransformer implements QResultTransformer<JdbcCallTransformInput, List<Map<String, Object>>> {
 
     private final JdbcResultTransformer rsTransformer = new JdbcResultTransformer()
 
     @Override
-    Map apply(JdbcCallTransformInput input) {
+    List<Map<String, Object>> apply(JdbcCallTransformInput input) {
         Statement statement = input.statement
         boolean hasResults = statement.execute()
         List rsList = []
@@ -41,13 +41,15 @@ class JdbcCallResultTransformer implements QResultTransformer<JdbcCallTransformI
             }
         }
 
+        List fResult = [] as LinkedList
         if (rsList.isEmpty()) {
-            [outs: op, result: null]
+            fResult.add([outs: op, result: null])
         } else if (rsList.size() == 1) {
-            [outs: op, result: rsList[0]]
+            fResult.add([outs: op, result: rsList[0]])
         } else {
-            [outs: op, result: rsList]
+            fResult.add([outs: op, result: rsList])
         }
+        fResult
     }
 
     @Override
