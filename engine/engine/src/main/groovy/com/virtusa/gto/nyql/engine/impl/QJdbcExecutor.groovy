@@ -77,7 +77,14 @@ class QJdbcExecutor implements QExecutor {
     }
 
     @CompileStatic
-    private static void logScript(QScript script) {
+    private static void logScript(QScript script) throws NyScriptExecutionException {
+        if (script.proxy.query == null) {
+            throw new NyScriptExecutionException(QUtils.generateErrStr(
+                    'Generated query for execution is empty! [SCRIPT: ' + script.id + ']',
+                    'Did you accidentally set cache true to this script?',
+                    'Did you happen to send incorrect data variables to the script?'))
+        }
+
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" +
                     script.proxy.query.trim())
@@ -156,8 +163,10 @@ class QJdbcExecutor implements QExecutor {
     private def batchExecute(QScript script) throws Exception {
         LOGGER.debug('Executing as batch...')
         PreparedStatement statement = null
+        boolean prevCommitStatus = true
         try {
             statement = getConnection().prepareStatement(script.proxy.query)
+            prevCommitStatus = connection.getAutoCommit()
             connection.setAutoCommit(false)
 
             List<AParam> parameters = script.proxy.orderedParameters
@@ -179,7 +188,9 @@ class QJdbcExecutor implements QExecutor {
             return [count: counts]
 
         } finally {
-            connection.setAutoCommit(true)
+            if (prevCommitStatus) {
+                connection.setAutoCommit(true)
+            }
 
             if (statement != null) {
                 statement.close()
@@ -267,16 +278,13 @@ class QJdbcExecutor implements QExecutor {
         for (int i = 0; i < parameters.size(); i++) {
             AParam param = parameters[i]
             Object itemValue = deriveValue(data, param.__name)
-            if (itemValue == null) {
-                throw new NyException("Data for parameter '$param.__name' cannot be found!")
-            }
 
             statement.setObject(cp++, itemValue)
         }
     }
 
     private PreparedStatement prepareStatement(QScript script, List<AParam> paramList, Map data) {
-        List orderedParams = [] as LinkedList
+        List orderedValues = [] as LinkedList
         String query = script.proxy.query
         int cp = 1
 
@@ -287,7 +295,7 @@ class QJdbcExecutor implements QExecutor {
             if (param instanceof ParamList) {
                 if (itemValue instanceof List) {
                     List itemList = itemValue
-                    itemList.each { orderedParams.add(it) }
+                    itemList.each { orderedValues.add(it) }
                     String pStr = itemList.stream().map { return '?' }.collect(Collectors.joining(', '))
                     if (itemList.isEmpty()) {
                         LOGGER.warn('Empty parameter list received!')
@@ -300,7 +308,7 @@ class QJdbcExecutor implements QExecutor {
                     throw new NyScriptExecutionException("Parameter value of '$param.__name' expected to be a list but given " + itemValue.class.simpleName + '!')
                 }
             } else {
-                orderedParams.add(convertValue(itemValue, param, script))
+                orderedValues.add(convertValue(itemValue, param, script))
                 cp++
             }
         }
@@ -312,7 +320,7 @@ class QJdbcExecutor implements QExecutor {
             statement = getConnection().prepareStatement(query)
         }
         cp = 1
-        for (Object pValue : orderedParams) {
+        for (Object pValue : orderedValues) {
             statement.setObject(cp++, pValue)
         }
         statement
@@ -321,6 +329,10 @@ class QJdbcExecutor implements QExecutor {
     @CompileStatic
     private static Object convertValue(Object value, AParam param, QScript qScript) {
         if (param.__shouldValueConvert()) {
+            if (value == null) {
+                return null
+            }
+
             if (param instanceof ParamTimestamp) {
                 JdbcHelperUtils.convertTimestamp(value, qScript.qSession.configurations, param.__tsFormat)
             } else if (param instanceof ParamDate) {
@@ -347,7 +359,7 @@ class QJdbcExecutor implements QExecutor {
                 res = res."$p"
             }
             if (res == dataMap) {
-                return null
+                throw new NyScriptExecutionException("The dot-notated parameter '$name' creates a circular reference in session!")
             }
             return res
 

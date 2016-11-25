@@ -22,6 +22,14 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
     @CompileStatic String date_trunc(c) { String.format("DATE_TRUNC('day', %s)", ___resolveIn(c)) }
 
     @Override
+    String str_replace(Object c) {
+        if (c instanceof List) {
+            return 'replace(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ', ' + ___resolveIn(c[2]) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for string replace function!')
+    }
+
+    @Override
     String substr(Object c) {
         if (c instanceof List) {
             'SUBSTRING(' + ___resolveIn(c[0]) + ', FROM ' + ___resolveIn(c[1]) +

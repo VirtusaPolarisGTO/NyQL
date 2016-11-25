@@ -114,9 +114,10 @@ trait QTranslator extends QJoins {
      *
      * @param column column instance.
      * @param contextType context type.
+     * @param paramList parameter list.
      * @return string representation of the column.
      */
-    abstract String ___columnName(Column column, QContextType contextType, List<AParam> paramList = null)
+    abstract String ___columnName(Column column, QContextType contextType, List<AParam> paramList)
 
     /**
      * Generate a query part which could be reusable among other queries.

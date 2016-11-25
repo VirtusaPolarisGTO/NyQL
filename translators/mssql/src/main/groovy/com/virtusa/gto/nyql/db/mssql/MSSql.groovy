@@ -150,7 +150,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
         }
 
         if (column instanceof Case) {
-            return ___ifColumn(column, null)
+            return ___ifColumn(column, paramList)
         }
 
         if (contextType == QContextType.INTO || contextType == QContextType.INSERT_PROJECTION) {

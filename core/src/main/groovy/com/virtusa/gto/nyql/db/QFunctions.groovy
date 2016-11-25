@@ -193,6 +193,14 @@ trait QFunctions {
     }
 
     /**
+     * Returns string replacement function.
+     *
+     * @param c inputs required for string.
+     * @return string representation of replace function.
+     */
+    @CompileStatic abstract String str_replace(c)
+
+    /**
      * Returns substring of the given string starting from start position and length.
      *
      * @param c input column to substring.

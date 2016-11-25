@@ -17,6 +17,14 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
 
     @CompileStatic
     @Override
+    String str_replace(Object c) {
+        if (c instanceof List) {
+            return 'REPLACE(' + ___resolveIn(c.get(0)) + ', ' + ___resolveIn(c.get(1)) + ', ' + ___resolveIn(c.get(2)) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for string replace function!')
+    }
+
+    @Override
     String substr(Object c) {
         if (c instanceof List) {
             return 'SUBSTRING(' + ___resolveIn(c.get(0)) + ', ' + ___resolveIn(c.get(1)) +
