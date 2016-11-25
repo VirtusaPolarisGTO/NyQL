@@ -136,7 +136,6 @@ class DSL {
 
     QResultProxy bulkInsert(@DelegatesTo(value = QueryInsert, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         QueryInsert qs = new QueryInsert(createContext())
-        //Object qs = assignTraits(queryInsert)
 
         def code = closure.rehydrate(qs, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -144,6 +143,18 @@ class DSL {
 
         QResultProxy proxy = qs._ctx.translator.___insertQuery(qs)
         proxy.setQueryType(QueryType.BULK_INSERT)
+        proxy
+    }
+
+    QResultProxy bulkUpdate(@DelegatesTo(value = QueryInsert, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QueryUpdate qs = new QueryUpdate(createContext())
+
+        def code = closure.rehydrate(qs, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        QResultProxy proxy = qs._ctx.translator.___updateQuery(qs)
+        proxy.setQueryType(QueryType.BULK_UPDATE)
         proxy
     }
 

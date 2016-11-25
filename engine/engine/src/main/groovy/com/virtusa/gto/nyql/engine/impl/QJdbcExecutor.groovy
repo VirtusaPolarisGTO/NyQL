@@ -98,7 +98,7 @@ class QJdbcExecutor implements QExecutor {
 
         logScript(script)
 
-        if (script.proxy.queryType == QueryType.BULK_INSERT) {
+        if (script.proxy.queryType == QueryType.BULK_INSERT || script.proxy.queryType == QueryType.BULK_UPDATE) {
             return batchExecute(script)
         }
 

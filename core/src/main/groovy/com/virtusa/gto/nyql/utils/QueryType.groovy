@@ -24,6 +24,11 @@ enum QueryType {
     BULK_INSERT,
 
     /**
+     * Bulk update query.
+     */
+    BULK_UPDATE,
+
+    /**
      * Update query.
      */
     UPDATE,
