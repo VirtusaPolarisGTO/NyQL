@@ -52,7 +52,7 @@ class OracleDb extends OracleFunctions implements QTranslator {
     }
 
     @Override
-    String ___columnName(Column column, QContextType contextType) {
+    String ___columnName(Column column, QContextType contextType, List<AParam> paramList) {
         return null
     }
 

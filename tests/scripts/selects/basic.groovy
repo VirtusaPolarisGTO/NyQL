@@ -45,5 +45,17 @@
             }
         },
         "SELECT f.rental_duration, COUNT(*) AS total FROM `Film` f GROUP BY f.rental_duration " +
-                "HAVING total > 200"
+                "HAVING total > 200",
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            FETCH (CASE {WHEN { EQ (f.count, PARAM("total")) }
+                THEN { BOOLEAN(true) }
+                ELSE { BOOLEAN(false) }})
+            WHERE {
+                EQ (f.count, PARAM("total"))
+            }
+        },
+        ["SELECT CASE WHEN f.count = ? THEN 1 ELSE 0 END FROM `Film` f WHERE f.count = ?", ["total", "total"]]
+
 ]
