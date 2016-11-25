@@ -1,12 +1,12 @@
 package com.virtusa.gto.nyql.engine.exceptions
 
 import com.virtusa.gto.nyql.exceptions.NyException
-import groovy.transform.InheritConstructors
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
-@InheritConstructors
+@CompileStatic
 class NyScriptParseException extends NyException {
 
     NyScriptParseException(String scriptId, File file, Throwable inner) {

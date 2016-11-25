@@ -1,10 +1,14 @@
 package com.virtusa.gto.nyql.exceptions
 
-import groovy.transform.InheritConstructors
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
-@InheritConstructors
+@CompileStatic
 class NySyntaxException extends NyException {
+
+    NySyntaxException(String message) {
+        super(message)
+    }
 }

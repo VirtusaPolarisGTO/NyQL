@@ -1,11 +1,11 @@
 package com.virtusa.gto.nyql.exceptions
 
-import groovy.transform.InheritConstructors
+import groovy.transform.CompileStatic
 
 /**
  * @author IWEERARATHNA
  */
-@InheritConstructors
+@CompileStatic
 class NyScriptNotFoundException extends NyException {
 
     NyScriptNotFoundException(String scriptId) {
