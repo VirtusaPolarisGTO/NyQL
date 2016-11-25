@@ -21,7 +21,7 @@ class MySqlFunctions implements QFunctions {
     @Override
     String str_replace(Object c) {
         if (c instanceof List) {
-            return 'REPLACE(' + ___resolveIn(c[0]) + ', ' + ___resolveIn(c[1]) + ', ' + ___resolveIn(c[2]) + ')'
+            return 'REPLACE(' + ___resolveIn(c.get(0)) + ', ' + ___resolveIn(c.get(1)) + ', ' + ___resolveIn(c.get(2)) + ')'
         }
         throw new NyException('Incorrect number of parameters for string replace function!')
     }

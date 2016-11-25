@@ -176,7 +176,7 @@ def innQP = $DSL.select {
                 STR_REPLACE(f.description, STR("pholder"), f.place))
     },
     "SELECT REPLACE(f.title, \"w\", \"www\"), REPLACE(f.description, f.title, \"movie\"), " +
-            "REPLACE(f.description, \"pholder\", f.place) FROM `Film` f"
+            "REPLACE(f.description, \"pholder\", f.place) FROM `Film` f",
 
     $DSL.select {
         TARGET (Film.alias("f"))
