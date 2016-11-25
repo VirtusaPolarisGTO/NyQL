@@ -12,7 +12,6 @@ import com.virtusa.gto.nyql.model.units.NamedParam
 import groovy.transform.CompileStatic
 
 import java.util.function.Function
-
 /**
  * @author Isuru Weerarathna
  */
@@ -24,7 +23,6 @@ final class QUtils {
     private static final String OP = '('
     private static final String CP = ')'
 
-    @CompileStatic
     static QContextType findDeleteContext(QContextType contextType) {
         if (contextType == QContextType.DELETE_CONDITIONAL || contextType == QContextType.DELETE_CONDITIONAL_JOIN) {
             contextType

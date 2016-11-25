@@ -33,10 +33,11 @@ final class ConfigKeys {
 
     static final List<String> DEFAULT_EXTENSIONS = Collections.unmodifiableList(['groovy', 'sgroovy'])
 
-    static final String SYS_JDBC_URL = 'com.virtusa.gto.nyql.JDBC_URL'
-    static final String SYS_JDBC_USERNAME = 'com.virtusa.gto.nyql.JDBC_USERNAME'
-    static final String SYS_JDBC_PASSWORD = 'com.virtusa.gto.nyql.JDBC_PASSWORD'
-    static final String SYS_JDBC_DRIVER = 'com.virtusa.gto.nyql.JDBC_DRIVER'
-    static final String SYS_ACTIVE_DB = 'com.virtusa.gto.nyql.ACTIVE_DB'
+    static final String SYS_JDBC_URL = 'NYQL_JDBC_URL'
+    static final String SYS_JDBC_USERNAME = 'NYQL_JDBC_USERNAME'
+    static final String SYS_JDBC_PASSWORD = 'NYQL_JDBC_PASSWORD'
+    static final String SYS_JDBC_PASSWORD_ENC = 'NYQL_JDBC_PASSWORD_ENC'
+    static final String SYS_JDBC_DRIVER = 'NYQL_JDBC_DRIVER'
+    static final String SYS_ACTIVE_DB = 'NYQL_ACTIVE_DB'
 
 }

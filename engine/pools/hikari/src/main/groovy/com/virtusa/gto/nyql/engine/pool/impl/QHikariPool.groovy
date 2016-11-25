@@ -8,6 +8,7 @@ import com.zaxxer.hikari.HikariDataSource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.nio.charset.StandardCharsets
 import java.sql.Connection
 
 /**
@@ -42,7 +43,19 @@ class QHikariPool implements QJdbcPool {
         }
         config.setJdbcUrl(System.getProperty(ConfigKeys.SYS_JDBC_URL, String.valueOf(options.url)))
         config.setUsername(System.getProperty(ConfigKeys.SYS_JDBC_USERNAME, String.valueOf(options.username)))
-        config.setPassword(System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD, String.valueOf(options.password)))
+
+        // read password correctly
+        if (System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD_ENC) != null) {
+            config.setPassword(new String(Base64.decoder.decode(System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD_ENC)),
+                    StandardCharsets.UTF_8))
+        } else if (System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD) != null) {
+            config.setPassword(System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD))
+        } else if (options.passwordEnc) {
+            config.setPassword(new String(Base64.decoder.decode(String.valueOf(options.passwordEnc)), StandardCharsets.UTF_8))
+        } else {
+            config.setPassword(String.valueOf(options.password))
+        }
+
         config.setPoolName(DEF_POOL_NAME)
 
         LOGGER.debug('JDBC Hikari Pool Configurations:')
