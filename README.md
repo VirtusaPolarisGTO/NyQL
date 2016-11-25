@@ -1,6 +1,7 @@
 # NyQL
 
-A common query DSL for popular relational databases.
+A common query DSL for popular relational databases. 
+Currently this supports `mysql` only, but `postgres`, `mssql` and `oracle` is pending.
 
 #### Terminology:
 * `Query Repository`: A folder containing all your query scripts and responsible of parsing a nyql query and generate a native query for the activated database.
@@ -95,11 +96,24 @@ If you want to turn it off, add a system property `com.virtusa.gto.nyql.autoBoot
       * **url**: JDBC url
       * **username**: database username
       * **password**: database password
+      * **passwordEnc**: encoded database password in base64
       * **pooling**: NyQL uses HikariCP for JDBC connection pooling. And you can specify those configurations here as a JSON object. See their [site](https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby) for available configurations
     * **profiling**: Enables query profiling at runtime and emits time taken for every query invocation.
       * **enabled**: `true/false` enable/disable profiling
       * **profiler**: full class name for the profiler to activate.
       * **options**: a set of options for the profiler.
+
+#### Configuration Values as Runtime Properties
+
+NyQL allows specifying configuration values through environment variables using `-D` option incase if you are
+expecting to execute in cloud environments or secure environments. Below shows the supported configurations.
+
+  * **NYQL_ACTIVE_DB**: the database implementation to activate. (_activate_ property in json)
+  * **NYQL_JDBC_URL**: JDBC url. 
+  * **NYQL_JDBC_USERNAME**: database username.
+  * **NYQL_JDBC_PASSWORD**: database password in plaintext.
+  * **NYQL_JDBC_PASSWORD_ENC**: base64 encoded database password.
+  * **NYQL_JDBC_DRIVER**: driver class name of the jdbc driver.
 
 3. There are two ways of configuring and running NyQL from a java application.
   * __Per-process configuration__: Use this method if you are absolutely sure that you use only one instance of NyQL in the 
