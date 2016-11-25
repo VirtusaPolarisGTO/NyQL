@@ -81,19 +81,9 @@ class Configurations {
             profiler.start(profOptions)
         }
 
-        def factoryClasses = getAvailableTranslators()
-        if (QUtils.notNullNorEmpty(factoryClasses)) {
-            factoryClasses.each { loadDBFactory it }
-        }
-
         // mark active database
         String activeDb = System.getProperty(ConfigKeys.SYS_ACTIVE_DB, getActivatedDb())
-        if (activeDb != null) {
-            LOGGER.debug("Activating DB: $activeDb")
-            databaseRegistry.load(activeDb)
-        } else {
-            throw new NyException('No database has been activated!')
-        }
+        loadActivatedTranslator(activeDb)
 
         // load repositories
         loadRepos(profileEnabled)
@@ -103,6 +93,31 @@ class Configurations {
 
         // finally, initialize factory
         databaseRegistry.getDbFactory(activeDb).init(this)
+    }
+
+    private void loadActivatedTranslator(String activeDb) {
+        if (activeDb == null) {
+            throw new NyConfigurationException('No database has been specified to be activated!')
+        }
+
+        def factoryClasses = getAvailableTranslators()
+        if (QUtils.notNullNorEmpty(factoryClasses)) {
+            Exception firstEx = null
+            for (def tr : factoryClasses) {
+                try {
+                    loadDBFactory(tr)
+                } catch (ReflectiveOperationException ex) {
+                    LOGGER.error(ex.getMessage())
+                    if (firstEx == null) {
+                        firstEx = ex
+                    }
+                }
+            }
+            databaseRegistry.load(activeDb)
+
+        } else {
+            throw new NyConfigurationException('No NyQL translators have been specified in the configuration file!')
+        }
     }
 
     @CompileStatic
@@ -226,10 +241,6 @@ class Configurations {
 
     private void loadDBFactory(QDbFactory qDbFactory) {
         databaseRegistry.register(qDbFactory)
-    }
-
-    boolean addShutdownHook() {
-        return properties.addAutoShutdownHook ?: false
     }
 
     void shutdown() {
