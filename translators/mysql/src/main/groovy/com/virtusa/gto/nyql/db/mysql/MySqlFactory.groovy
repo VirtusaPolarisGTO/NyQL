@@ -3,8 +3,8 @@ package com.virtusa.gto.nyql.db.mysql
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.db.QTranslator
+import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
-
 /**
  * MySQL factory responsible of creating translator instances.
  *
@@ -18,11 +18,23 @@ class MySqlFactory implements QDbFactory {
     private static final String DB_NAME = 'mysql'
     private static final String DATA_SOURCE_CLASS_NAME = 'com.mysql.jdbc.jdbc2.optional.MysqlDataSource'
     private static final String JDBC_CLASS_NAME = 'com.mysql.jdbc.Driver'
-    private final MySql mySql = new MySql()
+    private MySql mySql
 
     @Override
     void init(Configurations nyConfigs) throws NyConfigurationException {
-        // nothing to pre-configure mysql
+        // load all keywords
+        mySql = new MySql(loadKeywords(nyConfigs))
+    }
+
+
+    private static Set<String> loadKeywords(Configurations nyConfigs) {
+        Map props = nyConfigs.getAllProperties()
+        String loc = props.get('queries')?.get('keywordsPath')
+        File file = null
+        if (loc != null) {
+            file = new File(new File(String.valueOf(props.get('_location'))), loc)
+        }
+        return SqlMisc.loadKeywords('com/virtusa/gto/nyql/db/mysql/keywords.json', file)
     }
 
     /**

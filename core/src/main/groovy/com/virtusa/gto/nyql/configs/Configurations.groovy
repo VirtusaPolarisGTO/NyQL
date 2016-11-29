@@ -296,6 +296,10 @@ class Configurations {
         properties.supportedExtensions ?: ConfigKeys.DEFAULT_EXTENSIONS
     }
 
+    Map getAllProperties() {
+        properties
+    }
+
     QProfiling getProfiler() {
         profiler
     }

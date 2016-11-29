@@ -163,4 +163,13 @@
     [
         mysql: "SELECT ac.name AS nameOne, ac.name AS nameTwo FROM `Actor` ac"
     ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (ac.name.alias("user"), ac.year.alias("release"))
+        ORDER_BY (DESC(user))
+    },
+    [
+            mysql: "SELECT ac.name AS `user`, ac.year AS `release` FROM `Actor` ac ORDER BY `user` DESC"
+    ],
 ]

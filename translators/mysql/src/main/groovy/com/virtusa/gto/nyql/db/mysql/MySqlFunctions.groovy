@@ -11,6 +11,14 @@ import groovy.transform.CompileStatic
  */
 abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunctions {
 
+    protected MySqlFunctions() {
+        super()
+    }
+
+    protected MySqlFunctions(Collection<String> theKeywords) {
+        super(theKeywords)
+    }
+
     @CompileStatic
     @Override
     String date_trunc(it) { String.format('DATE(%s)', ___resolveIn(it)) }

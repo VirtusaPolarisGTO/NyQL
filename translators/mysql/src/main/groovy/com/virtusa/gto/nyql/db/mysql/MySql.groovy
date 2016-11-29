@@ -35,9 +35,9 @@ class MySql extends MySqlFunctions implements QTranslator {
     private static final String COMMA = ', '
     static final String OP = '('
     static final String CP = ')'
-    private static final String _AS_ = ' AS '
 
-    MySql() {}
+    MySql() { super() }
+    MySql(Collection<String> theKeywords) { super(theKeywords) }
 
     @CompileStatic
     @Override
@@ -51,9 +51,10 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append(___resolve(whenCondition._theResult, QContextType.SELECT, paramOrder))
             query.append(CP)
 
-            if (aCaseCol.__aliasDefined()) {
-                query.append(_AS_).append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
-            }
+            query.append(columnAliasAs(aCaseCol, BACK_TICK))
+//            if (aCaseCol.__aliasDefined()) {
+//                query.append(_AS_).append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
+//            }
             return query.toString()
 
         } else {
@@ -69,9 +70,10 @@ class MySql extends MySqlFunctions implements QTranslator {
             }
             query.append(' END')
 
-            if (aCaseCol.__aliasDefined()) {
-                query.append(_AS_).append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
-            }
+            query.append(columnAliasAs(aCaseCol, BACK_TICK))
+//            if (aCaseCol.__aliasDefined()) {
+//                query.append(_AS_).append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
+//            }
             return query.toString()
         }
     }
@@ -101,18 +103,18 @@ class MySql extends MySqlFunctions implements QTranslator {
                 || contextType == QContextType.DELETE_JOIN) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
-                return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + table.__alias : '')
+                return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + tableAlias(table, BACK_TICK) : '')
             }
-            return QUtils.quote(table.__name, BACK_TICK) + (table.__aliasDefined() ? ' ' + table.__alias : '')
+            return QUtils.quote(table.__name, BACK_TICK) + (table.__aliasDefined() ? ' ' + tableAlias(table, BACK_TICK) : '')
         } else if (contextType == QContextType.SELECT || contextType == QContextType.INSERT_DATA || contextType == QContextType.UPDATE_SET) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
-                return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? _AS_ + table.__alias : '')
+                return QUtils.parenthesis(proxy.query.trim()) + tableAliasAs(table, BACK_TICK)
             }
         }
 
         if (table.__aliasDefined()) {
-            return table.__alias
+            return tableAlias(table, BACK_TICK)
         } else {
             return QUtils.quote(table.__name, BACK_TICK)
         }
@@ -148,7 +150,7 @@ class MySql extends MySqlFunctions implements QTranslator {
     String ___columnName(final Column column, final QContextType contextType, List<AParam> paramList) {
         if (contextType == QContextType.ORDER_BY || contextType == QContextType.GROUP_BY || contextType == QContextType.HAVING) {
             if (column.__aliasDefined()) {
-                return QUtils.quoteIfWS(column.__alias, BACK_TICK)
+                return columnAlias(column, BACK_TICK)
             }
         }
 
@@ -162,7 +164,7 @@ class MySql extends MySqlFunctions implements QTranslator {
 
         if (contextType == QContextType.DELETE_CONDITIONAL_JOIN) {
             if (column._owner.__aliasDefined()) {
-                return QUtils.quoteIfWS(column._owner.__alias, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
+                return tableAlias(column._owner, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
             }
             return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
         } else if (contextType == QContextType.DELETE_CONDITIONAL) {
@@ -171,17 +173,15 @@ class MySql extends MySqlFunctions implements QTranslator {
 
         if (column instanceof FunctionColumn) {
             return String.valueOf(this.invokeMethod(column._func, column._setOfCols ? column._columns : column._wrapper)) +
-                    (column.__aliasDefined() ? _AS_ + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
+                    columnAliasAs(column, BACK_TICK)
         } else {
             boolean tableHasAlias = column._owner != null && column._owner.__aliasDefined()
             if (tableHasAlias) {
-                return column._owner.__alias + "." + column.__name +
-                        (column.__aliasDefined() && contextType == QContextType.SELECT ?
-                                _AS_ + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
+                return tableAlias(column._owner, BACK_TICK) + "." + column.__name +
+                        (column.__aliasDefined() && contextType == QContextType.SELECT ? columnAliasAs(column, BACK_TICK) : '')
             } else {
                 return QUtils.quoteIfWS(column.__name, BACK_TICK) +
-                        (column.__aliasDefined() && contextType == QContextType.SELECT ?
-                                _AS_ + QUtils.quoteIfWS(column.__alias, BACK_TICK) : '')
+                        (column.__aliasDefined() && contextType == QContextType.SELECT ? columnAliasAs(column, BACK_TICK) : '')
             }
         }
     }

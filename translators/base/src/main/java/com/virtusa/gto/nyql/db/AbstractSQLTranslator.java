@@ -7,15 +7,67 @@ import com.virtusa.gto.nyql.utils.QOperator;
 import com.virtusa.gto.nyql.utils.QUtils;
 import com.virtusa.gto.nyql.utils.QueryType;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author IWEERARATHNA
  */
 public abstract class AbstractSQLTranslator implements QTranslator {
+
+    private static final String EMPTY = "";
+
+    private final Collection<String> keywords;
+
+    private static final String _AS_ = " AS ";
+
+    protected AbstractSQLTranslator() {
+        keywords = new HashSet<>();
+    }
+
+    protected AbstractSQLTranslator(Collection<String> theKeywords) {
+        keywords = theKeywords;
+    }
+
+    protected String tableAlias(Table table, String qChar) {
+        if (table.__aliasDefined()) {
+            return (keywords.contains(table.get__alias().toUpperCase(Locale.getDefault()))
+                    ? QUtils.quote(table.get__alias(), qChar)
+                    : QUtils.quoteIfWS(table.get__alias(), qChar));
+        } else {
+            return EMPTY;
+        }
+    }
+
+    protected String tableAliasAs(Table table, String qChar) {
+        if (table.__aliasDefined()) {
+            return _AS_ + (keywords.contains(table.get__alias().toUpperCase(Locale.getDefault()))
+                            ? QUtils.quote(table.get__alias(), qChar)
+                            : QUtils.quoteIfWS(table.get__alias(), qChar));
+        } else {
+            return EMPTY;
+        }
+    }
+
+    protected String columnAlias(Column column, String qChar) {
+        if (column.__aliasDefined()) {
+            return (keywords.contains(column.get__alias().toUpperCase(Locale.getDefault()))
+                    ? QUtils.quote(column.get__alias(), qChar)
+                    : QUtils.quoteIfWS(column.get__alias(), qChar));
+        } else {
+            return EMPTY;
+        }
+    }
+
+    protected String columnAliasAs(Column column, String qChar) {
+        if (column.__aliasDefined()) {
+            return _AS_ + (keywords.contains(column.get__alias().toUpperCase(Locale.getDefault()))
+                        ? QUtils.quote(column.get__alias(), qChar)
+                        : QUtils.quoteIfWS(column.get__alias(), qChar));
+        } else {
+            return EMPTY;
+        }
+    }
 
     @Override
     public QResultProxy ___partQuery(QueryPart q) throws NyException {
