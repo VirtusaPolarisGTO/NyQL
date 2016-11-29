@@ -44,6 +44,60 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
     }
 
     /**
+     * In-place convert all column values to a boolean column, so user
+     * does not need to convert it again and again for each individual
+     * values.
+     *
+     * @param column column to convert to bool.
+     * @return this mutated instance.
+     */
+    @CompileStatic
+    NyQLResult mutateToBool(String column) {
+        if (!isEmpty()) {
+            for (Map<String, Object> row : this) {
+                row.put(column, toBool(row.get(column)))
+            }
+        }
+        this
+    }
+
+    /**
+     * In-place convert all values in the given column to a integer column, so user
+     * does not need to convert it again and again for each individual
+     * values.
+     *
+     * @param column column to convert to integers.
+     * @return this mutated instance.
+     */
+    @CompileStatic
+    NyQLResult mutateToInt(String column) {
+        if (!isEmpty()) {
+            for (Map<String, Object> row : this) {
+                row.put(column, toInt(row.get(column)))
+            }
+        }
+        this
+    }
+
+    /**
+     * In-place convert all values in the given column to a double values, so user
+     * does not need to convert it again and again for each individual
+     * values.
+     *
+     * @param column column to convert to integers.
+     * @return this mutated instance.
+     */
+    @CompileStatic
+    NyQLResult mutateToDouble(String column) {
+        if (!isEmpty()) {
+            for (Map<String, Object> row : this) {
+                row.put(column, toDouble(row.get(column)))
+            }
+        }
+        this
+    }
+
+    /**
      * Returns the column value as a boolean. If value is NULL, then return value will be null
      * as well.
      *
@@ -55,23 +109,49 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
     Boolean asBool(int index, String column) {
         Map<String, Object> record = get(index)
         if (record.containsKey(column)) {
-            def val = record.get(column)
-            if (val == null) {
-                null
-            } else if (val instanceof Number) {
-                ((Number) val).compareTo(0) != 0
-            } else {
-                String tx = String.valueOf(val)
-                TRUE.equalsIgnoreCase(tx) || PG_T.equalsIgnoreCase(tx) || YES.equalsIgnoreCase(tx)
-            }
+            toBool(record.get(column))
         } else {
             throw new NyException("The requested column '$column' does not exist in the specified record index at '$index'!")
         }
     }
 
     @CompileStatic
+    private static toBool(Object val) {
+        if (val == null) {
+            null
+        } else if (val instanceof Number) {
+            ((Number) val).compareTo(0) != 0
+        } else {
+            String tx = String.valueOf(val)
+            TRUE.equalsIgnoreCase(tx) || PG_T.equalsIgnoreCase(tx) || YES.equalsIgnoreCase(tx)
+        }
+    }
+
+    @CompileStatic
+    private static toInt(Object val) {
+        if (val == null) {
+            null
+        } else if (val instanceof Number) {
+            ((Number) val).intValue()
+        } else {
+            Integer.parseInt(String.valueOf(val))
+        }
+    }
+
+    @CompileStatic
+    private static toDouble(Object val) {
+        if (val == null) {
+            null
+        } else if (val instanceof Number) {
+            ((Number) val).doubleValue()
+        } else {
+            Double.parseDouble(String.valueOf(val))
+        }
+    }
+
+    @CompileStatic
     String asString(int index, String column) {
-        (String) cellValue(index, column)
+        (String) getField(index, column)
     }
 
     /**
@@ -82,8 +162,8 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
      * @return cell value as object. Returns null if no column is found.
      */
     @CompileStatic
-    Object cellValue(int index, String column) {
-        cellValue(index, column, null)
+    Object getField(int index, String column) {
+        getField(index, column, null)
     }
 
     /**
@@ -98,9 +178,15 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
      * @return cell value as object. Returns null if no column is found.
      */
     @CompileStatic
-    Object cellValue(int index, String column, Object defValue) {
+    Object getField(int index, String column, Object defValue) {
         get(index).getOrDefault(column, defValue)
     }
+
+    /* **************************************************************************************************
+     *
+     * BELOW METHODS SHOULD NOT BE CALLED BY USER. THOSE ARE FOR EXECUTORS TO APPEND DATA.
+     *
+     *************************************************************************************************** */
 
     @PackageScope
     NyQLResult appendCount(int count) {
