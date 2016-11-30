@@ -16,6 +16,14 @@ import java.time.format.DateTimeFormatter
 @PackageScope
 class JdbcHelperUtils {
 
+    /**
+     * Given parameter value will be converted into jdbc compatible timestamp.
+     *
+     * @param value parameter value.
+     * @param configurations nyql configuration instance to be used when parsing.
+     * @param tsFormat timestamp custom format.
+     * @return new timestamp instance corresponding to the given value.
+     */
     @SuppressWarnings('InstanceOf')
     static Timestamp convertTimestamp(Object value, Configurations configurations, String tsFormat = null) {
         if (value instanceof Long) {
@@ -29,6 +37,12 @@ class JdbcHelperUtils {
         }
     }
 
+    /**
+     * Given parameter value will be converted into jdbc compatible date instance.
+     *
+     * @param value parameter value.
+     * @return new date instance corresponding to the given value.
+     */
     static Date convertToDate(String value) {
         Date.valueOf(value)
     }

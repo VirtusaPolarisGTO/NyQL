@@ -52,9 +52,6 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append(CP)
 
             query.append(columnAliasAs(aCaseCol, BACK_TICK))
-//            if (aCaseCol.__aliasDefined()) {
-//                query.append(_AS_).append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
-//            }
             return query.toString()
 
         } else {
@@ -71,9 +68,6 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append(' END')
 
             query.append(columnAliasAs(aCaseCol, BACK_TICK))
-//            if (aCaseCol.__aliasDefined()) {
-//                query.append(_AS_).append(QUtils.quoteIfWS(aCaseCol.__alias, BACK_TICK))
-//            }
             return query.toString()
         }
     }

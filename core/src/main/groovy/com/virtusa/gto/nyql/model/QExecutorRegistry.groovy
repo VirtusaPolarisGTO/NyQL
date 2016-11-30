@@ -1,14 +1,10 @@
 package com.virtusa.gto.nyql.model
 
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
-
 /**
  * @author IWEERARATHNA
  */
 final class QExecutorRegistry {
-
-    private DateTimeFormatter tsFormatter = DateTimeFormatter.ISO_INSTANT
 
     private final Map<String, QExecutorFactory> registry = new ConcurrentHashMap<>()
     private QExecutorFactory defExec = null
@@ -31,14 +27,6 @@ final class QExecutorRegistry {
         registry.values().each {
             it.shutdown()
         }
-    }
-
-    DateTimeFormatter getTsFormatter() {
-        tsFormatter
-    }
-
-    void setTsFormatter(DateTimeFormatter tsFormatter) {
-        this.tsFormatter = tsFormatter
     }
 
     static QExecutorRegistry newInstance() {

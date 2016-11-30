@@ -18,6 +18,7 @@ class MySqlFactory implements QDbFactory {
     private static final String DB_NAME = 'mysql'
     private static final String DATA_SOURCE_CLASS_NAME = 'com.mysql.jdbc.jdbc2.optional.MysqlDataSource'
     private static final String JDBC_CLASS_NAME = 'com.mysql.jdbc.Driver'
+    private static final String MYSQL_KEYWORD_LOCATION = 'com/virtusa/gto/nyql/db/mysql/keywords.json'
     private MySql mySql
 
     @Override
@@ -34,7 +35,7 @@ class MySqlFactory implements QDbFactory {
         if (loc != null) {
             file = new File(new File(String.valueOf(props.get('_location'))), loc)
         }
-        return SqlMisc.loadKeywords('com/virtusa/gto/nyql/db/mysql/keywords.json', file)
+        return SqlMisc.loadKeywords(MYSQL_KEYWORD_LOCATION, file)
     }
 
     /**
