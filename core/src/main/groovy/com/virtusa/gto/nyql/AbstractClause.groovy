@@ -134,6 +134,15 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         }
     }
 
+    @CompileStatic
+    Column ALIAS_REF(String aliasStr) {
+        Column column = _ctx.getColumnIfExist(aliasStr)
+        if (column == null) {
+            throw new NySyntaxException('No column is found by alias \'' + aliasStr + '\'!')
+        }
+        column
+    }
+
     Case CASE(@DelegatesTo(value = Case, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Case aCase = new Case(_ctx: _ctx, _ownerQ: this)
 

@@ -172,4 +172,22 @@
     [
             mysql: "SELECT ac.name AS `user`, ac.year AS `release` FROM `Actor` ac ORDER BY `user` DESC"
     ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (ac.name.alias("userName"))
+        GROUP_BY (ALIAS_REF("userName"))
+    },
+    [
+            mysql: "SELECT ac.name AS userName FROM `Actor` ac GROUP BY userName"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (ac.name.alias("user name"))
+        ORDER_BY (DESC(ALIAS_REF("user name")))
+    },
+    [
+            mysql: "SELECT ac.name AS `user name` FROM `Actor` ac ORDER BY `user name` DESC"
+    ],
 ]
