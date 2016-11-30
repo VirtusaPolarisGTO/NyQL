@@ -1,18 +1,18 @@
 package com.virtusa.gto.nyql
 
 import com.virtusa.gto.nyql.ddl.DDL
-import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QScriptList
 import com.virtusa.gto.nyql.model.QSession
 import com.virtusa.gto.nyql.model.units.AParam
+import com.virtusa.gto.nyql.model.units.ParamList
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * @author Isuru Weerarathna
  */
@@ -127,15 +127,22 @@ class DSL {
                 orderedParameters: orderedParams)
     }
 
-    QResultProxy nativeQuery(QueryType queryType, List<AParam> orderedParams = [], Map queries) {
+    QResultProxy nativeQuery(QueryType queryType, Map queries) {
         String activeDb = session.dbFactory.dbName()
         def query = queries[activeDb]
         if (query == null) {
-            throw new NyException("No query is defined for the database '${activeDb}'!")
+            throw new NySyntaxException("No query is defined for the active database '${activeDb}'!")
         }
-        new QResultProxy(query: String.valueOf(query).trim(),
+        if (!(query instanceof List)) {
+            throw new NySyntaxException('A database specific query must be defined along with its parameter order! Refer NyQL syntax documentation for more info.')
+        }
+        List qList = (List)query;
+        if (qList.size() != 2) {
+            throw new NySyntaxException('A native query definition should have exactly 2 items, 1st being the ordered list of parameters and 2nd being the query string!')
+        }
+        new QResultProxy(query: String.valueOf(qList.get(1)).trim(),
                 queryType: queryType,
-                orderedParameters: orderedParams)
+                orderedParameters: (List)qList.get(0))
     }
 
     QResultProxy bulkInsert(@DelegatesTo(value = QueryInsert, strategy = Closure.DELEGATE_ONLY) Closure closure) {
@@ -343,6 +350,10 @@ class DSL {
 
     AParam PARAM(String name, AParam.ParamScope scope=null, String mappingName=null) {
         QUtils.createParam(name, scope, mappingName)
+    }
+
+    ParamList PARAMLIST(String name) {
+        new ParamList(__name: name)
     }
 
     private QContext createContext(String db=null) {
