@@ -30,10 +30,10 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn AVG(Object column)      { fColumn(column, 'avg') }
     @CompileStatic FunctionColumn SUM(Object column)      { fColumn(column, 'sum') }
 
-    @CompileStatic FunctionColumn LCASE(Column column)    { fColumn(column, 'lcase') }
-    @CompileStatic FunctionColumn UCASE(Column column)    { fColumn(column, 'ucase') }
-    @CompileStatic FunctionColumn TRIM(Column column)     { fColumn(column, 'trim') }
-    @CompileStatic FunctionColumn LEN(Column column)      { fColumn(column, 'len') }
+    @CompileStatic FunctionColumn LCASE(Object column)    { fColumn(column, 'lcase') }
+    @CompileStatic FunctionColumn UCASE(Object column)    { fColumn(column, 'ucase') }
+    @CompileStatic FunctionColumn TRIM(Object column)     { fColumn(column, 'trim') }
+    @CompileStatic FunctionColumn LEN(Object column)      { fColumn(column, 'len') }
     @CompileStatic FunctionColumn SUBSTRING(Object column, Object start, Object length) { vColumn('substr', column, start, length) }
     @CompileStatic FunctionColumn SUBSTRING(Object column, Object start) { vColumn('substr', column, start) }
     @CompileStatic FunctionColumn POSITION(Object column, Object substr) { vColumn('position', column, substr) }
