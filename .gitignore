@@ -25,3 +25,5 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 
+tests/nyprofile-output.json
+

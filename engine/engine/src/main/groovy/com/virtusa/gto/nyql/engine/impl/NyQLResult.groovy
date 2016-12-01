@@ -154,6 +154,24 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
         }
     }
 
+    /**
+     * Returns the column value as a boolean. If value is NULL, then return value will be null
+     * as well.
+     *
+     * @param index record index. This must be between 0 to N-1 inclusively.
+     * @param column column name.
+     * @return value as boolean.
+     */
+    @CompileStatic
+    Boolean asInt(int index, String column) throws NyException {
+        Map<String, Object> record = get(index)
+        if (record.containsKey(column)) {
+            toInt(record.get(column))
+        } else {
+            throw new NyException("The requested column '$column' does not exist in the specified record index at '$index'!")
+        }
+    }
+
     @CompileStatic
     private static toBool(Object val) {
         if (val == null) {
