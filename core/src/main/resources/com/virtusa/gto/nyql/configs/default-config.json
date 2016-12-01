@@ -1,0 +1,39 @@
+{
+  "translators": [
+    "com.virtusa.gto.nyql.db.mysql.MySqlFactory",
+    "com.virtusa.gto.nyql.db.postgre.PostgreFactory",
+    "com.virtusa.gto.nyql.db.mssql.MSSqlFactory"
+  ],
+
+  "caching": {
+    "compiledScripts": true,
+    "generatedQueries": true
+  },
+
+  "defaultImports": [
+    "groovy.transform.Field",
+    "com.virtusa.gto.nyql.ddl.DKeyIndexType",
+    "com.virtusa.gto.nyql.ddl.DFieldType",
+    "com.virtusa.gto.nyql.ddl.DReferenceOption",
+    "com.virtusa.gto.nyql.utils.QueryType",
+    "java.sql.JDBCType",
+    "java.sql.Types",
+    "com.virtusa.gto.nyql.model.units.AParam.ParamScope"
+  ],
+
+  "defaultExecutor": "dummy",
+  "executors": [
+    {
+      "name": "dummy",
+      "factory": "com.virtusa.gto.nyql.engine.impl.QDummyExecFactory"
+    }
+  ],
+
+  "defaultRepository": "default",
+  "repositories": [
+  ],
+
+  "profiling": {
+    "enabled": false
+  }
+}

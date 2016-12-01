@@ -17,7 +17,8 @@ class ConfigBuilder {
     private Map<String, QRepository> repositoryMap = [:]
     private Map<String, QScriptMapper> scriptMapper = [:]
 
-    private ConfigBuilder() {}
+    @PackageScope
+    ConfigBuilder() {}
 
     /**
      * Enable profiler in nyql. Profiler will passively run and notifies

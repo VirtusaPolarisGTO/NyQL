@@ -1,5 +1,7 @@
 package nyql.tests;
 
+import com.virtusa.gto.nyql.configs.Configurations;
+import com.virtusa.gto.nyql.configs.NyConfig;
 import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.model.QScript;
@@ -17,6 +19,12 @@ public class DBExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBExecutor.class);
 
     public static void main(String[] args) throws Exception {
+        Configurations configurations = NyConfig.withDefaults()
+                .forDatabase("mysql")
+                .scriptFolder(new File("./examples"))
+                .jdbcOptions("jdbc:mysql://localhost/sakila", "root", "")
+                .build();
+
         NyQLInstance nyQLInstance = null;
         try {
             Map<String, Object> data = new HashMap<>();
@@ -41,7 +49,7 @@ public class DBExecutor {
 
             //data.put("hello", inners);
 
-            nyQLInstance = NyQLInstance.create(new File("./nyql.json"));
+            nyQLInstance = NyQLInstance.create(configurations);
 
             //QScript result = NyQL.parse("insight/unmapped_users", data);
             Object result = nyQLInstance.execute("temp_table_test", data);

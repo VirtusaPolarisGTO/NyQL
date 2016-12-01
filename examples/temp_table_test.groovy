@@ -4,6 +4,17 @@
 /**
  * @author IWEERARATHNA
  */
+def tempCreate = $DSL.ddl {
+
+    TEMP_TABLE ("Isuru") {
+        FIELD ("id", DFieldType.INT)
+    }
+
+}
+
+def tempDrop = $DSL.ddl {
+    DROP_TEMP_TABLE ("Isuru")
+}
 
 def selIns = $DSL.select {
 
@@ -24,11 +35,11 @@ def selQ = $DSL.select {
 
 $DSL.script {
 
-    RUN('ddl/createTemp')
-    def r2 = RUN(selIns)
-    $LOG r2.affectedCount()
+    RUN(tempCreate)
+    RUN(selIns)
     def r = RUN(selQ)
-    RUN('ddl/dropTemp')
+    $LOG r
+    RUN(tempDrop)
 
 
 }

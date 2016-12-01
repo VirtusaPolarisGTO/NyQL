@@ -106,8 +106,8 @@ class Configurations {
             for (def tr : factoryClasses) {
                 try {
                     loadDBFactory(tr)
-                } catch (ReflectiveOperationException ex) {
-                    LOGGER.error(ex.getMessage())
+                } catch (ReflectiveOperationException | NyConfigurationException ex) {
+                    LOGGER.warn(ex.getMessage())
                     if (firstEx == null) {
                         firstEx = ex
                     }
