@@ -28,6 +28,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 @java.lang.SuppressWarnings('JdbcResultSetReference')
 import java.sql.ResultSet
+import java.sql.SQLException
 import java.sql.Savepoint
 import java.sql.Statement
 import java.util.stream.Collectors
@@ -99,25 +100,24 @@ class QJdbcExecutor implements QExecutor {
             return script.scriptResult
         }
 
-        if (script.proxy != null && script.proxy.queryType == QueryType.DB_FUNCTION) {
-            return executeCall(script)
-        }
-
-        logScript(script)
-
-        if (script.proxy.queryType == QueryType.BULK_INSERT || script.proxy.queryType == QueryType.BULK_UPDATE) {
-            return batchExecute(script)
-        }
-
         PreparedStatement statement = null
         try {
+            logScript(script)
+
+            if (script.proxy != null && script.proxy.queryType == QueryType.DB_FUNCTION) {
+                return executeCall(script)
+            }
+            if (script.proxy.queryType == QueryType.BULK_INSERT || script.proxy.queryType == QueryType.BULK_UPDATE) {
+                return batchExecute(script)
+            }
+
             Map<String, Object> data = script.qSession.sessionVariables
             List<AParam> parameters = script.proxy.orderedParameters
             statement = prepareStatement(script, parameters, data)
 
             if (script.proxy.queryType == QueryType.SELECT) {
                 if (returnRaw) {
-                    LOGGER.info('Returning raw result')
+                    LOGGER.debug('Returning raw result')
                     return statement.executeQuery()
                 } else {
                     //LOGGER.trace('Transforming result set using {}', transformer.class.name)
@@ -143,6 +143,9 @@ class QJdbcExecutor implements QExecutor {
                 return toMap(count, keys)
 
             }
+
+        } catch (SQLException ex) {
+            throw new NyScriptExecutionException(ex.getMessage(), ex)
 
         } finally {
             if (statement != null) {
