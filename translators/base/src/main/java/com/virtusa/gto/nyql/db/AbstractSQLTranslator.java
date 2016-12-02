@@ -19,7 +19,9 @@ public abstract class AbstractSQLTranslator implements QTranslator {
 
     private final Collection<String> keywords;
 
+    private static final String NL = "\n";
     private static final String _AS_ = " AS ";
+    private static final String COMMA = ", ";
 
     protected AbstractSQLTranslator() {
         keywords = new HashSet<>();
@@ -67,6 +69,133 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         } else {
             return EMPTY;
         }
+    }
+
+    protected String generateTableJoinName(final Join join, final String joinType, final QContextType contextType, List<AParam> paramOrder) {
+        StringBuilder qstr = new StringBuilder();
+
+        if (join.getTable1().__isResultOf()) {
+            QResultProxy proxy = (QResultProxy) join.getTable1().get__resultOf();
+            addAllSafely(paramOrder, proxy.getOrderedParameters());
+        }
+        qstr.append(___resolve(join.getTable1(), contextType, paramOrder));
+        qstr.append(" ").append(joinType).append(" ");
+
+        if (join.getTable2().__isResultOf()) {
+            QResultProxy proxy = (QResultProxy) join.getTable2().get__resultOf();
+            addAllSafely(paramOrder, proxy.getOrderedParameters());
+        }
+        qstr.append(___resolve(join.getTable2(), contextType, paramOrder));
+
+        if (join.___hasCondition()) {
+            qstr.append(" ON ").append(___expandConditions(join.getOnConditions(), paramOrder, QUtils.findDeleteContext(contextType)));
+        }
+        return qstr.toString();
+    }
+
+    protected QResultProxy generateInsertQuery(QueryInsert q, String quoteChar) throws NyException {
+        if (QUtils.isNullOrEmpty(q.get_data())) {
+            return ___selectQuery(q);
+        }
+
+        List<AParam> paramList = new LinkedList<>();
+        StringBuilder query = new StringBuilder();
+
+        query.append("INSERT INTO ").append(___resolve(q.getSourceTbl(), QContextType.INTO, paramList)).append(" (");
+        List<String> colList = new LinkedList<>();
+        List<String> valList = new LinkedList<>();
+
+        for (Map.Entry<String, Object> entry : q.get_data().entrySet()) {
+            colList.add(QUtils.quote(entry.getKey(), quoteChar));
+
+            if (entry.getValue() instanceof AParam) {
+                paramList.add((AParam)entry.getValue());
+            } else if (entry.getValue() instanceof Table) {
+                appendParamsFromTable((Table)entry.getValue(), paramList);
+            }
+            valList.add(String.valueOf(___resolve(entry.getValue(), QContextType.INSERT_DATA, paramList)));
+        }
+        query.append(colList.stream().collect(Collectors.joining(COMMA)))
+                .append(") VALUES (")
+                .append(valList.stream().collect(Collectors.joining(COMMA)))
+                .append(")");
+
+        QResultProxy resultProxy = createProxy(query.toString(), QueryType.INSERT, paramList, null, null);
+        resultProxy.setReturnType(q.getReturnType());
+        return resultProxy;
+    }
+
+    @Override
+    public QResultProxy ___selectQuery(QuerySelect q) throws NyException {
+        final List<AParam> paramList = new LinkedList<>();
+        StringBuilder query = new StringBuilder();
+        QueryType queryType = QueryType.SELECT;
+        if (q.get_intoTable() != null) {
+            queryType = QueryType.INSERT;
+            query.append("INSERT INTO ").append(___tableName(q.get_intoTable(), QContextType.INTO)).append(' ');
+            if (QUtils.notNullNorEmpty(q.get_intoColumns())) {
+                query.append(QUtils.parenthesis(___expandProjection(q.get_intoColumns(), paramList, QContextType.INSERT_PROJECTION)))
+                        .append(" ");
+            }
+            query.append(NL);
+        }
+
+        query.append("SELECT ");
+        if (q.is_distinct()) {
+            query.append("DISTINCT ");
+        }
+        query.append(___expandProjection(q.getProjection(), paramList, QContextType.SELECT)).append(NL);
+        // target is optional
+        if (q.get_joiningTable() != null) {
+            query.append(" FROM ").append(___deriveSource(q.get_joiningTable(), paramList, QContextType.FROM)).append(NL);
+        } else if (q.getSourceTbl() != null) {
+            query.append(" FROM ").append(___deriveSource(q.getSourceTbl(), paramList, QContextType.FROM)).append(NL);
+        }
+
+        if (q.getWhereObj() != null && q.getWhereObj().__hasClauses()) {
+            query.append(" WHERE ").append(___expandConditions(q.getWhereObj(), paramList, QContextType.CONDITIONAL)).append(NL);
+        }
+
+        if (QUtils.notNullNorEmpty(q.getGroupBy())) {
+            String gClauses = QUtils.join(q.getGroupBy(), it -> ___resolve(it, QContextType.GROUP_BY, paramList), COMMA, "", "");
+            query.append(" GROUP BY ").append(gClauses);
+
+            if (q.getGroupHaving() != null) {
+                query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
+            }
+            query.append(NL);
+        }
+
+        if (QUtils.notNullNorEmpty(q.getOrderBy())) {
+            String oClauses = QUtils.join(q.getOrderBy(), it -> ___resolve(it, QContextType.ORDER_BY, paramList), COMMA, "", "");
+            query.append(" ORDER BY ").append(oClauses).append(NL);
+        }
+
+        if (q.get_limit() != null) {
+            if (q.get_limit() instanceof Integer && ((Integer) q.get_limit()) > 0) {
+                query.append(" LIMIT ").append(String.valueOf(q.get_limit())).append(NL);
+            } else if (q.get_limit() instanceof AParam) {
+                paramList.add((AParam) q.get_limit());
+                query.append(" LIMIT ").append(___resolve(q.get_limit(), QContextType.ORDER_BY)).append(NL);
+            }
+        }
+
+        if (q.getOffset() != null) {
+            if (q.getOffset() instanceof Integer && ((Integer) q.getOffset()) >= 0) {
+                query.append(" OFFSET ").append(String.valueOf(q.getOffset())).append(NL);
+            } else if (q.getOffset() instanceof AParam) {
+                paramList.add((AParam) q.getOffset());
+                query.append(" OFFSET ").append(___resolve(q.getOffset(), QContextType.ORDER_BY)).append(NL);
+            }
+        }
+
+        return createProxy(query.toString(), queryType, paramList, null, null);
+    }
+
+    @Override
+    public QResultProxy ___truncateQuery(QueryTruncate q) {
+        String query = "TRUNCATE TABLE " + ___tableName(q.getSourceTbl(), QContextType.TRUNCATE);
+        return createProxy(query, QueryType.TRUNCATE, new ArrayList<>(), null, null);
     }
 
     @Override
@@ -332,4 +461,10 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         return list;
     }
 
+    private <T> List<T> addAllSafely(List<T> list, Collection<T> items) {
+        if (list != null) {
+            list.addAll(items);
+        }
+        return list;
+    }
 }

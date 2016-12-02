@@ -5,6 +5,8 @@ import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
+import groovy.transform.CompileStatic
+
 /**
  * MySQL factory responsible of creating translator instances.
  *
@@ -64,6 +66,7 @@ class MySqlFactory implements QDbFactory {
      *
      * @return mysql translator instance.
      */
+    @CompileStatic
     @Override
     QTranslator createTranslator() {
         mySql

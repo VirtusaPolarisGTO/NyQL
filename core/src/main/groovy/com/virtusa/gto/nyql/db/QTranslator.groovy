@@ -1,29 +1,12 @@
 package com.virtusa.gto.nyql.db
 
-import com.virtusa.gto.nyql.Case
-import com.virtusa.gto.nyql.Column
-import com.virtusa.gto.nyql.Join
-import com.virtusa.gto.nyql.QContextType
-import com.virtusa.gto.nyql.QResultProxy
-import com.virtusa.gto.nyql.QueryDelete
-import com.virtusa.gto.nyql.QueryInsert
-import com.virtusa.gto.nyql.QueryPart
-import com.virtusa.gto.nyql.QuerySelect
-import com.virtusa.gto.nyql.QueryTruncate
-import com.virtusa.gto.nyql.QueryUpdate
-import com.virtusa.gto.nyql.StoredFunction
-import com.virtusa.gto.nyql.Table
+import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.units.AParam
-import com.virtusa.gto.nyql.model.units.ParamList
-import com.virtusa.gto.nyql.model.units.QBoolean
-import com.virtusa.gto.nyql.model.units.QNumber
-import com.virtusa.gto.nyql.model.units.QString
+import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.utils.QOperator
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
 import groovy.transform.CompileStatic
-
 /**
  * @author Isuru Weerarathna
  */
@@ -158,7 +141,7 @@ trait QTranslator extends QJoins {
      * @param q input model of query.
      * @return generated select query.
      */
-    abstract QResultProxy ___selectQuery(QuerySelect q)
+    abstract QResultProxy ___selectQuery(QuerySelect q) throws NyException
 
     /**
      * Generate an insert query using given query model.

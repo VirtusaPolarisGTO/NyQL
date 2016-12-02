@@ -1,19 +1,6 @@
 package com.virtusa.gto.nyql.db.mysql
 
-import com.virtusa.gto.nyql.Case
-import com.virtusa.gto.nyql.Column
-import com.virtusa.gto.nyql.FunctionColumn
-import com.virtusa.gto.nyql.Join
-import com.virtusa.gto.nyql.QContextType
-import com.virtusa.gto.nyql.QResultProxy
-import com.virtusa.gto.nyql.QueryDelete
-import com.virtusa.gto.nyql.QueryInsert
-import com.virtusa.gto.nyql.QuerySelect
-import com.virtusa.gto.nyql.QueryTruncate
-import com.virtusa.gto.nyql.QueryUpdate
-import com.virtusa.gto.nyql.StoredFunction
-import com.virtusa.gto.nyql.Table
-import com.virtusa.gto.nyql.Where
+import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.model.units.AParam
@@ -52,7 +39,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append(CP)
 
             query.append(columnAliasAs(aCaseCol, BACK_TICK))
-            return query.toString()
+            query.toString()
 
         } else {
             StringBuilder query = new StringBuilder('CASE')
@@ -68,7 +55,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append(' END')
 
             query.append(columnAliasAs(aCaseCol, BACK_TICK))
-            return query.toString()
+            query.toString()
         }
     }
 
@@ -117,26 +104,8 @@ class MySql extends MySqlFunctions implements QTranslator {
     @CompileStatic
     @Override
     String ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
-        StringBuilder qstr = new StringBuilder()
         String jtype = invokeMethod(join.type, null)
-
-        if (join.table1.__isResultOf()) {
-            QResultProxy proxy = join.table1.__resultOf as QResultProxy
-            paramOrder?.addAll(proxy.orderedParameters)
-        }
-        qstr.append(___resolve(join.table1, contextType, paramOrder))
-        qstr.append(" $jtype ")
-
-        if (join.table2.__isResultOf()) {
-            QResultProxy proxy = join.table2.__resultOf as QResultProxy
-            paramOrder?.addAll(proxy.orderedParameters)
-        }
-        qstr.append(___resolve(join.table2, contextType, paramOrder))
-
-        if (join.___hasCondition()) {
-            qstr.append(' ON ').append(___expandConditions(join.onConditions, paramOrder, QUtils.findDeleteContext(contextType)))
-        }
-        qstr
+        generateTableJoinName(join, jtype, contextType, paramOrder)
     }
 
     @CompileStatic
@@ -218,7 +187,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
         query.append(CP).append(' }')
 
-        return new QResultProxy(query: query.toString(), orderedParameters: sp.paramList,
+        new QResultProxy(query: query.toString(), orderedParameters: sp.paramList,
                 rawObject: sp, queryType: QueryType.DB_FUNCTION)
     }
 
@@ -276,108 +245,8 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     @CompileStatic
-    QResultProxy ___selectQuery(QuerySelect q) {
-        List<AParam> paramList = new LinkedList<>()
-        StringBuilder query = new StringBuilder()
-        QueryType queryType = QueryType.SELECT
-        if (q._intoTable != null) {
-            queryType = QueryType.INSERT
-            query.append('INSERT INTO ').append(___tableName(q._intoTable, QContextType.INTO)).append(' ')
-            if (QUtils.notNullNorEmpty(q._intoColumns)) {
-                query.append(QUtils.parenthesis(___expandProjection(q._intoColumns, paramList, QContextType.INSERT_PROJECTION)))
-                        .append(' ')
-            }
-            query.append(NL)
-        }
-
-        query.append('SELECT ')
-        if (q._distinct) {
-            query.append('DISTINCT ')
-        }
-        query.append(___expandProjection(q.projection, paramList, QContextType.SELECT)).append(NL)
-        // target is optional
-        if (q._joiningTable ?: q.sourceTbl) {
-            query.append(' FROM ').append(___deriveSource(q._joiningTable ?: q.sourceTbl, paramList, QContextType.FROM)).append(NL)
-        }
-
-        if (q.whereObj != null && q.whereObj.__hasClauses()) {
-            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append(NL)
-        }
-
-        if (QUtils.notNullNorEmpty(q.groupBy)) {
-            String gClauses = QUtils.join(q.groupBy, { ___resolve(it, QContextType.GROUP_BY, paramList) }, COMMA, '', '')
-            query.append(' GROUP BY ').append(gClauses)
-
-            if (q.groupHaving != null) {
-                query.append(NL).append(' HAVING ').append(___expandConditions(q.groupHaving, paramList, QContextType.HAVING))
-            }
-            query.append(NL)
-        }
-
-        if (QUtils.notNullNorEmpty(q.orderBy)) {
-            String oClauses = QUtils.join(q.orderBy, { ___resolve(it, QContextType.ORDER_BY, paramList) }, COMMA, '', '')
-            query.append(' ORDER BY ').append(oClauses).append(NL)
-        }
-
-        if (q._limit != null) {
-            if (q._limit instanceof Integer && ((Integer) q._limit) > 0) {
-                query.append(' LIMIT ').append(String.valueOf(q._limit)).append(NL)
-            } else if (q._limit instanceof AParam) {
-                paramList.add((AParam) q._limit)
-                query.append(' LIMIT ').append(___resolve(q._limit, QContextType.ORDER_BY)).append(NL)
-            }
-        }
-
-        if (q.offset != null) {
-            if (q.offset instanceof Integer && ((Integer) q.offset) >= 0) {
-                query.append(' OFFSET ').append(String.valueOf(q.offset)).append(NL)
-            } else if (q.offset instanceof AParam) {
-                paramList.add((AParam) q.offset)
-                query.append(' OFFSET ').append(___resolve(q.offset, QContextType.ORDER_BY)).append(NL)
-            }
-        }
-
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: queryType)
-    }
-
-    @Override
-    QResultProxy ___truncateQuery(QueryTruncate q) {
-        StringBuilder query = new StringBuilder()
-        query.append('TRUNCATE TABLE ').append(___tableName(q.sourceTbl, QContextType.TRUNCATE))
-
-        new QResultProxy(query: query.toString(), orderedParameters: [], queryType: QueryType.TRUNCATE)
-    }
-
-    @CompileStatic
     QResultProxy ___insertQuery(QueryInsert q) {
-        if (QUtils.isNullOrEmpty(q._data)) {
-            return ___selectQuery(q)
-        }
-
-        List<AParam> paramList = new LinkedList<>()
-        StringBuilder query = new StringBuilder()
-
-        query.append('INSERT INTO ').append(___resolve(q.sourceTbl, QContextType.INTO, paramList)).append(' (')
-        List<String> colList = new LinkedList<>()
-        List<String> valList = new LinkedList<>()
-
-        for (Map.Entry<String, Object> entry : q._data) {
-            colList.add(QUtils.quote(entry.key, BACK_TICK))
-
-            if (entry.value instanceof AParam) {
-                paramList.add((AParam)entry.value)
-            } else if (entry.value instanceof Table) {
-                appendParamsFromTable((Table)entry.value, paramList)
-            }
-            valList.add(String.valueOf(___resolve(entry.value, QContextType.INSERT_DATA, paramList)))
-        }
-        query.append(colList.join(COMMA))
-                .append(') VALUES (')
-                .append(valList.join(COMMA))
-                .append(')')
-
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.INSERT,
-                returnType: q.returnType)
+        generateInsertQuery(q, BACK_TICK)
     }
 
     @CompileStatic

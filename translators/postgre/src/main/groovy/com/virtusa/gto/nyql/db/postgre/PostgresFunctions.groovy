@@ -16,6 +16,14 @@ import java.util.stream.Collectors
  */
 abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunctions {
 
+    PostgresFunctions() {
+        super()
+    }
+
+    PostgresFunctions(Collection<String> theKeywords) {
+        super(theKeywords)
+    }
+
     @CompileStatic String current_date(c) { 'CURRENT_TIME' }
     @CompileStatic String current_time(c) { 'CURRENT_DATE' }
 
