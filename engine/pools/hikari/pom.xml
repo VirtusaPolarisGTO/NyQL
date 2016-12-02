@@ -22,6 +22,8 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/groovy</sourceDirectory>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
