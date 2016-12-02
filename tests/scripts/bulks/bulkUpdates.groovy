@@ -12,6 +12,7 @@
         }
     },
     [
-        mysql: ["UPDATE `UserRental` ur SET ur.current_rental = ? WHERE ur.user_id = ?", ["currentRental", "theUser"]]
+        mysql:  ["UPDATE `UserRental` ur SET ur.current_rental = ? WHERE ur.user_id = ?", ["currentRental", "theUser"]],
+        pg:     ['UPDATE "UserRental" ur SET ur.current_rental = ? WHERE ur.user_id = ?', ["currentRental", "theUser"]]
     ]
 ]

@@ -28,7 +28,11 @@ public abstract class AbstractSQLTranslator implements QTranslator {
     }
 
     protected AbstractSQLTranslator(Collection<String> theKeywords) {
-        keywords = theKeywords;
+        if (theKeywords != null) {
+            keywords = theKeywords;
+        } else {
+            keywords = new HashSet<>();
+        }
     }
 
     protected String tableAlias(Table table, String qChar) {

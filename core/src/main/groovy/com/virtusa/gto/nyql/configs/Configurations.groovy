@@ -82,7 +82,8 @@ class Configurations {
         }
 
         // mark active database
-        String activeDb = System.getProperty(ConfigKeys.SYS_ACTIVE_DB, getActivatedDb())
+        String activeDb = getActivatedDb()
+        LOGGER.info("Activated: " + activeDb)
         loadActivatedTranslator(activeDb)
 
         // load repositories
@@ -277,7 +278,7 @@ class Configurations {
     }
 
     String getActivatedDb() {
-        properties.activate
+        (String) System.getProperty(ConfigKeys.SYS_ACTIVE_DB, properties.activate)
     }
 
     boolean cacheRawScripts() {

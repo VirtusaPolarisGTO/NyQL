@@ -68,7 +68,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
     String ___tableName(final Table table, final QContextType contextType) {
         if (contextType == QContextType.INTO || contextType == QContextType.TRUNCATE
                 || contextType == QContextType.DELETE_FROM) {
-            return QUtils.quote(table.__name)
+            return QUtils.quote(table.__name, DOUBLE_QUOTE)
         } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
                 || contextType == QContextType.DELETE_JOIN) {
             if (table.__isResultOf()) {
@@ -141,7 +141,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
     QResultProxy ___deleteQuery(QueryDelete q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
-        query.append('DELETE FROM ').append(___deriveSource(q.sourceTbl, paramList, QContextType.FROM)).append('\n')
+        query.append('DELETE FROM ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append('\n')
         if (q._joiningTable != null) {
             // has joining tables
             List<Table> allTables = new ArrayList<>()
@@ -182,11 +182,11 @@ class Postgres extends PostgresFunctions implements QTranslator {
 
         String qStr;
         if (combineType == QueryCombineType.UNION) {
-            qStr = stream.collect(Collectors.joining("\nUNION ALL\n"))
+            qStr = stream.collect(Collectors.joining("\n UNION ALL \n"))
         } else if (combineType == QueryCombineType.UNION_DISTINCT) {
-            qStr = stream.collect(Collectors.joining("\nUNION\n"))
+            qStr = stream.collect(Collectors.joining("\n UNION \n"))
         } else if (combineType == QueryCombineType.INTERSECT) {
-            qStr = stream.collect(Collectors.joining(NL + 'INTERSECT' + NL))
+            qStr = stream.collect(Collectors.joining(NL + ' INTERSECT ' + NL))
         } else {
             qStr = stream.collect(Collectors.joining("; "))
         }
@@ -214,9 +214,9 @@ class Postgres extends PostgresFunctions implements QTranslator {
     QResultProxy ___updateQuery(QueryUpdate q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
-        query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append("\n")
+        query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append(" \n")
         if (q._assigns.__hasAssignments()) {
-            query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append("\n")
+            query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(" \n")
         }
 
         if (q._joiningTable != null) {

@@ -2,7 +2,8 @@
   "activate": "mysql",
 
   "translators": [
-    "com.virtusa.gto.nyql.db.mysql.MySqlFactory"
+    "com.virtusa.gto.nyql.db.mysql.MySqlFactory",
+    "com.virtusa.gto.nyql.db.postgre.PostgreFactory"
   ],
 
   "caching": {

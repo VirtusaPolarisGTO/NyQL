@@ -3,10 +3,8 @@ package com.virtusa.gto.nyql.db.postgre
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.db.QTranslator
-import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import groovy.transform.CompileStatic
-
 /**
  * @author IWEERARATHNA
  */
@@ -31,7 +29,7 @@ class PostgreFactory implements QDbFactory {
         if (loc != null) {
             file = new File(new File(String.valueOf(props.get('_location'))), loc)
         }
-        SqlMisc.loadKeywords(PG_KEYWORDS_LOCATION, file)
+        //SqlMisc.loadKeywords(PG_KEYWORDS_LOCATION, file)
     }
 
     @Override

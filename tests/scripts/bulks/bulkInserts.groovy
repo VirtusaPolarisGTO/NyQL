@@ -11,7 +11,8 @@
         )
     },
     [
-        mysql: ["INSERT INTO `Customer` (`name`, `age`, `email`) VALUES (?, 25, ?)", ["custName", "custEmail"]]
+        mysql:  ["INSERT INTO `Customer` (`name`, `age`, `email`) VALUES (?, 25, ?)", ["custName", "custEmail"]],
+        pg:     ['INSERT INTO "Customer" ("name", "age", "email") VALUES (?, 25, ?)', ["custName", "custEmail"]],
     ]
 
 ]

@@ -12,6 +12,7 @@ import com.virtusa.gto.nyql.model.units.AParam
                 ]
         ),
         [
-            mysql: ["{ CALL MyProcedure(?, ?, ?) }", ["firstP", "secondP", "thirdP"]]
+            mysql:  ["{ CALL MyProcedure(?, ?, ?) }", ["firstP", "secondP", "thirdP"]],
+            pg:     ["", ["firstP", "secondP", "thirdP"]]
         ]
 ]
