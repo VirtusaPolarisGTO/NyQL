@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.units.AParam
+import com.virtusa.gto.nyql.model.units.ParamBinary
 import com.virtusa.gto.nyql.model.units.ParamDate
 import com.virtusa.gto.nyql.model.units.ParamTimestamp
 import com.virtusa.gto.nyql.traits.DataTypeTraits
@@ -56,6 +57,11 @@ class Assign implements DataTypeTraits, FunctionTraits, ScriptTraits {
     @Override
     AParam PARAM_TIMESTAMP(String name, String format) {
         _ctx.addParam(new ParamTimestamp(__name: name, __tsFormat: format))
+    }
+
+    @Override
+    AParam PARAM_BINARY(String name) {
+        _ctx.addParam(new ParamBinary(__name: name))
     }
 
     @CompileStatic

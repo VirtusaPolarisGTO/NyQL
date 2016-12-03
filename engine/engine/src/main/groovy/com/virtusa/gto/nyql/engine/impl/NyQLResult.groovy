@@ -4,6 +4,9 @@ import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
+
+import java.sql.Blob
+
 /**
  * Instance containing jdbc results after an execution of a query.
  *
@@ -80,6 +83,23 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
                 'May be you are not executing a insert/update statement? (Not supported for bulk insert/update in JDBC yet)',
                 'Or, you are not specifying explicitly to return keys from the statement (using RETURN_KEYS())',
                 'Or, even JDBC driver might not returning it for you. Consider a different strategy instead.'))
+    }
+
+    /**
+     * In-place convert all column BLOB values to base64 encoded column, so user
+     * can transfer values easily through networks.
+     *
+     * @param column column to convert to base64.
+     * @return this mutated instance.
+     */
+    @CompileStatic
+    NyQLResult mutateToBase64(String column) throws NyException {
+        if (!isEmpty()) {
+            for (Map<String, Object> row : this) {
+                row.put(column, toBase64(row.get(column)))
+            }
+        }
+        this
     }
 
     /**
@@ -163,7 +183,7 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
      * @return value as boolean.
      */
     @CompileStatic
-    Boolean asInt(int index, String column) throws NyException {
+    Integer asInt(int index, String column) throws NyException {
         Map<String, Object> record = get(index)
         if (record.containsKey(column)) {
             toInt(record.get(column))
@@ -173,7 +193,47 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
     }
 
     @CompileStatic
-    private static toBool(Object val) {
+    String asString(int index, String column) {
+        (String) getField(index, column)
+    }
+
+    /**
+     * Returns the binary column value as a base64 encoded string. If value is NULL, then return value will be null
+     * as well.
+     *
+     * @param index record index. This must be between 0 to N-1 inclusively.
+     * @param column column name.
+     * @return value as boolean.
+     */
+    @CompileStatic
+    String asBase64(int index, String column) throws NyException {
+        Map<String, Object> record = get(index)
+        if (record.containsKey(column)) {
+            toBase64(record.get(column))
+        } else {
+            throw new NyException("The requested column '$column' does not exist in the specified record index at '$index'!")
+        }
+    }
+
+    @CompileStatic
+    private static String toBase64(Object val) throws NyException {
+        if (val == null) {
+            null
+        } else if (val instanceof Blob) {
+            Blob blob = (Blob)val;
+            String data = Base64.encoder.encodeToString(blob.getBytes(0, (int)blob.length()));
+            blob.free()
+            data
+        } else if (val instanceof InputStream) {
+            InputStream inputStream = (InputStream)val;
+            Base64.encoder.encodeToString(inputStream.getBytes())
+        } else {
+            throw new NyException("Unknown binary data type column! [${val.class.name}]")
+        }
+    }
+
+    @CompileStatic
+    private static Boolean toBool(Object val) {
         if (val == null) {
             null
         } else if (val instanceof Number) {
@@ -185,7 +245,7 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
     }
 
     @CompileStatic
-    private static toInt(Object val) {
+    private static Integer toInt(Object val) {
         if (val == null) {
             null
         } else if (val instanceof Number) {
@@ -196,7 +256,7 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
     }
 
     @CompileStatic
-    private static toDouble(Object val) {
+    private static Double toDouble(Object val) {
         if (val == null) {
             null
         } else if (val instanceof Number) {
@@ -204,11 +264,6 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
         } else {
             Double.parseDouble(String.valueOf(val))
         }
-    }
-
-    @CompileStatic
-    String asString(int index, String column) {
-        (String) getField(index, column)
     }
 
     /**

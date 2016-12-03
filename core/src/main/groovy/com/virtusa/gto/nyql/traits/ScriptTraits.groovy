@@ -15,4 +15,6 @@ trait ScriptTraits {
     abstract AParam PARAM_DATE(String name)
 
     abstract AParam PARAM_TIMESTAMP(String name, String format)
+
+    abstract AParam PARAM_BINARY(String name)
 }

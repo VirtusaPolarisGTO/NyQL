@@ -47,4 +47,21 @@ class JdbcHelperUtils {
         Date.valueOf(value)
     }
 
+    /**
+     * Converts given parameter values to a binary input stream so that it can be assigned in
+     * prepared statement easily.
+     *
+     * @param value input parameter value.
+     * @return an input stream for prepared statement.
+     */
+    static InputStream convertBinary(Object value) {
+        if (value instanceof byte[]) {
+            new ByteArrayInputStream((byte[])value)
+        } else if (value instanceof InputStream) {
+            (InputStream)value
+        } else {
+            // assumes string and in base64 format
+            new ByteArrayInputStream(Base64.decoder.decode(String.valueOf(value)));
+        }
+    }
 }

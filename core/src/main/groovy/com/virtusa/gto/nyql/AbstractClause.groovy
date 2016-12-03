@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.units.AParam
+import com.virtusa.gto.nyql.model.units.ParamBinary
 import com.virtusa.gto.nyql.model.units.ParamDate
 import com.virtusa.gto.nyql.model.units.ParamList
 import com.virtusa.gto.nyql.model.units.ParamTimestamp
@@ -76,6 +77,11 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
     @CompileStatic
     AParam PARAM_TIMESTAMP(String name) {
         PARAM_TIMESTAMP(name, null)
+    }
+
+    @Override
+    AParam PARAM_BINARY(String name) {
+        _ctx.addParam(new ParamBinary(__name: name))
     }
 
     @CompileStatic

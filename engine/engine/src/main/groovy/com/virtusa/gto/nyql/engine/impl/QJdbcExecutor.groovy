@@ -9,11 +9,7 @@ import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QScriptResult
-import com.virtusa.gto.nyql.model.units.AParam
-import com.virtusa.gto.nyql.model.units.NamedParam
-import com.virtusa.gto.nyql.model.units.ParamDate
-import com.virtusa.gto.nyql.model.units.ParamList
-import com.virtusa.gto.nyql.model.units.ParamTimestamp
+import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.utils.QReturnType
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryType
@@ -340,6 +336,8 @@ class QJdbcExecutor implements QExecutor {
                 JdbcHelperUtils.convertTimestamp(value, qScript.qSession.configurations, param.__tsFormat)
             } else if (param instanceof ParamDate) {
                 JdbcHelperUtils.convertToDate(String.valueOf(value))
+            } else if (param instanceof ParamBinary) {
+                JdbcHelperUtils.convertBinary(value)
             } else {
                 throw new NyScriptExecutionException('Unknown parameter type specified in script!')
             }
