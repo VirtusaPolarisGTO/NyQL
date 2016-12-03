@@ -1,0 +1,11 @@
+sudo: false
+language: java
+cache:
+  directories:
+  - $HOME/.m2
+install: mvn clean install
+branches:
+  only:
+  - dev
+jdk:
+  - oraclejdk8
