@@ -216,6 +216,11 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         this
     }
 
+    @CompileStatic
+    Where NIN(Object c1, Object... cs) {
+        NOTIN(c1, cs)
+    }
+
     QResultProxy QUERY(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         QuerySelect querySelect = new QuerySelect(_ctx)
 

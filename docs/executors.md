@@ -1,8 +1,35 @@
-# Custom Executors
+# NyQL Executors
 
-Sometimes you may not be happy with the default executors (along with pools) and their implementations, mainly due to application's non-functional requirements, such as, application may already be using another JDBC connection pool like Spring, EBean, etc, or some customization issues. By default, NyQL provides two most common and matured jdbc pools out-of-the-box for your application. They are Hikari and C3P0. But sometimes these might not be the solutions for you.
+When you invoke the `execute` method from a _NyQLInstance_, framework uses the configured
+executor to execute the script after the parsing. 
+Note that only _**one**_ executor can active for an instance.
 
-In that case, NyQL provides an extension point to plug application-specific executors to the NyQL engine. Say that your application uses Hibernate for example. So, you want to reuse the connection pool used by Hibernate for executing you custom NyQL scripts. And this is easily provided by the NyQL, and all you have to do is to implement a executor factory and specify it in your NyQL configuration file as default executor.
+By default, NyQL provides two executors.
+ * **QJDBCExecutor** : Executes scripts using the configured jdbc driver.
+   * Associated Factory: `com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory`
+ * **QDummyExecutor** : Just a standing executor when no executor is configured and user
+ has no intention of executing a script.
+   * Associated Factory: `com.virtusa.gto.nyql.engine.impl.QDummyExecFactory`
+
+**Note:** When you are specifying an executor in configuration file, you should 
+specify the factory class, not the implementation of above executor class.
+
+### Custom Executors
+
+Sometimes you may not be happy with the default executors (along with pools) 
+and their implementations, mainly due to application's non-functional 
+requirements, such as, application may already be using another
+JDBC connection pool like Spring, EBean, etc, or some customization issues. 
+By default, NyQL provides two most common and matured jdbc pools 
+out-of-the-box for your application. They are Hikari and C3P0. 
+But sometimes these might not be the solutions for you.
+
+In that case, NyQL provides an extension point to plug application-specific 
+executors to the NyQL engine. Say that your application uses Hibernate for 
+example. So, you want to reuse the connection pool used by Hibernate for 
+executing you custom NyQL scripts. And this is easily provided by the NyQL, 
+and all you have to do is to implement a executor factory and specify it in 
+your NyQL configuration file as default executor.
 
 ### Defining a New Executor Factory
 * Implement a class with interface `QExecutorFactory`

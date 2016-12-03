@@ -1,7 +1,40 @@
+[![Build Status](https://travis-ci.org/VirtusaPolarisGTO/NyQL.svg?branch=dev)](https://travis-ci.org/VirtusaPolarisGTO/NyQL)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![StackOverflow](https://img.shields.io/:stack%20overflow-nyql-green.svg)](http://stackoverflow.com/questions/tagged/nyql)
+
+
 # NyQL
 
-A common query DSL for popular relational databases. 
-Currently this supports `mysql` only, but `postgres`, `mssql` and `oracle` is pending.
+A common query DSL for popular relational databases. You can write queries or scripts using the DSL
+once and execute it almost any relational database many times without
+modifying it from vendor to vendor. 
+NyQL removes the pain of dealing with some database specific
+characteristics automatically, such as auto-quoting, type conversions, query clause positioning etc.
+ 
+To provide that though, NyQL uses a flexible common layer to write your queries using DSL.
+
+Currently this supports `mysql` only, but `postgres`, `mssql` and `oracle` is in progress.
+
+#### Some Features:
+  * Write queries using a DSL in database independent way making sure those work in every 
+  popular relational dbs.
+  * Can write queries in separate files using DSL, and no need to write or raw queries
+  using string templates or any other manipulations.
+  * Prevents SQL injection.
+  * Your code and queries are independent, so that no need to compile your code again and
+  again when a query is changed.
+  * Ability to generate highly dynamic queries using groovy scripting features.
+  * Query generation through reusable query parts (clauses), so, no need to copy same clauses
+  again and again in every query leading to higher maintainability.
+  * Queries can be cached as per your choice, so no regeneration is needed when once generated.
+  * Almost same performance as you execute it directly through JDBC driver. 
+  Negligible parsing overhead.
+
+##### NyQL is not for you, if:
+ * you are looking for DDL and migration activities (use [Liquibase](http://www.liquibase.org/) instead)
+ * you want to use very highly database specific features, so that you have no intention of
+ supporting your application over other database vendors.
+ * you are looking for ORM activities through NyQL.
 
 #### Terminology:
 * `Query Repository`: A folder containing all your query scripts and responsible of parsing a nyql query and generate a native query for the activated database.
@@ -33,7 +66,7 @@ If you are going to use `mysql` then add `nyql-impl-mysql` dependency to the cla
 
 * If you are expecting to use the execution part of NyQL, then you need to specify the executor instance to be used with. By default,
 NyQL works with a pooled JDBC executor, currently equipped with a [Hikari](https://github.com/brettwooldridge/HikariCP) or [C3p0](http://www.mchange.com/projects/c3p0/) pools.
-For eg: if you expect to use hikari pool, you need to add below dependency.
+For eg: if you expect to use hikari pool, (which is our recommendation) you need to add below dependency.
 
 ```xml
 <dependency>
@@ -54,7 +87,8 @@ For eg: if you expect to use hikari pool, you need to add below dependency.
 ```
 
 * NyQL uses [slf4j  logging](http://www.slf4j.org/). To enable logging, you need add appropriate slf4j implementation
-to the dependency as well. Say you want to use [log4j logging](https://logging.apache.org/log4j/1.2/download.html).
+to the dependency as well. Say you want to use [log4j logging](https://logging.apache.org/log4j/1.2/download.html). 
+To disable logging, use slf4j Nop logger.
 
 ```xml
 <dependency>
@@ -115,7 +149,7 @@ expecting to execute in cloud environments or secure environments. Below shows t
   * **NYQL_JDBC_PASSWORD_ENC**: base64 encoded database password.
   * **NYQL_JDBC_DRIVER**: driver class name of the jdbc driver.
 
-3. There are two ways of configuring and running NyQL from a java application.
+3. There are three ways of configuring and running NyQL from a java application.
   * __Per-process configuration__: Use this method if you are absolutely sure that you use only one instance of NyQL in the 
    application process. Here you should be able to use static methods provided by `NyQL` class. See below example code.
    
@@ -177,3 +211,38 @@ expecting to execute in cloud environments or secure environments. Below shows t
            }
        }
        ```
+       
+  * __Quick and short configuration__ : Here you can programmatically configure NyQL for quick
+  java applications like shown in below using `NyConfig` class. Only you need to say is which database to
+  activate, where is your scripts folder, and jdbc parameters.
+  
+    ```java 
+         public class Main {
+             
+             public static void main(String[] args) throws Exception {
+                 // create a new nyql instance using minimum but
+                 // mandatory parameters.
+                 Configurations nyConfigs = NyConfig.withDefaults()
+                                        .forDatabase("mysql")
+                                        .scriptFolder(new File("./scripts"))
+                                        .jdbcOptions("jdbc:mysql:localhost/sampledb", "username", "password")
+                                        .build();
+                 NyQLInstance nyInstance = NyQLInstance.create(nyConfigs);
+                 
+                 // use this retrieved instance to execute queries...
+             }
+         }
+     ```
+     
+## Links     
+    
+ * [For issues or feature request, use github issue tracker](https://github.com/VirtusaPolarisGTO/NyQL/issues).
+ * [For questions, ask in StackOverflow under the tag of 'nyql'](https://stackoverflow.com/questions/ask/advice?tags=nyql).
+     
+## Contributing
+
+See [contributing guideline](https://github.com/VirtusaPolarisGTO/NyQL/blob/dev/CONTRIBUTING.md) for more information.
+     
+## LICENSE
+
+NyQL has been released under Apache 2.0 License.

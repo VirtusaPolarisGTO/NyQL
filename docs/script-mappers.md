@@ -5,11 +5,14 @@ By design, NyQL is expecting all your script (query) files are accessible as fil
   * __Caching:__ you may use your own caching mechanism to load scripts, or even watch script changes and act accordingly.
 
 
-By default NyQL provides three types of mapper implementations.
-  * __QScriptsFolder__ : Reads a single directory and recursively load all scripts under that directory and cache them. Script Id would be the relative path from the root directory.
-  * __QScriptFolders__ : Read several directories and load all scripts on those directories. Caches them too. Script Id would be the relative path from the root directory. Here if there are two scripts by the same id (relative paths are equal from the root dir), the loading will be failed.
-  * __QResourceScripts__ : Read scripts dynamically at runtime which are under a single resource path. No caching is provided, since there is no way to enumerate all resources, unlike files, without using a custom third party tools.
+By default, NyQL provides three types of mapper implementations.
+  * __QScriptsFolder__ (_com.virtusa.gto.nyql.engine.repo.QScriptsFolder_) : Reads a single directory and recursively load all scripts under that directory and cache them. Script Id would be the relative path from the root directory.
+  * __QScriptFolders__ (_com.virtusa.gto.nyql.engine.repo.QScriptFolders_) : Read several directories and load all scripts on those directories. Caches them too. Script Id would be the relative path from the root directory. Here if there are two scripts by the same id (relative paths are equal from the root dir), the loading will be failed.
+  * __QResourceScripts__ (_com.virtusa.gto.nyql.engine.repo.QResourceScripts_) : Read scripts dynamically at runtime which are under a single resource path. No caching is provided, since there is no way to enumerate all resources, unlike files, without using a custom third party tools.
 
+In configuration file, use the full qualified class name (as shown inside parenthesis) when specifying 
+mapper implementation. You are feel free to contribute to NyQL by writing any other useful
+mappers, and let us know.
 
 ### Defining a Custom Mapper
 Say that you want to implement a mapper to load scripts from a network location at runtime. For that you need to implement a new mapper implementation and register it with NyQL through its configurations.

@@ -7,5 +7,6 @@ install: mvn clean install
 branches:
   only:
   - dev
+  - master
 jdk:
   - oraclejdk8

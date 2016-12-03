@@ -19,7 +19,8 @@ Accessing field value is much easier. Use,
  * `asString(rowIndex, columnName)`: Returns column value as string for the given row and column.
  * `asBool(rowIndex, columnName)`: Returns column value as boolean for the given row and column.
  * `asInt(rowIndex, columnName)`: Returns column value as integer for the given row and column.
-
+ * `asBase64(rowIndex, columnName)`: Returns column value as base64 encoded string when it represents binary data.
+ 
 Example Java code:
 
 ```java
@@ -58,10 +59,11 @@ convert column values to specific java types automatically inplace of the result
 __REMEMBER:__ NyQL does not do these value conversions automatically because it has no
 idea what your value range may be like at the time of returning.
 
-Initially supports below three mutate functions.
+Initially supports below mutate functions.
  * `mutateToBool(columnName)`: change column values to java boolean values.
  * `mutateToInt(columnName)`: change column values to java integer values. (in case if it returns BigInteger data types)
  * `mutateToDouble(columnName)`: change column values to java double values. (in case if it returns BigDecimal data types)
+ * `mutateToBase64(columnName)`: change binary column data to base64 strings.
 
 In every above occasion, the `null` values will remain `null`. And it may throw cast exceptions
 if you try to convert a column which has actually a big value than the type it is converting.
@@ -76,7 +78,7 @@ For single query statements, you may use:
  * `affecedCount`: returns total number of changed rows.
  * `affectedKeys`: returns list of primary keys of inserted records. 
  
-For batch operation statement, keys won't be returned because JDBC drivers does not support it. You may use:
+For batch operation statement, keys won't be returned because JDBC drivers does not support it. You may use only:
  * `affectedCounts`: returns list of total number of affected rows for each batch invocation.
 
 Previously you had to access the count/keys like this.
@@ -97,4 +99,4 @@ List<Integer> keys = result.affectedKeys();
 
 __Note:__ All of those new methods throws a `NyException` if you are accessing counts
 from wrong result, or you are calling wrong method (mistaking batch and single operations).
-So prepare to deal with exception too.
+So prepare to deal with exceptions too.

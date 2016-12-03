@@ -35,17 +35,17 @@ there are situations where you want to do implicit conversions of parameter valu
 are being set as JDBC parameters. For instance, converting java dates / timestamps, binary data etc.
 
 To support such conversions NyQL provides additional parameter syntax. See below.
- * **PARAM_TIMESTAMP** : Converts the parameter value to `java.sql.Timestamp` instance just before
+ * **PARAM_TIMESTAMP("paramName", [format])** : Converts the parameter value to `java.sql.Timestamp` instance just before
  assigning as a JDBC parameter. User can send different types as to this parameter values.
     * If user has sent a long value, then NyQL assumes it is in _epoch milliseconds_.
     * If user has sent a timestamp as string, NyQL assumes it is in [ISO 8601 Timestamp](https://en.wikipedia.org/wiki/ISO_8601) format.
     * If user wishes to use custom timestamp format, user needs to specify the format he/she wishes along with the parameter name.
        * Eg: `PARAM_TIMESTAMP("paramName", "yyyy-MM-DD HH:mm:ss")`
  
- * **PARAM_DATE** : Converts the parameter value to `java.sql.Date` instance. Here parameter
+ * **PARAM_DATE("paramName")** : Converts the parameter value to `java.sql.Date` instance. Here parameter
  value must be in format `YYYY-MM-DD` because there is no other way to represent date as string.
  
- * **PARAM_BINARY** : Converts incoming binary value to a `BinaryArrayInputStream` automatically based on receiving data type.
+ * **PARAM_BINARY("paramName")** : Converts incoming binary value to a `BinaryArrayInputStream` automatically based on receiving data type.
    * If user has sent a byte array `byte[]`, then it will be converted to a BinaryArrayInputStream.
    * If user has sent a string, NyQL assumes it is in Base64 encoded format. And that string will be
    converted to a proper stream.

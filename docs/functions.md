@@ -13,6 +13,10 @@ _only_ if the first (left) operand is a column. The simple binary operator would
 
 ```groovy
 [column] (+-/*%) [any]
+
+// eg: you can write/use arithmetic operators as long as
+// your left operand is a column type. Otherwise, NO.
+Album.rating + 1 AS newRating
 ```
 
   * ADD (_column-1, column-2, ..._ ) 
