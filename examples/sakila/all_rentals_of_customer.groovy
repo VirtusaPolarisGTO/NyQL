@@ -1,6 +1,6 @@
-import java.sql.JDBCType
-
 /**
+ * For the given customer, returns all rental records in detail.
+ *
  * @author IWEERARATHNA
  */
 $DSL.select {

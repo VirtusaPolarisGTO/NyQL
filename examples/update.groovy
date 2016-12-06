@@ -1,8 +1,8 @@
-
 /**
+ * A join update.
+ *
  * @author IWEERARATHNA
  */
-
 $DSL.update {
 
     TARGET (Album.alias("alb"))

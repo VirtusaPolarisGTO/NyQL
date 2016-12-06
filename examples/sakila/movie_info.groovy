@@ -6,8 +6,9 @@ $DSL.select {
     TARGET (Film.alias("f"))
 
     JOIN (TARGET()) {
-        $IMPORT("partials/movie_join")
-        INNER_JOIN (Fork.alias("fk"))
+        // you can import/reuse join part from another file if
+        // the same join clauses are being joined in many queries.
+        $IMPORT("sakila/partials/movie_join")
     }
 
     FETCH ()

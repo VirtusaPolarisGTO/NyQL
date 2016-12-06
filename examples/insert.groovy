@@ -2,13 +2,14 @@
  * @author IWEERARATHNA
  */
 
+// example insert query
 $DSL.insert {
 
     TARGET (Song.alias("s"))
 
     DATA (
             "id": PARAM("id"),
-            "name": PARAM("str")
+            "title": PARAM("theTitle")
     )
 
 }

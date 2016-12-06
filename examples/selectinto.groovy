@@ -1,4 +1,6 @@
 /**
+ * Simple select into query.
+ *
  * @author IWEERARATHNA
  */
 $DSL.select {

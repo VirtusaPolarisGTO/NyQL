@@ -1,10 +1,3 @@
-import java.sql.JDBCType
-
-/**
- * @author IWEERARATHNA
- */
-def vals = $SESSION
-
 $DSL.select {
 /*
     TARGET SampleCity.alias('sc')
