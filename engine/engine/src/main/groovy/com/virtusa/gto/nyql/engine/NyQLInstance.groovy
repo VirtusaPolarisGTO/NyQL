@@ -158,7 +158,11 @@ class NyQLInstance {
     @CompileStatic
     String executeToJSON(String scriptName, Map<String, Object> data) throws NyException {
         Object result = execute(scriptName, data)
-        JsonOutput.toJson(result)
+        if (result == null) {
+            null
+        } else {
+            JsonOutput.toJson(result)
+        }
     }
 
     /**
