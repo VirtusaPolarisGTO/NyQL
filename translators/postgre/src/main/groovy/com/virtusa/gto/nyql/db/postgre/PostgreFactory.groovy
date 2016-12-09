@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.db.postgre
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.db.QTranslator
+import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import groovy.transform.CompileStatic
 /**
@@ -13,7 +14,7 @@ class PostgreFactory implements QDbFactory {
     private static final String PG = 'pg'
     private static final String PG_DRIVER_CLZ = 'org.postgresql.Driver'
     private static final String PG_DATA_SOURCE_NAME = 'org.postgresql.ds.PGSimpleDataSource'
-    private static final String PG_KEYWORDS_LOCATION = ''
+    private static final String PG_KEYWORDS_LOCATION = 'com/virtusa/gto/nyql/db/postgre/keywords.json'
     private Postgres postgres
 
     @Override
@@ -29,7 +30,7 @@ class PostgreFactory implements QDbFactory {
         if (loc != null) {
             file = new File(new File(String.valueOf(props.get('_location'))), loc)
         }
-        //SqlMisc.loadKeywords(PG_KEYWORDS_LOCATION, file)
+        SqlMisc.loadKeywords(PG_KEYWORDS_LOCATION, file)
     }
 
     @Override

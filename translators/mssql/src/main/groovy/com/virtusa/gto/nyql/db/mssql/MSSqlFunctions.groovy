@@ -1,12 +1,21 @@
 package com.virtusa.gto.nyql.db.mssql
 
+import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 /**
  * @author IWEERARATHNA
  */
-class MSSqlFunctions implements QFunctions {
+abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunctions {
+
+    protected MSSqlFunctions() {
+        super()
+    }
+
+    protected MSSqlFunctions(Collection<String> theKeywords) {
+        super(theKeywords)
+    }
 
     @Override
     String str_lpad(Object c) {
