@@ -15,6 +15,7 @@ enum QContextType {
     INSIDE_FUNCTION,
 
     UPDATE_FROM,
+    UPDATE_FROM_JOIN,
     UPDATE_JOIN,
     UPDATE_SET,
 

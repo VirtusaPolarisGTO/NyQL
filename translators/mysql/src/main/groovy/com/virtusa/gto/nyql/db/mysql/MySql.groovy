@@ -241,7 +241,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
             query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, delContext)).append(NL)
         }
-        return new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE)
+        new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE)
     }
 
     @CompileStatic

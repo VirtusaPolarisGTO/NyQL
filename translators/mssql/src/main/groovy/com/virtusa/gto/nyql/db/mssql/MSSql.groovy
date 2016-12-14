@@ -3,7 +3,6 @@ package com.virtusa.gto.nyql.db.mssql
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
-import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -180,8 +179,28 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     @CompileStatic
     @Override
     QResultProxy ___updateQuery(QueryUpdate q) {
-        // @TODO to be implemented
-        throw new NyException("Not yet implemented!")
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+
+        query.append('UPDATE ')
+        if (q._joiningTable != null) {
+            query.append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM_JOIN))
+        } else {
+            query.append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM))
+        }
+
+        if (q._assigns != null && q._assigns.__hasAssignments()) {
+            query.append(' SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(NL)
+        }
+
+        if (q._joiningTable != null) {
+            query.append(' FROM ').append(___deriveSource(q._joiningTable, paramList, QContextType.UPDATE_JOIN))
+        }
+
+        if (q.whereObj != null && q.whereObj.__hasClauses()) {
+            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL))
+        }
+        new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
     }
 
     @CompileStatic
@@ -240,8 +259,24 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     @CompileStatic
     @Override
     QResultProxy ___deleteQuery(QueryDelete q) {
-        // @TODO to be implemented
-        throw new NyException("Not yet implemented!")
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+        Table mainTable =  q.sourceTbl
+        QContextType delContext = QContextType.DELETE_CONDITIONAL
+
+        query.append('DELETE ')
+        if (q._joiningTable != null) {
+            query.append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM_JOIN)).append(' ').append(NL)
+            query.append('FROM ').append(___deriveSource(q._joiningTable, paramList, QContextType.DELETE_JOIN)).append(NL)
+            delContext = QContextType.DELETE_CONDITIONAL_JOIN
+        } else {
+            query.append('FROM ').append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append(NL)
+        }
+
+        if (q.whereObj != null && q.whereObj.__hasClauses()) {
+            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, delContext)).append(NL)
+        }
+        new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE)
     }
 
     QResultProxy ___insertQuery(QueryInsert q) {

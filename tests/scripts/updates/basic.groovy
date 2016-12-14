@@ -25,7 +25,8 @@ def innQP = $DSL.select {
             }
         },
         [
-            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL", ["title"]]
+            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL", ["title"]],
+            mssql: ['UPDATE "Film" f SET f.film_id = 1234, f.title = ?, f.language_id = NULL', ["title"]]
         ],
 
         $DSL.update {
@@ -42,7 +43,8 @@ def innQP = $DSL.select {
             }
         },
         [
-            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL WHERE f.year = 2016", ["title"]]
+            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = NULL WHERE f.year = 2016", ["title"]],
+            mssql: ['UPDATE "Film" f SET f.film_id = 1234, f.title = ?, f.language_id = NULL WHERE f.year = 2016', ["title"]]
         ],
 
         $DSL.update {
@@ -64,6 +66,9 @@ def innQP = $DSL.select {
         [
             mysql: ["UPDATE `Film` f LEFT JOIN `Actor` ac ON f.actor_id = ac.actor_id SET f.film_id = 1234, f.title = ? " +
                     "WHERE f.year = 2016",
+                    ["title"]],
+            mssql: ['UPDATE f SET f.film_id = 1234, f.title = ? FROM "Film" f LEFT JOIN "Actor" ac ON f.actor_id = ac.actor_id ' +
+                            'WHERE f.year = 2016',
                     ["title"]]
         ],
 
@@ -75,7 +80,8 @@ def innQP = $DSL.select {
             }
         },
         [
-            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = 1", ["title"]]
+            mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.title = ?, f.language_id = 1", ["title"]],
+            mssql: ['UPDATE "Film" f SET f.film_id = 1234, f.title = ?, f.language_id = 1', ["title"]]
         ],
 
         $DSL.update {
@@ -85,7 +91,8 @@ def innQP = $DSL.select {
             }
         },
         [
-            mysql: "UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = 1)"
+            mysql: "UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = 1)",
+            mssql: 'UPDATE "Film" f SET f.film_id = (SELECT * FROM "Film" f WHERE f.film_id = 1)'
         ],
 
         $DSL.update {
@@ -95,7 +102,8 @@ def innQP = $DSL.select {
             }
         },
         [
-            mysql: ["UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = ?)", ["id"]]
+            mysql: ["UPDATE `Film` f SET f.film_id = (SELECT * FROM `Film` f WHERE f.film_id = ?)", ["id"]],
+            mssql: ['UPDATE "Film" f SET f.film_id = (SELECT * FROM "Film" f WHERE f.film_id = ?)', ["id"]]
         ],
 
         $DSL.update {
@@ -110,6 +118,8 @@ def innQP = $DSL.select {
         },
         [
             mysql: ["UPDATE `Film` f SET f.film_id = 1234, f.releaseDate = ?, f.debutTime = ?, f.debutTime2 = ?, f.language_id = NULL",
+                    ["relDate", "debutTime", "debutTime2"]],
+            mssql: ['UPDATE "Film" f SET f.film_id = 1234, f.releaseDate = ?, f.debutTime = ?, f.debutTime2 = ?, f.language_id = NULL',
                     ["relDate", "debutTime", "debutTime2"]]
         ],
 
@@ -121,6 +131,7 @@ def innQP = $DSL.select {
             }
         },
         [
-            mysql: "UPDATE `Film` f SET f.film_id = 1234"
+            mysql: "UPDATE `Film` f SET f.film_id = 1234",
+            mssql: 'UPDATE "Film" f SET f.film_id = 1234'
         ],
 ]
