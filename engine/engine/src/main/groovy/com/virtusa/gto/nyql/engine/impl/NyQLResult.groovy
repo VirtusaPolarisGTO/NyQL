@@ -139,6 +139,24 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
     }
 
     /**
+     * In-place convert all values in the given column to a long column, so user
+     * does not need to convert it again and again for each individual
+     * values.
+     *
+     * @param column column to convert to long values.
+     * @return this mutated instance.
+     */
+    @CompileStatic
+    NyQLResult mutateToLong(String column) {
+        if (!isEmpty()) {
+            for (Map<String, Object> row : this) {
+                row.put(column, toLong(row.get(column)))
+            }
+        }
+        this
+    }
+
+    /**
      * In-place convert all values in the given column to a double values, so user
      * does not need to convert it again and again for each individual
      * values.
@@ -187,6 +205,24 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
         Map<String, Object> record = get(index)
         if (record.containsKey(column)) {
             toInt(record.get(column))
+        } else {
+            throw new NyException("The requested column '$column' does not exist in the specified record index at '$index'!")
+        }
+    }
+
+    /**
+     * Returns the column value as a long. If value is NULL, then return value will be null
+     * as well.
+     *
+     * @param index record index. This must be between 0 to N-1 inclusively.
+     * @param column column name.
+     * @return value as long.
+     */
+    @CompileStatic
+    Integer asLong(int index, String column) throws NyException {
+        Map<String, Object> record = get(index)
+        if (record.containsKey(column)) {
+            toLong(record.get(column))
         } else {
             throw new NyException("The requested column '$column' does not exist in the specified record index at '$index'!")
         }
@@ -252,6 +288,17 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
             ((Number) val).intValue()
         } else {
             Integer.parseInt(String.valueOf(val))
+        }
+    }
+
+    @CompileStatic
+    private static Integer toLong(Object val) {
+        if (val == null) {
+            null
+        } else if (val instanceof Number) {
+            ((Number) val).longValue()
+        } else {
+            Long.parseLong(String.valueOf(val))
         }
     }
 

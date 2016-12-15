@@ -54,13 +54,13 @@ class Postgres extends PostgresFunctions implements QTranslator {
     @CompileStatic
     @Override
     String ___quoteString(final String text) {
-        return QUtils.quote(text, STR_QUOTE)
+        QUtils.quote(text, STR_QUOTE)
     }
 
     @CompileStatic
     @Override
     String ___convertBool(Boolean value) {
-        return ___quoteString(value ? TRUE_STR : FALSE_STR)
+        ___quoteString(value ? TRUE_STR : FALSE_STR)
     }
 
     @CompileStatic
