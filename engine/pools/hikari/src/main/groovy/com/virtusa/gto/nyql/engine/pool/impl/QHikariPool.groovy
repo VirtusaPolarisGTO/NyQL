@@ -28,8 +28,8 @@ class QHikariPool implements QJdbcPool {
 
     @Override
     Connection getConnection() throws NyException {
-        LOGGER.debug('Requesting a new connection')
-        return hikari.getConnection()
+        LOGGER.trace('Requesting a new connection')
+        hikari.getConnection()
     }
 
     @Override

@@ -26,11 +26,21 @@ class QExternalJdbcFactory implements QExecutorFactory {
 
     }
 
+    /**
+     * By default this creates a reusable jdbc executor.
+     *
+     * @return executor instance.
+     */
     @Override
     QExecutor create() {
         new QJdbcExecutor(connection)
     }
 
+    /**
+     * By default, this also creates a reusable jdbc executor.
+     *
+     * @return executor instance.
+     */
     @Override
     QExecutor createReusable() {
         new QJdbcExecutor(connection)

@@ -135,7 +135,7 @@ class QSession {
     void closeScript() {
         def stack = decrStack()
         if (executor != null && stack <= 0) {
-            LOGGER.debug('Closing executor since script has completed running.')
+            LOGGER.trace('Closing executor since script has completed running.')
             executor.close()
             executor = null
         } else if (stack > 0) {

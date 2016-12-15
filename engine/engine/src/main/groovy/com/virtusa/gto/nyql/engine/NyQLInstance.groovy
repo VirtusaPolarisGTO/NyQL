@@ -9,6 +9,8 @@ import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QSession
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
+
+import java.util.function.BiFunction
 /**
  * @author IWEERARATHNA
  */
@@ -179,5 +181,38 @@ class NyQLInstance {
     @CompileStatic
     String executeToJSON(String scriptName) throws NyException {
         executeToJSON(scriptName, [:])
+    }
+
+    /**
+     * Programmatically (using API) do some sequence of operations inside a transaction. This would
+     * be useful, specially if you don't want to script your transaction logic externally. In case
+     * of an exception, transaction will be rollback automatically, but will throw the exception.
+     *
+     * Always use the provided nyql instance to execute scripts at all.
+     *
+     * @param transactionName a unique id for this executing transaction.
+     * @param body the content of transaction.
+     * @param parameter data for the transaction content.
+     * @param autoCommit should do auto commit
+     * @throws NyException any exception thrown while transaction.
+     */
+    @CompileStatic
+    <T> T doTransaction(String transactionName, BiFunction<NyQLInstance, Map<String, Object>, T> body,
+                        Map<String, Object> data, boolean autoCommit) throws NyException {
+        QSession qSession = QSession.create(configurations, transactionName)
+        try {
+            qSession.executor.startTransaction()
+            T result = body.apply(this, data)
+            if (autoCommit) {
+                qSession.executor.commit()
+            }
+            result
+
+        } catch (Exception ex) {
+            qSession.executor.rollback(null)
+            throw new NyException("An exception occurred inside transaction '$transactionName'!", ex)
+        } finally {
+            qSession.executor.done()
+        }
     }
 }

@@ -55,4 +55,12 @@ class QJdbcExecutorFactory implements QExecutorFactory {
         jdbcPool.shutdown()
     }
 
+    /**
+     * Returns the pool associated with this jdbc factory.
+     *
+     * @return the pool instance.
+     */
+    QJdbcPool getJdbcPool() {
+        jdbcPool
+    }
 }
