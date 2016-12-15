@@ -1,9 +1,11 @@
 package com.virtusa.gto.nyql.db.postgre
 
+import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.SqlMisc
+import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import groovy.transform.CompileStatic
 /**
@@ -20,17 +22,22 @@ class PostgreFactory implements QDbFactory {
     @Override
     void init(Configurations nyConfigs) throws NyConfigurationException {
         // load postgre keyword list
-        postgres = new Postgres(loadKeywords(nyConfigs))
+        Collection<String> keywords = loadKeywords(nyConfigs)
+
+        postgres = new Postgres(new TranslatorOptions(keywords))
     }
 
     private static Set<String> loadKeywords(Configurations nyConfigs) {
         Map props = nyConfigs.getAllProperties()
-        String loc = props.get('queries')?.get('keywordsPath')
+        String loc = props.get(ConfigKeys.QUERIES_ROOT)?.get(PG)?.get(ConfigKeys.QUERIES_KEYWORDS)
+        if (loc == null) {
+            loc = props.get(ConfigKeys.QUERIES_ROOT)?.get(ConfigKeys.QUERIES_KEYWORDS)
+        }
         File file = null
         if (loc != null) {
-            file = new File(new File(String.valueOf(props.get('_location'))), loc)
+            file = new File(new File(String.valueOf(props.get(ConfigKeys.LOCATION_KEY))), loc)
         }
-        SqlMisc.loadKeywords(PG_KEYWORDS_LOCATION, file)
+        return SqlMisc.loadKeywords(PG_KEYWORDS_LOCATION, file)
     }
 
     @Override

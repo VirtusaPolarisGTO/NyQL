@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.db.mssql
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
+import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -28,8 +29,8 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     MSSql() {
     }
 
-    MSSql(Collection<String> theKeywords) {
-        super(theKeywords)
+    MSSql(TranslatorOptions theOptions) {
+        super(theOptions)
     }
 
     @CompileStatic

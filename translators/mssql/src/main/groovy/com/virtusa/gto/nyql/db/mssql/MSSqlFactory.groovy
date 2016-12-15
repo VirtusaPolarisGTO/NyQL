@@ -1,9 +1,11 @@
 package com.virtusa.gto.nyql.db.mssql
 
+import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.SqlMisc
+import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 
 /**
@@ -20,17 +22,22 @@ class MSSqlFactory implements QDbFactory {
     @Override
     void init(Configurations nyConfigs) throws NyConfigurationException {
         // load mssql keywords
-        msSql = new MSSql(loadKeywords(nyConfigs))
+        Collection<String> keywords = loadKeywords(nyConfigs)
+
+        msSql = new MSSql(new TranslatorOptions(keywords))
     }
 
     private static Set<String> loadKeywords(Configurations nyConfigs) {
         Map props = nyConfigs.getAllProperties()
-        String loc = props.get('queries')?.get('keywordsPath')
+        String loc = props.get(ConfigKeys.QUERIES_ROOT)?.get(MSSQL)?.get(ConfigKeys.QUERIES_KEYWORDS)
+        if (loc == null) {
+            loc = props.get(ConfigKeys.QUERIES_ROOT)?.get(ConfigKeys.QUERIES_KEYWORDS)
+        }
         File file = null
         if (loc != null) {
-            file = new File(new File(String.valueOf(props.get('_location'))), loc)
+            file = new File(new File(String.valueOf(props.get(ConfigKeys.LOCATION_KEY))), loc)
         }
-        SqlMisc.loadKeywords(MSSQL_KEYWORD_LOCATION, file)
+        return SqlMisc.loadKeywords(MSSQL_KEYWORD_LOCATION, file)
     }
 
     @Override

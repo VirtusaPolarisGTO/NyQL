@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.db.mysql
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
+import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -24,7 +25,10 @@ class MySql extends MySqlFunctions implements QTranslator {
     static final String CP = ')'
 
     MySql() { super() }
-    MySql(Collection<String> theKeywords) { super(theKeywords) }
+
+    MySql(TranslatorOptions theOptions) {
+        super(theOptions)
+    }
 
     @CompileStatic
     @Override

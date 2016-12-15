@@ -23,6 +23,10 @@ final class ConfigKeys {
     static final String TRANSLATORS = 'translators'
     static final String ACTIVATE_DB = 'activate'
 
+    static final String QUERIES_ROOT = 'queries'
+    static final String QUERIES_KEYWORDS = 'keywordsPath'
+    static final String QUERIES_MAPPINGS = 'nameMappingPath'
+
     static final String LOCATION_KEY = '_location'
 
     static final JDBC_DRIVER_CLASS_KEY = 'jdbcDriverClass'

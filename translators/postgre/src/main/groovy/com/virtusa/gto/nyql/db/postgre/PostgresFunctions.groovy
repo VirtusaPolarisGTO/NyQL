@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.QContextType
 import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
+import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.units.QNumber
@@ -20,8 +21,8 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
         super()
     }
 
-    PostgresFunctions(Collection<String> theKeywords) {
-        super(theKeywords)
+    PostgresFunctions(TranslatorOptions theOptions) {
+        super(theOptions)
     }
 
     @CompileStatic String current_date(c) { 'CURRENT_TIME' }

@@ -9,7 +9,7 @@
     * Binary value input/output support through base64 encoded values
     
   * Enhancements
-    * Easily configure NyQL programmatically using only mandatory parameters.
+    * Easily configure NyQL programmatically using only minimum required parameters.
     * Ability to provide non-plaintext password using `passwordEnc` in configuration
     * Readable functions for CURRENT_TIME, CURRENT_DATE, CURRENT_EPOCH instead of CURTIME, CURDATE, CUERPOCH respectively.
     * Timestamp and date parameters can be converted automatically through `PARAM_TIMESTAMP` and `PARAM_DATE`.  

@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.db.mysql
 import com.virtusa.gto.nyql.QContextType
 import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
+import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import groovy.transform.CompileStatic
@@ -15,8 +16,8 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
         super()
     }
 
-    protected MySqlFunctions(Collection<String> theKeywords) {
-        super(theKeywords)
+    MySqlFunctions(TranslatorOptions theOptions) {
+        super(theOptions)
     }
 
     @CompileStatic

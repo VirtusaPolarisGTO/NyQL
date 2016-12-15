@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.db.mssql
 
 import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
+import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 /**
@@ -13,8 +14,8 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
         super()
     }
 
-    protected MSSqlFunctions(Collection<String> theKeywords) {
-        super(theKeywords)
+    MSSqlFunctions(TranslatorOptions theOptions) {
+        super(theOptions)
     }
 
     @Override

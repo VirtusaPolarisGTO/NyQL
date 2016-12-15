@@ -17,6 +17,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
 
     private static final String EMPTY = "";
 
+    private final TranslatorOptions translatorOptions;
     private final Collection<String> keywords;
 
     private static final String NL = "\n";
@@ -24,15 +25,21 @@ public abstract class AbstractSQLTranslator implements QTranslator {
     private static final String COMMA = ", ";
 
     protected AbstractSQLTranslator() {
-        keywords = new HashSet<>();
+        translatorOptions = TranslatorOptions.empty();
+        keywords = translatorOptions.getKeywords();
     }
 
-    protected AbstractSQLTranslator(Collection<String> theKeywords) {
-        if (theKeywords != null) {
-            keywords = theKeywords;
+    protected AbstractSQLTranslator(TranslatorOptions theOptions) {
+        if (theOptions != null) {
+            translatorOptions = theOptions;
         } else {
-            keywords = new HashSet<>();
+            translatorOptions = TranslatorOptions.empty();
         }
+        keywords = translatorOptions.getKeywords();
+    }
+
+    protected TranslatorOptions getTranslatorOptions() {
+        return translatorOptions;
     }
 
     protected String tableAlias(Table table, String qChar) {
