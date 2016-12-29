@@ -82,6 +82,29 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
     }
 
+    /**
+     * Returns correct table name for the given table name, if there is a name mapping for it.
+     *
+     * Usually this method will be used by Oracle implementation.
+     *
+     * @param tblName table name.
+     * @return mapping table name.
+     */
+    protected final String tableName(String tblName) {
+        return getTranslatorOptions().tableMapName(tblName);
+    }
+
+    /**
+     * Returns correct column name of the table, if there is a name mapping for it.
+     *
+     * @param tblName table name.
+     * @param colName column name.
+     * @return mapping column name.
+     */
+    protected final String columnName(String tblName, String colName) {
+        return getTranslatorOptions().columnMapName(tblName, colName);
+    }
+
     protected String generateTableJoinName(final Join join, final String joinType, final QContextType contextType, List<AParam> paramOrder) {
         StringBuilder qstr = new StringBuilder();
 
@@ -243,7 +266,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         if (!QUtils.isNullOrEmpty(q.get_dataColumns())) {
             return createProxy("", queryType, paramList, q.get_dataColumns(), q);
         }
-        throw new NyException("Parts are no longer supports to reuse other than WHERE and JOINING!");
+        throw new NyException("Unknown or incomplete re-usable query clause!");
     }
 
     private static QResultProxy createProxy(String query, QueryType queryType, List<AParam> params,

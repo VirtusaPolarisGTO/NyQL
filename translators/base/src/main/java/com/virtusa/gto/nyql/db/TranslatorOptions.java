@@ -1,8 +1,5 @@
 package com.virtusa.gto.nyql.db;
 
-import com.virtusa.gto.nyql.Column;
-import com.virtusa.gto.nyql.Table;
-
 import java.util.*;
 
 /**
@@ -30,15 +27,15 @@ public class TranslatorOptions {
         return keywords;
     }
 
-    public String tableMapName(Table table) {
-        return tableMappings.getOrDefault(table.get__name(), table.get__name());
+    public String tableMapName(String tblName) {
+        return tableMappings.getOrDefault(tblName, tblName);
     }
 
-    public String columnMapName(Table table, Column column) {
-        if (columnMappings.containsKey(table.get__name())) {
-            return columnMappings.get(table.get__name()).getOrDefault(column.get__name(), column.get__name());
+    public String columnMapName(String table, String column) {
+        if (columnMappings.containsKey(table)) {
+            return columnMappings.get(table).getOrDefault(column, column);
         } else {
-            return column.get__name();
+            return column;
         }
     }
 
