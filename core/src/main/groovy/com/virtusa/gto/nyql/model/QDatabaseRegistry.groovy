@@ -30,7 +30,7 @@ final class QDatabaseRegistry {
                 throw new NyException("There are no registered db implementation found for '$dbName'!")
             }
 
-            DSLContext dslContext = DSLContext.register(dbName)
+            DSLContext dslContext = new DSLContext(dbName)
             dslContext.activeFactory = factory
 
             dslContextMap.put(dbName, dslContext)

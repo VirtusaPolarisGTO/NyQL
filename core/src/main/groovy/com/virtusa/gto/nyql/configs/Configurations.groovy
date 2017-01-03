@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.configs
 
+import com.virtusa.gto.nyql.DSLContext
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
@@ -39,6 +40,7 @@ class Configurations {
     private boolean configured = false
     private ClassLoader classLoader
     private QProfiling profiler
+    private DSLContext dslContext
 
     private QDatabaseRegistry databaseRegistry
     private QExecutorRegistry executorRegistry
@@ -319,6 +321,10 @@ class Configurations {
 
     DateTimeFormatter getTimestampFormatter() {
         timestampFormatter
+    }
+
+    DSLContext getDslContext() {
+        databaseRegistry.load(getActivatedDb())
     }
 
     static Configurations instance() {

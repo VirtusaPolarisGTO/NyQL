@@ -1,6 +1,5 @@
 package com.virtusa.gto.nyql.model
 
-import com.virtusa.gto.nyql.DSLContext
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.db.QDbFactory
 import groovy.transform.CompileStatic
@@ -82,7 +81,7 @@ class QSession {
     }
 
     static QSession create(Configurations configurations, String theScriptId) {
-        QSession qSession = createSession(DSLContext.getActiveDSLContext().activeFactory,
+        QSession qSession = createSession(configurations.getDslContext().activeFactory,
                 configurations.repositoryRegistry.defaultRepository(),
                 null,
                 configurations.executorRegistry.defaultExecutorFactory())
