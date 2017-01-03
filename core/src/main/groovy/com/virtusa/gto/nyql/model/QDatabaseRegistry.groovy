@@ -33,6 +33,7 @@ final class QDatabaseRegistry {
             DSLContext dslContext = new DSLContext(dbName)
             dslContext.activeFactory = factory
 
+            factoryRegistry.put(dbName, factory)
             dslContextMap.put(dbName, dslContext)
             dslContext
         }
