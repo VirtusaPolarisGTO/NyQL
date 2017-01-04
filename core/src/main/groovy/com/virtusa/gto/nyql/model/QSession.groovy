@@ -81,7 +81,7 @@ class QSession {
     }
 
     static QSession create(Configurations configurations, String theScriptId) {
-        QSession qSession = createSession(configurations.getDslContext().activeFactory,
+        QSession qSession = createSession(configurations.activeDbFactory,
                 configurations.repositoryRegistry.defaultRepository(),
                 null,
                 configurations.executorRegistry.defaultExecutorFactory())

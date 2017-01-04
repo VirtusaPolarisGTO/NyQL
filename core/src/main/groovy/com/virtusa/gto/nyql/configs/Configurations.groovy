@@ -1,6 +1,5 @@
 package com.virtusa.gto.nyql.configs
 
-import com.virtusa.gto.nyql.DSLContext
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory
 
 import java.lang.reflect.Constructor
 import java.time.format.DateTimeFormatter
-
 /**
  * @author IWEERARATHNA
  */
@@ -40,7 +38,6 @@ class Configurations {
     private boolean configured = false
     private ClassLoader classLoader
     private QProfiling profiler
-    private DSLContext dslContext
 
     private QDatabaseRegistry databaseRegistry
     private QExecutorRegistry executorRegistry
@@ -116,7 +113,7 @@ class Configurations {
                     }
                 }
             }
-            databaseRegistry.load(activeDb)
+            //databaseRegistry.load(activeDb)
 
         } else {
             throw new NyConfigurationException('No NyQL translators have been specified in the configuration file!')
@@ -307,10 +304,6 @@ class Configurations {
         profiler
     }
 
-    QDatabaseRegistry getDatabaseRegistry() {
-        databaseRegistry
-    }
-
     QExecutorRegistry getExecutorRegistry() {
         executorRegistry
     }
@@ -323,8 +316,8 @@ class Configurations {
         timestampFormatter
     }
 
-    DSLContext getDslContext() {
-        databaseRegistry.load(getActivatedDb())
+    QDbFactory getActiveDbFactory() {
+        databaseRegistry.getDbFactory(getActivatedDb())
     }
 
     static Configurations instance() {
