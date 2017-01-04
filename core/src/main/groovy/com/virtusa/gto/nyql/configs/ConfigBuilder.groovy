@@ -284,7 +284,7 @@ class ConfigBuilder {
      * @return an instance of config builder.
      */
     static ConfigBuilder instance() {
-        Holder.INSTANCE
+        new ConfigBuilder()
     }
 
     @PackageScope void reset() {
