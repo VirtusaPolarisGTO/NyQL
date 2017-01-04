@@ -58,7 +58,7 @@ You can insert large batch of data at once by declaring the `$DSL.bulkInsert` sy
 
 You can use the same set of clauses used in `$DSL.insert` syntax except being used for select insert query clauses.
 
-When you execute a query do as below to send all records to be inserted.
+When you execute a query do as below to send all records to be inserted under the key `__batch__`.
 
 ```groovy
 $DSL.bulkInsert {
@@ -79,7 +79,7 @@ List<Map<String, Object>> records = ...
 
 // this can only have a single variable, or if multiple, then the variable name must be equal to ''batch''
 Map<String, Object> data = new HashMap<>();
-data.put("batch", records);
+data.put("__batch__", records);
 
 NyQL.execute("<bulk-script-name>", data);
 ```
