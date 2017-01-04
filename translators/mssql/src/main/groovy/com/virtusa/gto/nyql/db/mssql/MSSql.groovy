@@ -86,7 +86,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     String ___tableName(final Table table, final QContextType contextType) {
         if (contextType == QContextType.INTO || contextType == QContextType.TRUNCATE
                 || contextType == QContextType.DELETE_FROM) {
-            return QUtils.quote(table.__name)
+            return QUtils.quote(table.__name, QUOTE)
         } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
                 || contextType == QContextType.DELETE_JOIN) {
             if (table.__isResultOf()) {
