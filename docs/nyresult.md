@@ -68,6 +68,18 @@ Initially supports below mutate functions.
 In every above occasion, the `null` values will remain `null`. And it may throw cast exceptions
 if you try to convert a column which has actually a big value than the type it is converting.
 
+``` groovy
+NyQLResult result = nyInstance.execute("scriptId", data);
+result.mutateToBool("is_active");   // convert 'is_active' column to boolean
+result.mutateToInt("total");        // convert 'total' column to integers
+
+// now access the cell value.
+boolean activeFirst = result.getField(0, "is_active");
+
+// NOTE: use primitive type in case if you are expecting null values
+Boolean activeSecond = result.getField(1, "is_active");
+```
+
 #### Accessing Count and Keys
 
 When you execute a insert/update/delete query NyQL returns total number of affected
