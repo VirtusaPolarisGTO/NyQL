@@ -169,7 +169,13 @@ class QJdbcExecutor implements QExecutor {
             connection.setAutoCommit(false)
 
             List<AParam> parameters = script.proxy.orderedParameters
-            Object batchData = script.qSession.sessionVariables[JDBCConstants.BATCH_KEY]
+            Object batchData = script.qSession.sessionVariables[JDBCConstants.BATCH_ALT_KEY]
+            if (batchData == null) {
+                LOGGER.warn('[DEPRECATED] Use the key "__batch__" to provide data for all batch operations ' +
+                        'instead of "batch".')
+                batchData = script.qSession.sessionVariables[JDBCConstants.BATCH_KEY]
+            }
+
             if (batchData == null) {
                 throw new NyScriptExecutionException("No batch data has been specified through session variables 'batch'!")
             } else if (!(batchData instanceof List)) {
