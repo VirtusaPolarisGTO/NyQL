@@ -39,11 +39,15 @@ class Caching implements Closeable {
 
     void compileAllScripts(Collection<QSource> sources) throws NyException {
         if (configurations.cacheRawScripts()) {
-            LOGGER.info("Compiling all ${sources.size()} dsl script(s)...")
+            int n = sources.size()
+            int len = String.valueOf(n).length()
+            int curr = 1
+
+            LOGGER.info("Compiling all ${n} dsl script(s)...")
             for (QSource qSource : sources) {
                 String id = qSource.id
                 try {
-                    LOGGER.debug('  Compiling: ' + id)
+                    LOGGER.debug('  Compiling [' + padLeft(len, curr++) + '/' + n + ']: ' + id)
                     gcl.parseClass(qSource.codeSource, true)
                 } catch (CompilationFailedException ex) {
                     LOGGER.error("Compilation error in script '$id'", ex)
@@ -52,6 +56,10 @@ class Caching implements Closeable {
             }
             LOGGER.info('Compilation successful!')
         }
+    }
+
+    private String padLeft(int len, int number) {
+        ' '*(len - String.valueOf(number).length()) + number
     }
 
     boolean hasGeneratedQuery(String scriptId) {
