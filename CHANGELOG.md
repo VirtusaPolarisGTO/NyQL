@@ -6,8 +6,8 @@
     instead of previously used key 'batch'.
 
   * Features
-    * New result object `NyQLResult` having friendly methods to deal with the output of a query/script.
-    * Ability to configure NyQL using environment variables at startup time (see Readme file for more [info](l#configuration-values-as-runtime-properties)).
+    * New result object [`NyQLResult`](docs/nyresult.md) having friendly methods to deal with the output of a query/script.
+    * Ability to configure NyQL using environment variables at startup time (see Readme file for more [info](README.md#configuration-values-as-runtime-properties)).
     * New `batchUpdate` query (similar to batchInsert)
     * Binary value input/output support through base64 encoded values
     
