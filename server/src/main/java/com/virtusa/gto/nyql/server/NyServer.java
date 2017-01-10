@@ -30,28 +30,38 @@ public class NyServer {
     private static final String DEF_SERVER_JSON = "./config/server.json";
     private static final String DEF_NYQL_JSON = "./config/nyql.json";
 
+    private static final String CONTENT_JSON = "application/json";
+
     private static final Gson GSON = new Gson();
 
     private String basePath;
+
+    private Map<String, Object> configs;
+    private boolean authEnabled = true;
+    private String appToken = null;
 
     private NyServer() {
     }
 
     @SuppressWarnings("unchecked")
     private void init() {
-        String serverJson = System.getProperty("NYSERVER_CONFIG_PATH", DEF_SERVER_JSON);
-        String nyqlJson = System.getProperty("NYSERVER_NYJSON_PATH", DEF_NYQL_JSON);
+        String serverJson = readEnv("NYSERVER_CONFIG_PATH", DEF_SERVER_JSON);
+        String nyqlJson = readEnv("NYSERVER_NYJSON_PATH", DEF_NYQL_JSON);
 
         // read server config file
         File confFile = new File(serverJson);
         JsonSlurper jsonSlurper = new JsonSlurper();
         Map<String, Object> confObject = (Map<String, Object>) jsonSlurper.parse(confFile, StandardCharsets.UTF_8.name());
 
+        configs = confObject;
+        Map<String, Object> authConfigs = (Map<String, Object>) confObject.get("auth");
+        authEnabled = Boolean.parseBoolean(authConfigs.get("enabled").toString());
+        appToken = readEnv("NYSERVER_AUTH_TOKEN", authConfigs.get("token").toString());
         basePath = confObject.get("basePath") != null ? String.valueOf(confObject.get("basePath")) : "";
         if (basePath.endsWith("/")) {
             basePath = basePath.substring(0, basePath.length() - 1);
         }
-        int port = (int) confObject.get("port");
+        int port = Integer.parseInt(readEnv("NYSERVER_PORT", confObject.get("port").toString()));
 
         File nyConfigFile = new File(nyqlJson);
         NyQL.configure(nyConfigFile);
@@ -66,12 +76,15 @@ public class NyServer {
 
         // register all routes...
         registerRoutes();
-
         LOGGER.debug("Server is running at " + port + "...");
     }
 
     private void registerRoutes() {
-        Spark.webSocket(basePath + "/profile", NyProfileSocket.class);
+        if ((boolean)configs.getOrDefault("websocket", true)) {
+            Spark.webSocket(basePath + "/profile", NyProfileSocket.class);
+        }
+
+        Spark.before((request, response) -> checkAuthHeader(request));
 
         Spark.post(basePath + "/parse", this::epParse, GSON::toJson);
         Spark.post(basePath + "/execute", this::epExecute, GSON::toJson);
@@ -80,9 +93,26 @@ public class NyServer {
         Spark.exception(NyException.class, this::anyError);
     }
 
+    private void checkAuthHeader(Request request) throws NyServerAuthException {
+        if (!authEnabled) {
+            return;
+        }
+        String header = request.headers("Authorization");
+        if (header == null) {
+            throw new NyServerAuthException();
+        } else {
+            if (header.startsWith("Bearer ")) {
+                header = header.substring(7);
+            }
+            if (!header.equals(appToken)) {
+                throw new NyServerAuthException();
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private Object epParse(Request req, Response res) throws Exception {
-        res.type("application/json");
+        res.type(CONTENT_JSON);
 
         Map<String, Object> bodyData = (Map<String, Object>) new JsonSlurper().parseText(req.body());
         String scriptId = String.valueOf(bodyData.get("scriptId"));
@@ -99,7 +129,7 @@ public class NyServer {
             r.put("params", null);
         } else {
             r.put("result", null);
-            r.put("query", result.getProxy().getQuery());
+            r.put("query", result.getProxy() == null ? null : result.getProxy().getQuery());
             r.put("params", result.getProxy().getOrderedParameters().stream()
                     .map(AParam::get__name).collect(Collectors.toList()));
         }
@@ -108,20 +138,23 @@ public class NyServer {
 
     @SuppressWarnings("unchecked")
     private Object epExecute(Request req, Response res) throws Exception {
-        res.type("application/json");
+        res.type(CONTENT_JSON);
 
         Map<String, Object> bodyData = (Map<String, Object>) new JsonSlurper().parseText(req.body());
         String scriptId = String.valueOf(bodyData.get("scriptId"));
-        Map<String, Object> data = new HashMap<>();
-        if (bodyData.containsKey("data")) {
-            data = (Map<String, Object>) bodyData.get("data");
-        }
+        Map<String, Object> data = (Map<String, Object>) bodyData.getOrDefault("data", new HashMap<>());
 
-        return NyQL.execute(scriptId, data);
+        Map<String, Object> r = new HashMap<>();
+        r.put("result", NyQL.execute(scriptId, data));
+        return r;
     }
 
     private void anyError(Exception ex, Request req, Response res) {
-        res.status(500);
+        if (ex instanceof NyServerAuthException) {
+            Spark.halt(401, ex.getMessage());
+        } else {
+            res.status(500);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -133,4 +166,12 @@ public class NyServer {
         server.init();
     }
 
+    private static String readEnv(String key, String defValue) {
+        String val = System.getProperty(key, System.getenv(key));
+        if (val == null) {
+            return defValue;
+        } else {
+            return val;
+        }
+    }
 }

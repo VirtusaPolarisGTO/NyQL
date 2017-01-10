@@ -3,12 +3,10 @@
 
   "basePath": "/ny",
 
-  "ssl": {
-    "enabled": false,
+  "websocket": true,
 
-    "keystoreFile": "",
-    "keystorePassword": "",
-    "truststoreFile": "",
-    "truststorePassword": ""
+  "auth": {
+    "enabled": true,
+    "token": "f220d052-f133-492e-bf4c-c709b418e73f"
   }
 }
