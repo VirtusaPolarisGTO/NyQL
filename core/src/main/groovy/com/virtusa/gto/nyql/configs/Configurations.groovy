@@ -277,7 +277,7 @@ class Configurations {
     }
 
     String getActivatedDb() {
-        (String) System.getProperty(ConfigKeys.SYS_ACTIVE_DB, properties.activate)
+        (String) QUtils.readEnv(ConfigKeys.SYS_ACTIVE_DB, properties.activate)
     }
 
     boolean cacheRawScripts() {

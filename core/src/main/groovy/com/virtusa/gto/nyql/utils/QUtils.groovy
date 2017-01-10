@@ -23,6 +23,15 @@ final class QUtils {
     private static final String OP = '('
     private static final String CP = ')'
 
+    static String readEnv(String key, String defValue = null) {
+        String eval = System.getenv(key);
+        if (eval == null) {
+            System.getProperty(key, defValue)
+        } else {
+            eval
+        }
+    }
+
     static QContextType findDeleteContext(QContextType contextType) {
         if (contextType == QContextType.DELETE_CONDITIONAL || contextType == QContextType.DELETE_CONDITIONAL_JOIN) {
             contextType

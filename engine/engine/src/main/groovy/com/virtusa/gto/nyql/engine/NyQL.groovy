@@ -6,6 +6,7 @@ import com.virtusa.gto.nyql.configs.ConfigParser
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.QScript
+import com.virtusa.gto.nyql.utils.QUtils
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
@@ -36,7 +37,7 @@ class NyQL {
 
     static {
         try {
-            if (!Boolean.parseBoolean(System.getProperty(BOOTSTRAP_KEY, TRUE_STR))) {
+            if (!Boolean.parseBoolean(QUtils.readEnv(BOOTSTRAP_KEY, TRUE_STR))) {
                 LOGGER.warn('*' * STAR_LEN)
                 LOGGER.warn('You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!')
                 LOGGER.warn('*' * STAR_LEN)
@@ -45,7 +46,7 @@ class NyQL {
 
             configure()
 
-            if (Boolean.parseBoolean(System.getProperty(AUTO_SHUTDOWN_KEY, FALSE_STR))) {
+            if (Boolean.parseBoolean(QUtils.readEnv(AUTO_SHUTDOWN_KEY, FALSE_STR))) {
                 LOGGER.warn('Automatically adding a NyQL shutdown hook...')
                 Runtime.runtime.addShutdownHook(new Thread ({ shutdown() }))
             } else {
@@ -98,7 +99,7 @@ class NyQL {
      * @return true if configured from system property.
      */
     private static boolean configFromSystemProperty() {
-        String path = System.getProperty(CONFIG_PATH_KEY, null)
+        String path = QUtils.readEnv(CONFIG_PATH_KEY, null)
         if (path != null) {
             LOGGER.debug('NyQL is configuring from path specified in system property: ' + path)
             File inputConfig = new File(path)
@@ -121,7 +122,7 @@ class NyQL {
      * @return true if successfully configured from
      */
     private static boolean configFromClasspath() {
-        if (!asBoolean(System.getProperty(LOAD_CLASSPATH_KEY, TRUE_STR))) {
+        if (!asBoolean(QUtils.readEnv(LOAD_CLASSPATH_KEY, TRUE_STR))) {
             LOGGER.warn('NyQL configuration from classpath has been disabled!')
             return false
         }

@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.engine.pool.impl
 import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.engine.pool.QJdbcPool
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.utils.QUtils
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.slf4j.Logger
@@ -36,20 +37,25 @@ class QHikariPool implements QJdbcPool {
     void init(Map options) throws NyException {
         HikariConfig config = new HikariConfig();
         //config.setDataSourceClassName(String.valueOf(options.dataSourceClassName))
-        if (System.getProperty(ConfigKeys.SYS_JDBC_DRIVER) != null) {
-            config.setDriverClassName(System.getProperty(ConfigKeys.SYS_JDBC_DRIVER))
+        String jdbcDriverClass = QUtils.readEnv(ConfigKeys.SYS_JDBC_DRIVER)
+        String jdbcUrl = QUtils.readEnv(ConfigKeys.SYS_JDBC_URL, String.valueOf(options.url))
+        String jdbcUserName = QUtils.readEnv(ConfigKeys.SYS_JDBC_USERNAME, String.valueOf(options.username))
+        String jdbcPassword = QUtils.readEnv(ConfigKeys.SYS_JDBC_PASSWORD)
+
+        if (jdbcDriverClass != null) {
+            config.setDriverClassName(jdbcDriverClass)
         } else if (options.containsKey(ConfigKeys.JDBC_DRIVER_CLASS_KEY)) {
             config.setDriverClassName(String.valueOf(options.jdbcDriverClass))
         }
-        config.setJdbcUrl(System.getProperty(ConfigKeys.SYS_JDBC_URL, String.valueOf(options.url)))
-        config.setUsername(System.getProperty(ConfigKeys.SYS_JDBC_USERNAME, String.valueOf(options.username)))
+        config.setJdbcUrl(jdbcUrl)
+        config.setUsername(jdbcUserName)
 
         // read password correctly
-        if (System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD_ENC) != null) {
-            config.setPassword(new String(Base64.decoder.decode(System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD_ENC)),
-                    StandardCharsets.UTF_8))
-        } else if (System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD) != null) {
-            config.setPassword(System.getProperty(ConfigKeys.SYS_JDBC_PASSWORD))
+        String passEnc = QUtils.readEnv(ConfigKeys.SYS_JDBC_PASSWORD_ENC)
+        if (passEnc != null) {
+            config.setPassword(new String(Base64.decoder.decode(passEnc), StandardCharsets.UTF_8))
+        } else if (jdbcPassword != null) {
+            config.setPassword(jdbcPassword)
         } else if (options.passwordEnc) {
             config.setPassword(new String(Base64.decoder.decode(String.valueOf(options.passwordEnc)), StandardCharsets.UTF_8))
         } else {
