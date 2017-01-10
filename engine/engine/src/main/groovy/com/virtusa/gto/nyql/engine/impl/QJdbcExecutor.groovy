@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.impl
 
+import com.virtusa.gto.nyql.engine.exceptions.NyParamNotFoundException
 import com.virtusa.gto.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.nyql.engine.pool.QJdbcPoolFetcher
 import com.virtusa.gto.nyql.engine.transform.JdbcCallResultTransformer
@@ -14,6 +15,7 @@ import com.virtusa.gto.nyql.utils.QReturnType
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
+import javafx.util.Pair
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -278,11 +280,16 @@ class QJdbcExecutor implements QExecutor {
         connection.close()
     }
 
-    private static void assignParameters(PreparedStatement statement, List<AParam> parameters, Map data) {
+    private static void assignParameters(PreparedStatement statement, List<AParam> parameters, Map data, Map session) {
         int cp = 1
         for (int i = 0; i < parameters.size(); i++) {
             AParam param = parameters[i]
-            Object itemValue = deriveValue(data, param.__name)
+            Object itemValue = deriveValue(data, param.__name, false)
+            if (itemValue == NoneParameter.INSTANCE) {
+                // No parameter exist by given name in record map
+                // Let's find it in the session map...
+                itemValue = deriveValue(session, param.__name)
+            }
 
             statement.setObject(cp++, itemValue)
         }
@@ -358,7 +365,7 @@ class QJdbcExecutor implements QExecutor {
                 script.proxy.returnType == QReturnType.KEYS
     }
 
-    private static Object deriveValue(Map dataMap, String name) {
+    private static Object deriveValue(Map dataMap, String name, boolean throwEx = true) {
         if (name.indexOf('.') > 0) {
             String[] parts = name.split('[.]')
             Object res = dataMap
@@ -374,7 +381,11 @@ class QJdbcExecutor implements QExecutor {
             if (dataMap.containsKey(name)) {
                 return dataMap[name]
             } else {
-                throw new NyScriptExecutionException("Data for parameter '$name' cannot be found!")
+                if (throwEx) {
+                    throw new NyParamNotFoundException(name)
+                } else {
+                    return NoneParameter.INSTANCE
+                }
             }
         }
     }
@@ -420,5 +431,11 @@ class QJdbcExecutor implements QExecutor {
         if (connection != null) {
             connection.close()
         }
+    }
+
+    private static class NoneParameter {
+        private static final NoneParameter INSTANCE = new NoneParameter()
+
+        private NoneParameter() {}
     }
 }
