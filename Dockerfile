@@ -1,4 +1,4 @@
-FROM java:8
+FROM java:8-alpine
 
 # create a directory for nyserver in root
 RUN mkdir /nyserver
@@ -17,5 +17,5 @@ WORKDIR /nyserver
 # default nyql port is 9009
 EXPOSE 9009
 
-CMD ["java", "-classpath", ".:lib/*", "com.virtusa.gto.nyql.server.NyServer"]
+CMD ["java", "-Dcom.virtusa.gto.nyql.mode=server", "-classpath", ".:lib/*", "com.virtusa.gto.nyql.server.NyServer"]
 

@@ -34,7 +34,7 @@
       "pooling": {
         "impl": "com.virtusa.gto.nyql.engine.pool.impl.QHikariPool",
 
-        "maximumPoolSize": 1,
+        "maximumPoolSize": 10,
         "prepStmtCacheSize": 300,
         "prepStmtCacheSqlLimit": 2048,
         "useServerPrepStmts": true,

@@ -1,11 +1,13 @@
 package com.virtusa.gto.nyql.engine.repo
 
+import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.model.QFileSource
 import com.virtusa.gto.nyql.model.QScriptMapper
 import com.virtusa.gto.nyql.model.QSource
+import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -87,7 +89,7 @@ class QScriptsFolder implements QScriptMapper {
             throw new NyConfigurationException('To create a new QScriptsFolder requires at least one parameter with specifying base directory!')
         }
 
-        String path = args.baseDir
+        String path = QUtils.readEnv(ConfigKeys.SYS_SCRIPT_DIR, String.valueOf(args.baseDir))
         File dir = new File(path)
         if (!dir.exists()) {
             String configFilePath = args._location

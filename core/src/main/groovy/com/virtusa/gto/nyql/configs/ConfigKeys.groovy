@@ -43,5 +43,5 @@ final class ConfigKeys {
     static final String SYS_JDBC_PASSWORD_ENC = 'NYQL_JDBC_PASSWORD_ENC'
     static final String SYS_JDBC_DRIVER = 'NYQL_JDBC_DRIVER'
     static final String SYS_ACTIVE_DB = 'NYQL_ACTIVE_DB'
-
+    static final String SYS_SCRIPT_DIR = 'NYQL_SCRIPT_DIR'
 }

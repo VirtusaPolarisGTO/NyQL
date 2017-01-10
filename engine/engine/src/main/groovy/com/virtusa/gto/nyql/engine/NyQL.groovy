@@ -27,6 +27,7 @@ class NyQL {
     private static final String AUTO_SHUTDOWN_KEY = 'com.virtusa.gto.nyql.addShutdownHook'
     private static final String LOAD_CLASSPATH_KEY = 'com.virtusa.gto.nyql.classpathBootstrap'
     private static final String CONFIG_PATH_KEY = 'com.virtusa.gto.nyql.nyConfigFile'
+    private static final String MODE_KEY = 'com.virtusa.gto.nyql.mode'
 
     private static final int STAR_LEN = 100
     private static final String TRUE_STR = 'true'
@@ -36,8 +37,10 @@ class NyQL {
     private static NyQLInstance nyQLInstance
 
     static {
+        boolean serverMode = QUtils.readEnv(MODE_KEY, "").equalsIgnoreCase("server")
+
         try {
-            if (!Boolean.parseBoolean(QUtils.readEnv(BOOTSTRAP_KEY, TRUE_STR))) {
+            if (!serverMode && !Boolean.parseBoolean(QUtils.readEnv(BOOTSTRAP_KEY, TRUE_STR))) {
                 LOGGER.warn('*' * STAR_LEN)
                 LOGGER.warn('You MUST EXPLICITLY setup NyQL with programmatically or configuration json file!')
                 LOGGER.warn('*' * STAR_LEN)
@@ -49,7 +52,7 @@ class NyQL {
             if (Boolean.parseBoolean(QUtils.readEnv(AUTO_SHUTDOWN_KEY, FALSE_STR))) {
                 LOGGER.warn('Automatically adding a NyQL shutdown hook...')
                 Runtime.runtime.addShutdownHook(new Thread ({ shutdown() }))
-            } else {
+            } else if (!serverMode) {
                 LOGGER.warn('*' * STAR_LEN)
                 LOGGER.warn('You MUST EXPLICITLY Call SHUTDOWN method of NyQL when you are done with this!')
                 LOGGER.warn('*' * STAR_LEN)
@@ -68,16 +71,19 @@ class NyQL {
      * @param force if specified true, then configurations will be reloaded.
      */
     static void configure(File inputJson=null, boolean force=false) {
+        boolean serverMode = QUtils.readEnv(MODE_KEY, "").equalsIgnoreCase("server")
         if (!Configurations.instance().isConfigured() || force) {
             LOGGER.warn('NyQL is going to configure with default configurations using classpath...')
             if (!configFromSystemProperty() && !configFromClasspath()) {
                 File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME)
                 if (!nyConfig.exists()) {
-                    LOGGER.error('*' * STAR_LEN)
-                    LOGGER.error("No nyql.json file is found on classpath! [${nyConfig.absolutePath}]")
-                    LOGGER.error(' ' * (STAR_LEN / 2))
-                    LOGGER.error('Explicitly call the configure method with configuration input file!')
-                    LOGGER.error('*' * STAR_LEN)
+                    if (!serverMode) {
+                        LOGGER.error('*' * STAR_LEN)
+                        LOGGER.error("No nyql.json file is found on classpath! [${nyConfig.absolutePath}]")
+                        LOGGER.error(' ' * (STAR_LEN / 2))
+                        LOGGER.error('Explicitly call the configure method with configuration input file!')
+                        LOGGER.error('*' * STAR_LEN)
+                    }
                     //throw new RuntimeException("No '$JSON_CONFIG_FILENAME' file is found on classpath! [" + nyConfig.absolutePath + "]");
                 } else {
                     LOGGER.debug("Loading configurations from ${nyConfig.canonicalPath}...")
