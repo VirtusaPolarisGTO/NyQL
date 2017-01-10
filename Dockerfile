@@ -1,4 +1,6 @@
 FROM java:8-alpine
+MAINTAINER Isuru Weerarathna <uisurumadushanka89@gmail.com>
+
 
 # create a directory for nyserver in root
 RUN mkdir /nyserver
@@ -7,7 +9,7 @@ RUN mkdir /nyserver
 COPY ./server/target/nyserver.tar.gz /nyserver
 
 # update the system
-# RUN apt-get update
+RUN apk upgrade --update
 
 # move to the app folder and extract
 RUN cd /nyserver; tar -xzvf nyserver.tar.gz
