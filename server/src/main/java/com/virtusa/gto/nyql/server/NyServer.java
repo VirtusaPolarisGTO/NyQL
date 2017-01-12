@@ -162,8 +162,21 @@ public class NyServer {
         // turn off jetty logging
         org.eclipse.jetty.util.log.Log.setLog(null);
 
+        printLogo();
+
         NyServer server = new NyServer();
         server.init();
+    }
+
+    private static void printLogo() {
+        String ver = readEnv("com.virtusa.gto.nyql.version", "1.1");
+        System.out.println("\t  _  _        ___                          \n" +
+                "\t | \\| | _  _ / __| ___  _ _ __ __ ___  _ _ \n" +
+                "\t | .` || || |\\__ \\/ -_)| '_|\\ V // -_)| '_|\n" +
+                "\t |_|\\_| \\_, ||___/\\___||_|   \\_/ \\___||_|  \n" +
+                "\t        |__/                               ");
+        System.out.println("                                     - NyQL v" + ver);
+        System.out.println();
     }
 
     private static String readEnv(String key, String defValue) {
