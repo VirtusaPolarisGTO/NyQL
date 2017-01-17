@@ -29,6 +29,11 @@ class QueryInsert extends QuerySelect {
         this
     }
 
+    QueryInsert CELL_DATA(String columnName, Object val) {
+        _data.put(columnName, val)
+        return this
+    }
+
     QueryInsert RETURN_KEYS() {
         returnType = QReturnType.KEYS
         return this
