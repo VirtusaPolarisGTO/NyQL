@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.engine.pool.impl
 import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.engine.pool.QJdbcPool
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.exceptions.NyInitializationException
 import com.virtusa.gto.nyql.utils.QUtils
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -106,11 +107,11 @@ class QHikariPool implements QJdbcPool {
                         LOGGER.error('Failed to initialize hikari pool! [Message: ' + connectEx.getMessage() + '] Retrying...')
                         if (count++ == retryCount) {
                             LOGGER.error('Retrying aborted!')
-                            throw e
+                            throw new NyInitializationException('Failed to initialize hikari connection pool!', e)
                         }
                         Thread.sleep(retryInterval)
                     } else {
-                        throw e
+                        throw new NyInitializationException('Failed to initialize hikari connection pool!', e)
                     }
                 }
             }
