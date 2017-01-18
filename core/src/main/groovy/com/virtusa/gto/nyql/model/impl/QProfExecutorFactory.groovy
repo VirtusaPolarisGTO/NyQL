@@ -19,6 +19,10 @@ class QProfExecutorFactory implements QExecutorFactory {
         qExecutorFactory = executorFactory
     }
 
+    QExecutorFactory childFactory() {
+        qExecutorFactory
+    }
+
     @Override
     void init(Map options) {
         qExecutorFactory.init(options)

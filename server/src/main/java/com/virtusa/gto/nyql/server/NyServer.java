@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.server;
 
 import com.google.gson.Gson;
 import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import com.virtusa.gto.nyql.model.QScript;
 import com.virtusa.gto.nyql.model.QScriptResult;
@@ -40,11 +41,13 @@ public class NyServer {
     private boolean authEnabled = true;
     private String appToken = null;
 
+    private NyQLInstance nyQLInstance;
+
     private NyServer() {
     }
 
     @SuppressWarnings("unchecked")
-    private void init() {
+    private void init() throws Exception {
         String serverJson = readEnv("NYSERVER_CONFIG_PATH", DEF_SERVER_JSON);
         String nyqlJson = readEnv("NYSERVER_NYJSON_PATH", DEF_NYQL_JSON);
 
@@ -64,19 +67,22 @@ public class NyServer {
         int port = Integer.parseInt(readEnv("NYSERVER_PORT", confObject.get("port").toString()));
 
         File nyConfigFile = new File(nyqlJson);
-        NyQL.configure(nyConfigFile);
+        nyQLInstance = NyQLInstance.create(nyConfigFile);
 
         // register nyql shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(NyQL::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(nyQLInstance::shutdown));
 
         Spark.port(port);
 
         // register spark server stop hook
         Runtime.getRuntime().addShutdownHook(new Thread(Spark::stop));
 
+        // run change logs if necessary
+        new NyChangeLog(nyQLInstance).execute();
+
         // register all routes...
         registerRoutes();
-        LOGGER.debug("Server is running at " + port + "...");
+        LOGGER.info("Server is running at " + port + "...");
     }
 
     private void registerRoutes() {
@@ -120,7 +126,7 @@ public class NyServer {
         if (bodyData.containsKey("data")) {
             data = (Map<String, Object>) bodyData.get("data");
         }
-        QScript result = NyQL.parse(scriptId, data);
+        QScript result = nyQLInstance.parse(scriptId, data);
 
         Map<String, Object> r = new HashMap<>();
         if (result instanceof QScriptResult) {
@@ -145,7 +151,7 @@ public class NyServer {
         Map<String, Object> data = (Map<String, Object>) bodyData.getOrDefault("data", new HashMap<>());
 
         Map<String, Object> r = new HashMap<>();
-        r.put("result", NyQL.execute(scriptId, data));
+        r.put("result", nyQLInstance.execute(scriptId, data));
         return r;
     }
 
@@ -158,7 +164,7 @@ public class NyServer {
     }
 
     @SuppressWarnings("unchecked")
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // turn off jetty logging
         org.eclipse.jetty.util.log.Log.setLog(null);
 
@@ -179,7 +185,7 @@ public class NyServer {
         System.out.println();
     }
 
-    private static String readEnv(String key, String defValue) {
+    static String readEnv(String key, String defValue) {
         String val = System.getProperty(key, System.getenv(key));
         if (val == null) {
             return defValue;
