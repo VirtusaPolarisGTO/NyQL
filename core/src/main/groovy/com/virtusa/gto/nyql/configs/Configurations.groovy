@@ -281,11 +281,21 @@ class Configurations {
     }
 
     boolean cacheRawScripts() {
-        (boolean) properties.caching.compiledScripts
+        String cacheStatus = QUtils.readEnv(ConfigKeys.SYS_CACHE_RAW_ENABLED, null)
+        if (cacheStatus == null) {
+            (boolean) properties.caching.compiledScripts
+        } else {
+            Boolean.parseBoolean(cacheStatus);
+        }
     }
 
     boolean cacheGeneratedQueries() {
-        (boolean) properties.caching.generatedQueries
+        String cacheStatus = QUtils.readEnv(ConfigKeys.SYS_CACHE_RAW_ENABLED, null)
+        if (cacheStatus == null) {
+            (boolean) properties.caching.generatedQueries
+        } else {
+            Boolean.parseBoolean(cacheStatus)
+        }
     }
 
     List getAvailableTranslators() {

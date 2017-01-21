@@ -46,4 +46,6 @@ final class ConfigKeys {
     static final String SYS_SCRIPT_DIR = 'NYQL_SCRIPT_DIR'
     static final String SYS_CONNECT_RETRY_COUNT = 'NYQL_CONNECT_RETRY_COUNT'
     static final String SYS_CONNECT_RETRY_INTERVAL = 'NYQL_CONNECT_RETRY_INTERVAL'
+    static final String SYS_CACHE_RAW_ENABLED = 'NYQL_CACHE_RAW_ENABLED'
+    static final String SYS_CACHE_QUERY_ENABLED = 'NYQL_CACHE_QUERY_ENABLED'
 }

@@ -151,7 +151,14 @@ public class NyServer {
         Map<String, Object> data = (Map<String, Object>) bodyData.getOrDefault("data", new HashMap<>());
 
         Map<String, Object> r = new HashMap<>();
-        r.put("result", nyQLInstance.execute(scriptId, data));
+        try {
+            Object sqlResult = nyQLInstance.execute(scriptId, data);
+            r.put("result", sqlResult);
+        } catch (Throwable t) {
+            LOGGER.error("Error occurred executing script! " + scriptId, t);
+            throw new NyException("Error occurred while script running!", t);
+        }
+
         return r;
     }
 
