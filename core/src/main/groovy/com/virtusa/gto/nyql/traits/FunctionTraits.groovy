@@ -21,8 +21,8 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn BITXOR(Object left, Object right) { vColumn('op_bit_xor', left, right) }
     @CompileStatic FunctionColumn BITNOT(Object left) { fColumn(left, 'op_bit_not') }
 
-    @CompileStatic FunctionColumn ASC(Column column)      { fColumn(column, 'asc') }
-    @CompileStatic FunctionColumn DESC(Column column)     { fColumn(column, 'desc') }
+    @CompileStatic FunctionColumn ASC(Object column)      { fColumn(column, 'asc') }
+    @CompileStatic FunctionColumn DESC(Object column)     { fColumn(column, 'desc') }
     @CompileStatic FunctionColumn COUNT(Object column)    { fColumn(column, 'count') }
     @CompileStatic FunctionColumn DISTINCT(Column column) { fColumn(column, 'distinct') }
     @CompileStatic FunctionColumn MAX(Object column)      { fColumn(column, 'max') }

@@ -50,10 +50,11 @@ def innQ2 = $DSL.select {
         $DSL.select {
             TARGET (Payment.alias("p"))
             FETCH (TABLE(innQU).alias("films"), TABLE(innQ2))
+            ORDER_BY (DESC(films))
         },
         [
             mysql: ["SELECT (SELECT COUNT(*) AS totalFilms FROM `Film` f WHERE f.film_id = ? AND p.payment_id = f.payment_id) AS films, " +
-                    "(SELECT * FROM `Actor` ac) FROM `Payment` p",
+                    "(SELECT * FROM `Actor` ac) FROM `Payment` p ORDER BY films DESC",
                     ["filmId"]]
         ],
 ]
