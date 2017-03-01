@@ -57,4 +57,25 @@ def innQ2 = $DSL.select {
                     "(SELECT * FROM `Actor` ac) FROM `Payment` p ORDER BY films DESC",
                     ["filmId"]]
         ],
+
+        $DSL.select {
+            TARGET (Payment.alias("p"))
+            FETCH ((QUERY {
+                EXPECT (Payment.alias("p"))
+
+                TARGET (Film.alias("f"))
+                FETCH (COUNT().alias("totalFilms"))
+                WHERE {
+                    EQ (f.film_id, PARAM("filmId"))
+                    AND
+                    EQ (p.payment_id, f.payment_id)
+                }
+            }).alias("films"), TABLE(innQ2))
+            ORDER_BY (DESC(films))
+        },
+        [
+                mysql: ["SELECT (SELECT COUNT(*) AS totalFilms FROM `Film` f WHERE f.film_id = ? AND p.payment_id = f.payment_id) AS films, " +
+                                "(SELECT * FROM `Actor` ac) FROM `Payment` p ORDER BY films DESC",
+                        ["filmId"]]
+        ],
 ]
