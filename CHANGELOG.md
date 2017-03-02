@@ -1,7 +1,11 @@
 ## NyQL Changelog
 
+#### 1.1.1
+ 
+ * [Bug fixes](https://github.com/VirtusaPolarisGTO/NyQL/issues?q=is%3Aissue+milestone%3Av1.1.1+is%3Aclosed)
 
-#### 1.1-SNAPSHOT
+
+#### 1.1
     All batch related operations accept its data within the map in key name of '__batch__'
     instead of previously used key 'batch'.
 
