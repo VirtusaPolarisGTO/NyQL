@@ -1,5 +1,10 @@
 package nyql.tests;
 
+import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.exceptions.NyException;
+import com.virtusa.gto.nyql.model.QScript;
+
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,6 +23,18 @@ public class NyDSL {
 
     public StringBuilder newInnerQuery() {
         return newInnerQuery("innQ" + seq.incrementAndGet());
+    }
+
+    public static void main(String[] args) throws NyException {
+        try {
+            NyQL.configure(new File("./configs/nyql.json"));
+
+            QScript aaa = NyQL.parse("aaa", new HashMap<>());
+            System.out.println(aaa);
+
+        } finally {
+            NyQL.shutdown();
+        }
     }
 
     private StringBuilder newInnerQuery(String name) {

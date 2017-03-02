@@ -56,9 +56,10 @@ class NyChangeLog {
                 Liquibase liquibase = new Liquibase(masterFile.getAbsolutePath(),
                         new FileSystemResourceAccessor(basePath), database);
 
-                Writer writer = new Slf4jWriter("LIQUIBASE");
+                //Writer writer = new Slf4jWriter("LIQUIBASE");
                 //Writer writer = new PrintWriter(System.out);
-                liquibase.update(new Contexts(), writer);
+                //liquibase.update(new Contexts(), writer);
+                liquibase.update(new Contexts());
 
                 database.commit();
                 LOGGER.info("[LIQUIBASE] Database changelog execution completed.");
@@ -85,39 +86,39 @@ class NyChangeLog {
         return null;
     }
 
-    private static class Slf4jWriter extends Writer {
-
-        private static final Logger LOGGER = LoggerFactory.getLogger(Slf4jWriter.class);
-
-        private final String topic;
-
-        private Slf4jWriter(String theTopic) {
-            topic = theTopic;
-        }
-
-        @Override
-        public void write(char[] cbuf, int off, int len) throws IOException {
-            if (len > 0) {
-                LOGGER.debug("[" + topic + "] " + String.valueOf(cbuf));
-            }
-        }
-
-        @Override
-        public void write(String str) throws IOException {
-            if (str.trim().length() > 0) {
-                LOGGER.debug("[" + topic + "] " + str.trim());
-            }
-        }
-
-        @Override
-        public void flush() throws IOException {
-            // do nothing
-        }
-
-        @Override
-        public void close() throws IOException {
-            // do nothing
-        }
-    }
+//    private static class Slf4jWriter extends Writer {
+//
+//        private static final Logger LOGGER = LoggerFactory.getLogger(Slf4jWriter.class);
+//
+//        private final String topic;
+//
+//        private Slf4jWriter(String theTopic) {
+//            topic = theTopic;
+//        }
+//
+//        @Override
+//        public void write(char[] cbuf, int off, int len) throws IOException {
+//            if (len > 0) {
+//                LOGGER.debug("[" + topic + "] " + String.valueOf(cbuf));
+//            }
+//        }
+//
+//        @Override
+//        public void write(String str) throws IOException {
+//            if (str.trim().length() > 0) {
+//                LOGGER.debug("[" + topic + "] " + str.trim());
+//            }
+//        }
+//
+//        @Override
+//        public void flush() throws IOException {
+//            // do nothing
+//        }
+//
+//        @Override
+//        public void close() throws IOException {
+//            // do nothing
+//        }
+//    }
 
 }

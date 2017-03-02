@@ -2,13 +2,13 @@ package com.virtusa.gto.nyql.server;
 
 
 import com.google.gson.Gson;
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import com.virtusa.gto.nyql.model.QScript;
 import com.virtusa.gto.nyql.model.QScriptResult;
 import com.virtusa.gto.nyql.model.units.AParam;
 import groovy.json.JsonSlurper;
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -174,6 +174,9 @@ public class NyServer {
     public static void main(String[] args) throws Exception {
         // turn off jetty logging
         org.eclipse.jetty.util.log.Log.setLog(null);
+
+        String log4jConf = readEnv("LOG4J_CONFIG_FILE", "./config/log4j.properties");
+        PropertyConfigurator.configure(log4jConf);
 
         printLogo();
 
