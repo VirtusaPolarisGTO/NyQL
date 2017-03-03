@@ -10,6 +10,7 @@ class QuerySelect extends Query {
 
     List<Object> orderBy = null
     List<Object> groupBy = null
+    boolean groupByRollup = false
     Where groupHaving = null
     List<Object> projection = null
     Table _intoTable = null
@@ -71,6 +72,11 @@ class QuerySelect extends Query {
             groupBy = new ArrayList<>()
         }
         groupBy.addAll(columns)
+        this
+    }
+
+    QuerySelect ROLLUP() {
+        groupByRollup = true
         this
     }
 
