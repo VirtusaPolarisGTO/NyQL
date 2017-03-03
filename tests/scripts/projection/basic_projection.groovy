@@ -190,4 +190,17 @@
     [
             mysql: "SELECT ac.name AS `user name` FROM `Actor` ac ORDER BY `user name` DESC"
     ],
+
+    $DSL.select {
+        TARGET (Student.alias("student"))
+        FETCH (
+                SUM(CASE { WHEN { GTE (student.grade, PARAM("passGrade"))}
+                    THEN { 1 }
+                    ELSE { 0 }}).alias("totalPass")
+        )
+    },
+    [
+            mysql: ["SELECT SUM(CASE WHEN student.grade >= ? THEN 1 ELSE 0 END) AS totalPass FROM `Student` student",
+                    ["passGrade"]]
+    ]
 ]

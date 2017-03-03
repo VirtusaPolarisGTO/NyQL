@@ -139,7 +139,8 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
 
         if (column instanceof FunctionColumn) {
-            return String.valueOf(this.invokeMethod(column._func, column._setOfCols ? column._columns : column._wrapper)) +
+            return String.valueOf(
+                    this.invokeMethod(column._func, [column._setOfCols ? column._columns : column._wrapper, paramList])) +
                     columnAliasAs(column, BACK_TICK)
         } else {
             boolean tableHasAlias = column._owner != null && column._owner.__aliasDefined()
