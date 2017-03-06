@@ -291,4 +291,23 @@ def innQ = $DSL.select {
                 ["relDate", "debutTime", "langId", "debutTime2"]]
     ],
 
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        WHERE {
+            EQ (f.id, CASE {
+                WHEN {
+                    EQ (f.lastId, PARAM("whereParam"))
+                }
+                THEN {
+                    NUM(0)
+                }
+                ELSE {
+                    PARAM("elseParam")
+                }
+            })
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f WHERE f.id = CASE WHEN f.lastId = ? THEN 0 ELSE ? END", ["whereParam", "elseParam"]]
+    ]
 ]

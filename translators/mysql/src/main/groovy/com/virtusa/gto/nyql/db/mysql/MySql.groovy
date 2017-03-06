@@ -50,11 +50,12 @@ class MySql extends MySqlFunctions implements QTranslator {
             List<Case.CaseCondition> conditions = aCaseCol.allConditions
             for (Case.CaseCondition cc : conditions) {
                 query.append(' WHEN ').append(___expandConditions(cc._theCondition, paramOrder, QContextType.CONDITIONAL))
-                query.append(' THEN ').append(___resolve(cc._theResult, QContextType.SELECT))
+                query.append(' THEN ').append(___resolve(cc._theResult, QContextType.SELECT, paramOrder))
             }
 
             if (aCaseCol.getElse() != null) {
-                query.append(' ELSE ').append(___resolve(aCaseCol.getElse(), QContextType.SELECT))
+                ___scanForParameters(aCaseCol.getElse(), paramOrder);
+                query.append(' ELSE ').append(___resolve(aCaseCol.getElse(), QContextType.SELECT, paramOrder))
             }
             query.append(' END')
 

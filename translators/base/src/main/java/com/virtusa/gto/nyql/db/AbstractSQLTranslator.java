@@ -475,10 +475,10 @@ public abstract class AbstractSQLTranslator implements QTranslator {
                             QUtils.parenthesis(___resolve(((Where.QUnaryCondition) c).chooseOp(), contextType, paramOrder))
                             : ___resolve(((Where.QUnaryCondition) c).chooseOp(), contextType, paramOrder));
         } else {
-            return ___resolve(c.getLeftOp(), contextType) +
+            return ___resolve(c.getLeftOp(), contextType, paramOrder) +
                     (c.getOp() != QOperator.UNKNOWN ?
-                            ' ' + ___convertOperator(c.getOp()) + ' ' : ' ') + (!parenthesis ? ___resolve(c.getRightOp(), contextType)
-                            : QUtils.parenthesis(___resolve(c.getRightOp(), contextType)));
+                            ' ' + ___convertOperator(c.getOp()) + ' ' : ' ') + (!parenthesis ? ___resolve(c.getRightOp(), contextType, paramOrder)
+                            : QUtils.parenthesis(___resolve(c.getRightOp(), contextType, paramOrder)));
         }
     }
 
