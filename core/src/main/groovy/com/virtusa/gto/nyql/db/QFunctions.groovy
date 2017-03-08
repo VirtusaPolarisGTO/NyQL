@@ -52,6 +52,25 @@ trait QFunctions {
     }
 
     /**
+     * COALESCE function.
+     *
+     * @param input input values.
+     * @return function as query string.
+     */
+    String coalesce(input) {
+        def it = ___val(input)
+        def pmx = ___pm(input)
+        if (it instanceof List) {
+            List items = []
+            QUtils.expandToList(items, it)
+            items.stream().map { op -> return ___resolveIn(op, pmx) }
+                    .collect(Collectors.joining(', ', 'COALESCE(', ')'))
+        } else {
+            'COALESCE(' + ___resolveIn(it, pmx) + ')'
+        }
+    }
+
+    /**
      * ------------------------------------------------------------
      * Date and Time functions
      * ------------------------------------------------------------
