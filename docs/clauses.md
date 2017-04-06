@@ -1,21 +1,3 @@
-## DATA
-In INSERT query you must use key-value pairs for data in each column. **Note that here you must use `([ ... ])` instead of curly brackets `{}`**. The quotes are optional for column names, unless they have whitespaces.
-
-Eg:
-```groovy
-DATA ([
-    id: PARAM("songId"),
-    title: PARAM("songTitle"),
-    year: PARAM("year")
-])
-
-// in case if you are having column names with whitespaces, 
-// use double quotes ("").
-DATA ([
-    id: PARAM("songId"),
-    "album name": PARAM("albumName")
-])
-```
 
 
 ## HAVING
@@ -40,8 +22,9 @@ HAVING {
 Contains set of conditions for a query. 
 
 #### Notes:
-* Every where clause should be separated by `AND` or `OR` unless it is a grouped conditions.
+* Every where clause should be separated by `AND` or `OR` unless it is a grouped condition.
 * Two grouped conditions are supported. `ALL {...}` and `ANY {...}`
+* Use grouped conditions if you want to append parenthesis around several clauses.
 
 #### Supported Operators
  * **EQ** : Check for equality (=)
@@ -77,7 +60,8 @@ WHERE {
     OR
     LIKE (album.name, STR("%love%"))
 
-    // grouped conditions. you don't need AND, OR clauses inside here
+    // grouped condition. you don't need AND clauses inside here.
+    // nyql will automatically append 'AND' between every clauses.
     ALL {
         EQ (album.year, song.year)
         EQ (album.name, PARAM("albumName"))

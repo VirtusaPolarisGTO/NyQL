@@ -1,8 +1,8 @@
 ## Supported SQL Functions
 
 **Note:** NyQL supports only functions which are available in all popular relational databases
-either directly or indirectly. Here indirect means, the function should be able to
-manipulate within a single sql statement may be using help of other functions.
+and can be manipulated either directly or indirectly. Here indirect means, the function should be able to
+manipulate within a single sql statement, may be using help of other functions.
  
  * `[]` indicates optional arguments.
 
@@ -12,10 +12,11 @@ NyQL provides functions for basic arithmetic operations, but you can use simple 
 _only_ if the first (left) operand is a column. The simple binary operator would support in below format.
 
 ```groovy
-[column] (+-/*%) [any]
+[database-column] (+-*/%) [any]
 
 // eg: you can write/use arithmetic operators as long as
-// your left operand is a column type. Otherwise, NO.
+// your left operand is a column type. 
+// Otherwise, use below functions.
 Album.rating + 1 AS newRating
 ```
 
@@ -23,8 +24,8 @@ Album.rating + 1 AS newRating
   * MINUS (_left-operand, right-operand_ )
   * MULTIPLY (_left-operand, right-operand_ )
   * DIVIDE (_numerator, denominator_ )
-  * MODULUS (_column, divide-by-value_ )
-  * INVERSE (_column_ )
+  * MODULUS (_column, divide-by-value_ ) - Equivalent to `column % value`.
+  * INVERSE (_column_ ) - Equivalent to  `1 / column`.
 
 #### Bit Operators
   * BITAND (_left-operand, right-operand_ )
