@@ -64,7 +64,7 @@ $DSL.insert {
 }
 ```
 
-If you want to insert constant values to the target table, use [parameters](docs/parameters.md) or inline constants (such as `NUM` and `STR`).
+If you want to insert constant values to the target table, use [parameters](parameters.md) or inline [constants](constants.md).
 
 ```groovy
 $DSL.insert {

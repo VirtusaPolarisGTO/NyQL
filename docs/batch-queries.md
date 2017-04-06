@@ -3,7 +3,7 @@ You can insert large batch of data at once by declaring the `$DSL.bulkInsert` sy
 For update queries, use `$DSL.bulkUpdate`.
 
 You can use the same set of clauses used in `$DSL.insert` syntax except whats in select insert queries.
-Also, you can use only [parameters](docs/parameters.md) and constant values for query values.
+Also, you can use only [parameters](parameters.md) and [constant](constants.md) values for query values.
 
 ```groovy
 $DSL.bulkInsert {

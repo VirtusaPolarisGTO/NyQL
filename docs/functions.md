@@ -6,6 +6,51 @@ manipulate within a single sql statement, may be using help of other functions.
  
  * `[]` indicates optional arguments.
 
+### CASE Function
+NyQL supports writing `CASE` function similar to what SQL queries have.
+
+```groovy
+CASE {
+    WHEN { ... }
+    THEN { ... }
+    ELSE { ... }
+}
+```
+
+ * `WHEN` clause is same as to the content of [`WHERE` clause](clauses.md#where).
+ * `THEN`/`ELSE` clause should contain what should be returned. Usually this contains one statement.
+ You may select one parameter/column/constant.
+
+__Note:__
+ Considering simplicity, NyQL supports `IFNULL` and `IFNOTNULL` function, which is a special shorthand 
+ for returning value based on column value is `null` or not.
+ 
+```groovy
+IFNULL (column, <value-if-null>)
+
+IFNOTNULL (column, <value-if-not-null>)
+```
+
+Equivalent CASE query would be,
+
+```groovy
+// IFNULL query
+CASE {
+    WHEN { ISNULL(column) }
+    THEN { <value-if-null> }
+    ELSE { column }
+}
+
+// IFNOTNULL query
+CASE {
+    WHEN { NOTNULL (column) }
+    THEN { <value-if-not-null> }
+    ELSE { column }
+}
+```
+
+__Hint:__ If you want to deal with `null` values, may be [COALESCE](#other-functions) function would be helpful.
+
 ### Arithmetic Functions
 
 NyQL provides functions for basic arithmetic operations, but you can use simple expression-way
@@ -133,3 +178,9 @@ Album.rating + 1 AS newRating
 |CURRENT_EPOCH () |  Current epoch milliseconds |
 |EPOCH_TO_DATE (_column_ )|  Convert epoch milliseconds to date |
 |EPOCH_TO_DATETIME (_column_ )|  Convert epoch milliseconds to date time |
+
+### Other Functions
+
+| Function | Details |
+|---|---|
+|COALESCE (_columns_, ...) |  Returns first non-null value |

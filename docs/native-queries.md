@@ -1,5 +1,4 @@
-##Native Queries
-
+## Native Queries
 
 If you feel some function is missing or not working properly as expected and waiting until it is being fixed
 by developers, or if you really hate NyQL but can't get rid of it from right now, you can write db specific

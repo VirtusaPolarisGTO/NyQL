@@ -32,10 +32,38 @@ $DSL.select {
      }
 
      // set of columns to order
+     // default assumes ASC order.
      ORDER_BY (DESC(alb.year))
 
     // fetch only top 10 columns
     // can use shortcut TOP to get very top N rows
      LIMIT 10 OFFSET 0
+}
+```
+
+### FETCH Clause
+This is the clause for selecting columns from a select query.
+
+```groovy
+FETCH (...[column | constant | parameter | function])
+```
+
+
+
+### HAVING Clause
+Same as `WHERE` clause conditions, but as you know you can use aggregated functions as well since this is being used along with SQL Group By clause.
+Also you may use column aliases here as well.
+
+Eg:
+```groovy
+GROUP_BY (song.year)
+
+HAVING {
+
+    // check number of songs per year, and filter records only if at least N songs released
+    GTE (COUNT(), PARAM("minSongsPerYear"))    // COUNT() >= ?
+
+    // assuming 'songCount' is the alias used in FETCH clause for COUNT()...
+    GT (songCount, PARAM("minSongsPerYear"))
 }
 ```

@@ -1,23 +1,3 @@
-
-
-## HAVING
-Same as `WHERE` clause conditions, but as you know you can use aggregated functions as well since this is being used along with SQL Group By clause.
-Also you may use column aliases here as well.
-
-Eg:
-```groovy
-GROUP_BY (song.year)
-
-HAVING {
-
-    // check number of songs per year, and filter records only if at least N songs released
-    GTE (COUNT(), PARAM("minSongsPerYear"))    // COUNT() >= ?
-
-    // assuming 'songCount' is the alias used in FETCH clause for COUNT()...
-    GT (songCount, PARAM("minSongsPerYear"))
-}
-```
-
 ## WHERE
 Contains set of conditions for a query. 
 
@@ -41,6 +21,8 @@ Contains set of conditions for a query.
  * **NOTLIKE** : String not like comparator (`NOT LIKE`)
  * **BETWEEN** : Between operator (`BETWEEN`)
  * **NOTBETWEEN**: Not between operator (`NOT BETWEEN`)
+ * **EXISTS**: EXISTS operator which returns true if sub-query contains at least one record.
+ * **NOTEXISTS**: Negation of EXISTS operator.
  
 Eg:
 ```groovy
