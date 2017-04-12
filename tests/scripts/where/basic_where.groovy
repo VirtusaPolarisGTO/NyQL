@@ -195,7 +195,7 @@ def innQ = $DSL.select {
         WHERE {
             NEQ (f.title, STR("ACE GOLDFINDER"))
             AND
-            NOTIN (f.release_year, $SESSION.emptyList)
+            NIN (f.release_year, $SESSION.emptyList)
         }
     },
     [

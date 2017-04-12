@@ -166,6 +166,14 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (ac.COLUMN_AS("name", null), ac.COLUMN_AS("age"))
+    },
+    [
+            mysql: "SELECT ac.name, ac.age FROM `Actor` ac"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (ac.name.alias("user"), ac.year.alias("release"))
         ORDER_BY (DESC(user))
     },
