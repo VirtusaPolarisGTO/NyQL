@@ -37,9 +37,9 @@ class MySql extends MySqlFunctions implements QTranslator {
             StringBuilder query = new StringBuilder('IFNULL').append(OP)
             def whenCondition = aCaseCol.allConditions.get(0)
             Where.QCondition qCondition = (Where.QCondition) whenCondition._theCondition.clauses.get(0)
-            query.append(___resolve(qCondition.leftOp, QContextType.SELECT, paramOrder))
+            query.append(___resolve(qCondition.leftOp, QContextType.INSIDE_FUNCTION, paramOrder))
             query.append(COMMA)
-            query.append(___resolve(whenCondition._theResult, QContextType.SELECT, paramOrder))
+            query.append(___resolve(whenCondition._theResult, QContextType.INSIDE_FUNCTION, paramOrder))
             query.append(CP)
 
             query.append(columnAliasAs(aCaseCol, BACK_TICK))

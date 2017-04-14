@@ -7,7 +7,9 @@ NyQL supports writing basic constant values as below.
   * `BOOLEAN` - for boolean values
   * `STR` - for string literals
   
-All those functions can be used inside [`FETCH` clause](query-select.md#fetch-clause) with aliases.
+All those functions can be used inside [`FETCH` clause](query-select.md#fetch-clause) with aliases, 
+or with [`DATA` clause](query-inserts.md#data-clause) when inserting.
+
 _For eg:_ you can use,
 
 ```groovy

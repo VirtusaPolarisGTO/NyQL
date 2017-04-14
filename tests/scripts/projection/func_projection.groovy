@@ -49,6 +49,14 @@ def innQP = $DSL.select {
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (ac.middleName.alias("middleName"), IFNULL(ac.middleName, STR("")))
+    },
+    [
+            mysql: "SELECT ac.middleName AS middleName, IFNULL(ac.middleName, \"\") FROM `Actor` ac"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (IFNOTNULL(ac.middleName, STR("")))
     },
     [
