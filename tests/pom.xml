@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.virtusa.gto.nyql</groupId>
         <artifactId>nyql-parent</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

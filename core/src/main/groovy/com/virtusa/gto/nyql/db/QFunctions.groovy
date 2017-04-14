@@ -9,7 +9,6 @@ import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.CompileStatic
 
 import java.util.stream.Collectors
-
 /**
  * Contains actual implementation of sql functions.
  *
@@ -17,8 +16,58 @@ import java.util.stream.Collectors
  */
 trait QFunctions {
 
-    String ___resolveIn(def obj) {
-        ___resolve(obj, QContextType.INSIDE_FUNCTION)
+    /**
+     * Resolve given object assuming first element is the value and the second
+     * value is parameter list.
+     *
+     * @param obj pair of value and parameter list.
+     * @return resolved query string.
+     */
+    String ___resolveInP(obj) {
+        ___resolve(___val(obj), QContextType.INSIDE_FUNCTION, ___pm(obj))
+    }
+
+    String ___resolveIn(obj, List paramList) {
+        ___resolve(obj, QContextType.INSIDE_FUNCTION, paramList)
+    }
+
+    /**
+     * Extracts value from function input.
+     *
+     * @param input function input.
+     * @return value
+     */
+    def ___val(input) {
+        input[0]
+    }
+
+    /**
+     * Extracts parameter list from function input.
+     *
+     * @param input function input.
+     * @return parameter list.
+     */
+    List ___pm(input) {
+        (List) input[1]
+    }
+
+    /**
+     * COALESCE function.
+     *
+     * @param input input values.
+     * @return function as query string.
+     */
+    String coalesce(input) {
+        def it = ___val(input)
+        def pmx = ___pm(input)
+        if (it instanceof List) {
+            List items = []
+            QUtils.expandToList(items, it)
+            items.stream().map { op -> return ___resolveIn(op, pmx) }
+                    .collect(Collectors.joining(', ', 'COALESCE(', ')'))
+        } else {
+            'COALESCE(' + ___resolveIn(it, pmx) + ')'
+        }
     }
 
     /**
@@ -32,21 +81,21 @@ trait QFunctions {
      *
      * @return string <i>NOW()</i>
      */
-    @CompileStatic String current_timestamp() { 'NOW()' }
+    @CompileStatic String current_timestamp(pms) { 'NOW()' }
 
     /**
      * Returns current date without time.
      *
      * @return string representation of current date function.
      */
-    @CompileStatic String current_date() { 'CURDATE()' }
+    @CompileStatic String current_date(pms) { 'CURDATE()' }
 
     /**
      * Returns current time without date.
      *
      * @return string representation of current time function.
      */
-    @CompileStatic String current_time() { 'CURTIME()' }
+    @CompileStatic String current_time(pms) { 'CURTIME()' }
 
     abstract String current_epoch()
     abstract String epoch_to_date(Object col)
@@ -92,44 +141,46 @@ trait QFunctions {
      *
      * @param c input column to convert.
      */
-    @CompileStatic String lcase(c) { String.format('LOWER(%s)', ___resolveIn(c)) }
+    @CompileStatic String lcase(c) { String.format('LOWER(%s)', ___resolveInP(c)) }
 
     /**
      * Returns upper case string representation.
      *
      * @param c input column to convert.
      */
-    @CompileStatic String ucase(c) { String.format('UPPER(%s)', ___resolveIn(c)) }
+    @CompileStatic String ucase(c) { String.format('UPPER(%s)', ___resolveInP(c)) }
 
     /**
      * Returns whitespace trimmed string.
      *
      * @param c input column to convert.
      */
-    @CompileStatic String trim(c) { String.format('TRIM(%s)', ___resolveIn(c)) }
+    @CompileStatic String trim(c) { String.format('TRIM(%s)', ___resolveInP(c)) }
 
     /**
      * Returns the length of string.
      *
      * @param c input column to find length.
      */
-    @CompileStatic String len(c) { String.format('CHAR_LENGTH(%s)', ___resolveIn(c)) }
+    @CompileStatic String len(c) { String.format('CHAR_LENGTH(%s)', ___resolveInP(c)) }
 
     /**
      * Returns the function of reversed string of given string.
      *
      * @param c input column to find length.
      */
-    @CompileStatic String str_reverse(c) { String.format('REVERSE(%s)', ___resolveIn(c)) }
+    @CompileStatic String str_reverse(c) { String.format('REVERSE(%s)', ___resolveInP(c)) }
 
     /**
      * Returns the function of getting first n characters of a string.
      *
      * @param c input column and length as a list.
      */
-    @CompileStatic String str_left(c) {
+    @CompileStatic String str_left(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
         if (c instanceof List) {
-            return String.format('LEFT(%s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
+            return String.format('LEFT(%s, %s)', ___resolveIn(c.get(0), pmx), ___resolveIn(c.get(1), pmx))
         }
         throw new NyException('Insufficient parameters for LEFT function!')
     }
@@ -139,9 +190,11 @@ trait QFunctions {
      *
      * @param c input column and length as a list.
      */
-    @CompileStatic String str_right(c) {
+    @CompileStatic String str_right(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
         if (c instanceof List) {
-            return String.format('RIGHT(%s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
+            return String.format('RIGHT(%s, %s)', ___resolveIn(c.get(0), pmx), ___resolveIn(c.get(1), pmx))
         }
         throw new NyException('Insufficient parameters for RIGHT function!')
     }
@@ -151,26 +204,28 @@ trait QFunctions {
      *
      * @param c input column to left trim.
      */
-    @CompileStatic String str_ltrim(c) { String.format('LTRIM(%s)', ___resolveIn(c)) }
+    @CompileStatic String str_ltrim(c) { String.format('LTRIM(%s)', ___resolveInP(c)) }
 
     /**
      * Returns the function of right trimming function.
      *
      * @param c input column to right trim.
      */
-    @CompileStatic String str_rtrim(c) { String.format('RTRIM(%s)', ___resolveIn(c)) }
+    @CompileStatic String str_rtrim(c) { String.format('RTRIM(%s)', ___resolveInP(c)) }
 
     /**
      * Returns the function of left padding a text.
      *
      * @param c input column, length and character to fill with.
      */
-    @CompileStatic String str_lpad(c) {
+    @CompileStatic String str_lpad(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
         if (c instanceof List) {
             if (c.size() == 3) {
-                return String.format('LPAD(%s, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)), ___resolveIn(c.get(2)))
+                return String.format('LPAD(%s, %s, %s)', ___resolveIn(c.get(0), pmx), ___resolveIn(c.get(1), pmx), ___resolveIn(c.get(2), pmx))
             } else if (c.size() == 2) {
-                return String.format('LPAD(%s, %s, \" \")', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
+                return String.format('LPAD(%s, %s, \" \")', ___resolveIn(c.get(0), pmx), ___resolveIn(c.get(1), pmx))
             }
         }
         throw new NyException('Insufficient parameters for left pad function!')
@@ -181,12 +236,14 @@ trait QFunctions {
      *
      * @param c input column, length and character to fill with.
      */
-    @CompileStatic String str_rpad(c) {
+    @CompileStatic String str_rpad(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
         if (c instanceof List) {
             if (c.size() == 3) {
-                return String.format('RPAD(%s, %s, %s)', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)), ___resolveIn(c.get(2)))
+                return String.format('RPAD(%s, %s, %s)', ___resolveIn(c.get(0), pmx), ___resolveIn(c.get(1), pmx), ___resolveIn(c.get(2), pmx))
             } else if (c.size() == 2) {
-                return String.format('RPAD(%s, %s, \" \")', ___resolveIn(c.get(0)), ___resolveIn(c.get(1)))
+                return String.format('RPAD(%s, %s, \" \")', ___resolveIn(c.get(0), pmx), ___resolveIn(c.get(1), pmx))
             }
         }
         throw new NyException('Insufficient parameters for right pad function!')
@@ -224,8 +281,10 @@ trait QFunctions {
      * @param c input column and the number of decimal digits.
      * @return String representation of round function.
      */
-    @CompileStatic String round(c) {
-        if (c instanceof List) String.format('ROUND(%s, %s)', ___resolveIn(((List)c)[0]), ___resolveIn(((List)c)[1]))
+    @CompileStatic String round(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) String.format('ROUND(%s, %s)', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
         else throw new NyException('ROUND function requires two parameters!')
     }
 
@@ -234,21 +293,21 @@ trait QFunctions {
      *
      * @param c input column.
      */
-    @CompileStatic String floor(c) { String.format('FLOOR(%s)', ___resolveIn(c)) }
+    @CompileStatic String floor(c) { String.format('FLOOR(%s)', ___resolveInP(c)) }
 
     /**
      * Returns ceiling value of the column.
      *
      * @param c input column.
      */
-    @CompileStatic String ceil(c) { String.format('CEILING(%s)', ___resolveIn(c)) }
+    @CompileStatic String ceil(c) { String.format('CEILING(%s)', ___resolveInP(c)) }
 
     /**
      * Returns absolute value of the column.
      *
      * @param c input column.
      */
-    @CompileStatic String abs(c) { String.format('ABS(%s)', ___resolveIn(c)) }
+    @CompileStatic String abs(c) { String.format('ABS(%s)', ___resolveInP(c)) }
 
     /**
      * Returns a number raised to a power. <b>x ^ y</b>
@@ -256,9 +315,11 @@ trait QFunctions {
      * @param c input base and power value.
      * @return String representation of power value.
      */
-    @CompileStatic String power(c) {
+    @CompileStatic String power(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
         if (c instanceof List) {
-            String.format('POWER(%s, %s)', ___resolveIn(((List)c)[0]), ___resolveIn(((List)c)[1]))
+            String.format('POWER(%s, %s)', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
         } else {
             throw new NySyntaxException('Power requires exactly two parameters!')
         }
@@ -271,7 +332,7 @@ trait QFunctions {
      * @return String representation of sqrt function.
      */
     @CompileStatic String sqrt(c) {
-        String.format('SQRT(%s)', ___resolveIn(c))
+        String.format('SQRT(%s)', ___resolveInP(c))
     }
 
     /**
@@ -281,7 +342,7 @@ trait QFunctions {
      * @return String representation of sign function.
      */
     @CompileStatic String num_sign(c) {
-        String.format('SIGN(%s)', ___resolveIn(c))
+        String.format('SIGN(%s)', ___resolveInP(c))
     }
 
     /**
@@ -291,7 +352,7 @@ trait QFunctions {
      * @return String representation of degrees function.
      */
     @CompileStatic String num_degrees(c) {
-        String.format('DEGREES(%s)', ___resolveIn(c))
+        String.format('DEGREES(%s)', ___resolveInP(c))
     }
 
     /**
@@ -301,7 +362,7 @@ trait QFunctions {
      * @return String representation of radians function.
      */
     @CompileStatic String num_radians(c) {
-        String.format('RADIANS(%s)', ___resolveIn(c))
+        String.format('RADIANS(%s)', ___resolveInP(c))
     }
 
     /**
@@ -310,7 +371,7 @@ trait QFunctions {
      * @param c input columns.
      * @return String representation of distinct.
      */
-    @CompileStatic String distinct(c) { String.format('DISTINCT(%s)', ___resolveIn(c)) }
+    @CompileStatic String distinct(c) { String.format('DISTINCT(%s)', ___resolveInP(c)) }
 
     /**
      * Check a value is in between given two values. Requires minimum two values.
@@ -318,9 +379,11 @@ trait QFunctions {
      * @param c input values
      * @return string representation of between.
      */
-    @CompileStatic String between(c) {
+    @CompileStatic String between(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
         if (c instanceof List) {
-            String.format('BETWEEN %s AND %s', ___resolveIn(((List)c)[0]), ___resolveIn(((List)c)[1]))
+            String.format('BETWEEN %s AND %s', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
         } else {
             throw new NyException('Invalid syntax for BETWEEN function!')
         }
@@ -332,9 +395,11 @@ trait QFunctions {
      * @param c input values
      * @return string representation of not between.
      */
-    @CompileStatic String not_between(c) {
+    @CompileStatic String not_between(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
         if (c instanceof List) {
-            String.format('NOT BETWEEN %s AND %s', ___resolveIn(((List)c)[0]), ___resolveIn(((List)c)[1]))
+            String.format('NOT BETWEEN %s AND %s', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
         } else {
             throw new NyException('Invalid syntax for BETWEEN function!')
         }
@@ -346,8 +411,10 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of like.
      */
-    @CompileStatic String like(c) {
-        String.format('LIKE %s', (c instanceof List) ? ___resolveIn(((List)c)[0]) : ___resolveIn(c))
+    @CompileStatic String like(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        String.format('LIKE %s', (c instanceof List) ? ___resolveIn(((List)c)[0], pmx) : ___resolveIn(c, pmx))
     }
 
     /**
@@ -356,8 +423,10 @@ trait QFunctions {
      * @param c input column.
      * @return string representation of not like.
      */
-    @CompileStatic String not_like(c) {
-        String.format('NOT LIKE %s', (c instanceof List) ? ___resolveIn(((List)c)[0]) : ___resolveIn(c))
+    @CompileStatic String not_like(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        String.format('NOT LIKE %s', (c instanceof List) ? ___resolveIn(((List)c)[0], pmx) : ___resolveIn(c, pmx))
     }
 
     /**
@@ -366,7 +435,9 @@ trait QFunctions {
      * @param c input objects or columns to concatenate.
      * @return string representation of concatenation.
      */
-    String concat(c) {
+    String concat(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
         if (c instanceof String) {
             return String.valueOf(c)
         } else {
@@ -382,7 +453,7 @@ trait QFunctions {
                 col -> if (col instanceof String) {
                     return String.valueOf(col)
                 } else {
-                    return (String)___resolveIn(col)
+                    return (String)___resolveIn(col, pmx)
                 }
             }.collect(Collectors.joining(', ', 'CONCAT(', ')'))
         }
@@ -419,7 +490,7 @@ trait QFunctions {
      * @return string representation of ascending.
      */
     String asc(c) {
-        return ___resolve(c, QContextType.ORDER_BY) + ' ASC'
+        return ___resolve(___val(c), QContextType.ORDER_BY, ___pm(c)) + ' ASC'
     }
 
     /**
@@ -429,7 +500,7 @@ trait QFunctions {
      * @return string representation of descending.
      */
     String desc(c) {
-        return ___resolve(c, QContextType.ORDER_BY) + ' DESC'
+        return ___resolve(___val(c), QContextType.ORDER_BY, ___pm(c)) + ' DESC'
     }
 
     /**
@@ -439,7 +510,7 @@ trait QFunctions {
      * @return string representation of function
      */
     @CompileStatic String count(c) {
-        String.format('COUNT(%s)', ___resolveIn(c ?: '*'))
+        String.format('COUNT(%s)', ___resolveIn(___val(c) ?: '*', ___pm(c)))
     }
 
     /**
@@ -449,7 +520,7 @@ trait QFunctions {
      * @return string representation of function
      */
     @CompileStatic String sum(c) {
-        String.format('SUM(%s)', ___resolveIn(c ?: '*'))
+        String.format('SUM(%s)', ___resolveIn(___val(c) ?: '*', ___pm(c)))
     }
 
     /**
@@ -459,7 +530,7 @@ trait QFunctions {
      * @return string representation of function
      */
     @CompileStatic String avg(c) {
-        String.format('AVG(%s)', ___resolveIn(c ?: '*'))
+        String.format('AVG(%s)', ___resolveIn(___val(c) ?: '*', ___pm(c)))
     }
 
     /**
@@ -469,7 +540,7 @@ trait QFunctions {
      * @return string representation of function
      */
     @CompileStatic String min(c) {
-        String.format('MIN(%s)', ___resolveIn(c ?: '*'))
+        String.format('MIN(%s)', ___resolveIn(___val(c) ?: '*', ___pm(c)))
     }
 
     /**
@@ -479,7 +550,7 @@ trait QFunctions {
      * @return string representation of function
      */
     @CompileStatic String max(c) {
-        String.format('MAX(%s)', ___resolveIn(c ?: '*'))
+        String.format('MAX(%s)', ___resolveIn(___val(c) ?: '*', ___pm(c)))
     }
 
     /**
@@ -490,11 +561,13 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    String op_add(it) {
+    String op_add(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
         if (it instanceof List) {
             List items = []
             QUtils.expandToList(items, it)
-            items.stream().map { op -> return ___resolveIn(op) }
+            items.stream().map { op -> return ___resolveIn(op, pmx) }
                     .collect(Collectors.joining(' + ', '(', ')'))
         } else {
             throw new NySyntaxException('Add operation requires at least two operands!')
@@ -507,9 +580,11 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    @CompileStatic String op_minus(it) {
+    @CompileStatic String op_minus(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
         if (it instanceof List) {
-            String.format('(%s - %s)', ___resolveIn(((List)it)[0]), ___resolveIn(((List)it)[1]))
+            String.format('(%s - %s)', ___resolveIn(((List)it)[0], pmx), ___resolveIn(((List)it)[1], pmx))
         } else {
             throw new NySyntaxException('Minus operation requires at least two operands!')
         }
@@ -521,9 +596,11 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    @CompileStatic String op_multiply(it) {
+    @CompileStatic String op_multiply(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
         if (it instanceof List) {
-            String.format('(%s * %s)', ___resolveIn(((List)it)[0]), ___resolveIn(((List)it)[1]))
+            String.format('(%s * %s)', ___resolveIn(((List)it)[0], pmx), ___resolveIn(((List)it)[1], pmx))
         } else {
             throw new NySyntaxException('Multiply operation requires at least two operands!')
         }
@@ -535,9 +612,11 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    @CompileStatic String op_divide(it) {
+    @CompileStatic String op_divide(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
         if (it instanceof List) {
-            String.format('(%s / %s)', ___resolveIn(((List)it)[0]), ___resolveIn(((List)it)[1]))
+            String.format('(%s / %s)', ___resolveIn(((List)it)[0], pmx), ___resolveIn(((List)it)[1], pmx))
         } else {
             throw new NySyntaxException('Divide operation requires at least two operands!')
         }
@@ -549,9 +628,11 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    @CompileStatic String op_modulus(it) {
+    @CompileStatic String op_modulus(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
         if (it instanceof List) {
-            String.format('(%s %% %s)', ___resolveIn(((List)it)[0]), ___resolveIn(((List)it)[1]))
+            String.format('(%s %% %s)', ___resolveIn(((List)it)[0], pmx), ___resolveIn(((List)it)[1], pmx))
         } else {
             throw new NySyntaxException('Modulus operation requires at least two operands!')
         }
@@ -563,9 +644,11 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    @CompileStatic String op_bit_and(it) {
+    @CompileStatic String op_bit_and(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
         if (it instanceof List) {
-            String.format('%s & %s', ___resolveIn(((List)it)[0]), ___resolveIn(((List)it)[1]))
+            String.format('%s & %s', ___resolveIn(((List)it)[0], pmx), ___resolveIn(((List)it)[1], pmx))
         } else {
             throw new NySyntaxException('Bitwise And operation requires at least two operands!')
         }
@@ -577,9 +660,11 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    @CompileStatic String op_bit_or(it) {
+    @CompileStatic String op_bit_or(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
         if (it instanceof List) {
-            String.format('%s | %s', ___resolveIn(((List)it)[0]), ___resolveIn(((List)it)[1]))
+            String.format('%s | %s', ___resolveIn(((List)it)[0], pmx), ___resolveIn(((List)it)[1], pmx))
         } else {
             throw new NySyntaxException('Bitwise Or operation requires at least two operands!')
         }
@@ -591,9 +676,11 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    @CompileStatic String op_bit_xor(it) {
+    @CompileStatic String op_bit_xor(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
         if (it instanceof List) {
-            String.format('%s ^ %s', ___resolveIn(((List)it)[0]), ___resolveIn(((List)it)[1]))
+            String.format('%s ^ %s', ___resolveIn(((List)it)[0], pmx), ___resolveIn(((List)it)[1], pmx))
         } else {
             throw new NySyntaxException('Bitwise Xor operation requires at least two operands!')
         }
@@ -605,8 +692,10 @@ trait QFunctions {
      * @param it function input parameters.
      * @return string representation of function.
      */
-    @CompileStatic String op_bit_not(it) {
-        String.format('~%s', (it instanceof List) ? ___resolveIn(((List)it)[0]) : ___resolveIn(it))
+    @CompileStatic String op_bit_not(itx) {
+        def it = ___val(itx)
+        def pmx = ___pm(itx)
+        String.format('~%s', (it instanceof List) ? ___resolveIn(((List)it)[0], pmx) : ___resolveIn(it, pmx))
     }
 
     /**
@@ -615,7 +704,8 @@ trait QFunctions {
      * @param it inner query.
      * @return generated function.
      */
-    String exists(it) {
-        QOperator.EXISTS.getOp() + (String)___resolve(it, QContextType.UNKNOWN)
+    String exists(itx) {
+        def it = ___val(itx)
+        QOperator.EXISTS.getOp() + (String) ___resolve(it, QContextType.UNKNOWN, ___pm(itx))
     }
 }

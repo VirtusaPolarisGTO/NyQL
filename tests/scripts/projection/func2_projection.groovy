@@ -109,4 +109,15 @@
                 "CAST(? AS SIGNED), CAST(? AS CHAR), CAST(? AS DATE) " +
                 "FROM `Actor` ac", ["strValue", "intValue", "strDateValue"]]
     ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (COALESCE(ac.description, ac.details, STR('(none)')),
+                COALESCE(ac.description, PARAM("defVal1"), PARAM("defVal2")))
+    },
+    [
+            mysql: ["SELECT COALESCE(ac.description, ac.details, \"(none)\"), " +
+                    "COALESCE(ac.description, ?, ?) " +
+                    "FROM `Actor` ac", ["defVal1", "defVal2"]]
+    ],
 ]

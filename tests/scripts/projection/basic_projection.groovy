@@ -166,6 +166,14 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (ac.COLUMN_AS("name", null), ac.COLUMN_AS("age"))
+    },
+    [
+            mysql: "SELECT ac.name, ac.age FROM `Actor` ac"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (ac.name.alias("user"), ac.year.alias("release"))
         ORDER_BY (DESC(user))
     },
@@ -190,4 +198,17 @@
     [
             mysql: "SELECT ac.name AS `user name` FROM `Actor` ac ORDER BY `user name` DESC"
     ],
+
+    $DSL.select {
+        TARGET (Student.alias("student"))
+        FETCH (
+                SUM(CASE { WHEN { GTE (student.grade, PARAM("passGrade"))}
+                    THEN { 1 }
+                    ELSE { 0 }}).alias("totalPass")
+        )
+    },
+    [
+            mysql: ["SELECT SUM(CASE WHEN student.grade >= ? THEN 1 ELSE 0 END) AS totalPass FROM `Student` student",
+                    ["passGrade"]]
+    ]
 ]

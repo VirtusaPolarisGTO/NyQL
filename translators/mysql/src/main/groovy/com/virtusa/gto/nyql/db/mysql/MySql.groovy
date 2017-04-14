@@ -37,9 +37,9 @@ class MySql extends MySqlFunctions implements QTranslator {
             StringBuilder query = new StringBuilder('IFNULL').append(OP)
             def whenCondition = aCaseCol.allConditions.get(0)
             Where.QCondition qCondition = (Where.QCondition) whenCondition._theCondition.clauses.get(0)
-            query.append(___resolve(qCondition.leftOp, QContextType.SELECT, paramOrder))
+            query.append(___resolve(qCondition.leftOp, QContextType.INSIDE_FUNCTION, paramOrder))
             query.append(COMMA)
-            query.append(___resolve(whenCondition._theResult, QContextType.SELECT, paramOrder))
+            query.append(___resolve(whenCondition._theResult, QContextType.INSIDE_FUNCTION, paramOrder))
             query.append(CP)
 
             query.append(columnAliasAs(aCaseCol, BACK_TICK))
@@ -50,11 +50,12 @@ class MySql extends MySqlFunctions implements QTranslator {
             List<Case.CaseCondition> conditions = aCaseCol.allConditions
             for (Case.CaseCondition cc : conditions) {
                 query.append(' WHEN ').append(___expandConditions(cc._theCondition, paramOrder, QContextType.CONDITIONAL))
-                query.append(' THEN ').append(___resolve(cc._theResult, QContextType.SELECT))
+                query.append(' THEN ').append(___resolve(cc._theResult, QContextType.SELECT, paramOrder))
             }
 
             if (aCaseCol.getElse() != null) {
-                query.append(' ELSE ').append(___resolve(aCaseCol.getElse(), QContextType.SELECT))
+                ___scanForParameters(aCaseCol.getElse(), paramOrder);
+                query.append(' ELSE ').append(___resolve(aCaseCol.getElse(), QContextType.SELECT, paramOrder))
             }
             query.append(' END')
 
@@ -139,7 +140,8 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
 
         if (column instanceof FunctionColumn) {
-            return String.valueOf(this.invokeMethod(column._func, column._setOfCols ? column._columns : column._wrapper)) +
+            return String.valueOf(
+                    this.invokeMethod(column._func, [column._setOfCols ? column._columns : column._wrapper, paramList])) +
                     columnAliasAs(column, BACK_TICK)
         } else {
             boolean tableHasAlias = column._owner != null && column._owner.__aliasDefined()

@@ -33,6 +33,10 @@ class Table {
         __alias != null
     }
 
+    Column COLUMN_AS(String name) {
+        COLUMN_AS(name, null)
+    }
+
     Column COLUMN_AS(String name, String alias) {
         Column column = new Column(__name: name, __alias: alias, _owner: this, _ctx: _ctx)
         __allColumns.put(name + '::' + alias, column)

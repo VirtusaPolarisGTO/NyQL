@@ -1,13 +1,30 @@
 package com.virtusa.gto.nyql.db;
 
-import com.virtusa.gto.nyql.*;
+import com.virtusa.gto.nyql.Assign;
+import com.virtusa.gto.nyql.Column;
+import com.virtusa.gto.nyql.FunctionColumn;
+import com.virtusa.gto.nyql.Join;
+import com.virtusa.gto.nyql.QContextType;
+import com.virtusa.gto.nyql.QResultProxy;
+import com.virtusa.gto.nyql.Query;
+import com.virtusa.gto.nyql.QueryInsert;
+import com.virtusa.gto.nyql.QueryPart;
+import com.virtusa.gto.nyql.QuerySelect;
+import com.virtusa.gto.nyql.QueryTruncate;
+import com.virtusa.gto.nyql.Table;
+import com.virtusa.gto.nyql.Where;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import com.virtusa.gto.nyql.model.units.AParam;
 import com.virtusa.gto.nyql.utils.QOperator;
 import com.virtusa.gto.nyql.utils.QUtils;
 import com.virtusa.gto.nyql.utils.QueryType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -191,13 +208,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
 
         if (QUtils.notNullNorEmpty(q.getGroupBy())) {
-            String gClauses = QUtils.join(q.getGroupBy(), it -> ___resolve(it, QContextType.GROUP_BY, paramList), COMMA, "", "");
-            query.append(" GROUP BY ").append(gClauses);
-
-            if (q.getGroupHaving() != null) {
-                query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
-            }
-            query.append(NL);
+            ___selectQueryGroupByClause(q, query, paramList);
         }
 
         if (QUtils.notNullNorEmpty(q.getOrderBy())) {
@@ -224,6 +235,29 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
 
         return createProxy(query.toString(), queryType, paramList, null, null);
+    }
+
+    /**
+     * Generated group by clause as it is different with rollup introduction.
+     *
+     * @param q input select query model.
+     * @param query query string to generate.
+     * @param paramList parameter list.
+     * @throws NyException any exception thrown while generating.
+     */
+    protected void ___selectQueryGroupByClause(QuerySelect q, StringBuilder query, List<AParam> paramList) throws NyException {
+        String gClauses = QUtils.join(q.getGroupBy(), it -> ___resolve(it, QContextType.GROUP_BY, paramList), COMMA, "", "");
+        query.append(" GROUP BY ").append(gClauses);
+
+        if (q.getGroupByRollup()) {
+            // rollup enabled
+            query.append(" WITH ROLLUP");
+        }
+
+        if (q.getGroupHaving() != null) {
+            query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
+        }
+        query.append(NL);
     }
 
     @Override
@@ -441,10 +475,10 @@ public abstract class AbstractSQLTranslator implements QTranslator {
                             QUtils.parenthesis(___resolve(((Where.QUnaryCondition) c).chooseOp(), contextType, paramOrder))
                             : ___resolve(((Where.QUnaryCondition) c).chooseOp(), contextType, paramOrder));
         } else {
-            return ___resolve(c.getLeftOp(), contextType) +
+            return ___resolve(c.getLeftOp(), contextType, paramOrder) +
                     (c.getOp() != QOperator.UNKNOWN ?
-                            ' ' + ___convertOperator(c.getOp()) + ' ' : ' ') + (!parenthesis ? ___resolve(c.getRightOp(), contextType)
-                            : QUtils.parenthesis(___resolve(c.getRightOp(), contextType)));
+                            ' ' + ___convertOperator(c.getOp()) + ' ' : ' ') + (!parenthesis ? ___resolve(c.getRightOp(), contextType, paramOrder)
+                            : QUtils.parenthesis(___resolve(c.getRightOp(), contextType, paramOrder)));
         }
     }
 

@@ -203,8 +203,14 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         this
     }
 
+    @Deprecated
     @CompileStatic
     Where NOTIN(Object c1, Object... cs) {
+        NIN(c1, cs)
+    }
+
+    @CompileStatic
+    Where NIN(Object c1, Object... cs) {
         if (cs != null) {
             List list = new LinkedList()
             QUtils.expandToList(list, cs)
@@ -214,11 +220,6 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             ON(c1, QOperator.NOT_IN, list)
         }
         this
-    }
-
-    @CompileStatic
-    Where NIN(Object c1, Object... cs) {
-        NOTIN(c1, cs)
     }
 
     QResultProxy QUERY(@DelegatesTo(value = QuerySelect, strategy = Closure.DELEGATE_ONLY) Closure closure) {

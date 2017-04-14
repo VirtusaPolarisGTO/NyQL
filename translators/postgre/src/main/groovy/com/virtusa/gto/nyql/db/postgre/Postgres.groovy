@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
+import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -198,6 +199,21 @@ class Postgres extends PostgresFunctions implements QTranslator {
     @Override
     QResultProxy ___insertQuery(QueryInsert q) {
         generateInsertQuery(q, DOUBLE_QUOTE)
+    }
+
+    @Override
+    protected void ___selectQueryGroupByClause(QuerySelect q, StringBuilder query, List<AParam> paramList) throws NyException {
+        String gClauses = QUtils.join(q.getGroupBy(), { ___resolve(it, QContextType.GROUP_BY, paramList) }, COMMA, "", "");
+        if (q.groupByRollup) {
+            query.append(" GROUP BY ROLLUP(").append(gClauses).append(")");
+        } else {
+            query.append(" GROUP BY ").append(gClauses);
+        }
+
+        if (q.getGroupHaving() != null) {
+            query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
+        }
+        query.append(NL);
     }
 
     @Override

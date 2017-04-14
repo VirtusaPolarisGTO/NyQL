@@ -63,6 +63,48 @@
                 EQ (f.count, PARAM("total"))
             }
         },
-        ["SELECT CASE WHEN f.count = ? THEN 1 ELSE 0 END FROM `Film` f WHERE f.count = ?", ["total", "total"]]
+        [
+                mysql:  ["SELECT CASE WHEN f.count = ? THEN 1 ELSE 0 END FROM `Film` f WHERE f.count = ?", ["total", "total"]]
+        ],
 
+        $DSL.select {
+            TARGET (Sales.alias("s"))
+            FETCH (s.year, SUM(s.profit).alias("Profit"))
+            GROUP_BY (s.year) ROLLUP()
+        },
+        [
+                mysql: "SELECT s.year, SUM(s.profit) AS Profit FROM `Sales` s GROUP BY s.year WITH ROLLUP"
+        ],
+
+        $DSL.select {
+            TARGET (Sales.alias("s"))
+            FETCH (s.year.alias("theYear"), SUM(s.profit).alias("Profit"))
+            GROUP_BY (theYear) ROLLUP()
+        },
+        [
+                mysql: "SELECT s.year AS theYear, SUM(s.profit) AS Profit FROM `Sales` s GROUP BY theYear WITH ROLLUP"
+        ],
+
+//        SELECT year, country, product, SUM(profit) AS profit
+//        FROM sales
+//        GROUP BY year ASC, country ASC, product ASC WITH ROLLUP;
+
+        $DSL.select {
+            TARGET (Sales.alias("s"))
+            FETCH (s.year.alias("theYear"), SUM(s.profit).alias("Profit"))
+            GROUP_BY (ASC(theYear)) ROLLUP()
+        },
+        [
+                mysql: "SELECT s.year AS theYear, SUM(s.profit) AS Profit FROM `Sales` s GROUP BY theYear ASC WITH ROLLUP"
+        ],
+
+        $DSL.select {
+            TARGET (Sales.alias("s"))
+            FETCH (s.year.alias("theYear"), s.country, COUNT().alias("total"))
+            GROUP_BY (ASC(theYear), DESC(s.country)) ROLLUP()
+        },
+        [
+                mysql: "SELECT s.year AS theYear, s.country, COUNT(*) AS total FROM `Sales` s " +
+                        "GROUP BY theYear ASC, s.country DESC WITH ROLLUP"
+        ],
 ]
