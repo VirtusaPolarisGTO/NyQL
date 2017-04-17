@@ -225,7 +225,7 @@ expecting to execute in cloud environments or secure environments. Below shows t
                  Configurations nyConfigs = NyConfig.withDefaults()
                                         .forDatabase("mysql")
                                         .scriptFolder(new File("./scripts"))
-                                        .jdbcOptions("jdbc:mysql:localhost/sampledb", "username", "password")
+                                        .jdbcOptions("jdbc:mysql://localhost/sampledb", "username", "password")
                                         .build();
                  NyQLInstance nyInstance = NyQLInstance.create(nyConfigs);
                  
