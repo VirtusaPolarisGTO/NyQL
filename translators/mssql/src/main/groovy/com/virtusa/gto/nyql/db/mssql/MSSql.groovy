@@ -88,7 +88,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
                 || contextType == QContextType.DELETE_FROM) {
             return QUtils.quote(table.__name, QUOTE)
         } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
-                || contextType == QContextType.DELETE_JOIN) {
+                || contextType == QContextType.DELETE_JOIN || contextType == QContextType.CONDITIONAL) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
                 return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + tableAlias(table, QUOTE) : '')

@@ -6,6 +6,14 @@ def innQ = $DSL.select {
     TARGET (Film.alias("f"))
 }
 
+def innQAny = $DSL.select {
+    TARGET (Ages.alias("ag"))
+    FETCH (ag.age)
+    WHERE {
+        EQ (ag.group, PARAM("groupId"))
+    }
+}
+
 [
     $DSL.select {
         TARGET (Film.alias("f"))
@@ -309,5 +317,65 @@ def innQ = $DSL.select {
     },
     [
             mysql: ["SELECT * FROM `Film` f WHERE f.id = CASE WHEN f.lastId = ? THEN 0 ELSE ? END", ["whereParam", "elseParam"]]
-    ]
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        WHERE {
+            GT (ac.age, ANY(QUERY {
+                            TARGET (Ages.alias("ag"))
+                            FETCH (ag.age)
+                        }))
+        }
+    },
+    [
+            mysql: "SELECT * FROM `Actor` ac WHERE ac.age > ANY (SELECT ag.age FROM `Ages` ag)"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        WHERE {
+            GT (ac.age, ANY(QUERY {
+                TARGET (Ages.alias("ag"))
+                FETCH (ag.age)
+                WHERE {
+                    EQ (ag.group, PARAM("groupId"))
+                }
+            }))
+            AND
+            EQ (ac.birthYear, PARAM("birthYear"))
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Actor` ac WHERE ac.age > ANY (SELECT ag.age FROM `Ages` ag WHERE ag.group = ?) " +
+                            "AND ac.birthYear = ?",
+                    ["groupId", "birthYear"]]
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        WHERE {
+            GT (ac.age, ALL(innQAny))
+            AND
+            EQ (ac.birthYear, PARAM("birthYear"))
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Actor` ac WHERE ac.age > ALL (SELECT ag.age FROM `Ages` ag WHERE ag.group = ?) " +
+                            "AND ac.birthYear = ?",
+                    ["groupId", "birthYear"]]
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        WHERE {
+            LT (ac.age, ALL(QUERY {
+                TARGET (Ages.alias("ag"))
+                FETCH (ag.age)
+            }))
+        }
+    },
+    [
+            mysql: "SELECT * FROM `Actor` ac WHERE ac.age < ALL (SELECT ag.age FROM `Ages` ag)"
+    ],
 ]
