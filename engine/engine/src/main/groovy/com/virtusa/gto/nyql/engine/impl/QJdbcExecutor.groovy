@@ -15,7 +15,6 @@ import com.virtusa.gto.nyql.utils.QReturnType
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
-import javafx.util.Pair
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

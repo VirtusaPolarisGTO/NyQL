@@ -159,11 +159,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         for (Map.Entry<String, Object> entry : q.get_data().entrySet()) {
             colList.add(QUtils.quote(entry.getKey(), quoteChar));
 
-            if (entry.getValue() instanceof AParam) {
-                paramList.add((AParam)entry.getValue());
-            } else if (entry.getValue() instanceof Table) {
-                appendParamsFromTable((Table)entry.getValue(), paramList);
-            }
+            ___scanForParameters(entry.getValue(), paramList);
             valList.add(String.valueOf(___resolve(entry.getValue(), QContextType.INSERT_DATA, paramList)));
         }
         query.append(colList.stream().collect(Collectors.joining(COMMA)))
@@ -359,16 +355,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         return cols.stream().collect(Collectors.joining(", "));
     }
 
-
-    protected void appendParamsFromTable(Table table, List<AParam> paramList) {
-        if (table.__isResultOf()) {
-            QResultProxy proxy = (QResultProxy) table.get__resultOf();
-            if (proxy.getOrderedParameters() != null) {
-                paramList.addAll(proxy.getOrderedParameters());
-            }
-        }
-    }
-
     private static void appendParamsFromColumn(Column column, List<AParam> paramList) {
         if (column instanceof FunctionColumn) {
             if (((FunctionColumn) column).get_setOfCols()) {
@@ -392,21 +378,17 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         if (expression != null) {
             if (expression instanceof AParam) {
                 addSafely(paramOrder, (AParam)expression);
-            }
-
-            if (expression instanceof QResultProxy) {
+            } else if (expression instanceof QResultProxy) {
                 QResultProxy resultProxy = (QResultProxy)expression;
                 if (resultProxy.getOrderedParameters() != null) {
                     paramOrder.addAll(resultProxy.getOrderedParameters());
                 }
-            }
-            if (expression instanceof Table && ((Table)expression).__isResultOf()) {
+            } else if (expression instanceof Table && ((Table)expression).__isResultOf()) {
                 QResultProxy resultProxy = (QResultProxy)(((Table)expression).get__resultOf());
                 if (resultProxy.getOrderedParameters() != null) {
                     paramOrder.addAll(resultProxy.getOrderedParameters());
                 }
-            }
-            if (expression instanceof FunctionColumn) {
+            } else if (expression instanceof FunctionColumn) {
                 ___expandColumn((FunctionColumn) expression, paramOrder);
             }
             if (expression instanceof List) {
