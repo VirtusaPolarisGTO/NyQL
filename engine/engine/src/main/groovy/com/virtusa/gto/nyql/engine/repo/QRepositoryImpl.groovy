@@ -46,6 +46,7 @@ class QRepositoryImpl implements QRepository {
         LOGGER.warn('All caches cleared in query repository!')
     }
 
+    @CompileStatic
     QScript parse(String scriptIdGiven, QSession session) throws NyException {
         String scriptId = resolveScriptId(scriptIdGiven, session.currentCallingFromScript())
         QSource src = mapper.map(scriptId)
@@ -77,10 +78,11 @@ class QRepositoryImpl implements QRepository {
         if (scriptId.startsWith('@')) {
             Paths.get(currentScript).resolve('..').resolve(scriptId.substring(1)).normalize().toString()
         } else {
-            scriptId;
+            scriptId
         }
     }
 
+    @CompileStatic
     protected void cacheIfSpecified(Script compiledScript, String scriptId, QScript script) {
         try {
             Field field = compiledScript.getClass().getDeclaredField(configurations.cachingIndicatorVarName())
@@ -95,12 +97,13 @@ class QRepositoryImpl implements QRepository {
         }
     }
 
+    @CompileStatic
     protected static QScript convertResult(String scriptId, Object res, QSession session) {
         if (res instanceof QResultProxy) {
             return new QScript(id: scriptId, proxy: (QResultProxy) res, qSession: session)
         } else if (res instanceof QScriptList) {
             res.id = scriptId
-            return res
+            return (QScript) res
         } else {
             new QScriptResult(id: scriptId, qSession: session, scriptResult: res)
         }
