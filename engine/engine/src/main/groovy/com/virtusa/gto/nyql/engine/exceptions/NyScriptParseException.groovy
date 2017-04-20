@@ -9,8 +9,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class NyScriptParseException extends NyException {
 
-    NyScriptParseException(String scriptId, File file, Throwable inner) {
-        super("Query script cannot be parsed due to syntax errors! ['$scriptId', ${file.absolutePath}]", inner)
+    NyScriptParseException(String scriptId, String file, Throwable inner) {
+        super("Query script cannot be parsed due to syntax errors! ['$scriptId', ${file}]", inner)
     }
 
 }

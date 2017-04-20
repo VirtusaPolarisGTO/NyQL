@@ -17,8 +17,8 @@ class NyScriptExecutionException extends NyException {
         super(message, cause)
     }
 
-    NyScriptExecutionException(String scriptId, File file, Throwable inner) {
-        super("Query script cannot be parsed due to syntax errors! ['$scriptId', ${file.absolutePath}]", inner)
+    NyScriptExecutionException(String scriptId, String file, Throwable inner) {
+        super("Query script cannot be parsed due to syntax errors! ['$scriptId', ${file}]", inner)
     }
 
 }
