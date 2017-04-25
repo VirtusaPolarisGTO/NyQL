@@ -59,6 +59,10 @@ class QuerySelect extends Query {
         this
     }
 
+    QuerySelect JOIN(@DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
+        JOIN(TARGET(), closure)
+    }
+
     QuerySelect ORDER_BY(Object... columns) {
         if (orderBy == null) {
             orderBy = new ArrayList<>()

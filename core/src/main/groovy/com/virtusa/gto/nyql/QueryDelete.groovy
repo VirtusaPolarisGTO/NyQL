@@ -34,4 +34,8 @@ class QueryDelete extends Query {
         this
     }
 
+    QueryDelete JOIN(@DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        JOIN(TARGET(), closure)
+    }
+
 }
