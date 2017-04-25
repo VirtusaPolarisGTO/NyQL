@@ -65,9 +65,6 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     @CompileStatic
-    String JOIN(QContextType contextType) { 'JOIN' }
-
-    @CompileStatic
     @Override
     String ___quoteString(final String text) {
         QUtils.quote(text, STR_QUOTE)

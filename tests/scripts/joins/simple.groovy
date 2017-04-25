@@ -18,6 +18,28 @@
 
         $DSL.select {
             TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                JOIN (Film_Actor.alias("fa"))
+            }
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `Film` f CROSS JOIN `Film_Actor` fa"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                CROSS_JOIN (Film_Actor.alias("fa"))
+            }
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `Film` f CROSS JOIN `Film_Actor` fa"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
             JOIN {
                 INNER_JOIN (Film_Actor.alias("fa")) ON (f.film_id, fa.film_id)
                 LEFT_JOIN (Actor.alias("a")) ON (fa.actor_id, a.actor_id)
@@ -59,7 +81,7 @@
         [
             mysql: "SELECT * FROM `Film` f " +
                 "RIGHT OUTER JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id = fa.second_film_id " +
-                "INNER JOIN `Actor` a ON fa.actor_id = a.actor_id"
+                "CROSS JOIN `Actor` a ON fa.actor_id = a.actor_id"
         ],
 
         $DSL.select {

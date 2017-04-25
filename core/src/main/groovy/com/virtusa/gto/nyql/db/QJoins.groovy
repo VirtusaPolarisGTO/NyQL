@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 trait QJoins {
 
-    String JOIN(QContextType contextType) { ',' }
+    String JOIN(QContextType contextType) { 'CROSS JOIN' }
     String LEFT_JOIN(QContextType contextType) { 'LEFT JOIN' }
     String LEFT_OUTER_JOIN(QContextType contextType) { 'LEFT OUTER JOIN' }
     String RIGHT_JOIN(QContextType contextType) { 'RIGHT JOIN' }

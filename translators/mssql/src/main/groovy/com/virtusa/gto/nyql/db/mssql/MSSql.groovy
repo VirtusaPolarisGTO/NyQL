@@ -67,9 +67,6 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     }
 
     @CompileStatic
-    String JOIN(QContextType contextType) { 'INNER JOIN' }
-
-    @CompileStatic
     @Override
     String ___quoteString(final String text) {
         QUtils.quote(text, STR_QUOTE)
