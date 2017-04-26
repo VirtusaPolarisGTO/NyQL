@@ -75,8 +75,8 @@ class QRepositoryImpl implements QRepository {
 
     @CompileStatic
     private static String resolveScriptId(String scriptId, String currentScript) {
-        if (scriptId.startsWith('@')) {
-            Paths.get(currentScript).resolve('..').resolve(scriptId.substring(1)).normalize().toString()
+        if (scriptId.startsWith('./') || scriptId.startsWith('../')) {
+            Paths.get(currentScript).resolve('..').resolve(scriptId).normalize().toString()
         } else {
             scriptId
         }

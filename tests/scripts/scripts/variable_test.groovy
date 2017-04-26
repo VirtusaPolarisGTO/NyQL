@@ -20,7 +20,7 @@ $DSL.script {
         FETCH (f.film_id, $SESSION.manProperty)
 
     })
-    def result = RUN ("@./other_query")
+    def result = RUN ("./other_query")
     $LOG result
 
 }

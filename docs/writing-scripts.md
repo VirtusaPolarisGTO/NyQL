@@ -7,7 +7,7 @@ If you want to execute another script from a script, you can call `RUN ("script-
 which is `scriptId` is the relative path from script root directory.
 
 __Note:__ Since v1.1.3, you can specify `scriptId` relative to the current script location 
-using `@` notation. See below examples.
+starting with `./` or `../` notation. See below examples.
 
 You also can start transactions **(nested transactions are not supported)**, can create temp tables (_within transaction_).
 
@@ -87,11 +87,11 @@ $DSL.script {
     
     // calling some script inside foo/bar/baz/inner_script.groovy
     RUN ("foo/bar/baz/inner_script")  // before v1.1.3
-    RUN ("@baz/inner_script")
+    RUN ("./baz/inner_script")
     
     // calling some script in parent directory
     RUN ("foo/foo_script")  // before v1.1.3
-    RUN ("@../foo_script")
+    RUN ("../foo_script")
 }
 ```
 
