@@ -207,6 +207,11 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             ___selectQueryGroupByClause(q, query, paramList);
         }
 
+        if (q.getGroupHaving() != null) {
+            query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
+            query.append(NL);
+        }
+
         if (QUtils.notNullNorEmpty(q.getOrderBy())) {
             String oClauses = QUtils.join(q.getOrderBy(), it -> ___resolve(it, QContextType.ORDER_BY, paramList), COMMA, "", "");
             query.append(" ORDER BY ").append(oClauses).append(NL);
@@ -249,11 +254,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             // rollup enabled
             query.append(" WITH ROLLUP");
         }
-
-        if (q.getGroupHaving() != null) {
-            query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
-        }
-        query.append(NL);
     }
 
     @Override

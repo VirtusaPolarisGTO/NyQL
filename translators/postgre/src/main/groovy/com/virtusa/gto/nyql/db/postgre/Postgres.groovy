@@ -209,11 +209,6 @@ class Postgres extends PostgresFunctions implements QTranslator {
         } else {
             query.append(" GROUP BY ").append(gClauses);
         }
-
-        if (q.getGroupHaving() != null) {
-            query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
-        }
-        query.append(NL);
     }
 
     @Override

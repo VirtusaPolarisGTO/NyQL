@@ -10,7 +10,8 @@
    - Cross joins does not work [#15](https://github.com/VirtusaPolarisGTO/NyQL/issues/15)
    - INSERT queries with inline QUERY does not correctly identify parameters [#11](https://github.com/VirtusaPolarisGTO/NyQL/issues/11)
    - INSERT queries, which specified as RETURN_KEYS, will never return keys if cached [#9](https://github.com/VirtusaPolarisGTO/NyQL/issues/9)
-
+   - Cannot use HAVING clause without GROUP BY clause [#16](https://github.com/VirtusaPolarisGTO/NyQL/issues/16)
+   
 ### v1.1.2
  * [Features and Bug fixes](https://github.com/VirtusaPolarisGTO/NyQL/issues?q=is%3Aissue+milestone%3Av1.1.2+is%3Aclosed)
 
