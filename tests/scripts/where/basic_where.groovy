@@ -245,6 +245,28 @@ def innQAny = $DSL.select {
     ],
 
     $DSL.select {
+        TARGET (Address.alias("ad"))
+        WHERE {
+            ISNULL (TABLE(QUERY {
+                TARGET (Film.alias('f'))
+            }))
+        }
+    },
+    [
+            mysql: "SELECT * FROM `Address` ad WHERE (SELECT * FROM `Film` f) IS NULL"
+    ],
+
+    $DSL.select {
+        TARGET (Address.alias("ad"))
+        WHERE {
+            GT (TABLE(innQ), 5)
+        }
+    },
+    [
+            mysql: "SELECT * FROM `Address` ad WHERE (SELECT * FROM `Film` f) > 5"
+    ],
+
+    $DSL.select {
         TARGET (Film.alias("f"))
         FETCH ()
         WHERE {

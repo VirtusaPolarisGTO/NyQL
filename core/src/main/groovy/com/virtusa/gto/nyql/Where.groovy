@@ -50,15 +50,16 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     @CompileStatic
     QCondition ALL(QResultProxy resultProxy) {
-        ALL(TO_TABLE(resultProxy))
+        ALL(TABLE(resultProxy))
     }
 
     @CompileStatic
-    private Table TO_TABLE(QResultProxy resultProxy) {
+    Table TABLE(QResultProxy resultProxy) {
         Table table = new Table(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx, __resultOf: resultProxy)
         _ctx.tables.putIfAbsent(table.__name, table)
         table
     }
+
 
     @CompileStatic
     Where ANY(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
@@ -78,7 +79,7 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     @CompileStatic
     QCondition ANY(QResultProxy resultProxy) {
-        ANY(TO_TABLE(resultProxy))
+        ANY(TABLE(resultProxy))
     }
 
     @CompileStatic
