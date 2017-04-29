@@ -65,9 +65,6 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     @CompileStatic
-    String JOIN(QContextType contextType) { 'JOIN' }
-
-    @CompileStatic
     @Override
     String ___quoteString(final String text) {
         QUtils.quote(text, STR_QUOTE)
@@ -86,7 +83,7 @@ class MySql extends MySqlFunctions implements QTranslator {
             || contextType == QContextType.DELETE_FROM) {
             return QUtils.quote(table.__name)
         } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
-                || contextType == QContextType.DELETE_JOIN) {
+                || contextType == QContextType.DELETE_JOIN || contextType == QContextType.CONDITIONAL) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
                 return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + tableAlias(table, BACK_TICK) : '')
@@ -98,6 +95,8 @@ class MySql extends MySqlFunctions implements QTranslator {
                 return QUtils.parenthesis(proxy.query.trim()) + tableAliasAs(table, BACK_TICK)
             }
         }
+
+
 
         if (table.__aliasDefined()) {
             return tableAlias(table, BACK_TICK)

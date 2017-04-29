@@ -116,6 +116,18 @@ class QSession {
         }
     }
 
+    @CompileStatic
+    String currentCallingFromScript() {
+        synchronized (stackLock) {
+            int loc = scriptStack.size() - 2;
+            if (loc >= 0) {
+                scriptStack.get(loc)
+            } else {
+                rootScriptId
+            }
+        }
+    }
+
     String currentActiveScript() {
         synchronized (stackLock) {
             scriptStack.peek()

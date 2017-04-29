@@ -1,5 +1,6 @@
-[![Build Status](https://travis-ci.org/VirtusaPolarisGTO/NyQL.svg?branch=dev)](https://travis-ci.org/VirtusaPolarisGTO/NyQL)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.virtusa.gto.nyql/nyql-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.virtusa.gto.nyql/nyql-core)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://travis-ci.org/VirtusaPolarisGTO/NyQL.svg?branch=dev)](https://travis-ci.org/VirtusaPolarisGTO/NyQL)
 [![StackOverflow](https://img.shields.io/:stack%20overflow-nyql-green.svg)](http://stackoverflow.com/questions/tagged/nyql)
 
 
@@ -225,7 +226,7 @@ expecting to execute in cloud environments or secure environments. Below shows t
                  Configurations nyConfigs = NyConfig.withDefaults()
                                         .forDatabase("mysql")
                                         .scriptFolder(new File("./scripts"))
-                                        .jdbcOptions("jdbc:mysql:localhost/sampledb", "username", "password")
+                                        .jdbcOptions("jdbc:mysql://localhost/sampledb", "username", "password")
                                         .build();
                  NyQLInstance nyInstance = NyQLInstance.create(nyConfigs);
                  

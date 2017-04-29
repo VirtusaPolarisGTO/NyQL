@@ -22,6 +22,64 @@
                     ]
         ],
 
+        $DSL.select {
+            TARGET (QUERY {
+                        TARGET (TABLE("Film").alias("f"))
+                        WHERE {
+                            EQ (f.is_active, true)
+                        }
+                    }.alias("q"))
+
+            JOIN {
+                INNER_JOIN (TABLE("Actor").alias("ac")) ON ac.film_id, q.film_id
+            }
+        },
+        [
+                mysql: "SELECT * FROM (SELECT * FROM `Film` f WHERE f.is_active = 1) q " +
+                        "INNER JOIN `Actor` ac ON ac.film_id = q.film_id"
+        ],
+
+        $DSL.select {
+            TARGET (QUERY {
+                TARGET (TABLE("Film").alias("f"))
+                WHERE {
+                    EQ (f.is_active, true)
+                    AND
+                    EQ (f.year, PARAM("year"))
+                }
+            }.alias("q"))
+
+            JOIN {
+                INNER_JOIN (TABLE("Actor").alias("ac")) ON ac.film_id, q.film_id
+            }
+
+            WHERE {
+                EQ (ac.retired, PARAM("isRetired"))
+            }
+        },
+        [
+                mysql: ["SELECT * FROM (SELECT * FROM `Film` f WHERE f.is_active = 1 AND f.year = ?) q " +
+                        "INNER JOIN `Actor` ac ON ac.film_id = q.film_id WHERE ac.retired = ?",
+                        ["year", "isRetired"]]
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+
+            JOIN {
+                INNER_JOIN (QUERY {
+                    TARGET (TABLE("Actor").alias("ac"))
+                    WHERE {
+                        EQ (ac.retired, true)
+                    }
+                }.alias("q")) ON q.film_id, f.film_id
+            }
+        },
+        [
+                mysql: "SELECT * FROM `Film` f " +
+                        "INNER JOIN (SELECT * FROM `Actor` ac WHERE ac.retired = 1) q ON q.film_id = f.film_id"
+        ],
+
 
         $DSL.select {
             TARGET (Payment.alias("p"))

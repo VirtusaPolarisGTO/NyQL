@@ -159,11 +159,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         for (Map.Entry<String, Object> entry : q.get_data().entrySet()) {
             colList.add(QUtils.quote(entry.getKey(), quoteChar));
 
-            if (entry.getValue() instanceof AParam) {
-                paramList.add((AParam)entry.getValue());
-            } else if (entry.getValue() instanceof Table) {
-                appendParamsFromTable((Table)entry.getValue(), paramList);
-            }
+            ___scanForParameters(entry.getValue(), paramList);
             valList.add(String.valueOf(___resolve(entry.getValue(), QContextType.INSERT_DATA, paramList)));
         }
         query.append(colList.stream().collect(Collectors.joining(COMMA)))
@@ -211,6 +207,11 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             ___selectQueryGroupByClause(q, query, paramList);
         }
 
+        if (q.getGroupHaving() != null) {
+            query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
+            query.append(NL);
+        }
+
         if (QUtils.notNullNorEmpty(q.getOrderBy())) {
             String oClauses = QUtils.join(q.getOrderBy(), it -> ___resolve(it, QContextType.ORDER_BY, paramList), COMMA, "", "");
             query.append(" ORDER BY ").append(oClauses).append(NL);
@@ -253,11 +254,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             // rollup enabled
             query.append(" WITH ROLLUP");
         }
-
-        if (q.getGroupHaving() != null) {
-            query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
-        }
-        query.append(NL);
     }
 
     @Override
@@ -359,16 +355,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         return cols.stream().collect(Collectors.joining(", "));
     }
 
-
-    protected void appendParamsFromTable(Table table, List<AParam> paramList) {
-        if (table.__isResultOf()) {
-            QResultProxy proxy = (QResultProxy) table.get__resultOf();
-            if (proxy.getOrderedParameters() != null) {
-                paramList.addAll(proxy.getOrderedParameters());
-            }
-        }
-    }
-
     private static void appendParamsFromColumn(Column column, List<AParam> paramList) {
         if (column instanceof FunctionColumn) {
             if (((FunctionColumn) column).get_setOfCols()) {
@@ -392,21 +378,17 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         if (expression != null) {
             if (expression instanceof AParam) {
                 addSafely(paramOrder, (AParam)expression);
-            }
-
-            if (expression instanceof QResultProxy) {
+            } else if (expression instanceof QResultProxy) {
                 QResultProxy resultProxy = (QResultProxy)expression;
                 if (resultProxy.getOrderedParameters() != null) {
                     paramOrder.addAll(resultProxy.getOrderedParameters());
                 }
-            }
-            if (expression instanceof Table && ((Table)expression).__isResultOf()) {
+            } else if (expression instanceof Table && ((Table)expression).__isResultOf()) {
                 QResultProxy resultProxy = (QResultProxy)(((Table)expression).get__resultOf());
                 if (resultProxy.getOrderedParameters() != null) {
                     paramOrder.addAll(resultProxy.getOrderedParameters());
                 }
-            }
-            if (expression instanceof FunctionColumn) {
+            } else if (expression instanceof FunctionColumn) {
                 ___expandColumn((FunctionColumn) expression, paramOrder);
             }
             if (expression instanceof List) {
@@ -475,10 +457,18 @@ public abstract class AbstractSQLTranslator implements QTranslator {
                             QUtils.parenthesis(___resolve(((Where.QUnaryCondition) c).chooseOp(), contextType, paramOrder))
                             : ___resolve(((Where.QUnaryCondition) c).chooseOp(), contextType, paramOrder));
         } else {
-            return ___resolve(c.getLeftOp(), contextType, paramOrder) +
-                    (c.getOp() != QOperator.UNKNOWN ?
-                            ' ' + ___convertOperator(c.getOp()) + ' ' : ' ') + (!parenthesis ? ___resolve(c.getRightOp(), contextType, paramOrder)
-                            : QUtils.parenthesis(___resolve(c.getRightOp(), contextType, paramOrder)));
+            return ___resolveOperand(c.getLeftOp(), paramOrder, contextType) +
+                    (c.getOp() != QOperator.UNKNOWN ? ' ' + ___convertOperator(c.getOp()) + ' ' : ' ') +
+                    (!parenthesis ? ___resolveOperand(c.getRightOp(), paramOrder, contextType)
+                            : QUtils.parenthesis(___resolveOperand(c.getRightOp(), paramOrder, contextType)));
+        }
+    }
+
+    private String ___resolveOperand(Object operand, List<AParam> paramOrder, QContextType contextType) {
+        if (operand instanceof Where.QCondition) {
+            return ___expandCondition((Where.QCondition)operand, paramOrder, contextType);
+        } else {
+            return ___resolve(operand, contextType, paramOrder);
         }
     }
 

@@ -73,7 +73,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
                 || contextType == QContextType.DELETE_FROM) {
             return QUtils.quote(table.__name, DOUBLE_QUOTE)
         } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
-                || contextType == QContextType.DELETE_JOIN) {
+                || contextType == QContextType.DELETE_JOIN || contextType == QContextType.CONDITIONAL) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
                 return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + tableAlias(table, DOUBLE_QUOTE) : '')
@@ -209,11 +209,6 @@ class Postgres extends PostgresFunctions implements QTranslator {
         } else {
             query.append(" GROUP BY ").append(gClauses);
         }
-
-        if (q.getGroupHaving() != null) {
-            query.append(NL).append(" HAVING ").append(___expandConditions(q.getGroupHaving(), paramList, QContextType.HAVING));
-        }
-        query.append(NL);
     }
 
     @Override

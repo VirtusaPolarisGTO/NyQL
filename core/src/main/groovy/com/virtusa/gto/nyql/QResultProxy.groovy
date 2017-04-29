@@ -41,6 +41,7 @@ class QResultProxy {
             QueryPart queryPart = new QueryPart(cloned)
             proxy.qObject = queryPart
         }
+        proxy.returnType = returnType
         proxy
     }
 

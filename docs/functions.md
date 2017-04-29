@@ -107,9 +107,9 @@ Album.rating + 1 AS newRating
 |LEFT_TRIM (_column_) | Left trim whitespace from column |
 |RIGHT_TRIM (_column_) | Right trim whitespace from column |
 |LEN (_column_ ) |  Length of the string |
-|POSITION (_column, stringToFind_ ) |  Find the position of substring in the given string __(case sensitive)__  |
-|SUBSTRING (_column, startFrom, [length]_ ) | Capture part of a string starting from given location to the given length. |
-|STR_REPLACE (_column, from, to_ ) | Replace a string of all _from_ text to _to_ |
+|POSITION (_column, stringToFind_ ) |  Find the position of substring in the given string __(case sensitive)__. If the text is not found, returns 0. Position value is always >= 1.  |
+|SUBSTRING (_column, startFrom, [length]_ ) | Capture part of a string starting from given location to the given length. _startFrom_ must be >= 1, because databases uses 1-based indices. |
+|STR_REPLACE (_column, from, to_ ) | Replace a string of all _from_ text to _to_. Both _from_ and _to_ are 1-based indices. |
 |REVERSE (_column_) | Reverse a string |
 |STR_LEFT (_column_, _length_) | Capture specified length from the given string starting from left |
 |STR_RIGHT (_column_, _length_) | Capture specified length from the given string starting from right |

@@ -74,6 +74,31 @@ def innQP = $DSL.select {
 
         $DSL.update {
             TARGET (Film.alias("f"))
+            JOIN {
+                LEFT_JOIN (Actor.alias("ac")) ON f.actor_id, ac.actor_id
+            }
+            SET {
+                EQ (f.film_id, 1234)
+                EQ (f.title, PARAM("title"))
+                if ($SESSION.thisValueNotExist) {
+                    SET_NULL(f.language_id)
+                }
+            }
+            WHERE {
+                EQ (f.year, 2016)
+            }
+        },
+        [
+                mysql: ["UPDATE `Film` f LEFT JOIN `Actor` ac ON f.actor_id = ac.actor_id SET f.film_id = 1234, f.title = ? " +
+                                "WHERE f.year = 2016",
+                        ["title"]],
+                mssql: ['UPDATE f SET f.film_id = 1234, f.title = ? FROM "Film" f LEFT JOIN "Actor" ac ON f.actor_id = ac.actor_id ' +
+                                'WHERE f.year = 2016',
+                        ["title"]]
+        ],
+
+        $DSL.update {
+            TARGET (Film.alias("f"))
             SET {
                 EQ (f.film_id, 1234)
                 $IMPORT "updates/import_part"

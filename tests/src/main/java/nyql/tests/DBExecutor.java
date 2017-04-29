@@ -22,7 +22,7 @@ public class DBExecutor {
         Configurations configurations = NyConfig.withDefaults()
                 .forDatabase("mysql")
                 .scriptFolder(new File("./examples"))
-                .jdbcOptions("jdbc:mysql://localhost/sakila", "root", "")
+                .jdbcOptions("jdbc:mysql://localhost/sakila", "root", "root", "com.mysql.cj.jdbc.Driver")
                 .build();
 
         NyQLInstance nyQLInstance = null;

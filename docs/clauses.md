@@ -54,6 +54,47 @@ WHERE {
 }
 ```
 
+#### Special Operators (ANY/SOME, ALL)
+SQL has `ANY` and `ALL` operators which has a different meaning with respect to NyQL's ANY and ALL grouping operators.
+[See Here](https://www.w3schools.com/sql/sql_any_all.asp) for more information.
+
+NyQL supports these conditional operators too. 
+Considering readability, it is better to write inline queries inside ALL/ANY.
+Also remember always use ALL/ANY as right operand of the condition.
+See below examples.
+
+```groovy
+
+WHERE {
+    GT (t.column, ANY(QUERY { 
+                            // ... inner query goes here
+                            }))
+    OR 
+    
+    GT (t.column, ALL(QUERY { 
+                            // ... inner query goes here
+                            }))
+}
+
+```
+
+Or you can define your query in somewhere else and use the groovy definition variable inside ANY/ALL.
+
+```groovy
+
+def innerQuery = $DSL.select {
+    // your inner query definition
+}
+
+$DSL.select {
+    // ...
+    
+    WHERE {
+        GT (t.column, ALL(innerQuery))
+    }
+}
+```
+
 ## TARGET
 
 Target indicates the main table which get affected from the query. Usually there is one.

@@ -91,12 +91,42 @@ final class NyConfig {
      * @return this config instance.
      */
     NyConfig jdbcOptions(String jdbcUrl, String jdbcUserName, String jdbcPassword) {
+        jdbcOptions(jdbcUrl, jdbcUserName, jdbcPassword, null, null)
+    }
+
+    /**
+     * Sets the jdbc parameter for query executions.
+     *
+     * @param jdbcUrl jdbc url.
+     * @param jdbcUserName user name for jdbc.
+     * @param jdbcPassword password for jdbc.
+     * @param jdbcDriverClz full driver class name.
+     * @return this config instance.
+     */
+    NyConfig jdbcOptions(String jdbcUrl, String jdbcUserName, String jdbcPassword, String jdbcDriverClz) {
+        jdbcOptions(jdbcUrl, jdbcUserName, jdbcPassword, jdbcDriverClz, null)
+    }
+
+    /**
+     * Sets the jdbc parameter for query executions.
+     *
+     * @param jdbcUrl jdbc url.
+     * @param jdbcUserName user name for jdbc.
+     * @param jdbcPassword password for jdbc.
+     * @param jdbcDriverClz full driver class name.
+     * @param jdbcDataSourceClz full data source class name.
+     * @return this config instance.
+     */
+    NyConfig jdbcOptions(String jdbcUrl, String jdbcUserName, String jdbcPassword,
+                         String jdbcDriverClz, String jdbcDataSourceClz) {
         configBuilder.addExecutor([
                 name: 'jdbc',
                 factory: 'com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory',
                 url: jdbcUrl,
                 username: jdbcUserName,
                 password: jdbcPassword,
+                jdbcDriverClass: jdbcDriverClz,
+                jdbcDataSourceClass: jdbcDataSourceClz,
 
                 pooling: [
                     impl: 'com.virtusa.gto.nyql.engine.pool.impl.QHikariPool',

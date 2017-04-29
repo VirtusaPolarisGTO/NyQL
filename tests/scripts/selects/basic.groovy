@@ -43,6 +43,16 @@
         ],
 
         $DSL.select {
+            TARGET (FilmIncome.alias("f"))
+            HAVING {
+                GT (AVG(f.gross), 200)
+            }
+        },
+        [
+                mysql: "SELECT * FROM `FilmIncome` f HAVING AVG(f.gross) > 200"
+        ],
+
+        $DSL.select {
             TARGET (Film.alias("f"))
             FETCH (COLUMN("rental_duration"), COUNT().alias("total"))
             GROUP_BY (f.rental_duration)

@@ -25,6 +25,10 @@ enum QOperator {
     AND('AND'),
     OR('OR'),
 
+    ALL('ALL'),
+    ANY('ANY'),
+    SOME('SOME'),
+
     UNKNOWN('');
 
     private final String op

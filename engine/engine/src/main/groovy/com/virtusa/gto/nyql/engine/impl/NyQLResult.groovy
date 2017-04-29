@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.engine.impl
 
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.utils.QUtils
+import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 
@@ -34,7 +35,7 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
             if (record != null && record.containsKey(JDBCConstants.COUNT_KEY)) {
                 Object val = record.get(JDBCConstants.COUNT_KEY)
                 if (val instanceof Number) {
-                    return val.longValue();
+                    return ((Number)val).longValue();
                 }
             }
         }
@@ -339,6 +340,15 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
     @CompileStatic
     Object getField(int index, String column, Object defValue) {
         get(index).getOrDefault(column, defValue)
+    }
+
+    /**
+     * Returns json representation of this instance.
+     *
+     * @return json string of this result instance.
+     */
+    String toJson() {
+        JsonOutput.toJson(this)
     }
 
     /* **************************************************************************************************

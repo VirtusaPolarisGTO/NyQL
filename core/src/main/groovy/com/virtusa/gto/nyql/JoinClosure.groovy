@@ -38,7 +38,11 @@ class JoinClosure extends AbstractClause {
     }
 
     Table JOIN(Table t) {
-        activeTable = INNER_JOIN(t)
+        CROSS_JOIN(t)
+    }
+
+    Table CROSS_JOIN(Table t) {
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'JOIN')
         activeTable
     }
 

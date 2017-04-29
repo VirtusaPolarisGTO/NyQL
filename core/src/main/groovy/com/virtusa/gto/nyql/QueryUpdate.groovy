@@ -35,6 +35,10 @@ class QueryUpdate extends Query {
         this
     }
 
+    QueryUpdate JOIN(@DelegatesTo(value = JoinClosure, strategy = Closure.DELEGATE_ONLY) Closure  closure) {
+        JOIN(TARGET(), closure)
+    }
+
     QueryUpdate SET(@DelegatesTo(value = Assign, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Assign ass = new Assign(_ctx, this)
 

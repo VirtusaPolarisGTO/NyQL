@@ -43,6 +43,25 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     }
 
     @CompileStatic
+    QCondition ALL(Table table) {
+        def unaryCondition = new QUnaryCondition(op: QOperator.ALL, rightOp: table)
+        unaryCondition
+    }
+
+    @CompileStatic
+    QCondition ALL(QResultProxy resultProxy) {
+        ALL(TABLE(resultProxy))
+    }
+
+    @CompileStatic
+    Table TABLE(QResultProxy resultProxy) {
+        Table table = new Table(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx, __resultOf: resultProxy)
+        _ctx.tables.putIfAbsent(table.__name, table)
+        table
+    }
+
+
+    @CompileStatic
     Where ANY(@DelegatesTo(value = Where, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         Where inner = new Where(_ctx)
         def code = closure.rehydrate(inner, this, this)
@@ -50,6 +69,17 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
         code()
         clauses.add(new QConditionGroup(where: inner, condConnector: QOperator.OR))
         this
+    }
+
+    @CompileStatic
+    QCondition ANY(Table table) {
+        def unaryCondition = new QUnaryCondition(op: QOperator.ANY, rightOp: table)
+        unaryCondition
+    }
+
+    @CompileStatic
+    QCondition ANY(QResultProxy resultProxy) {
+        ANY(TABLE(resultProxy))
     }
 
     @CompileStatic
