@@ -1,9 +1,9 @@
 package com.virtusa.gto.nyql.model
 
+import com.virtusa.gto.nyql.Query
 import groovy.transform.ToString
 
 import java.util.stream.Collectors
-
 /**
  * @author IWEERARATHNA
  */
@@ -12,6 +12,7 @@ class QScriptList extends QScript {
 
     List<QScript> scripts
     QScriptListType type = QScriptListType.DEFAULT
+    Query baseQuery
 
     @Override
     QScript spawn() {
@@ -20,6 +21,10 @@ class QScriptList extends QScript {
             for (QScript script : scripts) {
                 scriptList.scripts.add(script.spawn())
             }
+        }
+        if (baseQuery != null) {
+            baseQuery._ctx = null
+            scriptList.baseQuery = baseQuery
         }
         scriptList.type = type
         scriptList

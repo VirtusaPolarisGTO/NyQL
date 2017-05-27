@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.impl
 
+import com.virtusa.gto.nyql.UpsertQuery
 import com.virtusa.gto.nyql.engine.exceptions.NyParamNotFoundException
 import com.virtusa.gto.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.nyql.engine.pool.QJdbcPoolFetcher
@@ -408,18 +409,7 @@ class QJdbcExecutor implements QExecutor {
 
         try {
             if (scriptList.type == QScriptListType.UPSERT) {
-                if (scriptList.scripts.size() < 3) {
-                    throw new NyException('Not defined either select, insert, or update query in UPSERT query!')
-                }
-
-                NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
-                if (result.isEmpty()) {
-                    // insert
-                    return execute(scriptList.scripts[1])
-                } else {
-                    // records exist... update
-                    return execute(scriptList.scripts[2])
-                }
+                return handleUpsertExecution(scriptList)
 
             } else {
                 List results = []
@@ -433,6 +423,35 @@ class QJdbcExecutor implements QExecutor {
         } finally {
             reusable = prevReusable
             closeConnection()
+        }
+    }
+
+    private handleUpsertExecution(QScriptList scriptList) throws Exception {
+        if (scriptList.scripts.size() < 3) {
+            throw new NyException('Not defined either select, insert, or update query in UPSERT query!')
+        }
+
+        UpsertQuery upsertQuery = (UpsertQuery)scriptList.baseQuery
+
+        NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
+        if (result.isEmpty()) {
+            // insert
+            execute(scriptList.scripts[1])
+        } else {
+            // records exist... update
+            execute(scriptList.scripts[2])
+        }
+
+        if (upsertQuery.returningType == UpsertQuery.ReturnType.NONE) {
+            return new NyQLResult()
+        } else if (upsertQuery.returningType == UpsertQuery.ReturnType.RECORD_BEFORE) {
+            return result
+        } else {
+            if (scriptList.scripts.size() < 4) {
+                throw new NyException('Query correspond to returning upsert result is not found!')
+            } else {
+                return execute(scriptList.scripts[3])
+            }
         }
     }
 

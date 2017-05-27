@@ -54,6 +54,8 @@ public class AbstractTest {
             }
 
             List res = (List)gen;
+            Assert.assertEquals(res.size(), ((QScriptList) obj).getScripts().size(),
+                    "Number of generated queries are different in comparing script lists!");
             for (int i = 0; i < ((QScriptList) obj).getScripts().size(); i++) {
                 QScript qScript = ((QScriptList) obj).getScripts().get(i);
                 compare(qScript.getProxy(), res.get(i));
