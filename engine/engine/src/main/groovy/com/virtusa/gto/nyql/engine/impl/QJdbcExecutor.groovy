@@ -9,6 +9,8 @@ import com.virtusa.gto.nyql.engine.transform.JdbcResultTransformer
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QScript
+import com.virtusa.gto.nyql.model.QScriptList
+import com.virtusa.gto.nyql.model.QScriptListType
 import com.virtusa.gto.nyql.model.QScriptResult
 import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.utils.QReturnType
@@ -392,6 +394,36 @@ class QJdbcExecutor implements QExecutor {
                     return NoneParameter.INSTANCE
                 }
             }
+        }
+    }
+
+    @Override
+    def execute(QScriptList scriptList) throws Exception {
+        if (scriptList == null || scriptList.scripts == null) {
+            return new LinkedList<>();
+        }
+
+        if (scriptList.type == QScriptListType.UPSERT) {
+            if (scriptList.scripts.size() < 3) {
+                throw new NyException('Not defined either select, insert, or update query in UPSERT query!')
+            }
+
+            NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
+            if (result.isEmpty()) {
+                // insert
+                return execute(scriptList.scripts[1])
+            } else {
+                // records exist... update
+                return execute(scriptList.scripts[2])
+            }
+
+        } else {
+            List results = []
+            for (QScript qScript : scriptList.scripts) {
+                def res = execute(qScript)
+                results.add(res)
+            }
+            return results
         }
     }
 

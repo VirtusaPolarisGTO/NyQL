@@ -1,9 +1,11 @@
 package com.virtusa.gto.nyql
 
 import com.virtusa.gto.nyql.ddl.DDL
+import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QScriptList
+import com.virtusa.gto.nyql.model.QScriptListType
 import com.virtusa.gto.nyql.model.QSession
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.ParamList
@@ -212,6 +214,47 @@ class DSL {
 
         qs._ctx.translator.___updateQuery(qs)
     }
+
+
+    QScriptList upsert(@DelegatesTo(value = QueryUpdate, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QContext qContext = createContext()
+        QueryUpdate qu = new QueryUpdate(qContext)
+
+        def code = closure.rehydrate(qu, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        if (qu.whereObj == null || !qu.whereObj.__hasClauses()) {
+            throw new NyException('WHERE clause is mandatory for upsert queries!')
+        }
+        QuerySelect querySelect = new QuerySelect(qContext)
+        querySelect.sourceTbl = qu.sourceTbl
+        querySelect._joiningTable = qu._joiningTable
+        querySelect.whereObj = qu.whereObj
+        querySelect.LIMIT(1)
+
+        QResultProxy proxySelect = querySelect._ctx.translator.___selectQuery(querySelect)
+        QScript scriptSelect = new QScript(qSession: session, proxy: proxySelect)
+
+        QueryInsert queryInsert = new QueryInsert(qContext)
+        queryInsert.sourceTbl = qu.sourceTbl
+        if (qu._assigns != null && qu._assigns.__hasAssignments()) {
+            queryInsert._assigns = qu._assigns
+        }
+        queryInsert.RETURN_KEYS()
+
+        QResultProxy proxyInsert = queryInsert._ctx.translator.___insertQuery(queryInsert)
+        QScript scriptInsert = new QScript(qSession: session, proxy: proxyInsert)
+
+        QResultProxy proxyUpdate = qu._ctx.translator.___updateQuery(qu)
+        QScript scriptUpdate = new QScript(qSession: session, proxy: proxyUpdate)
+
+        QScriptList scriptList = new QScriptList()
+        scriptList.scripts = [scriptSelect, scriptInsert, scriptUpdate]
+        scriptList.type = QScriptListType.UPSERT
+        scriptList
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////////////
     ////

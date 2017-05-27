@@ -145,7 +145,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
     }
 
     protected QResultProxy generateInsertQuery(QueryInsert q, String quoteChar) throws NyException {
-        if (QUtils.isNullOrEmpty(q.get_data())) {
+        if (QUtils.isNullOrEmpty(q.get_data()) && q.get_assigns() == null) {
             return ___selectQuery(q);
         }
 
@@ -156,12 +156,31 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         List<String> colList = new LinkedList<>();
         List<String> valList = new LinkedList<>();
 
-        for (Map.Entry<String, Object> entry : q.get_data().entrySet()) {
-            colList.add(QUtils.quote(entry.getKey(), quoteChar));
+        if (q.get_data() != null) {
+            for (Map.Entry<String, Object> entry : q.get_data().entrySet()) {
+                colList.add(QUtils.quote(entry.getKey(), quoteChar));
 
-            ___scanForParameters(entry.getValue(), paramList);
-            valList.add(String.valueOf(___resolve(entry.getValue(), QContextType.INSERT_DATA, paramList)));
+                ___scanForParameters(entry.getValue(), paramList);
+                valList.add(String.valueOf(___resolve(entry.getValue(), QContextType.INSERT_DATA, paramList)));
+            }
         }
+
+        if (q.get_assigns() != null && q.get_assigns().__hasAssignments()) {
+            for (Object object : q.get_assigns().getAssignments()) {
+                if (object instanceof Assign.AnAssign) {
+                    Assign.AnAssign anAssign = (Assign.AnAssign)object;
+
+                    if (anAssign.getLeftOp() instanceof Column) {
+                        colList.add(String.valueOf(___resolve(anAssign.getLeftOp(), QContextType.INSERT_PROJECTION, paramList)));
+                    } else {
+                        colList.add(QUtils.quote(anAssign.toString(), quoteChar));
+                    }
+                    ___scanForParameters(anAssign.getRightOp(), paramList);
+                    valList.add(String.valueOf(___resolve(anAssign.getRightOp(), QContextType.INSERT_DATA, paramList)));
+                }
+            }
+        }
+
         query.append(colList.stream().collect(Collectors.joining(COMMA)))
                 .append(") VALUES (")
                 .append(valList.stream().collect(Collectors.joining(COMMA)))

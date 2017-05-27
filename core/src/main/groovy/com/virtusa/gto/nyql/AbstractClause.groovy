@@ -144,7 +144,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
     Column ALIAS_REF(String aliasStr) {
         Column column = _ctx.getColumnIfExist(aliasStr)
         if (column == null) {
-            throw new NySyntaxException('No column is found by alias \'' + aliasStr + '\'!')
+            throw new NySyntaxException("No column is found by alias '$aliasStr'!")
         }
         column
     }

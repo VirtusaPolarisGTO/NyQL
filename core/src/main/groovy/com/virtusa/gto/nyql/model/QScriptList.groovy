@@ -11,6 +11,7 @@ import java.util.stream.Collectors
 class QScriptList extends QScript {
 
     List<QScript> scripts
+    QScriptListType type = QScriptListType.DEFAULT
 
     @Override
     QScript spawn() {
@@ -20,12 +21,13 @@ class QScriptList extends QScript {
                 scriptList.scripts.add(script.spawn())
             }
         }
+        scriptList.type = type
         scriptList
     }
 
     @Override
     void free() {
-        Object.free()
+        super.free()
         if (scripts != null) {
             scripts.each { it.free() }
             scripts.clear()

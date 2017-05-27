@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 class QueryInsert extends QuerySelect {
 
     Map<String, Object> _data = new LinkedHashMap<>()
+    Assign _assigns = null
 
     QueryInsert(QContext contextParam) {
         super(contextParam)
@@ -32,6 +33,17 @@ class QueryInsert extends QuerySelect {
     QueryInsert CELL_DATA(String columnName, Object val) {
         _data.put(columnName, val)
         return this
+    }
+
+    QueryInsert SET(@DelegatesTo(value = Assign, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        Assign ass = new Assign(_ctx, this)
+
+        def code = closure.rehydrate(ass, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        _assigns = ass
+        this
     }
 
     QueryInsert RETURN_KEYS() {
