@@ -44,7 +44,7 @@ class QJdbcExecutor implements QExecutor {
     private final QJdbcPoolFetcher poolFetcher
     private Connection connection
     private final boolean returnRaw
-    private final boolean reusable
+    private boolean reusable
 
     /**
      * Creates an executor with custom connection.
@@ -403,27 +403,36 @@ class QJdbcExecutor implements QExecutor {
             return new LinkedList<>();
         }
 
-        if (scriptList.type == QScriptListType.UPSERT) {
-            if (scriptList.scripts.size() < 3) {
-                throw new NyException('Not defined either select, insert, or update query in UPSERT query!')
-            }
+        final boolean prevReusable = reusable
+        reusable = true
 
-            NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
-            if (result.isEmpty()) {
-                // insert
-                return execute(scriptList.scripts[1])
+        try {
+            if (scriptList.type == QScriptListType.UPSERT) {
+                if (scriptList.scripts.size() < 3) {
+                    throw new NyException('Not defined either select, insert, or update query in UPSERT query!')
+                }
+
+                NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
+                if (result.isEmpty()) {
+                    // insert
+                    return execute(scriptList.scripts[1])
+                } else {
+                    // records exist... update
+                    return execute(scriptList.scripts[2])
+                }
+
             } else {
-                // records exist... update
-                return execute(scriptList.scripts[2])
+                List results = []
+                for (QScript qScript : scriptList.scripts) {
+                    def res = execute(qScript)
+                    results.add(res)
+                }
+                return results
             }
 
-        } else {
-            List results = []
-            for (QScript qScript : scriptList.scripts) {
-                def res = execute(qScript)
-                results.add(res)
-            }
-            return results
+        } finally {
+            reusable = prevReusable
+            closeConnection()
         }
     }
 
