@@ -35,6 +35,17 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
         throw new NyException('Incorrect number of parameters for string replace function!')
     }
 
+    @CompileStatic
+    @Override
+    String str_repeat(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            return 'REPEAT(' + ___resolveIn(c.get(0), pmx) + ', ' + ___resolveIn(c.get(1), pmx) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for string repeat function')
+    }
+
     @Override
     String substr(Object cx) {
         def c = ___val(cx)
@@ -54,6 +65,17 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
         def pmx = ___pm(cx)
         if (c instanceof List) {
             return String.format('POSITION(%s IN %s)', ___resolveIn(c.get(1), pmx), ___resolveIn(c.get(0), pmx))
+        }
+        throw new NyException('Insufficient parameters for POSITION function!')
+    }
+
+    @Override
+    String position_last(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            String tmp = ___resolveIn(c.get(0), pmx)
+            return String.format('LENGTH(%s) - LOCATE(%s, REVERSE(%s))', tmp, ___resolveIn(c.get(1), pmx), tmp)
         }
         throw new NyException('Insufficient parameters for POSITION function!')
     }
