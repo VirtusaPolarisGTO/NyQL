@@ -214,9 +214,20 @@ class DSL {
     }
 
 
-    QScriptList upsert(@DelegatesTo(value = QueryUpdate, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    QScriptList upsert(@DelegatesTo(value = UpsertQuery, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         QContext qContext = createContext()
         UpsertQuery qu = new UpsertQuery(qContext)
+
+        def code = closure.rehydrate(qu, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        qu.createScripts(qContext, session)
+    }
+
+    QScriptList insertOrLoad(@DelegatesTo(value = InsertOrQuery, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QContext qContext = createContext()
+        InsertOrQuery qu = new InsertOrQuery(qContext)
 
         def code = closure.rehydrate(qu, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY

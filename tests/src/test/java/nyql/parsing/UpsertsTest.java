@@ -21,5 +21,12 @@ public class UpsertsTest extends AbstractTest {
         assertQueries(NyQL.parse("upserts/upserts", data));
     }
 
+    public void testInsertOrLoad() throws Exception {
+        Map<String, Object> data = new HashMap<>();
+        data.put("title", "Yeah");
+
+        assertQueries(NyQL.parse("upserts/insertOr", data));
+    }
+
 
 }

@@ -6,7 +6,7 @@ package com.virtusa.gto.nyql.model;
 public enum QScriptListType {
 
     UPSERT,
-
+    INSERT_OR_LOAD,
     DEFAULT
 
 }

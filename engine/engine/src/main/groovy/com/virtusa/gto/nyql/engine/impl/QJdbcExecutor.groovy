@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.impl
 
+import com.virtusa.gto.nyql.InsertOrQuery
 import com.virtusa.gto.nyql.UpsertQuery
 import com.virtusa.gto.nyql.engine.exceptions.NyParamNotFoundException
 import com.virtusa.gto.nyql.engine.exceptions.NyScriptExecutionException
@@ -410,7 +411,8 @@ class QJdbcExecutor implements QExecutor {
         try {
             if (scriptList.type == QScriptListType.UPSERT) {
                 return handleUpsertExecution(scriptList)
-
+            } else if (scriptList.type == QScriptListType.INSERT_OR_LOAD) {
+                return handleInsertOrExecution(scriptList)
             } else {
                 List results = []
                 for (QScript qScript : scriptList.scripts) {
@@ -424,6 +426,21 @@ class QJdbcExecutor implements QExecutor {
             reusable = prevReusable
             closeConnection()
         }
+    }
+
+    private handleInsertOrExecution(QScriptList scriptList) throws Exception {
+        if (scriptList.scripts.size() < 2) {
+            throw new NyException('InsertOrLoad query has missing clauses!')
+        }
+
+        NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
+        if (result.isEmpty()) {
+            // insert
+            execute(scriptList.scripts[1])
+            result = execute(scriptList.scripts[0]) as NyQLResult // get the latest value
+        }
+
+        return result
     }
 
     private handleUpsertExecution(QScriptList scriptList) throws Exception {

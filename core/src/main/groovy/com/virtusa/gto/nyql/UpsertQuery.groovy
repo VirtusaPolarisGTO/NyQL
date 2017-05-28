@@ -44,20 +44,18 @@ class UpsertQuery extends QueryUpdate implements MultiQuery {
         this
     }
 
-    @Override
-    QScriptList createScripts(QContext qContext, QSession qSession) throws Exception {
-        if (whereObj == null || !whereObj.__hasClauses()) {
-            throw new NyException('WHERE clause is mandatory for upsert queries!')
-        }
-        final QuerySelect querySelect = new QuerySelect(qContext)
+    protected QScript createSelectQuery(QContext qContext, QSession qSession) {
+        QuerySelect querySelect = new QuerySelect(qContext)
         querySelect.sourceTbl = sourceTbl
         querySelect._joiningTable = _joiningTable
         querySelect.whereObj = whereObj
         querySelect.LIMIT(1)
 
-        final QResultProxy proxySelect = querySelect._ctx.translator.___selectQuery(querySelect)
-        final QScript scriptSelect = new QScript(qSession: qSession, proxy: proxySelect)
+        QResultProxy proxySelect = querySelect._ctx.translator.___selectQuery(querySelect)
+        return new QScript(qSession: qSession, proxy: proxySelect)
+    }
 
+    protected QScript createInsertQuery(QContext qContext, QSession qSession) {
         QueryInsert queryInsert = new QueryInsert(qContext)
         queryInsert.sourceTbl = sourceTbl
         if (_assigns != null && _assigns.__hasAssignments()) {
@@ -66,7 +64,16 @@ class UpsertQuery extends QueryUpdate implements MultiQuery {
         queryInsert.RETURN_KEYS()
 
         QResultProxy proxyInsert = queryInsert._ctx.translator.___insertQuery(queryInsert)
-        QScript scriptInsert = new QScript(qSession: qSession, proxy: proxyInsert)
+        return new QScript(qSession: qSession, proxy: proxyInsert)
+    }
+
+    @Override
+    QScriptList createScripts(QContext qContext, QSession qSession) throws Exception {
+        if (whereObj == null || !whereObj.__hasClauses()) {
+            throw new NyException('WHERE clause is mandatory for upsert queries!')
+        }
+        final QScript scriptSelect = createSelectQuery(qContext, qSession)
+        final QScript scriptInsert = createInsertQuery(qContext, qSession)
 
         QResultProxy proxyUpdate = _ctx.translator.___updateQuery(this)
         QScript scriptUpdate = new QScript(qSession: qSession, proxy: proxyUpdate)
@@ -84,7 +91,7 @@ class UpsertQuery extends QueryUpdate implements MultiQuery {
             qrs.projection = returningColumns
             qrs.LIMIT(1)
 
-            QResultProxy tmpProxySel = querySelect._ctx.translator.___selectQuery(qrs)
+            QResultProxy tmpProxySel = qrs._ctx.translator.___selectQuery(qrs)
             QScript tmpScriptSel = new QScript(qSession: qSession, proxy: tmpProxySel)
             scriptList.scripts.add(tmpScriptSel)
         }
