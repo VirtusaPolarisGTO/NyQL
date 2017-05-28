@@ -1,5 +1,10 @@
 ## NyQL Changelog
 
+### v2
+ * Features & Enhancements
+    - Syntactic sugar for upsert and insertOrLoad queries [#18](https://github.com/VirtusaPolarisGTO/NyQL/issues/18)
+    - Insert syntax supports `SET {}` clause
+    
 ### v1.1.3
  * Features & Enhancements
    - Relative script paths [#13](https://github.com/VirtusaPolarisGTO/NyQL/issues/13)

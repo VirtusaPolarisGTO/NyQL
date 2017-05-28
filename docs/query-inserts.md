@@ -37,6 +37,20 @@ DATA ([
 ])
 ```
 
+### SET Clause
+_(Since v2)_ Instead of using key-value pairs, you can specify columns and their values using
+`SET` clause as similar to the in [`UPDATE` query](query-update.md).
+
+Eg:
+```groovy
+SET {
+    EQ (s.id, PARAM("songId"))
+    EQ (s.title, PARAM("songTitle"))
+    EQ (s.year, PARAM("year"))
+}
+```
+
+
 ## Select Insert Query
 Sometimes you might want to insert records into a table, selecting from another table.
 For that, you can use syntax very similar to `select` syntax, but additionally with `INTO` clause,
