@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
+import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -108,7 +109,7 @@ class MySql extends MySqlFunctions implements QTranslator {
     @CompileStatic
     @Override
     String ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
-        String jtype = invokeMethod(join.type, null)
+        String jtype = ___resolveJoinType(join.type)
         generateTableJoinName(join, jtype, contextType, paramOrder)
     }
 
@@ -152,6 +153,44 @@ class MySql extends MySqlFunctions implements QTranslator {
                         (column.__aliasDefined() && contextType == QContextType.SELECT ? columnAliasAs(column, BACK_TICK) : '')
             }
         }
+    }
+
+    @Override
+    QResultProxy ___selectQuery(QuerySelect q) throws NyException {
+        int count
+        if ((count = MySqlUtils.countFullJoin(q._joiningTable)) > 0) {
+            List<QResultProxy> qParts = new LinkedList<>()
+            List<String> qs = new LinkedList<>()
+            QResultProxy resultProxy = new QResultProxy()
+            resultProxy.orderedParameters = new LinkedList<>()
+
+            for (int i = count; i >= 0; i--) {
+                QuerySelect qt = MySqlUtils.cloneQuery(q)
+                MySqlUtils.flipNthFullJoin(qt._joiningTable, i, 0)
+
+                QResultProxy qr = super.___selectQuery(qt)
+                qs.add(qr.query)
+                qParts.add(qr)
+
+                if (qr.orderedParameters != null) {
+                    resultProxy.orderedParameters.addAll(qr.orderedParameters)
+                }
+                resultProxy.returnType = qr.returnType
+                resultProxy.qObject = qr.qObject
+                resultProxy.queryType = qr.queryType
+                resultProxy.rawObject = qr.rawObject
+            }
+
+            resultProxy.query = String.join(' UNION ALL ', qs)
+            return resultProxy
+
+        } else {
+            return super.___selectQuery(q)
+        }
+    }
+
+    private static QResultProxy mergeResults(List<QResultProxy> resultProxies) {
+
     }
 
     @CompileStatic

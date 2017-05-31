@@ -1,6 +1,7 @@
 package com.virtusa.gto.nyql
 
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.nyql.model.JoinType
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryType
@@ -12,7 +13,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class JoinClosure extends AbstractClause {
 
-    private static final String DEF_JOIN = 'INNER_JOIN'
+    private static final JoinType DEF_JOIN = JoinType.INNER_JOIN
 
     final Table startingTable
 
@@ -42,7 +43,7 @@ class JoinClosure extends AbstractClause {
     }
 
     Table CROSS_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'JOIN')
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, JoinType.CROSS_JOIN)
         activeTable
     }
 
@@ -52,23 +53,27 @@ class JoinClosure extends AbstractClause {
     }
 
     Table LEFT_OUTER_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'LEFT_OUTER_JOIN')
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, JoinType.LEFT_JOIN)
         activeTable
     }
 
     Table RIGHT_OUTER_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'RIGHT_OUTER_JOIN')
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, JoinType.RIGHT_JOIN)
         activeTable
     }
 
     Table RIGHT_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'RIGHT_JOIN')
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, JoinType.RIGHT_JOIN)
         activeTable
     }
 
     Table LEFT_JOIN(Table t) {
-        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, 'LEFT_JOIN')
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, JoinType.LEFT_JOIN)
         activeTable
     }
 
+    Table FULL_JOIN(Table t) {
+        activeTable = QUtils.mergeJoinClauses(_ctx, activeTable, t, JoinType.FULL_JOIN)
+        activeTable
+    }
 }

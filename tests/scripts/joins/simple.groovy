@@ -40,6 +40,32 @@
 
         $DSL.select {
             TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                FULL_JOIN (Film_Actor.alias("fa"))
+            }
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                FULL_JOIN (Film_Actor.alias("fa"))
+                FULL_JOIN (Film_Character.alias("fc"))
+            }
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa LEFT JOIN `Film_Character` fc UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa LEFT JOIN `Film_Character` fc UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa RIGHT JOIN `Film_Character` fc"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
             JOIN {
                 INNER_JOIN (Film_Actor.alias("fa")) ON (f.film_id, fa.film_id)
                 LEFT_JOIN (Actor.alias("a")) ON (fa.actor_id, a.actor_id)
@@ -62,7 +88,7 @@
         },
         [
             mysql: "SELECT * FROM `Film` f " +
-                "LEFT OUTER JOIN `Film_Actor` fa ON f.film_id = fa.film_id " +
+                "LEFT JOIN `Film_Actor` fa ON f.film_id = fa.film_id " +
                 "RIGHT JOIN `Actor` a ON fa.actor_id = a.actor_id"
         ],
 
@@ -80,7 +106,7 @@
         },
         [
             mysql: "SELECT * FROM `Film` f " +
-                "RIGHT OUTER JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id = fa.second_film_id " +
+                "RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id = fa.second_film_id " +
                 "CROSS JOIN `Actor` a ON fa.actor_id = a.actor_id"
         ],
 

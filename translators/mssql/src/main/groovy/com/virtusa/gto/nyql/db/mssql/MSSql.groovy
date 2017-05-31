@@ -108,7 +108,7 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     @CompileStatic
     @Override
     String ___tableJoinName(final Join join, final QContextType contextType, List<AParam> paramOrder) {
-        String jtype = invokeMethod(join.type, null)
+        String jtype = ___resolveJoinType(join.type)
         generateTableJoinName(join, jtype, contextType, paramOrder)
     }
 

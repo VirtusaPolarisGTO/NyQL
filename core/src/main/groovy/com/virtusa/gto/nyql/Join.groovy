@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql
 
+import com.virtusa.gto.nyql.model.JoinType
 import com.virtusa.gto.nyql.utils.QOperator
 import groovy.transform.CompileStatic
 
@@ -9,7 +10,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class Join extends Table {
 
-    String type = 'JOIN'
+    JoinType type = JoinType.CROSS_JOIN
 
     Table table1
     Table table2

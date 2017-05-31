@@ -7,6 +7,7 @@ import com.virtusa.gto.nyql.Table
 import com.virtusa.gto.nyql.TableProxy
 import com.virtusa.gto.nyql.Where
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.nyql.model.JoinType
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.NamedParam
 import groovy.transform.CompileStatic
@@ -157,7 +158,7 @@ final class QUtils {
      * @param type type of the join if it needed to be merged.
      * @return merged table reference.
      */
-    static Table mergeJoinClauses(QContext ctx, Table tableLeft, Table tableRight, String type) {
+    static Table mergeJoinClauses(QContext ctx, Table tableLeft, Table tableRight, JoinType type) {
         Table table1 = tableLeft
         Table table2 = tableRight
         Table rmost = findRightMostTable(table1)

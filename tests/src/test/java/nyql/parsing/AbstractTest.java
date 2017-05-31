@@ -90,7 +90,7 @@ public class AbstractTest {
         }
         System.out.println("Generated Query:");
         System.out.println(q1);
-        Assert.assertEquals(q2, q1);
+        Assert.assertEquals(q1, q2);
 
         List<AParam> paramList = proxy.getOrderedParameters();
         assertLists(paramList, pList);

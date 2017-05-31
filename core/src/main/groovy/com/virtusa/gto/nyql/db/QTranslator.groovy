@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.db
 
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.model.JoinType
 import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.utils.QOperator
 import com.virtusa.gto.nyql.utils.QUtils
@@ -10,7 +11,7 @@ import groovy.transform.CompileStatic
 /**
  * @author Isuru Weerarathna
  */
-trait QTranslator extends QJoins {
+trait QTranslator {
 
     String NULL() { 'NULL' }
 
@@ -166,6 +167,16 @@ trait QTranslator extends QJoins {
      * @return generated query.
      */
     abstract QResultProxy ___updateQuery(QueryUpdate q)
+
+    /**
+     * Return resolved name for the given join type.
+     *
+     * @param joinType join type.
+     * @return resolved name for join.
+     */
+    String ___resolveJoinType(JoinType joinType) {
+        return joinType.getJoinName()
+    }
 
     /**
      * Converts a given operator to appropriate db specific string.
