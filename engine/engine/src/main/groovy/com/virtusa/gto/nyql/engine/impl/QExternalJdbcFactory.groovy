@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.impl
 
+import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QExecutorFactory
 
@@ -22,8 +23,8 @@ class QExternalJdbcFactory implements QExecutorFactory {
     }
 
     @Override
-    void init(Map options) {
-
+    DbInfo init(Map options) {
+        DbInfo.deriveFromConnection(connection)
     }
 
     /**

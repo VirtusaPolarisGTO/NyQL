@@ -7,6 +7,7 @@ import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
+import com.virtusa.gto.nyql.model.DbInfo
 
 /**
  * @author IWEERARATHNA
@@ -20,7 +21,7 @@ class MSSqlFactory implements QDbFactory {
     private MSSql msSql
 
     @Override
-    void init(Configurations nyConfigs) throws NyConfigurationException {
+    void init(Configurations nyConfigs, DbInfo dbInfo) throws NyConfigurationException {
         // load mssql keywords
         Collection<String> keywords = loadKeywords(nyConfigs)
 

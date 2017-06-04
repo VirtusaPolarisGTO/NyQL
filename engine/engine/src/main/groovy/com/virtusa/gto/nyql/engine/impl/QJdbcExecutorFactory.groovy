@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql.engine.impl
 
 import com.virtusa.gto.nyql.engine.pool.QJdbcPool
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
+import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QExecutorFactory
 import groovy.transform.CompileStatic
@@ -20,7 +21,7 @@ class QJdbcExecutorFactory implements QExecutorFactory {
     private QJdbcPool jdbcPool
 
     @Override
-    void init(Map options) throws NyConfigurationException {
+    DbInfo init(Map options) throws NyConfigurationException {
         if (options.pooling) {
             String implClz = String.valueOf(options.pooling['impl'] ?: '')
             if (!implClz.isEmpty()) {
@@ -34,9 +35,20 @@ class QJdbcExecutorFactory implements QExecutorFactory {
                 throw new NyConfigurationException('JDBC pooling class has not been specified!')
             }
             jdbcPool.init(options)
+            return getDatabaseInfo()
         } else {
             throw new NyConfigurationException(this.class.name + ' is for producing pooled jdbc executors. ' +
                     'If you want to use non-pooled jdbc executor use another implementation!')
+        }
+    }
+
+    private DbInfo getDatabaseInfo() throws NyConfigurationException {
+        try {
+            return DbInfo.deriveFromConnection(jdbcPool.getConnection())
+        } catch (NyConfigurationException ex) {
+            throw ex
+        } catch (Exception ex) {
+            throw new NyConfigurationException("Error occurred while retreiving database information!", ex)
         }
     }
 

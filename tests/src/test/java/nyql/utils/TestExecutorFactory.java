@@ -1,6 +1,7 @@
 package nyql.utils;
 
 import com.virtusa.gto.nyql.engine.impl.QDummyExecutor;
+import com.virtusa.gto.nyql.model.DbInfo;
 import com.virtusa.gto.nyql.model.QExecutor;
 import com.virtusa.gto.nyql.model.QExecutorFactory;
 
@@ -23,7 +24,7 @@ public class TestExecutorFactory implements QExecutorFactory {
 //    }
 
     @Override
-    public void init(Map options) {
+    public DbInfo init(Map options) {
         if (options.containsKey("max")) {
             maxInvocations = Integer.parseInt(options.get("max").toString());
         } else {
@@ -35,6 +36,7 @@ public class TestExecutorFactory implements QExecutorFactory {
         } else {
             throw new AssertionError("Maximum reuse invocation is not specified!");
         }
+        return DbInfo.UNRESOLVED;
     }
 
     @Override

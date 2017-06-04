@@ -7,6 +7,7 @@ import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
+import com.virtusa.gto.nyql.model.DbInfo
 import groovy.transform.CompileStatic
 /**
  * @author IWEERARATHNA
@@ -20,7 +21,7 @@ class PostgreFactory implements QDbFactory {
     private Postgres postgres
 
     @Override
-    void init(Configurations nyConfigs) throws NyConfigurationException {
+    void init(Configurations nyConfigs, DbInfo dbInfo) throws NyConfigurationException {
         // load postgre keyword list
         Collection<String> keywords = loadKeywords(nyConfigs)
 

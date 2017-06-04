@@ -1,6 +1,7 @@
 package com.virtusa.gto.nyql.model.impl
 
 import com.virtusa.gto.nyql.configs.Configurations
+import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QExecutorFactory
 import groovy.transform.CompileStatic
@@ -24,7 +25,7 @@ class QProfExecutorFactory implements QExecutorFactory {
     }
 
     @Override
-    void init(Map options) {
+    DbInfo init(Map options) {
         qExecutorFactory.init(options)
     }
 

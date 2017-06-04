@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.configs
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.QDatabaseRegistry
 import com.virtusa.gto.nyql.model.QExecutorFactory
 import com.virtusa.gto.nyql.model.QExecutorRegistry
@@ -89,10 +90,10 @@ class Configurations {
         loadRepos(profileEnabled)
 
         // load executors
-        loadExecutors(activeDb, profileEnabled)
+        DbInfo dbInfo = loadExecutors(activeDb, profileEnabled)
 
         // finally, initialize factory
-        databaseRegistry.getDbFactory(activeDb).init(this)
+        databaseRegistry.getDbFactory(activeDb).init(this, dbInfo)
     }
 
     private void loadActivatedTranslator(String activeDb) {
@@ -188,11 +189,12 @@ class Configurations {
         }
     }
 
-    private void loadExecutors(String activeDb, boolean profEnabled=false) {
+    private DbInfo loadExecutors(String activeDb, boolean profEnabled=false) {
         QDbFactory activeFactory = databaseRegistry.getDbFactory(activeDb)
         boolean loadDefOnly = properties.loadDefaultExecutorOnly ?: false
         String defExec = properties.defaultExecutor ?: Constants.DEFAULT_EXECUTOR_NAME
         List execs = properties.executors ?: []
+        DbInfo activeDbInfo = DbInfo.UNRESOLVED
         for (Map r : execs) {
             boolean thisDef = r.name == defExec
             if (loadDefOnly && !thisDef) {
@@ -208,9 +210,13 @@ class Configurations {
             if (profEnabled) {
                 executorFactory = new QProfExecutorFactory(this, executorFactory)
             }
-            executorFactory.init(r)
+            DbInfo dbInfo = executorFactory.init(r)
+            if (dbInfo != DbInfo.UNRESOLVED) {
+                activeDbInfo = dbInfo
+            }
             executorRegistry.register(String.valueOf(r.name), executorFactory, thisDef)
         }
+        activeDbInfo
     }
 
     private static QExecutorFactory createExecFactoryInstance(Class<?> clz, Map options) {
