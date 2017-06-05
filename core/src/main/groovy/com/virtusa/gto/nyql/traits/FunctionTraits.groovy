@@ -33,34 +33,44 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn SUM(Object column)      { fColumn(column, 'sum') }
 
     @CompileStatic FunctionColumn LCASE(Object column)    { fColumn(column, 'lcase') }
-    @CompileStatic FunctionColumn UCASE(Object column)    { fColumn(column, 'ucase') }
-    @CompileStatic FunctionColumn TRIM(Object column)     { fColumn(column, 'trim') }
-    @CompileStatic FunctionColumn LEN(Object column)      { fColumn(column, 'len') }
-    @CompileStatic FunctionColumn SUBSTRING(Object column, Object start, Object length) { vColumn('substr', column, start, length) }
-    @CompileStatic FunctionColumn SUBSTRING(Object column, Object start) { vColumn('substr', column, start) }
-    @CompileStatic FunctionColumn POSITION(Object column, Object substr) { vColumn('position', column, substr) }
-    @CompileStatic FunctionColumn STR_REPLACE(Object column, Object checkStr, Object replaceStr) {
-        vColumn('str_replace', column, checkStr, replaceStr)
-    }
-    @CompileStatic FunctionColumn REVERSE(Object column) { fColumn(column, 'str_reverse') }
-    @CompileStatic FunctionColumn STR_LEFT(Object column, Object length) { vColumn('str_left', column, length) }
-    @CompileStatic FunctionColumn STR_RIGHT(Object column, Object length) { vColumn('str_right', column, length) }
-    @CompileStatic FunctionColumn LEFT_TRIM(Object column) { fColumn(column, 'str_ltrim') }
-    @CompileStatic FunctionColumn RIGHT_TRIM(Object column) { fColumn(column, 'str_rtrim') }
-    @CompileStatic FunctionColumn LEFT_PAD(Object column, Object length, Object text) { vColumn('str_lpad', column, length, text) }
     @CompileStatic FunctionColumn LEFT_PAD(Object column, Object length) { vColumn('str_lpad', column, length) }
-    @CompileStatic FunctionColumn RIGHT_PAD(Object column, Object length, Object text) { vColumn('str_rpad', column, length, text) }
+    @CompileStatic FunctionColumn LEFT_PAD(Object column, Object length, Object text) { vColumn('str_lpad', column, length, text) }
+    @CompileStatic FunctionColumn LEFT_TRIM(Object column) { fColumn(column, 'str_ltrim') }
+    @CompileStatic FunctionColumn LEN(Object column)      { fColumn(column, 'len') }
+    @CompileStatic FunctionColumn POSITION(Object column, Object substr) { vColumn('position', column, substr) }
+    @CompileStatic FunctionColumn REVERSE(Object column) { fColumn(column, 'str_reverse') }
     @CompileStatic FunctionColumn RIGHT_PAD(Object column, Object length) { vColumn('str_rpad', column, length) }
+    @CompileStatic FunctionColumn RIGHT_PAD(Object column, Object length, Object text) { vColumn('str_rpad', column, length, text) }
+    @CompileStatic FunctionColumn RIGHT_TRIM(Object column) { fColumn(column, 'str_rtrim') }
+    @CompileStatic FunctionColumn STR_LEFT(Object column, Object length) { vColumn('str_left', column, length) }
+    @CompileStatic FunctionColumn STR_REPLACE(Object column, Object checkStr, Object replaceStr) { vColumn('str_replace', column, checkStr, replaceStr) }
+    @CompileStatic FunctionColumn STR_RIGHT(Object column, Object length) { vColumn('str_right', column, length) }
+    @CompileStatic FunctionColumn SUBSTRING(Object column, Object start) { vColumn('substr', column, start) }
+    @CompileStatic FunctionColumn SUBSTRING(Object column, Object start, Object length) { vColumn('substr', column, start, length) }
+    @CompileStatic FunctionColumn TRIM(Object column)     { fColumn(column, 'trim') }
+    @CompileStatic FunctionColumn UCASE(Object column)    { fColumn(column, 'ucase') }
 
-    @CompileStatic FunctionColumn ROUND(Object column, Object decimalPlaces)    { vColumn('round', column, decimalPlaces) }
-    @CompileStatic FunctionColumn FLOOR(Object column) { fColumn(column, 'floor') }
-    @CompileStatic FunctionColumn CEIL(Object column) { fColumn(column, 'ceil') }
     @CompileStatic FunctionColumn ABS(Object column) { fColumn(column, 'abs') }
-    @CompileStatic FunctionColumn POWER(Object column, Object magnitude) { vColumn('power', column, magnitude) }
-    @CompileStatic FunctionColumn SIGN(Object column) { fColumn(column, 'num_sign') }
-    @CompileStatic FunctionColumn SQRT(Object column) { fColumn(column, 'sqrt') }
+    @CompileStatic FunctionColumn ACOS(Object column) { fColumn(column, 'trig_acos') }
+    @CompileStatic FunctionColumn ASIN(Object column) { fColumn(column, 'trig_asin') }
+    @CompileStatic FunctionColumn ATAN(Object column) { fColumn(column, 'trig_atan') }
+    @CompileStatic FunctionColumn ATAN2(Object y, Object x) { vColumn('trig_atan2', y, x) }
+    @CompileStatic FunctionColumn CEIL(Object column) { fColumn(column, 'ceil') }
+    @CompileStatic FunctionColumn COS(Object column) { fColumn(column, 'trig_cos') }
+    @CompileStatic FunctionColumn COT(Object column) { fColumn(column, 'trig_cot') }
     @CompileStatic FunctionColumn DEGREES(Object column) { fColumn(column, 'num_degrees') }
+    @CompileStatic FunctionColumn EXP(Object column) { fColumn(column, 'lg_exp') }
+    @CompileStatic FunctionColumn FLOOR(Object column) { fColumn(column, 'floor') }
+    @CompileStatic FunctionColumn LOGE(Object column) { fColumn(column, 'lg_ln') }
+    @CompileStatic FunctionColumn LOG(Object base, Object val) { vColumn('lg_log', base, val) }
+    @CompileStatic FunctionColumn POWER(Object column, Object magnitude) { vColumn('power', column, magnitude) }
     @CompileStatic FunctionColumn RADIANS(Object column) { fColumn(column, 'num_radians') }
+    @CompileStatic FunctionColumn ROUND(Object column, Object decimalPlaces)    { vColumn('round', column, decimalPlaces) }
+    @CompileStatic FunctionColumn SIGN(Object column) { fColumn(column, 'num_sign') }
+    @CompileStatic FunctionColumn SIN(Object column) { fColumn(column, 'trig_sin') }
+    @CompileStatic FunctionColumn SQRT(Object column) { fColumn(column, 'sqrt') }
+    @CompileStatic FunctionColumn TAN(Object column) { fColumn(column, 'trig_tan') }
+    @CompileStatic FunctionColumn TRUNCATE(Object column, Object dpoints) { vColumn('truncate', column, dpoints) }
 
     @CompileStatic FunctionColumn CONCAT(Object... columns) { vColumn("concat", columns) }
 

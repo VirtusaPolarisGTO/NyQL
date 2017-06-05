@@ -5,6 +5,8 @@ import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import groovy.transform.CompileStatic
+
 /**
  * @author IWEERARATHNA
  */
@@ -16,6 +18,31 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
 
     MSSqlFunctions(TranslatorOptions theOptions) {
         super(theOptions)
+    }
+
+    @CompileStatic
+    @Override
+    String truncate(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            return 'ROUND(' + ___resolveIn(c.get(0), pmx) + ', ' + ___resolveIn(c.get(1), pmx) + ', 1)'
+        }
+        throw new NyException('Incorrect number of parameters for rounding with truncate function!')
+    }
+
+    @CompileStatic
+    @Override
+    String trig_atan2(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) String.format('ATN2(%s, %s)', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
+        else throw new NyException('ATAN2 function requires two parameters!')
+    }
+
+    @Override
+    String lg_ln(Object cx) {
+        String.format('LOG(%s)', ___resolveInP(cx))
     }
 
     @Override

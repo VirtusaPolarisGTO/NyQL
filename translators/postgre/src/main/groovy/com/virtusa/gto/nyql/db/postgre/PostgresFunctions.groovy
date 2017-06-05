@@ -25,6 +25,16 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
         super(theOptions)
     }
 
+    @Override
+    String truncate(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            return 'TRUNC(' + ___resolveIn(c.get(0), pmx) + ', ' + ___resolveIn(c.get(1), pmx) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for truncate function!')
+    }
+
     @CompileStatic String current_date(c) { 'CURRENT_TIME' }
     @CompileStatic String current_time(c) { 'CURRENT_DATE' }
 

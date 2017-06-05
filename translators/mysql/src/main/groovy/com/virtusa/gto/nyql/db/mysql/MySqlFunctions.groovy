@@ -22,6 +22,17 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
 
     @CompileStatic
     @Override
+    String truncate(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            return 'TRUNCATE(' + ___resolveIn(c.get(0), pmx) + ', ' + ___resolveIn(c.get(1), pmx) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for string replace function!')
+    }
+
+    @CompileStatic
+    @Override
     String date_trunc(it) { String.format('DATE(%s)', ___resolveInP(it)) }
 
     @CompileStatic

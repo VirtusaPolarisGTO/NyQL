@@ -120,4 +120,41 @@
                     "COALESCE(ac.description, ?, ?) " +
                     "FROM `Actor` ac", ["defVal1", "defVal2"]]
     ],
+
+    $DSL.select {
+        TARGET (Trig.alias('t'))
+        FETCH (ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATAN2(t.x, t.y),
+                COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot))
+    },
+    [
+            mysql: "SELECT ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATAN2(t.x, t.y), " +
+                    "COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot) " +
+                    "FROM `Trig` t",
+            mssql: "SELECT ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATN2(t.x, t.y), " +
+                    "COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot) " +
+                    "FROM `Trig` t",
+            pg: "SELECT ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATAN2(t.x, t.y), " +
+                    "COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot) " +
+                    "FROM `Trig` t"
+    ],
+
+    $DSL.select {
+        TARGET (Logs.alias('l'))
+        FETCH (LOGE(l.lne), LOG(10, l.val), LOG(2, l.val2), LOGE(EXP(l.eval)), EXP(l.eval))
+    },
+    [
+            mysql: "SELECT LN(l.lne), LOG(10, l.val), LOG(2, l.val2), LN(EXP(l.eval)), EXP(l.eval) FROM `Logs` l",
+            mssql: "SELECT LOG(l.lne), LOG(l.val, 10), LOG(l.val2, 2), LOG(EXP(l.eval)), EXP(l.eval) FROM `Logs` l",
+            pg: "SELECT LN(l.lne), LOG(10, l.val), LOG(2, l.val2), LN(EXP(l.eval)), EXP(l.eval) FROM `Logs` l"
+    ],
+
+    $DSL.select {
+        TARGET (Logs.alias('l'))
+        FETCH (TRUNCATE(l.v, 2))
+    },
+    [
+            mysql: "SELECT TRUNCATE(l.v, 2) FROM `Logs` l",
+            mssql: "SELECT ROUND(l.v, 2, 1) FROM `Logs` l",
+            pg:    "SELECT TRUNC(l.v, 2) FROM `Logs` l"
+    ],
 ]

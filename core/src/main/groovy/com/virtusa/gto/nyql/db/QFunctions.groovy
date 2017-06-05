@@ -272,8 +272,62 @@ trait QFunctions {
     @CompileStatic abstract String position(c)
 
     /**
+     * --------------------------------------------------------------
      * Math functions.
+     * --------------------------------------------------------------
      */
+
+    @CompileStatic String trig_sin(cx) {
+        String.format('SIN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_cos(cx) {
+        String.format('COS(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_tan(cx) {
+        String.format('TAN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_cot(cx) {
+        String.format('COT(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_acos(cx) {
+        String.format('ACOS(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_asin(cx) {
+        String.format('ASIN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_atan(cx) {
+        String.format('ATAN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_atan2(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) String.format('ATAN2(%s, %s)', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
+        else throw new NyException('ATAN2 function requires two parameters!')
+    }
+
+    @CompileStatic String lg_exp(cx) {
+        String.format('EXP(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String lg_ln(cx) {
+        String.format('LN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String lg_log(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) String.format('LOG(%s, %s)', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
+        else throw new NyException('LOG function requires two parameters!')
+    }
+
+    @CompileStatic abstract String truncate(c)
 
     /**
      * Rounds a column value to given number of decimal digits.
