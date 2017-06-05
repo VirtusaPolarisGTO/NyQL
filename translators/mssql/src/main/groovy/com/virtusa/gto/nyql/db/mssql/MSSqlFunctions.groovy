@@ -20,6 +20,26 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
         super(theOptions)
     }
 
+    @Override
+    String stat_stddevpop(Object cx) {
+        return String.format('STDEVP(%s)', ___resolveInP(cx))
+    }
+
+    @Override
+    String stat_stddevsamp(Object cx) {
+        return String.format('STDEV(%s)', ___resolveInP(cx))
+    }
+
+    @Override
+    String stat_varpop(Object cx) {
+        return String.format('VARP(%s)', ___resolveInP(cx))
+    }
+
+    @Override
+    String stat_varsamp(Object cx) {
+        return String.format('VAR(%s)', ___resolveInP(cx))
+    }
+
     @CompileStatic
     @Override
     String truncate(Object cx) {

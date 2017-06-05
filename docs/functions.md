@@ -145,6 +145,17 @@ Album.rating + 1 AS newRating
 |TAN (_value_ )  | Returns the tangent for the given value. |
 |TRUNCATE(_column, d_ ) | Truncate the given decimal number to _d_ decimal places. This does not _round_ the number. Negative _d_ values will truncate before the decimal point. |
 
+
+### Stats Functions
+
+| Function | Details |
+|---|---|
+|STDDEV_POP (_column_ ) | Population standard deviation of values in given column. |
+|STDDEV_SAMP (_column_ ) | Sample standard deviation of values in given column. |
+|VAR_POP (_column_ ) | Population variance of values in given column. |
+|VAR_SAMP (_column_ ) | Sample variance of values in given column. |
+ 
+
 ### Casting Functions
 
 | Function | Details |

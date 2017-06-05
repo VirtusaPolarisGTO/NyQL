@@ -32,6 +32,12 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn AVG(Object column)      { fColumn(column, 'avg') }
     @CompileStatic FunctionColumn SUM(Object column)      { fColumn(column, 'sum') }
 
+    // stats functions
+    @CompileStatic FunctionColumn STDDEV_POP(Object expr) { fColumn(expr, 'stat_stddevpop') }
+    @CompileStatic FunctionColumn STDDEV_SAMP(Object expr) { fColumn(expr, 'stat_stddevsamp') }
+    @CompileStatic FunctionColumn VAR_POP(Object expr) { fColumn(expr, 'stat_varpop') }
+    @CompileStatic FunctionColumn VAR_SAMP(Object expr) { fColumn(expr, 'stat_varsamp') }
+
     @CompileStatic FunctionColumn LCASE(Object column)    { fColumn(column, 'lcase') }
     @CompileStatic FunctionColumn UCASE(Object column)    { fColumn(column, 'ucase') }
     @CompileStatic FunctionColumn TRIM(Object column)     { fColumn(column, 'trim') }

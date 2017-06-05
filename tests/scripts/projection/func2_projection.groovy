@@ -157,4 +157,15 @@
             mssql: "SELECT ROUND(l.v, 2, 1) FROM `Logs` l",
             pg:    "SELECT TRUNC(l.v, 2) FROM `Logs` l"
     ],
+
+    $DSL.select {
+        TARGET (Stats.alias('s'))
+        FETCH (STDDEV_POP(s.income), STDDEV_SAMP(s.income), VAR_POP(s.income), VAR_SAMP(s.income))
+        GROUP_BY (s.year)
+    },
+    [
+            mysql: "SELECT STDDEV_POP(s.income), STDDEV_SAMP(s.income), VAR_POP(s.income), VAR_SAMP(s.income) FROM `Stats` s GROUP BY s.year",
+            mssql: "SELECT STDEVP(s.income), STDEV(s.income), VARP(s.income), VAR(s.income) FROM `Stats` s GROUP BY s.year",
+            pg:    "SELECT STDDEV_POP(s.income), STDDEV_SAMP(s.income), VAR_POP(s.income), VAR_SAMP(s.income) FROM `Stats` s GROUP BY s.year"
+    ],
 ]

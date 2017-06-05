@@ -583,6 +583,28 @@ trait QFunctions {
     }
 
     /**
+     * --------------------------------------------------------------
+     * Stat functions
+     * --------------------------------------------------------------
+     */
+
+    @CompileStatic String stat_stddevpop(cx) {
+        String.format('STDDEV_POP(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String stat_stddevsamp(cx) {
+        String.format('STDDEV_SAMP(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String stat_varpop(cx) {
+        String.format('VAR_POP(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String stat_varsamp(cx) {
+        String.format('VAR_SAMP(%s)', ___resolveInP(cx))
+    }
+
+    /**
      * Returns the sum value of given column.
      *
      * @param c input column.
