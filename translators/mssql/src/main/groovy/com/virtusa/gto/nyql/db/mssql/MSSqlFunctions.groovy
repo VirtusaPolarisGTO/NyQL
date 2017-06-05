@@ -92,6 +92,16 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
     }
 
     @Override
+    String str_repeat(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            return 'REPLICATE(' + ___resolveIn(c[0], pmx) + ', ' + ___resolveIn(c[1], pmx) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for string repeat function')
+    }
+
+    @Override
     String date_trunc(Object it) {
         String.format('CAST(%s AS DATE)', ___resolveInP(it))
     }
@@ -113,9 +123,21 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
         def c = ___val(cx)
         def pmx = ___pm(cx)
         if (c instanceof List) {
-            String.format('CHARINDEX(%s, %s)', ___resolveIn(c[0], pmx), ___resolveIn(c[1], pmx))
+            String.format('CHARINDEX(%s, %s)', ___resolveIn(c[1], pmx), ___resolveIn(c[0], pmx))
         } else {
             throw new NySyntaxException('Insufficient parameters for POSITION function!')
+        }
+    }
+
+    @Override
+    String position_last(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            String tmp = ___resolveIn(c.get(0), pmx)
+            String.format('LEN(%s) - CHARINDEX(%s, REVERSE(%s))', tmp, ___resolveIn(c.get(1), pmx), tmp)
+        } else {
+            throw new NyException('Insufficient parameters for POSITION function!')
         }
     }
 

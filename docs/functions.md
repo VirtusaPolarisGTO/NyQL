@@ -100,21 +100,23 @@ Album.rating + 1 AS newRating
 
 | Function | Details |
 |---|---|
-|CONCAT (_column-1, column-2, ..._ ) |  Concat the set of given columns/strings |
 |LCASE (_column_ ) | Converts string to lowercase |
-|LEFT_PAD (_column_, _length_, [_text_]) | Left pad given column to the specified length using given text. If text is undefined, then will be used a space. |
+|UCASE (_column_ ) | Converts string to upper case |
+|CONCAT (_column-1, column-2, ..._ ) |  Concat the set of given columns/strings |
+|TRIM (_column_ ) | Trims whitespace from the column |
 |LEFT_TRIM (_column_) | Left trim whitespace from column |
+|RIGHT_TRIM (_column_) | Right trim whitespace from column |
 |LEN (_column_ ) |  Length of the string |
 |POSITION (_column, stringToFind_ ) |  Find the position of substring in the given string __(case sensitive)__. If the text is not found, returns 0. Position value is always >= 1.  |
-|REVERSE (_column_) | Reverse a string |
-|RIGHT_PAD (_column_, _length_, [_text_]) | Right pad given column to the specified length using given text. If text is undefined, then will be used a space. |
-|RIGHT_TRIM (_column_) | Right trim whitespace from column |
-|STR_LEFT (_column_, _length_) | Capture specified length from the given string starting from left |
-|STR_REPLACE (_column, from, to_ ) | Replace a string of all _from_ text to _to_. Both _from_ and _to_ are 1-based indices. |
-|STR_RIGHT (_column_, _length_) | Capture specified length from the given string starting from right |
+|POSITION_LAST (_column, stringToFind_ ) |  Find the last occurred position of substring in the given string __(case sensitive)__. If the text is not found, returns 0. Position value is always >= 1.  |
 |SUBSTRING (_column, startFrom, [length]_ ) | Capture part of a string starting from given location to the given length. _startFrom_ must be >= 1, because databases uses 1-based indices. |
-|TRIM (_column_ ) | Trims whitespace from the column |
-|UCASE (_column_ ) | Converts string to upper case |
+|STR_REPLACE (_column, from, to_ ) | Replace a string of all _from_ text to _to_. Both _from_ and _to_ are 1-based indices. |
+|REVERSE (_column_) | Reverse a string |
+|REPEAT (_column_, _noOfTimes_) | Repeats the string given amount of time |
+|STR_LEFT (_column_, _length_) | Capture specified length from the given string starting from left |
+|STR_RIGHT (_column_, _length_) | Capture specified length from the given string starting from right |
+|LEFT_PAD (_column_, _length_, [_text_]) | Left pad given column to the specified length using given text. If text is undefined, then will be used a space. |
+|RIGHT_PAD (_column_, _length_, [_text_]) | Right pad given column to the specified length using given text. If text is undefined, then will be used a space. |
 
 
 ### Math Functions
