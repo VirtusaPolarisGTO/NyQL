@@ -265,5 +265,8 @@ class Postgres extends PostgresFunctions implements QTranslator {
         DDL
     }
 
-
+    @Override
+    List<QResultProxy> ___cteQuery(CTE cte) {
+        return null
+    }
 }

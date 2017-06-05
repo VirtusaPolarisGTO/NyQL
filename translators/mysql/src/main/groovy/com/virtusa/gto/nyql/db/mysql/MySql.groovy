@@ -5,6 +5,8 @@ import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.model.QScript
+import com.virtusa.gto.nyql.model.QScriptList
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -258,6 +260,10 @@ class MySql extends MySqlFunctions implements QTranslator {
                     paramList.addAll(((QResultProxy)q).orderedParameters)
                 }
                 joiner.add(QUtils.parenthesis(___resolve(q, QContextType.UNKNOWN)))
+            } else if (q instanceof QuerySelect) {
+                QResultProxy proxy = ___selectQuery((QuerySelect)q)
+                paramList.addAll(proxy.orderedParameters)
+                joiner.add(proxy.query)
             } else {
                 joiner.add(___resolve(q, QContextType.UNKNOWN, paramList))
             }
@@ -297,6 +303,53 @@ class MySql extends MySqlFunctions implements QTranslator {
     @Override
     QDdl ___ddls() {
         DDL
+    }
+
+    @Override
+    List<QResultProxy> ___cteQuery(CTE cte) {
+        List<AParam> paramList = new LinkedList<>()
+        List<String> qctes = new LinkedList<>()
+        int recCount = 0
+        for (Object item : cte.withs) {
+            StringBuilder iqStr = new StringBuilder()
+            Map map = item as Map
+            Table tbl = map['table'] as Table
+
+            iqStr.append(___tableName(tbl, QContextType.INTO))
+            List cols = map['cols'] as List
+            if (QUtils.notNullNorEmpty(cols)) {
+                iqStr.append(' ').append(OP).append(String.join(', ', cols)).append(CP)
+            }
+
+            Object query = map['query']
+            if (query instanceof QuerySelect) {
+                QResultProxy proxy = ___selectQuery((QuerySelect)query)
+                iqStr.append(' AS ').append(OP).append(proxy.query).append(CP)
+                paramList.addAll(proxy.orderedParameters)
+            } else if (query instanceof WithClosure) {
+                WithClosure withClosure = (WithClosure)query
+                QResultProxy proxy = ___combinationQuery(withClosure.combineType, [withClosure.anchor, withClosure.recursion])
+                iqStr.append(' AS ').append(OP).append(proxy.query).append(CP)
+                paramList.addAll(proxy.orderedParameters)
+                recCount++
+            }
+
+            qctes.add(iqStr.toString())
+        }
+
+        StringBuilder mq = new StringBuilder()
+        mq.append('WITH ')
+        if (recCount > 0) {
+            mq.append('RECURSIVE ')
+        }
+        mq.append(String.join(', ', qctes))
+
+        def proxy = ___selectQuery(cte.querySelect)
+        paramList.addAll(proxy.orderedParameters)
+        mq.append(' ').append(proxy.query)
+
+        QResultProxy qResultProxy = new QResultProxy(query: mq.toString(), orderedParameters: paramList)
+        return [qResultProxy]
     }
 
     /*

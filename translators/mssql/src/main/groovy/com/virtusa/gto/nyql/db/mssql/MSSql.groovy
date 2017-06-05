@@ -286,4 +286,8 @@ class MSSql extends MSSqlFunctions implements QTranslator {
         return DDL
     }
 
+    @Override
+    List<QResultProxy> ___cteQuery(CTE cte) {
+        return null
+    }
 }

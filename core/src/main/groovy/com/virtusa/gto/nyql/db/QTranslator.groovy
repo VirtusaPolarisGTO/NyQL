@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.db
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.JoinType
+import com.virtusa.gto.nyql.model.QScriptList
 import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.utils.QOperator
 import com.virtusa.gto.nyql.utils.QUtils
@@ -167,6 +168,14 @@ trait QTranslator {
      * @return generated query.
      */
     abstract QResultProxy ___updateQuery(QueryUpdate q)
+
+    /**
+     * Common table expression queries.
+     *
+     * @param cte cte query model
+     * @return returns a list of queries needed to execute this.
+     */
+    abstract List<QResultProxy> ___cteQuery(CTE cte)
 
     /**
      * Return resolved name for the given join type.
