@@ -258,6 +258,14 @@ trait QFunctions {
     @CompileStatic abstract String str_replace(c)
 
     /**
+     * Returns string repeat function.
+     *
+     * @param c inputs required for string.
+     * @return string representation of repeat function.
+     */
+    @CompileStatic abstract String str_repeat(c)
+
+    /**
      * Returns substring of the given string starting from start position and length.
      *
      * @param c input column to substring.
@@ -270,6 +278,13 @@ trait QFunctions {
      * @param c input column to find position.
      */
     @CompileStatic abstract String position(c)
+
+    /**
+     * Returns last position of string in the given main string.
+     *
+     * @param c input column to find position.
+     */
+    @CompileStatic abstract String position_last(c)
 
     /**
      * Math functions.

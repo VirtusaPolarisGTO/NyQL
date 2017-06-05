@@ -39,9 +39,11 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn SUBSTRING(Object column, Object start, Object length) { vColumn('substr', column, start, length) }
     @CompileStatic FunctionColumn SUBSTRING(Object column, Object start) { vColumn('substr', column, start) }
     @CompileStatic FunctionColumn POSITION(Object column, Object substr) { vColumn('position', column, substr) }
+    @CompileStatic FunctionColumn POSITION_LAST(Object column, Object substr) { vColumn('position_last', column, substr) }
     @CompileStatic FunctionColumn STR_REPLACE(Object column, Object checkStr, Object replaceStr) {
         vColumn('str_replace', column, checkStr, replaceStr)
     }
+    @CompileStatic FunctionColumn REPEAT(Object str, Object noOfTimes) { vColumn('str_repeat', str, noOfTimes) }
     @CompileStatic FunctionColumn REVERSE(Object column) { fColumn(column, 'str_reverse') }
     @CompileStatic FunctionColumn STR_LEFT(Object column, Object length) { vColumn('str_left', column, length) }
     @CompileStatic FunctionColumn STR_RIGHT(Object column, Object length) { vColumn('str_right', column, length) }
