@@ -31,6 +31,8 @@ import java.util.stream.Stream
 @CompileStatic
 class QScriptsFolder implements QScriptMapper {
 
+    private static final String GROOVY_EXT = '.groovy'
+
     private static final String KEY_INCLUSIONS = 'inclusions'
     private static final String KEY_EXCLUSIONS = 'exclusions'
     private static final String GLOB_NAME = 'glob:'
@@ -60,15 +62,21 @@ class QScriptsFolder implements QScriptMapper {
 
     private QSource processScript(File file) {
         String relPath = captureFileName(baseDir.toPath().relativize(file.toPath()).toString()).replace('\\', '/')
+        def qSrc = createSourceScript(file, baseDir)
+
+        fileMap[relPath] = qSrc
+        maxLen = Math.max(relPath.length(), maxLen)
+        qSrc
+    }
+
+    static QSource createSourceScript(File file, File baseDir) {
+        String relPath = captureFileName(baseDir.toPath().relativize(file.toPath()).toString()).replace('\\', '/')
 
         String content = readAll(file)
         GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, relPath, GroovyShell.DEFAULT_CODE_BASE)
         groovyCodeSource.setCachable(true)
 
-        def qSrc = new QFileSource(relPath, file, groovyCodeSource)
-        fileMap[relPath] = qSrc
-        maxLen = Math.max(relPath.length(), maxLen)
-        qSrc
+        new QFileSource(relPath, file, groovyCodeSource)
     }
 
     private static String readAll(File file) {
@@ -114,7 +122,7 @@ class QScriptsFolder implements QScriptMapper {
     QSource map(String id) throws NyScriptNotFoundException {
         QSource source = fileMap[id]
         if (source == null) {
-            File scriptFresh = baseDir.toPath().resolve(id).toFile()
+            File scriptFresh = baseDir.toPath().resolve(id + GROOVY_EXT).toFile()
             if (scriptFresh.exists()) {
                 LOGGER.debug('Loading a fresh script from ' + id + '...')
                 source = processScript(scriptFresh)
@@ -138,6 +146,14 @@ class QScriptsFolder implements QScriptMapper {
         true
     }
 
+    @Override
+    QSource reload(String id) throws NyScriptNotFoundException {
+        fileMap.remove(id)
+        QSource srcNew = map(id)
+        fileMap[id] = srcNew
+        srcNew
+    }
+
     private void prettyPrintFiles() {
         fileMap.keySet().sort().each {
             String kb = toKB((fileMap[it] as QFileSource).file.length())
@@ -159,7 +175,7 @@ class QScriptsFolder implements QScriptMapper {
         private final QScriptsFolder scriptsFolder
         private final Path startDir
 
-        @SuppressWarnings("UnnecessaryGetter")
+        @SuppressWarnings('UnnecessaryGetter')
         ScriptVisitor(QScriptsFolder qScriptsFolder, Path rootDir, String patternInclusions, String patternExclusions) {
             scriptsFolder = qScriptsFolder
             startDir = rootDir
@@ -186,7 +202,7 @@ class QScriptsFolder implements QScriptMapper {
 
         @Override
         FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            if (!attrs.directory && !isEndsWithAny(file.getFileName().toString().toLowerCase(), '.groovy')) {
+            if (!attrs.directory && !isEndsWithAny(file.getFileName().toString().toLowerCase(), GROOVY_EXT)) {
                 return FileVisitResult.SKIP_SUBTREE
             }
 

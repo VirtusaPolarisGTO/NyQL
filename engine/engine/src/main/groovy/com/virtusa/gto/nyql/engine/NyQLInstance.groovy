@@ -88,6 +88,20 @@ class NyQLInstance {
     }
 
     /**
+     * Allows recompiling a script when it is already compiled and cached. You may call
+     * this method at runtime, but it does not reload or recompile unless scripts are loaded from
+     * file.
+     *
+     * @param scriptName unique script name.
+     * @throws NyException any exception thrown while recompiling.
+     * @since v2
+     */
+    @CompileStatic
+    void recompileScript(String scriptName) throws NyException {
+        configurations.repositoryRegistry.defaultRepository().reloadScript(scriptName)
+    }
+
+    /**
      * Shutdown the nyql engine.
      * This should be called only when your application exits.
      */

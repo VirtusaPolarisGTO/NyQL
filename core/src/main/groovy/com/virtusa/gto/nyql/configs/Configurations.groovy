@@ -295,6 +295,10 @@ class Configurations {
         }
     }
 
+    boolean isAllowRecompilation() {
+        (boolean) (properties.caching.allowRecompilation ?: false)
+    }
+
     boolean cacheGeneratedQueries() {
         String cacheStatus = QUtils.readEnv(ConfigKeys.SYS_CACHE_RAW_ENABLED, null)
         if (cacheStatus == null) {

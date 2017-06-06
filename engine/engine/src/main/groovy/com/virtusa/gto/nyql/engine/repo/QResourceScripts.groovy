@@ -83,4 +83,9 @@ class QResourceScripts implements QScriptMapper {
     boolean canCacheAtStartup() {
         false
     }
+
+    @Override
+    QSource reload(String id) throws NyScriptNotFoundException {
+        map(id)
+    }
 }

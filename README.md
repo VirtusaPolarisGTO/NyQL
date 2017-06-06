@@ -125,6 +125,7 @@ If you want to turn it off, add a system property `com.virtusa.gto.nyql.autoBoot
     * **caching**: 
       * **compiledScripts**: Whether to cache the groovy compiled scripts or not. Recommended to set this `true`.
       * **generatedQueries**: Whether to cache generated queries by NyQL. Then you can have fine tune by specifying a cache status for each script using `do_cache=true` declaration in very top of scripts you want to cache. Recommended to set this `true`.
+      * **allowRecompilation**: _(Since v2)_ Whether to recompile scripts again at runtime. Works when _compiledScripts_ is set to `true` only.
     * **executors**: List of executors for query execution. Each executor should declare below properties.
       * **name**: name of the executor. Should be unique.
       * **factory**: factory class which creates executors at runtime for each session.

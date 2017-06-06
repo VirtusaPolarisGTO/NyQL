@@ -8,7 +8,8 @@
 
   "caching": {
     "compiledScripts": true,
-    "generatedQueries": true
+    "generatedQueries": true,
+    "allowRecompilation": true
   },
 
   "defaultImports": [

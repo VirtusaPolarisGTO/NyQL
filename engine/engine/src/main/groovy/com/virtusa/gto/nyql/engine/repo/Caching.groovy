@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.NyBaseScript
 import com.virtusa.gto.nyql.model.QScript
+import com.virtusa.gto.nyql.model.QScriptMapper
 import com.virtusa.gto.nyql.model.QSession
 import com.virtusa.gto.nyql.model.QSource
 import groovy.transform.CompileStatic
@@ -28,38 +29,59 @@ class Caching implements Closeable {
     private final Map<String, QScript> cache = new ConcurrentHashMap<>()
 
     private CompilerConfiguration compilerConfigurations
-    private final GroovyClassLoader gcl
+    private final NyGroovyClassLoader gcl
     private final Configurations configurations
+    private final QScriptMapper mapper
+    private final Object clzLoaderLock = new Object()
 
-    Caching(Configurations theConfigs) {
+    Caching(Configurations theConfigs, QScriptMapper scriptMapper) {
         configurations = theConfigs
+        mapper = scriptMapper
 
-        gcl = new GroovyClassLoader(Thread.currentThread().contextClassLoader, makeCompilerConfigs())
+        gcl = new NyGroovyClassLoader(Thread.currentThread().contextClassLoader, makeCompilerConfigs())
     }
 
     void compileAllScripts(Collection<QSource> sources) throws NyException {
         if (configurations.cacheRawScripts()) {
-            int n = sources.size()
-            int len = String.valueOf(n).length()
-            int curr = 1
+            synchronized (clzLoaderLock) {
+                int n = sources.size()
+                int len = String.valueOf(n).length()
+                int curr = 1
 
-            LOGGER.info("Compiling all ${n} dsl script(s)...")
-            for (QSource qSource : sources) {
-                String id = qSource.id
-                try {
-                    LOGGER.debug('  Compiling [' + padLeft(len, curr++) + '/' + n + ']: ' + id)
-                    gcl.parseClass(qSource.codeSource, true)
-                } catch (CompilationFailedException ex) {
-                    LOGGER.error("Compilation error in script '$id'", ex)
-                    throw new NyException("Compilation error in script '$id'!", ex)
+                LOGGER.info("Compiling all ${n} dsl script(s)...")
+                for (QSource qSource : sources) {
+                    String id = qSource.id
+                    try {
+                        LOGGER.debug('  Compiling [' + padLeft(len, curr++) + '/' + n + ']: ' + id)
+                        gcl.parseClass(qSource.codeSource, true)
+                    } catch (CompilationFailedException ex) {
+                        LOGGER.error("Compilation error in script '$id'", ex)
+                        throw new NyException("Compilation error in script '$id'!", ex)
+                    }
                 }
+                LOGGER.info('Compilation successful!')
             }
-            LOGGER.info('Compilation successful!')
         }
     }
 
-    private String padLeft(int len, int number) {
+    private static String padLeft(int len, int number) {
         ' '*(len - String.valueOf(number).length()) + number
+    }
+
+    void reloadScript(String scriptId) throws NyException {
+        cache.remove(scriptId)
+        def reloaded = mapper.reload(scriptId)
+        synchronized (clzLoaderLock) {
+            try {
+                LOGGER.debug('-'*80)
+                LOGGER.debug(' Recompiling script: ' + scriptId + '...')
+                gcl.parseClass(reloaded.codeSource, true, true)
+                LOGGER.debug(' Successfully recompiled the script ' + scriptId)
+            } catch (CompilationFailedException ex) {
+                LOGGER.error("Compilation error in script '$scriptId'", ex)
+                throw new NyException("Compilation error in script '$scriptId'!", ex)
+            }
+        }
     }
 
     boolean hasGeneratedQuery(String scriptId) {
@@ -106,17 +128,35 @@ class Caching implements Closeable {
     Script getCompiledScript(QSource sourceScript, QSession session) {
         Binding binding = new Binding(session?.sessionVariables ?: [:])
         if (configurations.cacheRawScripts()) {
-            Class<?> clazz = gcl.parseClass(sourceScript.codeSource, true)
-            NyBaseScript scr = clazz.newInstance() as NyBaseScript
-            scr.setBinding(binding)
-            scr.setSession(session)
-            scr
+            if (compilerConfigurations.recompileGroovySource) {
+                synchronized (clzLoaderLock) {
+                    parseAndGet(sourceScript, session, binding)
+                }
+            } else {
+                parseAndGet(sourceScript, session, binding)
+            }
         } else {
             GroovyShell shell = new GroovyShell(Thread.currentThread().contextClassLoader, binding, makeCompilerConfigs())
             Script parsedScript = sourceScript.parseIn(shell)
             parsedScript.setSession(session)
             parsedScript
         }
+    }
+
+    /**
+     * Parse the groovy source from class loader and apply the session and bindings.
+     *
+     * @param sourceScript source script.
+     * @param session session instance.
+     * @param binding binding instance.
+     * @return loaded compiled script.
+     */
+    private Script parseAndGet(QSource sourceScript, QSession session, Binding binding) {
+        Class<?> clazz = gcl.parseClass(sourceScript.codeSource, true)
+        NyBaseScript scr = clazz.newInstance() as NyBaseScript
+        scr.setBinding(binding)
+        scr.setSession(session)
+        scr
     }
 
     /**
@@ -157,6 +197,16 @@ class Caching implements Closeable {
             importCustomizer.addImports(defImports)
             compilerConfigurations.addCompilationCustomizers(importCustomizer)
         }
+
+        // setup recompilation, if specified
+        boolean doRecompile = configurations.isAllowRecompilation()
+        if (doRecompile) {
+            LOGGER.warn('-'*100)
+            LOGGER.warn('*** NyQL has enabled to recompile scripts at runtime!')
+            LOGGER.warn("*** If this is NOT intentional, then set 'allowRecompilation' flag under 'caching' section to false")
+            LOGGER.warn('-'*100)
+        }
+        compilerConfigurations.setRecompileGroovySource(doRecompile)
         compilerConfigurations
     }
 
