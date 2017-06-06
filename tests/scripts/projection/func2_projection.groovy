@@ -57,6 +57,34 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (CONCAT(ac.first_name, STR(' '), ac.last_name),
+                CONCAT_WS(STR(' '), ac.first_name, ac.last_name))
+    },
+    [
+            mysql: "SELECT CONCAT(ac.first_name, \" \", ac.last_name), " +
+                    "CONCAT_WS(\" \", ac.first_name, ac.last_name) " +
+                    "FROM `Actor` ac",
+            mssql: "SELECT CONCAT(ac.first_name, \" \", ac.last_name), " +
+                    "CONCAT(ac.first_name, \" \", ac.last_name) " +
+                    "FROM `Actor` ac",
+            pg: "SELECT CONCAT(ac.first_name, \" \", ac.last_name), " +
+                    "CONCAT_WS(\" \", ac.first_name, ac.last_name) " +
+                    "FROM `Actor` ac",
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (CONCAT_NN(ac.first_name, STR(' '), ac.last_name),
+                CONCAT_NN(ac.first_name, ac.last_name))
+    },
+    [
+            mysql: "SELECT CONCAT(COALESCE(ac.first_name, \"\"), \" \", COALESCE(ac.last_name, \"\")), " +
+                    "CONCAT(COALESCE(ac.first_name, \"\"), COALESCE(ac.last_name, \"\")) " +
+                    "FROM `Actor` ac"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (REVERSE(ac.nameHash), LEFT_TRIM(ac.city), RIGHT_TRIM(ac.country))
     },
     [

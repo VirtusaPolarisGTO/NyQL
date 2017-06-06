@@ -1,11 +1,14 @@
 package com.virtusa.gto.nyql.db.mssql
 
+import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import groovy.transform.CompileStatic
+
+import java.util.stream.Collectors
 
 /**
  * @author IWEERARATHNA
@@ -18,6 +21,35 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
 
     MSSqlFunctions(TranslatorOptions theOptions) {
         super(theOptions)
+    }
+
+    @Override
+    String concat_ws(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof String) {
+            return String.valueOf(c)
+        } else {
+            List list
+            Object sep = null
+            if (c instanceof FunctionColumn) {
+                list = (List)c._columns
+            } else if (c instanceof List) {
+                list = (List)c.get(1)
+                sep = c.get(0)
+            } else {
+                return null
+            }
+
+            String delim = ', ' + ___resolveIn(sep, pmx) + ', '
+            return list.stream().map {
+                col -> if (col instanceof String) {
+                    return String.valueOf(col)
+                } else {
+                    return (String)___resolveIn(col, pmx)
+                }
+            }.collect(Collectors.joining(delim, 'CONCAT(', ')'))
+        }
     }
 
     @Override

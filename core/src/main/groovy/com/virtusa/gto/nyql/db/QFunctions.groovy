@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.QContextType
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.nyql.model.units.QString
 import com.virtusa.gto.nyql.utils.QOperator
 import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.CompileStatic
@@ -525,6 +526,78 @@ trait QFunctions {
                     return (String)___resolveIn(col, pmx)
                 }
             }.collect(Collectors.joining(', ', 'CONCAT(', ')'))
+        }
+    }
+
+    /**
+     * Concatenate a set of objects/strings converting null values to empties.
+     *
+     * @param c input objects or columns to concatenate.
+     * @return string representation of concatenation.
+     */
+    String concat_nn(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof String) {
+            return String.valueOf(c)
+        } else {
+            List list
+            if (c instanceof FunctionColumn) {
+                list = (List)c._columns
+            } else if (c instanceof List) {
+                list = (List)c
+            } else {
+                return null
+            }
+            QString emptyStr = new QString()
+            emptyStr.text = ""
+
+            return list.stream()
+                .filter({it -> it != null})
+                .map {
+                    col -> if (col instanceof String) {
+                        return String.valueOf(col)
+                    } else if (col instanceof QString) {
+                        return ___resolveIn(col, pmx)
+                    } else {
+                        def ip = [[___resolveIn(col, pmx), emptyStr], pmx]
+                        return coalesce(ip)
+                    }
+            }.collect(Collectors.joining(', ', 'CONCAT(', ')'))
+        }
+    }
+
+    /**
+     * Concatenate a set of objects/strings with given separator.
+     *
+     * @param c input objects or columns to concatenate.
+     * @return string representation of concatenation.
+     */
+    String concat_ws(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof String) {
+            return String.valueOf(c)
+        } else {
+            List list
+            Object sep = null
+            if (c instanceof FunctionColumn) {
+                list = (List)c._columns
+            } else if (c instanceof List) {
+                list = (List)c.get(1)
+                sep = c.get(0)
+            } else {
+                return null
+            }
+
+            String pfx = 'CONCAT_WS(' + ___resolveIn(sep, pmx) + ', '
+            return list.stream().map {
+                col -> if (col instanceof String) {
+                    return String.valueOf(col)
+                } else {
+                    return (String)___resolveIn(col, pmx)
+                }
+            }.collect(Collectors.joining(', ', pfx, ')'))
         }
     }
 
