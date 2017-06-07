@@ -52,7 +52,7 @@ class UpsertQuery extends QueryUpdate implements MultiQuery {
         querySelect.LIMIT(1)
 
         QResultProxy proxySelect = querySelect._ctx.translator.___selectQuery(querySelect)
-        return new QScript(qSession: qSession, proxy: proxySelect)
+        return new QScript(id: qSession?.currentActiveScript(), qSession: qSession, proxy: proxySelect)
     }
 
     protected QScript createInsertQuery(QContext qContext, QSession qSession) {
@@ -64,7 +64,7 @@ class UpsertQuery extends QueryUpdate implements MultiQuery {
         queryInsert.RETURN_KEYS()
 
         QResultProxy proxyInsert = queryInsert._ctx.translator.___insertQuery(queryInsert)
-        return new QScript(qSession: qSession, proxy: proxyInsert)
+        return new QScript(id: qSession?.currentActiveScript(), qSession: qSession, proxy: proxyInsert)
     }
 
     @Override
@@ -76,9 +76,10 @@ class UpsertQuery extends QueryUpdate implements MultiQuery {
         final QScript scriptInsert = createInsertQuery(qContext, qSession)
 
         QResultProxy proxyUpdate = _ctx.translator.___updateQuery(this)
-        QScript scriptUpdate = new QScript(qSession: qSession, proxy: proxyUpdate)
+        QScript scriptUpdate = new QScript(id: qSession?.currentActiveScript(), qSession: qSession, proxy: proxyUpdate)
 
-        QScriptList scriptList = new QScriptList()
+        QScriptList scriptList = new QScriptList(id: qSession?.currentActiveScript())
+        scriptList.baseQuery = this
         scriptList.scripts = [scriptSelect, scriptInsert, scriptUpdate]
         scriptList.type = QScriptListType.UPSERT
         if (returningType == ReturnType.RECORD_AFTER) {
