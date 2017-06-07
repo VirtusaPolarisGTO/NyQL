@@ -210,5 +210,31 @@
     [
             mysql: ["SELECT SUM(CASE WHEN student.grade >= ? THEN 1 ELSE 0 END) AS totalPass FROM `Student` student",
                     ["passGrade"]]
+    ],
+
+    $DSL.select {
+        TARGET (Student.alias("student"))
+        FETCH (
+                student.marks.alias("sMarks"),
+                (CASE { WHEN { GT (student.attempt, 1)}
+                    THEN { student.marks }
+                    ELSE { student.marks * 0.85 }}).alias("realMarks")
+        )
+    },
+    [
+            mysql: "SELECT student.marks AS sMarks, " +
+                    "CASE WHEN student.attempt > 1 THEN student.marks ELSE (student.marks * 0.85) END AS realMarks FROM `Student` student"
+    ],
+
+    $DSL.select {
+        TARGET (Student.alias("student"))
+        FETCH (
+                student.first_name.alias("firstName"),
+                IFNULL(student.first_name, STR('<No-Name>')).alias('dName')
+        )
+    },
+    [
+            mysql: "SELECT student.first_name AS firstName, " +
+                    "IFNULL(student.first_name, \"<No-Name>\") AS dName FROM `Student` student"
     ]
 ]
