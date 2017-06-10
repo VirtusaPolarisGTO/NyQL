@@ -1,10 +1,12 @@
 package com.virtusa.gto.nyql
 
 import com.virtusa.gto.nyql.ddl.DDL
+import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QScriptList
 import com.virtusa.gto.nyql.model.QSession
+import com.virtusa.gto.nyql.model.ValueTable
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.ParamList
 import com.virtusa.gto.nyql.utils.QUtils
@@ -236,6 +238,12 @@ class DSL {
         qu.createScripts(qContext, session)
     }
 
+    QResultProxy valueTable(Collection<Object> values, String colAlias = null) throws NyException {
+        ValueTable vt = new ValueTable(values: values, columnAlias: colAlias)
+
+        QContext context = createContext()
+        context.translator.___valueTable(vt)
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////
     ////

@@ -265,5 +265,8 @@ class Postgres extends PostgresFunctions implements QTranslator {
         DDL
     }
 
-
+    @Override
+    protected String getQuoteChar() {
+        DOUBLE_QUOTE
+    }
 }

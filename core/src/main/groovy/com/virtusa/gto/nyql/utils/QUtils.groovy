@@ -10,9 +10,12 @@ import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.JoinType
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.NamedParam
+import com.virtusa.gto.nyql.model.units.QString
 import groovy.transform.CompileStatic
 
 import java.util.function.Function
+import java.util.stream.Collectors
+
 /**
  * @author Isuru Weerarathna
  */
@@ -23,6 +26,10 @@ final class QUtils {
     private static final String P_PAD = '::'
     private static final String OP = '('
     private static final String CP = ')'
+
+    static List<QString> toQStrs(Collection<String> src) {
+        src.stream().map({s -> new QString(text: (String)s)}).collect(Collectors.toList())
+    }
 
     static String readEnv(String key, String defValue = null) {
         String eval = System.getenv(key);

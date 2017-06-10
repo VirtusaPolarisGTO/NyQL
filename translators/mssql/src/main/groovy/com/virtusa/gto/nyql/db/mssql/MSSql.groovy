@@ -286,4 +286,8 @@ class MSSql extends MSSqlFunctions implements QTranslator {
         return DDL
     }
 
+    @Override
+    protected String getQuoteChar() {
+        QUOTE
+    }
 }

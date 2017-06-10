@@ -3,11 +3,8 @@ package com.virtusa.gto.nyql
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
-import com.virtusa.gto.nyql.model.units.AParam
-import com.virtusa.gto.nyql.model.units.ParamBinary
-import com.virtusa.gto.nyql.model.units.ParamDate
-import com.virtusa.gto.nyql.model.units.ParamList
-import com.virtusa.gto.nyql.model.units.ParamTimestamp
+import com.virtusa.gto.nyql.model.ValueTable
+import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.traits.DataTypeTraits
 import com.virtusa.gto.nyql.traits.FunctionTraits
 import com.virtusa.gto.nyql.traits.ScriptTraits
@@ -107,6 +104,13 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
         Table table = new Table(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx, __resultOf: resultProxy)
         _ctx.tables.putIfAbsent(table.__name, table)
         table
+    }
+
+    @CompileStatic
+    Table TABLE(Collection<Object> items, String colName = null) {
+        ValueTable valueTable = new ValueTable(columnAlias: colName, values: items)
+        QResultProxy proxy = _ctx.translator.___valueTable(valueTable)
+        TABLE(proxy)
     }
 
     Table TABLE(QScript qScript) {

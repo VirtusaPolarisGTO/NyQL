@@ -299,7 +299,11 @@ class MySql extends MySqlFunctions implements QTranslator {
         DDL
     }
 
-    /*
+    @Override
+    protected String getQuoteChar() {
+        BACK_TICK
+    }
+/*
     private QResultProxy manipulateIntersect(List<Object> queries) {
         if (queries.size() != 2) {
             throw new NySyntaxException('MySQL intersect operator exactly requires only two queries!')

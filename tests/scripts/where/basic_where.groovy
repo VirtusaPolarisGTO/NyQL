@@ -400,4 +400,14 @@ def innQAny = $DSL.select {
     [
             mysql: "SELECT * FROM `Actor` ac WHERE ac.age < ALL (SELECT ag.age FROM `Ages` ag)"
     ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        WHERE {
+            IN (ac.bornIn, STR_LIST(["Jan", "Feb", "Mar"]))
+        }
+    },
+    [
+            mysql: "SELECT * FROM `Actor` ac WHERE ac.bornIn IN (\"Jan\", \"Feb\", \"Mar\")"
+    ],
 ]
