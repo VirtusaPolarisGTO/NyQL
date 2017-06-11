@@ -13,16 +13,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.FileSystems
-import java.nio.file.FileVisitResult
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.PathMatcher
-import java.nio.file.SimpleFileVisitor
+import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.stream.Collectors
 import java.util.stream.Stream
-
 /**
  * Contains script mapping from a single folder in the system.
  *
@@ -30,8 +24,6 @@ import java.util.stream.Stream
  */
 @CompileStatic
 class QScriptsFolder implements QScriptMapper {
-
-    private static final String GROOVY_EXT = '.groovy'
 
     private static final String KEY_INCLUSIONS = 'inclusions'
     private static final String KEY_EXCLUSIONS = 'exclusions'
@@ -122,7 +114,7 @@ class QScriptsFolder implements QScriptMapper {
     QSource map(String id) throws NyScriptNotFoundException {
         QSource source = fileMap[id]
         if (source == null) {
-            File scriptFresh = baseDir.toPath().resolve(id + GROOVY_EXT).toFile()
+            File scriptFresh = baseDir.toPath().resolve(id + ConfigKeys.GROOVY_EXT).toFile()
             if (scriptFresh.exists()) {
                 LOGGER.debug('Loading a fresh script from ' + id + '...')
                 source = processScript(scriptFresh)
@@ -202,7 +194,7 @@ class QScriptsFolder implements QScriptMapper {
 
         @Override
         FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            if (!attrs.directory && !isEndsWithAny(file.getFileName().toString().toLowerCase(), GROOVY_EXT)) {
+            if (!attrs.directory && !isEndsWithAny(file.getFileName().toString().toLowerCase(), ConfigKeys.GROOVY_EXT)) {
                 return FileVisitResult.SKIP_SUBTREE
             }
 

@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.repo
 
+import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
@@ -16,6 +17,7 @@ class QScriptFolders implements QScriptMapper {
 
     private final List<QScriptsFolder> scriptsFolderList = []
     private final Map<String, QSource> fileMap = [:]
+    private final Map<String, QScriptsFolder> scriptsFolderMap = [:]
 
     QScriptFolders(Collection<File> folders) {
         if (folders != null) {
@@ -32,6 +34,7 @@ class QScriptFolders implements QScriptMapper {
                         "from ${file.absolutePath} too!")
             }
             fileMap.put(scriptId, it)
+            scriptsFolderMap.put(scriptId, impl)
         }
         scriptsFolderList << impl
         this
@@ -80,6 +83,16 @@ class QScriptFolders implements QScriptMapper {
 
     @Override
     QSource reload(String id) throws NyScriptNotFoundException {
+        def folderOfFile = scriptsFolderMap[id] as QScriptsFolder
+        if (folderOfFile == null) {
+            throw new NyScriptNotFoundException('There is no record of from which directory the script ' + id + ' has been loaded!')
+        }
+
+        File baseDir = folderOfFile.baseDir
+        File sFile = new File(baseDir, id + ConfigKeys.GROOVY_EXT)
+        def script = QScriptsFolder.createSourceScript(sFile, baseDir)
+
+        fileMap.put(id, script)
         map(id)
     }
 }
