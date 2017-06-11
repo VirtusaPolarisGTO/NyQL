@@ -1,6 +1,7 @@
 package com.virtusa.gto.nyql.engine.impl
 
 import com.virtusa.gto.nyql.UpsertQuery
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QScript
@@ -20,6 +21,14 @@ class QDummyExecutor implements QExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QDummyExecutor)
 
+    private Configurations nyqlConfigs
+    private int logLevel = 1
+
+    QDummyExecutor(Configurations configurations) {
+        nyqlConfigs = configurations
+        logLevel = configurations.getQueryLoggingLevel()
+    }
+
     @Override
     def execute(QScript script) throws Exception {
         if (script instanceof QScriptResult) {
@@ -27,11 +36,12 @@ class QDummyExecutor implements QExecutor {
         }
         LOGGER.debug('=====================================================================')
         LOGGER.debug('Executing query:')
+        JdbcHelperUtils.logScript(script, logLevel)
         LOGGER.debug("\t${script.proxy.query.trim()}")
         if (QUtils.notNullNorEmpty(script.proxy.orderedParameters)) {
             LOGGER.debug('-------------------------------------------------')
             LOGGER.debug('  with ')
-            script.proxy.orderedParameters.each {LOGGER.debug("    $it")}
+            script.proxy.orderedParameters.eachWithIndex { it, idx -> JdbcHelperUtils.logParameter(idx+1, it, logLevel) }
         }
 
         if (script.proxy.queryType == QueryType.INSERT || script.proxy.queryType == QueryType.DELETE

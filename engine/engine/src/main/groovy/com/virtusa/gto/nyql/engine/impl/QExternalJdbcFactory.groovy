@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.impl
 
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QExecutorFactory
@@ -17,13 +18,15 @@ import java.sql.Connection
 class QExternalJdbcFactory implements QExecutorFactory {
 
     private final Connection connection
+    private Configurations nyqlConfigs
 
     QExternalJdbcFactory(Connection connection) {
         this.connection = connection
     }
 
     @Override
-    DbInfo init(Map options) {
+    DbInfo init(Map options, Configurations configurations) {
+        nyqlConfigs = configurations
         DbInfo.deriveFromConnection(connection)
     }
 
@@ -34,7 +37,7 @@ class QExternalJdbcFactory implements QExecutorFactory {
      */
     @Override
     QExecutor create() {
-        new QJdbcExecutor(connection)
+        new QJdbcExecutor(connection, nyqlConfigs)
     }
 
     /**
@@ -44,7 +47,7 @@ class QExternalJdbcFactory implements QExecutorFactory {
      */
     @Override
     QExecutor createReusable() {
-        new QJdbcExecutor(connection)
+        new QJdbcExecutor(connection, nyqlConfigs)
     }
 
     @Override

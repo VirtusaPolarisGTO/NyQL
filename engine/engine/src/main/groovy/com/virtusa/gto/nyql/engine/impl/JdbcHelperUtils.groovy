@@ -1,8 +1,13 @@
 package com.virtusa.gto.nyql.engine.impl
 
 import com.virtusa.gto.nyql.configs.Configurations
+import com.virtusa.gto.nyql.engine.exceptions.NyScriptExecutionException
+import com.virtusa.gto.nyql.model.QScript
+import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.sql.Date
 import java.sql.Timestamp
@@ -15,6 +20,8 @@ import java.time.format.DateTimeFormatter
 @CompileStatic
 @PackageScope
 class JdbcHelperUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcHelperUtils)
 
     /**
      * Given parameter value will be converted into jdbc compatible timestamp.
@@ -62,6 +69,52 @@ class JdbcHelperUtils {
         } else {
             // assumes string and in base64 format
             new ByteArrayInputStream(Base64.decoder.decode(String.valueOf(value)));
+        }
+    }
+
+    @CompileStatic
+    static void logScript(QScript script, int logLevel) throws NyScriptExecutionException {
+        if (script.proxy.query == null) {
+            throw new NyScriptExecutionException(QUtils.generateErrStr(
+                    'Generated query for execution is empty! [SCRIPT: ' + script.id + ']',
+                    'Did you accidentally set cache true to this script?',
+                    'Did you happen to send incorrect data variables to the script?'))
+        }
+
+        String q = "Query @ ${script.id}: -----------------------------------------------------\n" +
+                script.proxy.query.trim()
+        String qs = '------------------------------------------------------------'
+        if (1 == logLevel && LOGGER.isTraceEnabled()) {
+            LOGGER.trace(q)
+            LOGGER.trace(qs)
+        } else if (logLevel == 2 && LOGGER.isDebugEnabled()) {
+            LOGGER.debug(q)
+            LOGGER.debug(qs)
+        } else if (logLevel == 3 && LOGGER.isInfoEnabled()) {
+            LOGGER.info(q)
+            LOGGER.info(qs)
+        } else if (logLevel == 4 && LOGGER.isWarnEnabled()) {
+            LOGGER.warn(q)
+            LOGGER.warn(qs)
+        } else if (logLevel == 5 && LOGGER.isErrorEnabled()) {
+            LOGGER.error(q)
+            LOGGER.error(qs)
+        }
+    }
+
+    @CompileStatic
+    static void logParameter(Object pcount, Object itemValue, int logLevel) {
+        String q = ' Parameter #' + pcount + ' : ' + itemValue + ' [' + (itemValue != null ? itemValue.class.simpleName : '') + ']'
+        if (logLevel == 1 && LOGGER.isTraceEnabled()) {
+            LOGGER.trace(q)
+        } else if (logLevel == 2 && LOGGER.isDebugEnabled()) {
+            LOGGER.debug(q)
+        } else if (logLevel == 3 && LOGGER.isDebugEnabled()) {
+            LOGGER.info(q)
+        } else if (logLevel == 4 && LOGGER.isDebugEnabled()) {
+            LOGGER.warn(q)
+        } else if (logLevel == 5 && LOGGER.isDebugEnabled()) {
+            LOGGER.error(q)
         }
     }
 }

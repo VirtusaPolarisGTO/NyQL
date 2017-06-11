@@ -1,5 +1,6 @@
 package nyql.utils;
 
+import com.virtusa.gto.nyql.configs.Configurations;
 import com.virtusa.gto.nyql.engine.impl.QDummyExecutor;
 import com.virtusa.gto.nyql.model.DbInfo;
 import com.virtusa.gto.nyql.model.QExecutor;
@@ -17,6 +18,7 @@ public class TestExecutorFactory implements QExecutorFactory {
     private int totalInvocations = 0;
     private int totalReuseInvocations = 0;
     private final Object lock = new Object();
+    private Configurations nyConfigs;
 
 //    public TestExecutorFactory(int maxInvocations, int maxReuseInvocations) {
 //        this.maxInvocations = maxInvocations;
@@ -24,7 +26,8 @@ public class TestExecutorFactory implements QExecutorFactory {
 //    }
 
     @Override
-    public DbInfo init(Map options) {
+    public DbInfo init(Map options, Configurations configurations) {
+        nyConfigs = configurations;
         if (options.containsKey("max")) {
             maxInvocations = Integer.parseInt(options.get("max").toString());
         } else {
@@ -48,7 +51,7 @@ public class TestExecutorFactory implements QExecutorFactory {
                         "[" + totalInvocations + " > " + maxInvocations + "]");
             }
         }
-        return new QDummyExecutor();
+        return new QDummyExecutor(nyConfigs);
     }
 
     @Override
@@ -60,7 +63,7 @@ public class TestExecutorFactory implements QExecutorFactory {
                         " [" + totalReuseInvocations + " > " + maxReuseInvocations + "]");
             }
         }
-        return new QDummyExecutor();
+        return new QDummyExecutor(nyConfigs);
     }
 
     @Override

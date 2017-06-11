@@ -1,7 +1,6 @@
 package com.virtusa.gto.nyql.engine.pool
 
 import com.virtusa.gto.nyql.exceptions.NyException
-
 /**
  * @author IWEERARATHNA
  */
