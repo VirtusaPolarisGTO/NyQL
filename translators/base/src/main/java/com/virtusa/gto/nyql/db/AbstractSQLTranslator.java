@@ -386,8 +386,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
                 Object wrap = ((FunctionColumn) column).get_wrapper();
                 if (wrap instanceof QResultProxy && ((QResultProxy)wrap).getOrderedParameters() != null) {
                     paramList.addAll(((QResultProxy)wrap).getOrderedParameters());
-                } else if (wrap instanceof AParam) {
-                    paramList.add((AParam)wrap);
                 }
             }
         }
@@ -395,9 +393,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
 
     protected void ___scanForParameters(Object expression, List<AParam> paramOrder) {
         if (expression != null) {
-            if (expression instanceof AParam) {
-                addSafely(paramOrder, (AParam)expression);
-            } else if (expression instanceof QResultProxy) {
+            if (expression instanceof QResultProxy) {
                 QResultProxy resultProxy = (QResultProxy)expression;
                 if (resultProxy.getOrderedParameters() != null) {
                     paramOrder.addAll(resultProxy.getOrderedParameters());
@@ -437,8 +433,6 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             for (Object it : ((FunctionColumn) column).get_columns()) {
                 if (it instanceof FunctionColumn) {
                     ___expandColumn((FunctionColumn)it, paramList);
-                } else if (it instanceof AParam) {
-                    paramList.add((AParam)it);
                 }
             }
         }
@@ -464,9 +458,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
     }
 
     protected String ___expandCondition(Where.QCondition c, List<AParam> paramOrder, QContextType contextType) {
-        if (c.getLeftOp() instanceof AParam) {
-            paramOrder.add((AParam)c.getLeftOp());
-        }
+        ___scanForParameters(c.getLeftOp(), paramOrder);
         ___scanForParameters(c.getRightOp(), paramOrder);
         boolean parenthesis = (c.getRightOp() instanceof QResultProxy);
 

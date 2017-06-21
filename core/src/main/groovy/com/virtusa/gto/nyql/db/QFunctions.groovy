@@ -141,7 +141,9 @@ trait QFunctions {
      *
      * @param c input column to convert.
      */
-    @CompileStatic String lcase(c) { String.format('LOWER(%s)', ___resolveInP(c)) }
+    @CompileStatic String lcase(c) {
+        String.format('LOWER(%s)', ___resolveInP(c))
+    }
 
     /**
      * Returns upper case string representation.

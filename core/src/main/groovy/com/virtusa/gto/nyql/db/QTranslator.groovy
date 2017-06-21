@@ -40,6 +40,9 @@ trait QTranslator {
         } else if (obj instanceof Number) {
             return ___convertNumeric(obj)
         } else if (obj instanceof AParam) {
+            if (paramOrder != null) {
+                paramOrder.add((AParam)obj)
+            }
             if (obj instanceof ParamList) {
                 return QUtils.padParamList((String)obj.__name)
             }
@@ -47,7 +50,7 @@ trait QTranslator {
         } else if (obj instanceof QResultProxy) {
             return (obj.query ?: '').trim()
         } else if (obj instanceof List) {
-            return QUtils.join(obj, { ___resolve(it, contextType, paramOrder) }, ', ', '(', ')')
+            return QUtils.join((List)obj, { ___resolve(it, contextType, paramOrder) }, ', ', '(', ')')
             //return obj.stream().map { (String) }.collect(Collectors.joining(', ', '(', ')'))
         } else {
             throw new NyException('Unsupported data object to convert! [' + obj + ', type: ' + obj.class + ']')
