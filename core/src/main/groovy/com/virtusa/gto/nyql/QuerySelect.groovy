@@ -14,6 +14,7 @@ class QuerySelect extends Query {
     Where groupHaving = null
     List<Object> projection = null
     Table _intoTable = null
+    boolean _intoTemp = false
     List<Object> _intoColumns = null
     Table _joiningTable = null
     boolean _distinct = false
@@ -45,6 +46,12 @@ class QuerySelect extends Query {
     QuerySelect INTO(Table table, Object... columns) {
         INTO(table)
         _intoColumns = Arrays.asList(columns)
+        this
+    }
+
+    QuerySelect INTO_TEMP(Table table) {
+        INTO(table)
+        _intoTemp = true
         this
     }
 

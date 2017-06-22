@@ -1,4 +1,36 @@
-## DDL
+## Creating a Temp Table On-The-Fly
+Rather than defining table structure first, user can automatically define a temp table
+with data using the result of another query. This is very similar to `SELECT INTO` sql query but
+data is being inserted to a temporary table and can be used within the same script.
+
+---
+**NOTE:** NyQL always creates local temporary tables, not global temporary tables which are visible to
+other connections.
+
+**WARN:** NyQL will never remove local temporary tables implicitly. 
+User needs to remove them explicitly using `ddl { DROP_TEMP_TABLE (...) }` command.
+
+---
+To insert data into a temporary table, user has to do a small change in the select query.
+Instead of `INTO`, user should use `INTO_TEMP` clause.
+ 
+```groovy
+$DSL.select {
+    // ... usual select query clauses goes here
+    
+    // here columns are optional as they will be automatically chosen
+    // from the projection of select query
+    INTO_TEMP (TABLE("<table-name>"))
+}
+```
+
+These kinds of queries are useless outside a NyQL script, otherwise, which you might not have a way to track
+dropped/not-dropped temporary tables.
+
+
+## Creating a Temp Table with structure
+
+### Basic DDL
 Basic DDL is supported by NyQL. Specially for working with temporary tables.
 
 Again DDL commands can only be used inside scripts. i.e. `$DSL.script { ... }`.
