@@ -17,9 +17,15 @@ class Column {
     String __alias = null
 
     Column alias(String newName) {
-        _ctx.renameColumn(__alias, newName, this)
-        __alias = newName
-        this
+        if (_ctx.hasAliasForColumn(this, __alias)) {
+            Column column = new Column(_ctx: _ctx, _owner: _owner, __name: __name, __alias: newName)
+            _ctx.renameColumn(null, newName, column)
+            column
+        } else {
+            _ctx.renameColumn(__alias, newName, this)
+            __alias = newName
+            this
+        }
     }
 
     boolean __aliasDefined() {

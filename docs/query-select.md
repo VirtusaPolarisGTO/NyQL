@@ -48,7 +48,75 @@ This is the clause for selecting columns from a select query.
 FETCH (...[column | constant | parameter | function])
 ```
 
+There can have special cases when fetching columns. See below for some of scenarios and how you can handle it.
 
+#### Fetching the same column with different aliases
+For some reasons, you may want to fetch same column in two different aliases. Prior to NyQL v2.0, you must do it like below.
+
+```groovy
+FETCH (
+    ...
+    table.my_column.alias("firstAlias"),
+    table.COLUMN_AS("my_column", "secondAlias"),
+    ...
+)
+```
+
+However, since v2, you can implicitly use different aliases without using `COLUMN_AS` function.
+
+```groovy
+FETCH (
+    ...
+    table.my_column.alias("firstAlias"),
+    table.my_column.alias("secondAlias"),
+    ...
+)
+```
+
+**WARN:** Still you can't use the same column, one without an alias at all and other with an alias, as shown in below.
+
+```groovy
+FETCH (
+    // this DOES NOT WORK!!! 
+    // You must specify an alias for the first-time column reference as well
+    table.my_column,
+    table.my_column.alias("secondAlias"),
+    ...
+)
+```
+
+
+#### Referencing column aliases in different places of query
+Sometimes the alias you used in `FETCH` clause needs to be referenced in different place of the query, such as, in `GROUP_BY` or `ORDER_BY` clause.
+In that case, you have to use NyQL special __`ALIAS_REF`__ function to refer the column associated
+with provided alias.
+
+`ALIAS_REF` function is very useful when your alias has whitespaces or special characters which you can directly
+refer within DSL.
+
+```groovy
+$DSL.select {
+    // ...
+    FETCH (t.id, t.column.alias("my aliased column")
+    
+    // ...
+    GROUP_BY (t.id, ALIAS_REF("my aliased column"))
+}
+```
+
+Or alternatively you can use the column directly in place like below.
+
+```groovy
+$DSL.select {
+    // ...
+    FETCH (t.id, t.column.alias("my aliased column")
+    
+    // You can use t.column and NyQL will replace it with 'my aliased column'.
+    GROUP_BY (t.id, t.column)
+}
+```
+
+Above both DSL generates the same correct query.
 
 ### HAVING Clause
 Same as `WHERE` clause conditions, but as you know you can use aggregated functions as well since this is being used along with SQL Group By clause.
