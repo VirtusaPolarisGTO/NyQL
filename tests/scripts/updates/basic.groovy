@@ -190,7 +190,7 @@ def innQP = $DSL.select {
             TARGET (Film.alias("f"))
             SET {
                 EQ (f.film_id, 1234)
-                $IMPORT_UNSAFE ("updates/non-existing-script")
+                $IMPORT_SAFE ("updates/non-existing-script")
             }
         },
         [

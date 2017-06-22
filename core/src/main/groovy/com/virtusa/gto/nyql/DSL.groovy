@@ -1,6 +1,7 @@
 package com.virtusa.gto.nyql
 
 import com.virtusa.gto.nyql.ddl.DDL
+import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QScriptList
@@ -55,6 +56,14 @@ class DSL {
         QScript res = session.scriptRepo.parse(scriptName, session)
         session.outFromScript(scriptName)
         res
+    }
+
+    QScript $IMPORT_SAFE(String scriptName) {
+        try {
+            $IMPORT(scriptName)
+        } catch (NyScriptNotFoundException ex) {
+            return null
+        }
     }
 
     def RUN(QScriptList scriptList) {

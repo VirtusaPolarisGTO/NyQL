@@ -13,6 +13,8 @@ def q = $DSL.insertOrLoad {
     }
 }
 
+$DSL.$IMPORT_SAFE("a/b/c/non_existing_script")
+
 $DSL.script {
 
     RUN (q)

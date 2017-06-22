@@ -26,7 +26,7 @@
             WHERE {
                 EQ (f.film_id, 123)
                 AND
-                $IMPORT_UNSAFE ("where/import_wpartxxx")
+                $IMPORT_SAFE ("where/import_wpartxxx")
             }
         },
         [
