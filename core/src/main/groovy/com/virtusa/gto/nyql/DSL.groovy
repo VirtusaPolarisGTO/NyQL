@@ -269,6 +269,19 @@ class DSL {
     ////
     ///////////////////////////////////////////////////////////////////////////////////
 
+    @CompileStatic
+    QScriptList drop(String table, boolean isTemp = true, boolean ifExist = false) {
+        if (isTemp) {
+            ddl {
+                DROP_TEMP_TABLE(table, ifExist)
+            }
+        } else {
+            ddl {
+                DROP_TABLE(table, ifExist)
+            }
+        }
+    }
+
     QScriptList ddl(@DelegatesTo(value = DDL, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         DDL activeDDL = new DDL(session)
 

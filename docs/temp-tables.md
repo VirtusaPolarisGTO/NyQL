@@ -8,7 +8,7 @@ data is being inserted to a temporary table and can be used within the same scri
 other connections.
 
 **WARN:** NyQL will never remove local temporary tables implicitly. 
-User needs to remove them explicitly using `ddl { DROP_TEMP_TABLE (...) }` command.
+User needs to remove them explicitly using `$DSL.drop("table-name")` command within the same script.
 
 ---
 To insert data into a temporary table, user has to do a small change in the select query.
