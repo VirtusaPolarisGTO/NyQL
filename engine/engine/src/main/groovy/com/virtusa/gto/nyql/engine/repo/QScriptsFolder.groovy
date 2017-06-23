@@ -25,8 +25,9 @@ import java.util.stream.Stream
 @CompileStatic
 class QScriptsFolder implements QScriptMapper {
 
-    private static final String KEY_INCLUSIONS = 'inclusions'
-    private static final String KEY_EXCLUSIONS = 'exclusions'
+    static final String KEY_INCLUSIONS = 'inclusions'
+    static final String KEY_EXCLUSIONS = 'exclusions'
+
     private static final String GLOB_NAME = 'glob:'
     private static final Logger LOGGER = LoggerFactory.getLogger(QScriptsFolder)
 

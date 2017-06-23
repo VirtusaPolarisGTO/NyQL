@@ -53,6 +53,25 @@ By default, NyQL provides three types of mapper implementations. Detailed descri
 }
 ```
 
+Or, if you want to specify inclusions/exclusions for each folder, you may use the format as in 
+loading from single directory with same properties. See below example.
+
+```json
+{
+"mapper": "com.virtusa.gto.nyql.engine.repo.QScriptFolders",
+"mapperArgs": {
+  "baseDirs": [ "./scripts-dir-1", 
+               {
+                "baseDir": "./scripts-dir-2",
+                "exclusions": "<comma-separated-glob-patterns>..."
+               }
+              ]
+}
+```
+
+As you can see you may use directory name, or, directory name + exclusions interchangeably within the same array.
+
+
 #### Loading Scripts from Classpath (inside a jar)
 * Use _QResourceScripts_ mapper.
 * Impl class: _com.virtusa.gto.nyql.engine.repo.QResourceScripts_
