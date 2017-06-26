@@ -3,7 +3,6 @@ package com.virtusa.gto.nyql.traits
 import com.virtusa.gto.nyql.Column
 import com.virtusa.gto.nyql.FunctionColumn
 import groovy.transform.CompileStatic
-
 /**
  * @author IWEERARATHNA
  */
@@ -98,12 +97,9 @@ trait FunctionTraits {
 
     /// Date time functions
     @CompileStatic FunctionColumn NOW() { fColumn(null, 'current_timestamp') }
-    @CompileStatic FunctionColumn CURDATE() { fColumn(null, 'current_date') }
-    @CompileStatic FunctionColumn CURRENT_DATE() { CURDATE() }
-    @CompileStatic FunctionColumn CURTIME() { fColumn(null, 'current_time') }
-    @CompileStatic FunctionColumn CURRENT_TIME() { CURTIME() }
-    @CompileStatic FunctionColumn CUREPOCH() { fColumn(null, 'current_epoch') }
-    @CompileStatic FunctionColumn CURRENT_EPOCH() { CUREPOCH() }
+    @CompileStatic FunctionColumn CURRENT_DATE() { fColumn(null, 'current_date') }
+    @CompileStatic FunctionColumn CURRENT_TIME() { fColumn(null, 'current_time') }
+    @CompileStatic FunctionColumn CURRENT_EPOCH() { fColumn(null, 'current_epoch') }
     @CompileStatic FunctionColumn DATE_TRUNC(Column column) { fColumn(column, 'date_trunc') }
 
     @CompileStatic FunctionColumn EPOCH_TO_DATE(Object column)     { fColumn(column, 'epoch_to_date') }
