@@ -42,11 +42,11 @@ class Postgres extends PostgresFunctions implements QTranslator {
         List<Case.CaseCondition> conditions = aCaseCol.allConditions
         for (Case.CaseCondition cc : conditions) {
             query.append(' WHEN ').append(___expandConditions(cc._theCondition, paramOrder, QContextType.CONDITIONAL))
-            query.append(' THEN ').append(___resolve(cc._theResult, QContextType.SELECT))
+            query.append(' THEN ').append(___resolve(cc._theResult, QContextType.INSIDE_FUNCTION))
         }
 
         if (aCaseCol.getElse() != null) {
-            query.append(' ELSE ').append(___resolve(aCaseCol.getElse(), QContextType.SELECT))
+            query.append(' ELSE ').append(___resolve(aCaseCol.getElse(), QContextType.INSIDE_FUNCTION))
         }
         query.append(' END')
 
@@ -137,6 +137,43 @@ class Postgres extends PostgresFunctions implements QTranslator {
                 return QUtils.quoteIfWS(column.__name, DOUBLE_QUOTE) +
                         (column.__aliasDefined() && contextType == QContextType.SELECT ? columnAliasAs(column, DOUBLE_QUOTE) : '')
             }
+        }
+    }
+
+    @Override
+    QResultProxy ___selectQuery(QuerySelect q) throws NyException {
+        if (q.get_intoTable() != null) {
+            List<AParam> paramList = new LinkedList<>()
+            StringBuilder query = new StringBuilder()
+            QueryType queryType = QueryType.INSERT
+
+            if (q._intoTemp) {
+                query.append('CREATE TEMPORARY TABLE ').append(___tableName(q.get_intoTable(), QContextType.INTO)).append(' ')
+            } else {
+                query.append('INSERT INTO ').append(___tableName(q.get_intoTable(), QContextType.INTO)).append(' ');
+            }
+
+            // append column names...
+            if (QUtils.notNullNorEmpty(q.get_intoColumns())) {
+                query.append(QUtils.parenthesis(___expandProjection(q.get_intoColumns(), paramList, QContextType.INSERT_PROJECTION)))
+                        .append(' ')
+            }
+
+            if (q._intoTemp) {
+                query.append('AS ')
+            }
+            query.append(NL)
+
+            def px = generateSelectQueryBody(q, paramList)
+            query.append(px.toString())
+            return createProxy(query.toString(), queryType, paramList, null, null)
+
+        } else {
+            List<AParam> paramList = new LinkedList<>()
+            StringBuilder query = new StringBuilder()
+
+            query.append(generateSelectQueryBody(q, paramList).toString())
+            return createProxy(query.toString(), QueryType.SELECT, paramList, null, null)
         }
     }
 

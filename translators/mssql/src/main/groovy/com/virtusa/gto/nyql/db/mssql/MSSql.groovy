@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
+import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -53,11 +54,11 @@ class MSSql extends MSSqlFunctions implements QTranslator {
             List<Case.CaseCondition> conditions = aCaseCol.allConditions
             for (Case.CaseCondition cc : conditions) {
                 query.append(' WHEN ').append(___expandConditions(cc._theCondition, paramOrder, QContextType.CONDITIONAL))
-                query.append(' THEN ').append(___resolve(cc._theResult, QContextType.SELECT))
+                query.append(' THEN ').append(___resolve(cc._theResult, QContextType.INSIDE_FUNCTION))
             }
 
             if (aCaseCol.getElse() != null) {
-                query.append(' ELSE ').append(___resolve(aCaseCol.getElse(), QContextType.SELECT))
+                query.append(' ELSE ').append(___resolve(aCaseCol.getElse(), QContextType.INSIDE_FUNCTION))
             }
             query.append(' END')
 
@@ -153,7 +154,50 @@ class MSSql extends MSSqlFunctions implements QTranslator {
         }
     }
 
-    /**
+    @Override
+    QResultProxy ___selectQuery(QuerySelect q) throws NyException {
+        if (q.get_intoTable() != null) {
+            List<AParam> paramList = new LinkedList<>()
+            StringBuilder query = new StringBuilder()
+            QueryType queryType = QueryType.INSERT
+
+            if (!q._intoTemp) {
+                query.append('INSERT INTO ').append(___tableName(q.get_intoTable(), QContextType.INTO)).append(' ')
+                // append column names...
+                if (QUtils.notNullNorEmpty(q.get_intoColumns())) {
+                    query.append(QUtils.parenthesis(___expandProjection(q.get_intoColumns(), paramList, QContextType.INSERT_PROJECTION)))
+                            .append(' ')
+                }
+
+                query.append(NL)
+            }
+
+            def px = generateSelectQueryBody(q, paramList)
+            query.append(px.toString())
+            return createProxy(query.toString(), queryType, paramList, null, null)
+
+        } else {
+            List<AParam> paramList = new LinkedList<>()
+            StringBuilder query = new StringBuilder()
+
+            query.append(generateSelectQueryBody(q, paramList).toString())
+            return createProxy(query.toString(), QueryType.SELECT, paramList, null, null)
+        }
+    }
+
+    @Override
+    protected void ___selectQueryAfterFetchClause(QuerySelect q, StringBuilder query, List<AParam> paramList) throws NyException {
+        // if a temporary table, we will append INTO clause...
+        if (q._intoTemp) {
+            // add # which is convention in sql server temp tables...
+            if (!q._intoTable.__name.startsWith('#')) {
+                q._intoTable.__name = '#' + q._intoTable.__name
+            }
+            query.append(' INTO ').append(___tableName(q.get_intoTable(), QContextType.INTO)).append(' ')
+        }
+    }
+
+/**
      * UPDATE im
      SET mf_item_number = gm.SKU --etc
      FROM item_master im

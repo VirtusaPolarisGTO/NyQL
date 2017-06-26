@@ -23,6 +23,11 @@ class QProfExecutor implements QExecutor {
     }
 
     @Override
+    def execute(QScriptList scriptList) throws Exception {
+        executor.execute(scriptList)
+    }
+
+    @Override
     void startTransaction() throws NyException {
         executor.startTransaction()
     }

@@ -30,7 +30,7 @@
             TARGET (Film.alias("f"))
             JOIN (TARGET()) {
                 INNER_JOIN (Payment.alias("p")) ON p.payment_id, f.payment_id
-                $IMPORT_UNSAFE ("joins/import_talias123")
+                $IMPORT_SAFE ("joins/import_talias123")
             }
             FETCH ()
         },
@@ -41,7 +41,7 @@
         $DSL.select {
             TARGET (Film.alias("f"))
             JOIN (TARGET()) {
-                $IMPORT_UNSAFE ("joins/import_talias123")
+                $IMPORT_SAFE ("joins/import_talias123")
             }
             FETCH ()
         },

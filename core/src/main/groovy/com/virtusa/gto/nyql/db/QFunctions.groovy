@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.QContextType
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.nyql.model.units.QString
 import com.virtusa.gto.nyql.utils.QOperator
 import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.CompileStatic
@@ -141,7 +142,9 @@ trait QFunctions {
      *
      * @param c input column to convert.
      */
-    @CompileStatic String lcase(c) { String.format('LOWER(%s)', ___resolveInP(c)) }
+    @CompileStatic String lcase(c) {
+        String.format('LOWER(%s)', ___resolveInP(c))
+    }
 
     /**
      * Returns upper case string representation.
@@ -258,6 +261,14 @@ trait QFunctions {
     @CompileStatic abstract String str_replace(c)
 
     /**
+     * Returns string repeat function.
+     *
+     * @param c inputs required for string.
+     * @return string representation of repeat function.
+     */
+    @CompileStatic abstract String str_repeat(c)
+
+    /**
      * Returns substring of the given string starting from start position and length.
      *
      * @param c input column to substring.
@@ -272,8 +283,69 @@ trait QFunctions {
     @CompileStatic abstract String position(c)
 
     /**
-     * Math functions.
+     * Returns last position of string in the given main string.
+     *
+     * @param c input column to find position.
      */
+    @CompileStatic abstract String position_last(c)
+
+    /**
+     * --------------------------------------------------------------
+     * Math functions.
+     * --------------------------------------------------------------
+     */
+
+    @CompileStatic String trig_sin(cx) {
+        String.format('SIN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_cos(cx) {
+        String.format('COS(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_tan(cx) {
+        String.format('TAN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_cot(cx) {
+        String.format('COT(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_acos(cx) {
+        String.format('ACOS(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_asin(cx) {
+        String.format('ASIN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_atan(cx) {
+        String.format('ATAN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String trig_atan2(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) String.format('ATAN2(%s, %s)', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
+        else throw new NyException('ATAN2 function requires two parameters!')
+    }
+
+    @CompileStatic String lg_exp(cx) {
+        String.format('EXP(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String lg_ln(cx) {
+        String.format('LN(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String lg_log(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) String.format('LOG(%s, %s)', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
+        else throw new NyException('LOG function requires two parameters!')
+    }
+
+    @CompileStatic abstract String truncate(c)
 
     /**
      * Rounds a column value to given number of decimal digits.
@@ -460,6 +532,78 @@ trait QFunctions {
     }
 
     /**
+     * Concatenate a set of objects/strings converting null values to empties.
+     *
+     * @param c input objects or columns to concatenate.
+     * @return string representation of concatenation.
+     */
+    String concat_nn(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof String) {
+            return String.valueOf(c)
+        } else {
+            List list
+            if (c instanceof FunctionColumn) {
+                list = (List)c._columns
+            } else if (c instanceof List) {
+                list = (List)c
+            } else {
+                return null
+            }
+            QString emptyStr = new QString()
+            emptyStr.text = ""
+
+            return list.stream()
+                .filter({it -> it != null})
+                .map {
+                    col -> if (col instanceof String) {
+                        return String.valueOf(col)
+                    } else if (col instanceof QString) {
+                        return ___resolveIn(col, pmx)
+                    } else {
+                        def ip = [[___resolveIn(col, pmx), emptyStr], pmx]
+                        return coalesce(ip)
+                    }
+            }.collect(Collectors.joining(', ', 'CONCAT(', ')'))
+        }
+    }
+
+    /**
+     * Concatenate a set of objects/strings with given separator.
+     *
+     * @param c input objects or columns to concatenate.
+     * @return string representation of concatenation.
+     */
+    String concat_ws(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof String) {
+            return String.valueOf(c)
+        } else {
+            List list
+            Object sep = null
+            if (c instanceof FunctionColumn) {
+                list = (List)c._columns
+            } else if (c instanceof List) {
+                list = (List)c.get(1)
+                sep = c.get(0)
+            } else {
+                return null
+            }
+
+            String pfx = 'CONCAT_WS(' + ___resolveIn(sep, pmx) + ', '
+            return list.stream().map {
+                col -> if (col instanceof String) {
+                    return String.valueOf(col)
+                } else {
+                    return (String)___resolveIn(col, pmx)
+                }
+            }.collect(Collectors.joining(', ', pfx, ')'))
+        }
+    }
+
+    /**
      * Cast the given column to integer value.
      *
      * @param col input column.
@@ -511,6 +655,28 @@ trait QFunctions {
      */
     @CompileStatic String count(c) {
         String.format('COUNT(%s)', ___resolveIn(___val(c) ?: '*', ___pm(c)))
+    }
+
+    /**
+     * --------------------------------------------------------------
+     * Stat functions
+     * --------------------------------------------------------------
+     */
+
+    @CompileStatic String stat_stddevpop(cx) {
+        String.format('STDDEV_POP(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String stat_stddevsamp(cx) {
+        String.format('STDDEV_SAMP(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String stat_varpop(cx) {
+        String.format('VAR_POP(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic String stat_varsamp(cx) {
+        String.format('VAR_SAMP(%s)', ___resolveInP(cx))
     }
 
     /**

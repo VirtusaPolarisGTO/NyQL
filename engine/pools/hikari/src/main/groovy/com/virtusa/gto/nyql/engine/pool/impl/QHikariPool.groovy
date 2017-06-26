@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory
 
 import java.nio.charset.StandardCharsets
 import java.sql.Connection
-
 /**
  * Available configurations are mentioned here.
  *

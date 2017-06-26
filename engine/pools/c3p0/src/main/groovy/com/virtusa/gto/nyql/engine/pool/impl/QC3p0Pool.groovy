@@ -7,7 +7,6 @@ import com.virtusa.gto.nyql.exceptions.NyException
 import groovy.transform.CompileStatic
 
 import java.sql.Connection
-
 /**
  * @author IWEERARATHNA
  */

@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.repo
 
+import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.model.QScriptMapper
 import com.virtusa.gto.nyql.model.QSource
 import groovy.transform.CompileStatic
@@ -35,5 +36,10 @@ class QSingleScript implements QScriptMapper {
     @Override
     boolean canCacheAtStartup() {
         true
+    }
+
+    @Override
+    QSource reload(String id) throws NyScriptNotFoundException {
+        map(id)
     }
 }

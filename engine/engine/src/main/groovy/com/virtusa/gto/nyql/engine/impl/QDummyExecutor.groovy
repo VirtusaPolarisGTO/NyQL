@@ -1,8 +1,12 @@
 package com.virtusa.gto.nyql.engine.impl
 
+import com.virtusa.gto.nyql.UpsertQuery
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QScript
+import com.virtusa.gto.nyql.model.QScriptList
+import com.virtusa.gto.nyql.model.QScriptListType
 import com.virtusa.gto.nyql.model.QScriptResult
 import com.virtusa.gto.nyql.utils.QReturnType
 import com.virtusa.gto.nyql.utils.QUtils
@@ -17,6 +21,14 @@ class QDummyExecutor implements QExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QDummyExecutor)
 
+    private Configurations nyqlConfigs
+    private int logLevel = 1
+
+    QDummyExecutor(Configurations configurations) {
+        nyqlConfigs = configurations
+        logLevel = configurations.getQueryLoggingLevel()
+    }
+
     @Override
     def execute(QScript script) throws Exception {
         if (script instanceof QScriptResult) {
@@ -24,11 +36,12 @@ class QDummyExecutor implements QExecutor {
         }
         LOGGER.debug('=====================================================================')
         LOGGER.debug('Executing query:')
+        JdbcHelperUtils.logScript(script, logLevel)
         LOGGER.debug("\t${script.proxy.query.trim()}")
         if (QUtils.notNullNorEmpty(script.proxy.orderedParameters)) {
             LOGGER.debug('-------------------------------------------------')
             LOGGER.debug('  with ')
-            script.proxy.orderedParameters.each {LOGGER.debug("    $it")}
+            script.proxy.orderedParameters.eachWithIndex { it, idx -> JdbcHelperUtils.logParameter(idx+1, it, logLevel) }
         }
 
         if (script.proxy.queryType == QueryType.INSERT || script.proxy.queryType == QueryType.DELETE
@@ -49,6 +62,72 @@ class QDummyExecutor implements QExecutor {
              [id: '4', title: 'item-4', 'aboolCol': 0, price: '0', year: '2017'],
              [id: '5', title: 'item-5', 'aboolCol': 1, price: null],
              [id: '6', title: 'item-6', 'aboolCol': 't', price: '-2.043243']] as NyQLResult
+        }
+    }
+
+    @Override
+    def execute(QScriptList scriptList) throws Exception {
+        if (scriptList == null || scriptList.scripts == null) {
+            return new LinkedList<>();
+        }
+
+        if (scriptList.type == QScriptListType.UPSERT) {
+            if (scriptList.scripts.size() < 3) {
+                throw new NyException('Not defined either select, insert, or update query in UPSERT query!')
+            }
+
+            UpsertQuery upsertQuery = (UpsertQuery)scriptList.baseQuery
+
+            LOGGER.debug("Executing UPSERT:")
+            LOGGER.debug("Executing 1st query to select existing records...")
+            NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
+            LOGGER.debug(">>>>")
+            LOGGER.debug("If no results returned we execute this query:")
+            // insert
+            execute(scriptList.scripts[1])
+
+            LOGGER.debug(">>>>")
+            LOGGER.debug("If results returned, we execute this query:")
+            // records exist... update
+            execute(scriptList.scripts[2])
+
+            if (upsertQuery.returningType == UpsertQuery.ReturnType.NONE) {
+                LOGGER.debug("Upsert query has been defined not to return any result. So nothing will be executed.")
+                return new NyQLResult()
+            } else if (upsertQuery.returningType == UpsertQuery.ReturnType.RECORD_BEFORE) {
+                LOGGER.debug("Upsert query will return result returned from 1st selection query.")
+                return result
+            } else {
+                if (scriptList.scripts.size() < 4) {
+                    throw new NyException('Query correspond to returning upsert result is not found!')
+                } else {
+                    LOGGER.debug(">>>")
+                    LOGGER.debug("Upsert query will return updated result by executing this query:")
+                    return execute(scriptList.scripts[3])
+                }
+            }
+
+        } else if (scriptList.type == QScriptListType.INSERT_OR_LOAD) {
+            LOGGER.debug("Executing INSERT Or LOAD query...")
+            LOGGER.debug("Executing 1st query to select existing records...")
+            NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
+
+            LOGGER.debug(">>>>")
+            LOGGER.debug("If no results returned we execute this query:")
+            execute(scriptList.scripts[1])
+            LOGGER.debug("Exeute 1st query to get the updated record and return it")
+            result = execute(scriptList.scripts[0]) as NyQLResult // get the latest value
+
+            LOGGER.debug(">>>>")
+            LOGGER.debug("If results returned, we return result from 1st query.")
+            return result
+        } else {
+            List results = []
+            for (QScript qScript : scriptList.scripts) {
+                def res = execute(qScript)
+                results.add(res)
+            }
+            return results
         }
     }
 

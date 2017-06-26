@@ -28,7 +28,7 @@ class QRepositoryImpl implements QRepository {
     protected Configurations configurations
 
     QRepositoryImpl(Configurations theConfigs, QScriptMapper scriptMapper) {
-        caching = new Caching(theConfigs)
+        caching = new Caching(theConfigs, scriptMapper)
         mapper = scriptMapper
         configurations = theConfigs
 
@@ -44,6 +44,12 @@ class QRepositoryImpl implements QRepository {
     void clearCache(int level) {
         caching.clearGeneratedCache(level)
         LOGGER.warn('All caches cleared in query repository!')
+    }
+
+    @CompileStatic
+    @Override
+    void reloadScript(String id) throws NyException {
+        caching.reloadScript(id)
     }
 
     @CompileStatic

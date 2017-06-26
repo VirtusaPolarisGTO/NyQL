@@ -44,7 +44,8 @@ class InsertOrQuery extends UpsertQuery {
         final QScript scriptSelect = createSelectQuery(qContext, qSession)
         final QScript scriptInsert = createInsertQuery(qContext, qSession)
 
-        QScriptList scriptList = new QScriptList()
+        QScriptList scriptList = new QScriptList(id: qSession?.currentActiveScript())
+        scriptList.baseQuery = this
         scriptList.scripts = [scriptSelect, scriptInsert]
         scriptList.type = QScriptListType.INSERT_OR_LOAD
         scriptList

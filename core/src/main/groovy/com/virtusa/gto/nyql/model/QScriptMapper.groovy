@@ -39,4 +39,12 @@ trait QScriptMapper implements Function<String, QSource> {
      */
     abstract boolean canCacheAtStartup()
 
+    /**
+     * Reloads the script by given id.
+     *
+     * @param id unique script id.
+     * @return reloaded script.
+     * @throws NyScriptNotFoundException when no script is found for given id.
+     */
+    abstract QSource reload(String id) throws NyScriptNotFoundException
 }

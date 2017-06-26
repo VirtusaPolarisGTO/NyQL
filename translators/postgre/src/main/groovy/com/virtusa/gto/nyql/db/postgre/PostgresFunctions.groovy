@@ -25,6 +25,16 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
         super(theOptions)
     }
 
+    @Override
+    String truncate(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            return 'TRUNC(' + ___resolveIn(c.get(0), pmx) + ', ' + ___resolveIn(c.get(1), pmx) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for truncate function!')
+    }
+
     @CompileStatic String current_date(c) { 'CURRENT_TIME' }
     @CompileStatic String current_time(c) { 'CURRENT_DATE' }
 
@@ -38,6 +48,16 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
             return 'replace(' + ___resolveIn(c[0], pmx) + ', ' + ___resolveIn(c[1], pmx) + ', ' + ___resolveIn(c[2], pmx) + ')'
         }
         throw new NyException('Incorrect number of parameters for string replace function!')
+    }
+
+    @Override
+    String str_repeat(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            return 'repeat(' + ___resolveIn(c[0], pmx) + ', ' + ___resolveIn(c[1], pmx) + ')'
+        }
+        throw new NyException('Incorrect number of parameters for string repeat function')
     }
 
     @Override
@@ -58,6 +78,18 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
         def pmx = ___pm(cx)
         if (c instanceof List) {
             String.format('POSITION(%s IN %s)', ___resolveIn(c.get(1), pmx), ___resolveIn(c.get(0), pmx))
+        } else {
+            throw new NyException('Insufficient parameters for POSITION function!')
+        }
+    }
+
+    @Override
+    String position_last(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            String tmp = ___resolveIn(c.get(0), pmx)
+            String.format('LENGTH(%s) - POSITION(%s IN REVERSE(%s))', tmp, ___resolveIn(c.get(1), pmx), tmp)
         } else {
             throw new NyException('Insufficient parameters for POSITION function!')
         }

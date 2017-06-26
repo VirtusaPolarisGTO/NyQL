@@ -19,6 +19,13 @@ trait QRepository implements Closeable {
     abstract void clearCache(int level)
 
     /**
+     * Reload the script for the given id.
+     *
+     * @param id unique script id.
+     */
+    abstract void reloadScript(String id) throws NyException
+
+    /**
      * Parse the given script represented by given id using the session instance provided.
      *
      * @param scriptId script id to parse.

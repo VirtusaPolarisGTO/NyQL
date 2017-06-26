@@ -30,10 +30,13 @@ class Configurations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurations)
 
+    private static final Map Q_LOGGING_LEVELS = [trace: 1, debug: 2, info: 3, warn: 4, error: 5]
+
     private DateTimeFormatter timestampFormatter = DateTimeFormatter.ISO_INSTANT
 
     private Map properties = [:]
 
+    private int qLogLevel = -1
     private String cacheVarName
     private final Object lock = new Object()
     private boolean configured = false
@@ -210,7 +213,7 @@ class Configurations {
             if (profEnabled) {
                 executorFactory = new QProfExecutorFactory(this, executorFactory)
             }
-            DbInfo dbInfo = executorFactory.init(r)
+            DbInfo dbInfo = executorFactory.init(r, this)
             if (dbInfo != DbInfo.UNRESOLVED) {
                 activeDbInfo = dbInfo
             }
@@ -295,6 +298,10 @@ class Configurations {
         }
     }
 
+    boolean isAllowRecompilation() {
+        (boolean) (properties.caching.allowRecompilation ?: false)
+    }
+
     boolean cacheGeneratedQueries() {
         String cacheStatus = QUtils.readEnv(ConfigKeys.SYS_CACHE_RAW_ENABLED, null)
         if (cacheStatus == null) {
@@ -334,6 +341,20 @@ class Configurations {
 
     QDbFactory getActiveDbFactory() {
         databaseRegistry.getDbFactory(getActivatedDb())
+    }
+
+    /**
+     * Returns query logging level. By default is is set to 'trace'.
+     *
+     * @return query logging level.
+     */
+    int getQueryLoggingLevel() {
+        if (qLogLevel > 0) {
+            qLogLevel
+        } else {
+            qLogLevel = (int) Q_LOGGING_LEVELS.getOrDefault(properties.queryLoggingLevel ?: 'trace', 1)
+            qLogLevel
+        }
     }
 
     static Configurations instance() {

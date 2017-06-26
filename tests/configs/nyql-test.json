@@ -20,6 +20,9 @@
     }
   ],
 
+  "queryLoggingLevel": "warn",
+
+
   "executors": [
     {
       "name": "jdbc2",

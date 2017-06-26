@@ -28,6 +28,11 @@ class QProfRepository implements QRepository {
     }
 
     @Override
+    void reloadScript(String id) throws NyException {
+        repository.reloadScript(id)
+    }
+
+    @Override
     QScript parse(String scriptId, QSession session) throws NyException {
         long s = System.currentTimeMillis()
         def result = repository.parse(scriptId, session)
