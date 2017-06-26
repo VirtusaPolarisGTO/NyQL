@@ -32,7 +32,7 @@ class MySqlFactory implements QDbFactory {
         // load all keywords
         Collection<String> keywords = loadKeywords(nyConfigs)
 
-        mySql = new MySql(new TranslatorOptions(keywords))
+        mySql = new MySql(new TranslatorOptions(keywords), dbInfo)
     }
 
 

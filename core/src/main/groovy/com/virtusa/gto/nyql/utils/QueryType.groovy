@@ -64,6 +64,11 @@ enum QueryType {
     PART,
 
     /**
+     * Common table expression.
+     */
+    CTE,
+
+    /**
      * Unknown type.
      */
     UNKNOWN

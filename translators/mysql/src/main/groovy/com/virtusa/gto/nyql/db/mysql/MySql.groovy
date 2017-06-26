@@ -5,6 +5,8 @@ import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QScriptList
 import com.virtusa.gto.nyql.model.units.AParam
@@ -27,10 +29,13 @@ class MySql extends MySqlFunctions implements QTranslator {
     static final String OP = '('
     static final String CP = ')'
 
+    protected DbInfo dbInfo
+
     MySql() { super() }
 
-    MySql(TranslatorOptions theOptions) {
+    MySql(TranslatorOptions theOptions, DbInfo dbInformation) {
         super(theOptions)
+        dbInfo = dbInformation
     }
 
     @CompileStatic
@@ -342,49 +347,11 @@ class MySql extends MySqlFunctions implements QTranslator {
 
     @Override
     List<QResultProxy> ___cteQuery(CTE cte) {
-        List<AParam> paramList = new LinkedList<>()
-        List<String> qctes = new LinkedList<>()
-        int recCount = 0
-        for (Object item : cte.withs) {
-            StringBuilder iqStr = new StringBuilder()
-            Map map = item as Map
-            Table tbl = map['table'] as Table
-
-            iqStr.append(___tableName(tbl, QContextType.INTO))
-            List cols = map['cols'] as List
-            if (QUtils.notNullNorEmpty(cols)) {
-                iqStr.append(' ').append(OP).append(String.join(', ', cols)).append(CP)
-            }
-
-            Object query = map['query']
-            if (query instanceof QuerySelect) {
-                QResultProxy proxy = ___selectQuery((QuerySelect)query)
-                iqStr.append(' AS ').append(OP).append(proxy.query).append(CP)
-                paramList.addAll(proxy.orderedParameters)
-            } else if (query instanceof WithClosure) {
-                WithClosure withClosure = (WithClosure)query
-                QResultProxy proxy = ___combinationQuery(withClosure.combineType, [withClosure.anchor, withClosure.recursion])
-                iqStr.append(' AS ').append(OP).append(proxy.query).append(CP)
-                paramList.addAll(proxy.orderedParameters)
-                recCount++
-            }
-
-            qctes.add(iqStr.toString())
+        if (!isUnresolvedVersion(dbInfo) && dbInfo.majorVersion < 8) {
+            throw new NySyntaxException('MySQL does not had support for Common Table Expressions prior to version 8.0!')
         }
 
-        StringBuilder mq = new StringBuilder()
-        mq.append('WITH ')
-        if (recCount > 0) {
-            mq.append('RECURSIVE ')
-        }
-        mq.append(String.join(', ', qctes))
-
-        def proxy = ___selectQuery(cte.querySelect)
-        paramList.addAll(proxy.orderedParameters)
-        mq.append(' ').append(proxy.query)
-
-        QResultProxy qResultProxy = new QResultProxy(query: mq.toString(), orderedParameters: paramList)
-        return [qResultProxy]
+        generateCTE(cte)
     }
 
     /*

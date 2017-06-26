@@ -304,6 +304,6 @@ class Postgres extends PostgresFunctions implements QTranslator {
 
     @Override
     List<QResultProxy> ___cteQuery(CTE cte) {
-        return null
+        generateCTE(cte)
     }
 }
