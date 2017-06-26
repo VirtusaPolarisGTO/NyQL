@@ -256,6 +256,34 @@ def innQAny = $DSL.select {
     ],
 
     $DSL.select {
+        TARGET (Film.alias("f"))
+        WHERE {
+            GT (f.opening_weekend, LEAST(f.expected_budget, PARAM("thresholdV")))
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f " +
+                            "WHERE f.opening_weekend > LEAST(f.expected_budget, ?)", ["thresholdV"]],
+            mssql: ["SELECT * FROM `Film` f " +
+                    "WHERE f.opening_weekend > CASE WHEN f.expected_budget <= ? THEN f.expected_budget ELSE ? END",
+                    ["thresholdV", "thresholdV"]]
+    ],
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        WHERE {
+            LT (f.opening_weekend, GREATEST(f.expected_budget, PARAM("thresholdV")))
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f " +
+                            "WHERE f.opening_weekend < GREATEST(f.expected_budget, ?)", ["thresholdV"]],
+            mssql: ["SELECT * FROM `Film` f " +
+                            "WHERE f.opening_weekend < CASE WHEN f.expected_budget >= ? THEN f.expected_budget ELSE ? END",
+                    ["thresholdV", "thresholdV"]]
+    ],
+
+    $DSL.select {
         TARGET (Address.alias("ad"))
         WHERE {
             ISNULL (TABLE(QUERY {

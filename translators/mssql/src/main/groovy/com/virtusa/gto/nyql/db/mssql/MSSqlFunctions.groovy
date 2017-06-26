@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.db.mssql
 
+import com.virtusa.gto.nyql.Case
 import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
@@ -21,6 +22,32 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
 
     MSSqlFunctions(TranslatorOptions theOptions) {
         super(theOptions)
+    }
+
+    String greatest(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            Case aCase = new Case()
+            aCase.WHEN { GTE(c.get(0), c.get(1)) } THEN { c.get(0) } ELSE { c.get(1) }
+            return ___resolveIn(aCase, pmx)
+        } else {
+            throw new NySyntaxException('GREATEST function requires at least two or more values!')
+        }
+    }
+
+    String least(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            Case aCase = new Case()
+            aCase.WHEN { LTE(c.get(0), c.get(1)) } THEN { c.get(0) } ELSE { c.get(1) }
+            return ___resolveIn(aCase, pmx)
+        } else {
+            throw new NySyntaxException('LEAST function requires at least two or more values!')
+        }
     }
 
     @Override

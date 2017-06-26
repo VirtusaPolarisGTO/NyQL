@@ -20,6 +20,28 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
         super(theOptions)
     }
 
+    String greatest(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            return 'GREATEST' + ___resolveIn(c, pmx)
+        } else {
+            throw new NySyntaxException('GREATEST function requires at least two or more values!')
+        }
+    }
+
+    String least(cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            return 'LEAST' + ___resolveIn(c, pmx)
+        } else {
+            throw new NySyntaxException('LEAST function requires at least two or more values!')
+        }
+    }
+
     @CompileStatic
     @Override
     String truncate(Object cx) {

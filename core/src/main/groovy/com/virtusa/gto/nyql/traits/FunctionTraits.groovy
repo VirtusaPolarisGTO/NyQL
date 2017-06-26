@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 trait FunctionTraits {
 
     @CompileStatic FunctionColumn COALESCE(Object... cols) { vColumn("coalesce", cols) }
+    @CompileStatic FunctionColumn LEAST(Object v1, Object v2) { vColumn("least", v1, v2) }
+    @CompileStatic FunctionColumn GREATEST(Object v1, Object v2) { vColumn("greatest", v1, v2) }
 
     @CompileStatic FunctionColumn ADD(Object... cols)     { vColumn('op_add', cols) }
     @CompileStatic FunctionColumn MINUS(Object op1, Object op2)     { vColumn('op_minus', op1, op2) }

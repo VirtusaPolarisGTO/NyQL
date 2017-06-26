@@ -210,3 +210,5 @@ Album.rating + 1 AS newRating
 | Function | Details |
 |---|---|
 |COALESCE (_columns_, ...) |  Returns first non-null value |
+|GREATEST (_val1, val2_ ) | Returns the highest values from given two values. This is equivalent to `CASE WHEN val1 >= val2 THEN val1 ELSE val2 END`. |
+|LEAST (_val1, val2_ ) | Returns the highest values from given two values. This is equivalent to `CASE WHEN val1 <= val2 THEN val1 ELSE val2 END`. |

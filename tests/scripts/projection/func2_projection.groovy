@@ -150,6 +150,34 @@
     ],
 
     $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (GREATEST(ac.salary1, ac.salary2),
+                LEAST(ac.graduate_date, ac.debut_date).alias("firstActingDay"))
+    },
+    [
+            mysql: "SELECT GREATEST(ac.salary1, ac.salary2), " +
+                    "LEAST(ac.graduate_date, ac.debut_date) AS firstActingDay " +
+                    "FROM `Actor` ac",
+            mssql: "SELECT CASE WHEN ac.salary1 >= ac.salary2 THEN ac.salary1 ELSE ac.salary2 END, " +
+                    "CASE WHEN ac.graduate_date <= ac.debut_date THEN ac.graduate_date ELSE ac.debut_date END AS firstActingDay " +
+                    "FROM `Actor` ac"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (GREATEST(ac.salary1, PARAM("minSalary")),
+                LEAST(ac.graduate_date, ac.debut_date).alias("firstActingDay"))
+    },
+    [
+            mysql: ["SELECT GREATEST(ac.salary1, ?), " +
+                    "LEAST(ac.graduate_date, ac.debut_date) AS firstActingDay " +
+                    "FROM `Actor` ac", ["minSalary"]],
+            mssql: ["SELECT CASE WHEN ac.salary1 >= ? THEN ac.salary1 ELSE ? END, " +
+                    "CASE WHEN ac.graduate_date <= ac.debut_date THEN ac.graduate_date ELSE ac.debut_date END AS firstActingDay " +
+                    "FROM `Actor` ac", ["minSalary"]]
+    ],
+
+    $DSL.select {
         TARGET (Trig.alias('t'))
         FETCH (ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATAN2(t.x, t.y),
                 COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot))
