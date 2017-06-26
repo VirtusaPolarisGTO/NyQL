@@ -236,6 +236,11 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
     }
 
     @Override
+    String cast_to_bigint(Object col) {
+        String.format('CAST(%s AS BIGINT)', ___resolveInP(col))
+    }
+
+    @Override
     String current_epoch() {
         'CAST(DATEDIFF(SECOND, \'19700101\', GETUTCDATE()) AS BIGINT) * 1000'
     }

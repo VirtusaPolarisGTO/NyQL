@@ -93,8 +93,10 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn TRUNCATE(Object column, Object dpoints) { vColumn('truncate', column, dpoints) }
 
     // cast function
+    @CompileStatic FunctionColumn CAST_BIGINT(Object column) { fColumn(column, 'cast_to_bigint') }
     @CompileStatic FunctionColumn CAST_INT(Object column) { fColumn(column, 'cast_to_int') }
     @CompileStatic FunctionColumn CAST_STR(Object column) { fColumn(column, 'cast_to_str') }
+    @CompileStatic FunctionColumn CAST_STR(Object column, Object length) { vColumn('cast_to_str', column, length) }
     @CompileStatic FunctionColumn CAST_DATE(Object column) { fColumn(column, 'cast_to_date') }
 
     /// Date time functions

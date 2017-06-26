@@ -121,14 +121,27 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
 
     @CompileStatic
     @Override
-    String cast_to_str(Object col) {
-        String.format('CAST(%s AS CHAR)', ___resolveInP(col))
+    String cast_to_str(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List && c.size() > 1) {
+            String.format('CAST(%s AS CHAR(%s))', ___resolveIn(c.get(0), pmx), ___resolveIn(c.get(1), pmx))
+        } else {
+            String.format('CAST(%s AS CHAR)', ___resolveInP(cx))
+        }
     }
 
     @CompileStatic
     @Override
     String cast_to_date(Object col) {
         String.format('CAST(%s AS DATE)', ___resolveInP(col))
+    }
+
+    @CompileStatic
+    @Override
+    String cast_to_bigint(Object col) {
+        String.format('CAST(%s AS UNSIGNED INTEGER)', ___resolveInP(col))
     }
 
     @CompileStatic

@@ -280,6 +280,11 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
         String.format('to_date(%s, YYYY-MM-DD)', ___resolveInP(col))
     }
 
+    @Override
+    String cast_to_bigint(Object col) {
+        String.format('CAST(%s AS BIGINT)', ___resolveInP(col))
+    }
+
     @CompileStatic @Override
     String op_bit_xor(Object itx) {
         def it = ___val(itx)

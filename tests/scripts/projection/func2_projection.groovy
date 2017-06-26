@@ -140,6 +140,16 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (CAST_BIGINT(ac.birthDay), CAST_STR(ac.level, 64), CAST_STR(ac.level, PARAM("lenOf")))
+    },
+    [
+            mysql: ["SELECT CAST(ac.birthDay AS UNSIGNED INTEGER), CAST(ac.level AS CHAR(64)), " +
+                            "CAST(ac.level AS CHAR(?)) " +
+                    "FROM `Actor` ac", ["lenOf"]]
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (COALESCE(ac.description, ac.details, STR('(none)')),
                 COALESCE(ac.description, PARAM("defVal1"), PARAM("defVal2")))
     },
