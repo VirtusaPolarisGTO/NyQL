@@ -100,38 +100,62 @@ Album.rating + 1 AS newRating
 
 | Function | Details |
 |---|---|
+|CONCAT (_column-1, column-2, ..._ ) |  Concat the set of given columns/strings. **WARN:** `NULL` ignorance is dependent on the running database. |
+|CONCAT_NN (_col-1, col-2, ..._ ) | Concat the set of columns ignoring _NULL_ columns/values automatically. |
+|CONCAT_WS (_separator, col-1, col-2, ..._ ) | Concat the set of columns using given separator |
 |LCASE (_column_ ) | Converts string to lowercase |
-|UCASE (_column_ ) | Converts string to upper case |
-|CONCAT (_column-1, column-2, ..._ ) |  Concat the set of given columns/strings |
-|TRIM (_column_ ) | Trims whitespace from the column |
+|LEFT_PAD (_column_, _length_, [_text_]) | Left pad given column to the specified length using given text. If text is undefined, then will be used a space. |
 |LEFT_TRIM (_column_) | Left trim whitespace from column |
-|RIGHT_TRIM (_column_) | Right trim whitespace from column |
 |LEN (_column_ ) |  Length of the string |
 |POSITION (_column, stringToFind_ ) |  Find the position of substring in the given string __(case sensitive)__. If the text is not found, returns 0. Position value is always >= 1.  |
 |POSITION_LAST (_column, stringToFind_ ) |  Find the last occurred position of substring in the given string __(case sensitive)__. If the text is not found, returns 0. Position value is always >= 1.  |
-|SUBSTRING (_column, startFrom, [length]_ ) | Capture part of a string starting from given location to the given length. _startFrom_ must be >= 1, because databases uses 1-based indices. |
-|STR_REPLACE (_column, from, to_ ) | Replace a string of all _from_ text to _to_. Both _from_ and _to_ are 1-based indices. |
-|REVERSE (_column_) | Reverse a string |
 |REPEAT (_column_, _noOfTimes_) | Repeats the string given amount of time |
-|STR_LEFT (_column_, _length_) | Capture specified length from the given string starting from left |
-|STR_RIGHT (_column_, _length_) | Capture specified length from the given string starting from right |
-|LEFT_PAD (_column_, _length_, [_text_]) | Left pad given column to the specified length using given text. If text is undefined, then will be used a space. |
+|REVERSE (_column_) | Reverse a string |
 |RIGHT_PAD (_column_, _length_, [_text_]) | Right pad given column to the specified length using given text. If text is undefined, then will be used a space. |
-
+|RIGHT_TRIM (_column_) | Right trim whitespace from column |
+|STR_LEFT (_column_, _length_) | Capture specified length from the given string starting from left |
+|STR_REPLACE (_column, from, to_ ) | Replace a string of all _from_ text to _to_. Both _from_ and _to_ are 1-based indices. |
+|STR_RIGHT (_column_, _length_) | Capture specified length from the given string starting from right |
+|SUBSTRING (_column, startFrom, [length]_ ) | Capture part of a string starting from given location to the given length. _startFrom_ must be >= 1, because databases uses 1-based indices. |
+|TRIM (_column_ ) | Trims whitespace from the column |
+|UCASE (_column_ ) | Converts string to upper case |
 
 ### Math Functions
 
 | Function | Details |
 |---|---|
-|ROUND (_column, decimalPlaces_ ) | Round the given number to specified decimal places |
-|FLOOR (_column_ )  | Gets the floor value of decimal number |
-|CEIL (_column_ )  | Gets the ceiling value of decimal number |
 |ABS (_column_ )  | Gets the absolute value of a real number |
-|POWER (_column_, _magnitude_ )  | Raise the given column value to the given magnitude. ( i.e. (column)^(magnitude) ) |
-|SIGN (_column_ )  | Returns the sign value as an integer of the given column value (-1,0,+1) |
-|SQRT (_column_ )  | Returns the square root value of the given column |
+|ACOS (_value_ )  | Returns the arc cosine for given value. The value must be between -1 and 1. |
+|ASIN (_value_ )  | Returns the arc sine for given value. The value must be between -1 and 1. |
+|ATAN (_value_ )  | Returns the arc tangent for given value. |
+|ATAN2 (_x, y_ )  | Returns the arc tangent of two variables. Equivalent to arc tangent of _x / y_. |
+|CEIL (_column_ )  | Gets the ceiling value of decimal number |
+|COS (_radians_ )  | Returns the cosine for given radians value. |
+|COT (_value_ )  | Returns the cotangent for given value. Equivalent, _1 / TAN(x)_. |
 |DEGREES (_column_ )  | Converts given radian value to degrees |
+|EXP (_power_ )  | Returns value of _**e**_ raised to the given power. |
+|FLOOR (_column_ )  | Gets the floor value of decimal number |
+|LOGE (_value_ )  | Returns the natural logarithm of given value. |
+|LOG (_base, value_ )  | Returns logarithm of _value_ to the given _base_.  |
+|POWER (_column_, _magnitude_ )  | Raise the given column value to the given magnitude. ( i.e. (column)^(magnitude) ) |
 |RADIANS (_column_ )  | Converts given degree value to radians |
+|ROUND (_column, decimalPlaces_ ) | Round the given number to specified decimal places |
+|SIGN (_column_ )  | Returns the sign value as an integer of the given column value (-1,0,+1) |
+|SIN (_value_ )  | Returns the sine value of given radians. |
+|SQRT (_column_ )  | Returns the square root value of the given column |
+|TAN (_value_ )  | Returns the tangent for the given value. |
+|TRUNCATE(_column, d_ ) | Truncate the given decimal number to _d_ decimal places. This does not _round_ the number. Negative _d_ values will truncate before the decimal point. |
+
+
+### Stats Functions
+
+| Function | Details |
+|---|---|
+|STDDEV_POP (_column_ ) | Population standard deviation of values in given column. |
+|STDDEV_SAMP (_column_ ) | Sample standard deviation of values in given column. |
+|VAR_POP (_column_ ) | Population variance of values in given column. |
+|VAR_SAMP (_column_ ) | Sample variance of values in given column. |
+ 
 
 ### Casting Functions
 

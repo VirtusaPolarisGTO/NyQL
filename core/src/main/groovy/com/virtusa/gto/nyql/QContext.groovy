@@ -47,6 +47,19 @@ class QContext {
         param
     }
 
+    boolean hasAliasForColumn(Column column, String alias) {
+        if (alias == null) {
+            return false;
+        }
+        Column col = columns.get(alias)
+        if (col == null) {
+            return false
+        }
+        return col.__name == column.__name &&
+                col._owner != null && column._owner != null &&
+                col._owner.__name == column._owner.__name
+    }
+
     void renameColumn(String oldKey, String newKey, Column col) {
         Column oVal = columns.get(oldKey)
         columns.remove(oldKey)

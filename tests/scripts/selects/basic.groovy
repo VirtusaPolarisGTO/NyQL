@@ -20,6 +20,33 @@
 
         $DSL.select {
             TARGET (Film.alias("f"))
+            FETCH (f.title.alias("title1"), f.title.alias("title2"))
+        },
+        [
+                mysql: "SELECT f.title AS title1, f.title AS title2 FROM `Film` f"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            FETCH (f.title.alias("title"), f.title.alias("title2"))
+        },
+        [
+                mysql: "SELECT f.title AS title, f.title AS title2 FROM `Film` f"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN {
+                INNER_JOIN (Actor.alias("a")) ON a.film_id, f.film_id
+            }
+            FETCH (f.name.alias("title1"), a.name.alias("title1"))
+        },
+        [
+                mysql: "SELECT f.name AS title1, a.name AS title1 FROM `Film` f INNER JOIN `Actor` a ON a.film_id = f.film_id"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
             FETCH (f.rental_duration, COUNT())
             GROUP_BY (f.rental_duration)
             HAVING {
@@ -28,6 +55,32 @@
         },
         [
             mysql: "SELECT f.rental_duration, COUNT(*) FROM `Film` f GROUP BY f.rental_duration HAVING COUNT(*) > 200"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            FETCH (f.rental_duration.alias("rental duration"), COUNT())
+            GROUP_BY (f.rental_duration)
+            HAVING {
+                GT (COUNT(), 200)
+            }
+        },
+        [
+                mysql: "SELECT f.rental_duration AS `rental duration`, COUNT(*) " +
+                        "FROM `Film` f GROUP BY `rental duration` HAVING COUNT(*) > 200"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            FETCH (f.rental_duration.alias("rental duration"), COUNT())
+            GROUP_BY (ALIAS_REF("rental duration"))
+            HAVING {
+                GT (COUNT(), 200)
+            }
+        },
+        [
+                mysql: "SELECT f.rental_duration AS `rental duration`, COUNT(*) " +
+                        "FROM `Film` f GROUP BY `rental duration` HAVING COUNT(*) > 200"
         ],
 
         $DSL.select {

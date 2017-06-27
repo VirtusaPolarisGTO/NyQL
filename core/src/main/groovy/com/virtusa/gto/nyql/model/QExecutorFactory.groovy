@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.model
 
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 
 /**
@@ -7,7 +8,7 @@ import com.virtusa.gto.nyql.exceptions.NyConfigurationException
  */
 interface QExecutorFactory {
 
-    DbInfo init(Map options) throws NyConfigurationException
+    DbInfo init(Map options, Configurations configurations) throws NyConfigurationException
 
     QExecutor create()
 

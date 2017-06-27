@@ -57,6 +57,34 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (CONCAT(ac.first_name, STR(' '), ac.last_name),
+                CONCAT_WS(STR(' '), ac.first_name, ac.last_name))
+    },
+    [
+            mysql: "SELECT CONCAT(ac.first_name, \" \", ac.last_name), " +
+                    "CONCAT_WS(\" \", ac.first_name, ac.last_name) " +
+                    "FROM `Actor` ac",
+            mssql: "SELECT CONCAT(ac.first_name, \" \", ac.last_name), " +
+                    "CONCAT(ac.first_name, \" \", ac.last_name) " +
+                    "FROM `Actor` ac",
+            pg: "SELECT CONCAT(ac.first_name, \" \", ac.last_name), " +
+                    "CONCAT_WS(\" \", ac.first_name, ac.last_name) " +
+                    "FROM `Actor` ac",
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (CONCAT_NN(ac.first_name, STR(' '), ac.last_name),
+                CONCAT_NN(ac.first_name, ac.last_name))
+    },
+    [
+            mysql: "SELECT CONCAT(COALESCE(ac.first_name, \"\"), \" \", COALESCE(ac.last_name, \"\")), " +
+                    "CONCAT(COALESCE(ac.first_name, \"\"), COALESCE(ac.last_name, \"\")) " +
+                    "FROM `Actor` ac"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (REVERSE(ac.nameHash), LEFT_TRIM(ac.city), RIGHT_TRIM(ac.country))
     },
     [
@@ -119,5 +147,53 @@
             mysql: ["SELECT COALESCE(ac.description, ac.details, \"(none)\"), " +
                     "COALESCE(ac.description, ?, ?) " +
                     "FROM `Actor` ac", ["defVal1", "defVal2"]]
+    ],
+
+    $DSL.select {
+        TARGET (Trig.alias('t'))
+        FETCH (ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATAN2(t.x, t.y),
+                COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot))
+    },
+    [
+            mysql: "SELECT ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATAN2(t.x, t.y), " +
+                    "COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot) " +
+                    "FROM `Trig` t",
+            mssql: "SELECT ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATN2(t.x, t.y), " +
+                    "COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot) " +
+                    "FROM `Trig` t",
+            pg: "SELECT ACOS(t.val), ASIN(t.val2), ATAN(t.val3), ATAN2(t.x, t.y), " +
+                    "COS(t.cos), SIN(t.sine), TAN(t.tang), COT(t.cot) " +
+                    "FROM `Trig` t"
+    ],
+
+    $DSL.select {
+        TARGET (Logs.alias('l'))
+        FETCH (LOGE(l.lne), LOG(10, l.val), LOG(2, l.val2), LOGE(EXP(l.eval)), EXP(l.eval))
+    },
+    [
+            mysql: "SELECT LN(l.lne), LOG(10, l.val), LOG(2, l.val2), LN(EXP(l.eval)), EXP(l.eval) FROM `Logs` l",
+            mssql: "SELECT LOG(l.lne), LOG(l.val, 10), LOG(l.val2, 2), LOG(EXP(l.eval)), EXP(l.eval) FROM `Logs` l",
+            pg: "SELECT LN(l.lne), LOG(10, l.val), LOG(2, l.val2), LN(EXP(l.eval)), EXP(l.eval) FROM `Logs` l"
+    ],
+
+    $DSL.select {
+        TARGET (Logs.alias('l'))
+        FETCH (TRUNCATE(l.v, 2))
+    },
+    [
+            mysql: "SELECT TRUNCATE(l.v, 2) FROM `Logs` l",
+            mssql: "SELECT ROUND(l.v, 2, 1) FROM `Logs` l",
+            pg:    "SELECT TRUNC(l.v, 2) FROM `Logs` l"
+    ],
+
+    $DSL.select {
+        TARGET (Stats.alias('s'))
+        FETCH (STDDEV_POP(s.income), STDDEV_SAMP(s.income), VAR_POP(s.income), VAR_SAMP(s.income))
+        GROUP_BY (s.year)
+    },
+    [
+            mysql: "SELECT STDDEV_POP(s.income), STDDEV_SAMP(s.income), VAR_POP(s.income), VAR_SAMP(s.income) FROM `Stats` s GROUP BY s.year",
+            mssql: "SELECT STDEVP(s.income), STDEV(s.income), VARP(s.income), VAR(s.income) FROM `Stats` s GROUP BY s.year",
+            pg:    "SELECT STDDEV_POP(s.income), STDDEV_SAMP(s.income), VAR_POP(s.income), VAR_SAMP(s.income) FROM `Stats` s GROUP BY s.year"
     ],
 ]

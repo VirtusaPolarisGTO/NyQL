@@ -25,8 +25,8 @@ class QProfExecutorFactory implements QExecutorFactory {
     }
 
     @Override
-    DbInfo init(Map options) {
-        qExecutorFactory.init(options)
+    DbInfo init(Map options, Configurations configs) {
+        qExecutorFactory.init(options, configs)
     }
 
     @Override

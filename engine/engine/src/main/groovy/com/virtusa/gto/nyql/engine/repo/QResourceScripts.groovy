@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.repo
 
+import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
@@ -25,11 +26,11 @@ class QResourceScripts implements QScriptMapper {
     }
 
     static QResourceScripts createNew(Map args) throws NyException {
-        if (args == null || args.size() == 0 || !args.resourceDir) {
+        if (args == null || args.size() == 0 || !args.resourceRoot) {
             throw new NyConfigurationException('To create a new QResourceScripts requires at least one parameter with specifying a resource directory!')
         }
 
-        String path = args.resourceDir ?: ''
+        String path = args.resourceRoot ?: ''
         new QResourceScripts(path)
     }
 
@@ -38,7 +39,7 @@ class QResourceScripts implements QScriptMapper {
         if (resMap.containsKey(id)) {
             resMap[id]
         } else {
-            String content = readAll(rootRes + id)
+            String content = readAll(rootRes + id + ConfigKeys.GROOVY_EXT)
             GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, id, GroovyShell.DEFAULT_CODE_BASE)
             groovyCodeSource.setCachable(true)
 

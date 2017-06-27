@@ -201,6 +201,17 @@ def innQAny = $DSL.select {
         TARGET (Film.alias("f"))
         FETCH ()
         WHERE {
+            EQ (LCASE(f.name), LCASE(PARAM('filmName')))
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f WHERE LOWER(f.name) = LOWER(?)", ["filmName"]]
+    ],
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
             NEQ (f.title, STR("ACE GOLDFINDER"))
             AND
             NIN (f.release_year, $SESSION.emptyList)
@@ -339,6 +350,26 @@ def innQAny = $DSL.select {
     },
     [
             mysql: ["SELECT * FROM `Film` f WHERE f.id = CASE WHEN f.lastId = ? THEN 0 ELSE ? END", ["whereParam", "elseParam"]]
+    ],
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        WHERE {
+            EQ (f.id, CASE {
+                WHEN {
+                    EQ (f.lastId, PARAM("whereParam"))
+                }
+                THEN {
+                    PARAM("thenParam")
+                }
+                ELSE {
+                    PARAM("elseParam")
+                }
+            })
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f WHERE f.id = CASE WHEN f.lastId = ? THEN ? ELSE ? END", ["whereParam", "thenParam", "elseParam"]]
     ],
 
     $DSL.select {

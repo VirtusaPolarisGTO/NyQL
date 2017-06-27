@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.engine.impl
 
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.engine.pool.QJdbcPool
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.model.DbInfo
@@ -19,9 +20,11 @@ class QJdbcExecutorFactory implements QExecutorFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(QJdbcExecutorFactory)
 
     private QJdbcPool jdbcPool
+    private Configurations nyqlConfigs
 
     @Override
-    DbInfo init(Map options) throws NyConfigurationException {
+    DbInfo init(Map options, Configurations configurations) throws NyConfigurationException {
+        nyqlConfigs = configurations
         if (options.pooling) {
             String implClz = String.valueOf(options.pooling['impl'] ?: '')
             if (!implClz.isEmpty()) {
@@ -54,12 +57,12 @@ class QJdbcExecutorFactory implements QExecutorFactory {
 
     @Override
     QExecutor create() {
-        new QJdbcExecutor(jdbcPool)
+        new QJdbcExecutor(jdbcPool, nyqlConfigs)
     }
 
     @Override
     QExecutor createReusable() {
-        new QJdbcExecutor(jdbcPool, true)
+        new QJdbcExecutor(jdbcPool, true, nyqlConfigs)
     }
 
     @Override

@@ -20,6 +20,8 @@
     }
   ],
 
+  "queryLoggingLevel": "trace",
+
   "executors": [
     {
       "name": "jdbc2",

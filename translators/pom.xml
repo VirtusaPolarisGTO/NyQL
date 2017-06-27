@@ -19,6 +19,7 @@
         <module>mysql</module>
         <module>postgre</module>
         <module>mssql</module>
+        <module>maria</module>
     </modules>
 
     <dependencies>

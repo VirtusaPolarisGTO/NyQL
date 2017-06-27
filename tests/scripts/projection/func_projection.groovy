@@ -243,5 +243,15 @@ def innQP = $DSL.select {
     },
     [
         mysql: "SELECT TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(0 / 1000), f.release_date) AS releaseDate FROM `Film` f"
+    ],
+
+    $DSL.select {
+        TARGET (TABLE('File').alias("f"))
+        FETCH (POSITION_LAST(f.path, STR('.')), REPEAT(STR('*'), 100))
+    },
+    [
+            mysql: "SELECT LENGTH(f.path) - LOCATE(\".\", REVERSE(f.path)), REPEAT(\"*\", 100) FROM `File` f",
+            mssql: "SELECT LEN(f.path) - CHARINDEX('.', REVERSE(f.path)), REPLICATE('*', 100) FROM `File` f",
+            pg: "SELECT LENGTH(f.path) - POSITION('.' IN REVERSE(f.path)), repeat('*', 100) FROM `File` f"
     ]
 ]

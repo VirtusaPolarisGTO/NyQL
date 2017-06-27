@@ -32,6 +32,44 @@ def innQP = $DSL.select {
         $DSL.update {
             TARGET (Film.alias("f"))
             SET {
+                EQ (f.year, CASE {
+                    WHEN { EQ(f.current_year, PARAM("currYear")) }
+                    THEN { PARAM("thenParamYear") }
+                    ELSE { 1 }
+                })
+                EQ (f.title, PARAM("title"))
+                SET_NULL (f.language_id)
+            }
+        },
+        [
+                mysql: ["UPDATE `Film` f SET f.year = CASE WHEN f.current_year = ? THEN ? ELSE 1 END, f.title = ?, f.language_id = NULL",
+                        ["currYear", "thenParamYear", "title"]],
+                mssql: ['UPDATE "Film" f SET f.year = CASE WHEN f.current_year = ? THEN ? ELSE 1 END, f.title = ?, f.language_id = NULL',
+                        ["currYear", "thenParamYear", "title"]]
+        ],
+
+        $DSL.update {
+            TARGET (Film.alias("f"))
+            SET {
+                EQ (f.year, CASE {
+                    WHEN { EQ(f.current_year, PARAM("elseParamYear")) }
+                    THEN { 1 }
+                    ELSE { PARAM("elseParamYear") }
+                })
+                EQ (f.title, PARAM("title"))
+                SET_NULL (f.language_id)
+            }
+        },
+        [
+                mysql: ["UPDATE `Film` f SET f.year = CASE WHEN f.current_year = ? THEN 1 ELSE ? END, f.title = ?, f.language_id = NULL",
+                        ["elseParamYear", "elseParamYear", "title"]],
+                mssql: ['UPDATE "Film" f SET f.year = CASE WHEN f.current_year = ? THEN 1 ELSE ? END, f.title = ?, f.language_id = NULL',
+                        ["elseParamYear", "elseParamYear", "title"]]
+        ],
+
+        $DSL.update {
+            TARGET (Film.alias("f"))
+            SET {
                 EQ (f.film_id, 1234)
                 EQ (f.title, PARAM("title"))
                 if ($SESSION.alwaysTrue) {
@@ -152,7 +190,7 @@ def innQP = $DSL.select {
             TARGET (Film.alias("f"))
             SET {
                 EQ (f.film_id, 1234)
-                $IMPORT_UNSAFE ("updates/non-existing-script")
+                $IMPORT_SAFE ("updates/non-existing-script")
             }
         },
         [

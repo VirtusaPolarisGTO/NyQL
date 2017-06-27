@@ -41,7 +41,7 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
     }
 
     @CompileStatic
-    def $IMPORT_UNSAFE(String scriptId) {
+    def $IMPORT_SAFE(String scriptId) {
         try {
             return this.$IMPORT(scriptId)
         } catch (NyScriptNotFoundException ignored) {

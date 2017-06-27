@@ -1,6 +1,7 @@
 package com.virtusa.gto.nyql
 
 import com.virtusa.gto.nyql.ddl.DDL
+import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
@@ -57,6 +58,14 @@ class DSL {
         QScript res = session.scriptRepo.parse(scriptName, session)
         session.outFromScript(scriptName)
         res
+    }
+
+    QScript $IMPORT_SAFE(String scriptName) {
+        try {
+            $IMPORT(scriptName)
+        } catch (NyScriptNotFoundException ex) {
+            return null
+        }
     }
 
     def RUN(QScriptList scriptList) {
@@ -267,6 +276,19 @@ class DSL {
     ////   DDL Related Commands
     ////
     ///////////////////////////////////////////////////////////////////////////////////
+
+    @CompileStatic
+    QScriptList drop(String table, boolean isTemp = true, boolean ifExist = false) {
+        if (isTemp) {
+            ddl {
+                DROP_TEMP_TABLE(table, ifExist)
+            }
+        } else {
+            ddl {
+                DROP_TABLE(table, ifExist)
+            }
+        }
+    }
 
     QScriptList ddl(@DelegatesTo(value = DDL, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         DDL activeDDL = new DDL(session)

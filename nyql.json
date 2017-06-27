@@ -61,7 +61,7 @@
   ],
 
   "profiling": {
-    "enabled": true,
+    "enabled": false,
     "profiler": "com.virtusa.gto.nyql.model.impl.QLogProfiler"
   }
 }

@@ -57,6 +57,8 @@
     }
   ],
 
+  "queryLoggingLevel": "warn",
+
   "profiling": {
     "enabled": true,
     "profiler": "com.virtusa.gto.nyql.model.impl.QLogProfiler",

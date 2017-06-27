@@ -1,10 +1,15 @@
 package com.virtusa.gto.nyql.db.mssql
 
+import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.db.AbstractSQLTranslator
 import com.virtusa.gto.nyql.db.QFunctions
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import groovy.transform.CompileStatic
+
+import java.util.stream.Collectors
+
 /**
  * @author IWEERARATHNA
  */
@@ -16,6 +21,80 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
 
     MSSqlFunctions(TranslatorOptions theOptions) {
         super(theOptions)
+    }
+
+    @Override
+    String concat_ws(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof String) {
+            return String.valueOf(c)
+        } else {
+            List list
+            Object sep = null
+            if (c instanceof FunctionColumn) {
+                list = (List)c._columns
+            } else if (c instanceof List) {
+                list = (List)c.get(1)
+                sep = c.get(0)
+            } else {
+                return null
+            }
+
+            String delim = ', ' + ___resolveIn(sep, pmx) + ', '
+            return list.stream().map {
+                col -> if (col instanceof String) {
+                    return String.valueOf(col)
+                } else {
+                    return (String)___resolveIn(col, pmx)
+                }
+            }.collect(Collectors.joining(delim, 'CONCAT(', ')'))
+        }
+    }
+
+    @Override
+    String stat_stddevpop(Object cx) {
+        return String.format('STDEVP(%s)', ___resolveInP(cx))
+    }
+
+    @Override
+    String stat_stddevsamp(Object cx) {
+        return String.format('STDEV(%s)', ___resolveInP(cx))
+    }
+
+    @Override
+    String stat_varpop(Object cx) {
+        return String.format('VARP(%s)', ___resolveInP(cx))
+    }
+
+    @Override
+    String stat_varsamp(Object cx) {
+        return String.format('VAR(%s)', ___resolveInP(cx))
+    }
+
+    @CompileStatic
+    @Override
+    String truncate(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) {
+            return 'ROUND(' + ___resolveIn(c.get(0), pmx) + ', ' + ___resolveIn(c.get(1), pmx) + ', 1)'
+        }
+        throw new NyException('Incorrect number of parameters for rounding with truncate function!')
+    }
+
+    @CompileStatic
+    @Override
+    String trig_atan2(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+        if (c instanceof List) String.format('ATN2(%s, %s)', ___resolveIn(((List)c)[0], pmx), ___resolveIn(((List)c)[1], pmx))
+        else throw new NyException('ATAN2 function requires two parameters!')
+    }
+
+    @Override
+    String lg_ln(Object cx) {
+        String.format('LOG(%s)', ___resolveInP(cx))
     }
 
     @Override

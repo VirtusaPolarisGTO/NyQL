@@ -1,7 +1,7 @@
 package com.virtusa.gto.nyql.engine.impl
 
-import com.virtusa.gto.nyql.InsertOrQuery
 import com.virtusa.gto.nyql.UpsertQuery
+import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.engine.exceptions.NyParamNotFoundException
 import com.virtusa.gto.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.nyql.engine.pool.QJdbcPoolFetcher
@@ -9,11 +9,7 @@ import com.virtusa.gto.nyql.engine.transform.JdbcCallResultTransformer
 import com.virtusa.gto.nyql.engine.transform.JdbcCallTransformInput
 import com.virtusa.gto.nyql.engine.transform.JdbcResultTransformer
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.QExecutor
-import com.virtusa.gto.nyql.model.QScript
-import com.virtusa.gto.nyql.model.QScriptList
-import com.virtusa.gto.nyql.model.QScriptListType
-import com.virtusa.gto.nyql.model.QScriptResult
+import com.virtusa.gto.nyql.model.*
 import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.utils.QReturnType
 import com.virtusa.gto.nyql.utils.QUtils
@@ -33,6 +29,7 @@ import java.sql.SQLException
 import java.sql.Savepoint
 import java.sql.Statement
 import java.util.stream.Collectors
+
 /**
  * @author IWEERARATHNA
  */
@@ -47,6 +44,8 @@ class QJdbcExecutor implements QExecutor {
     private Connection connection
     private final boolean returnRaw
     private boolean reusable
+    private Configurations nyqlConfigs
+    private int logLevel = 1
 
     /**
      * Creates an executor with custom connection.
@@ -54,23 +53,28 @@ class QJdbcExecutor implements QExecutor {
      *
      * @param yourConnection sql connection
      */
-    QJdbcExecutor(Connection yourConnection) {
+    QJdbcExecutor(Connection yourConnection, Configurations configurations) {
         poolFetcher = null
         connection = yourConnection
         reusable = true
         returnRaw = false
+        nyqlConfigs = configurations
+        logLevel = configurations.getQueryLoggingLevel()
     }
 
-    QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher) {
-        this(jdbcPoolFetcher, false)
+    QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher, Configurations configurations) {
+        this(jdbcPoolFetcher, false, configurations)
     }
 
-    QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher, boolean canReusable) {
+    QJdbcExecutor(QJdbcPoolFetcher jdbcPoolFetcher, boolean canReusable, Configurations configurations) {
         poolFetcher = jdbcPoolFetcher
         reusable = canReusable
         returnRaw = false
+        nyqlConfigs = configurations
+        logLevel = configurations.getQueryLoggingLevel()
     }
 
+    @CompileStatic
     private Connection getConnection() {
         if (connection == null && poolFetcher != null) {
             connection = poolFetcher.getConnection()
@@ -79,31 +83,15 @@ class QJdbcExecutor implements QExecutor {
     }
 
     @CompileStatic
-    private static void logScript(QScript script) throws NyScriptExecutionException {
-        if (script.proxy.query == null) {
-            throw new NyScriptExecutionException(QUtils.generateErrStr(
-                    'Generated query for execution is empty! [SCRIPT: ' + script.id + ']',
-                    'Did you accidentally set cache true to this script?',
-                    'Did you happen to send incorrect data variables to the script?'))
-        }
-
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Query @ ${script.id}: -----------------------------------------------------\n" +
-                    script.proxy.query.trim())
-            LOGGER.trace('------------------------------------------------------------')
-        }
-    }
-
-    @CompileStatic
     @Override
     def execute(QScript script) throws Exception {
         if (script instanceof QScriptResult) {
-            return script.scriptResult
+            return ((QScriptResult)script).scriptResult
         }
 
         PreparedStatement statement = null
         try {
-            logScript(script)
+            JdbcHelperUtils.logScript(script, logLevel)
 
             if (script.proxy != null && script.proxy.queryType == QueryType.DB_FUNCTION) {
                 return executeCall(script)
@@ -249,8 +237,7 @@ class QJdbcExecutor implements QExecutor {
                     throw new NyException("Mapping parameter name has not been defined for SP input parameter '$param.__name'!")
                 }
 
-                LOGGER.trace(' Parameter #{} : {} [{}]', param.__mappingParamName, itemValue,
-                        itemValue != null ? itemValue.class.simpleName : '')
+                JdbcHelperUtils.logParameter(param.__mappingParamName, itemValue, logLevel)
                 statement.setObject(param.__mappingParamName, itemValue)
             }
 
@@ -277,6 +264,7 @@ class QJdbcExecutor implements QExecutor {
     /**
      * Closes the connection if reusable is not specified.
      */
+    @CompileStatic
     private void closeConnection() {
         if (connection == null || reusable) {
             return
@@ -284,6 +272,7 @@ class QJdbcExecutor implements QExecutor {
         connection.close()
     }
 
+    @CompileStatic
     private static void assignParameters(PreparedStatement statement, List<AParam> parameters, Map data, Map session) {
         int cp = 1
         for (int i = 0; i < parameters.size(); i++) {
@@ -307,10 +296,10 @@ class QJdbcExecutor implements QExecutor {
         for (AParam param : paramList) {
             Object itemValue = deriveValue(data, param.__name)
 
-            LOGGER.trace(' Parameter #{} : {}  [{}]', cp, itemValue, itemValue != null ? itemValue.class.simpleName : '')
+            JdbcHelperUtils.logParameter(cp, itemValue, logLevel)
             if (param instanceof ParamList) {
                 if (itemValue instanceof List) {
-                    List itemList = itemValue
+                    List itemList = (List)itemValue
                     itemList.each { orderedValues.add(it) }
                     String pStr = itemList.stream().map { return '?' }.collect(Collectors.joining(', '))
                     if (itemList.isEmpty()) {
@@ -355,7 +344,7 @@ class QJdbcExecutor implements QExecutor {
             }
 
             if (param instanceof ParamTimestamp) {
-                JdbcHelperUtils.convertTimestamp(value, qScript.qSession.configurations, param.__tsFormat)
+                JdbcHelperUtils.convertTimestamp(value, qScript.qSession.configurations, ((ParamTimestamp)param).__tsFormat)
             } else if (param instanceof ParamDate) {
                 JdbcHelperUtils.convertToDate(String.valueOf(value))
             } else if (param instanceof ParamBinary) {
@@ -399,10 +388,11 @@ class QJdbcExecutor implements QExecutor {
         }
     }
 
+    @CompileStatic
     @Override
     def execute(QScriptList scriptList) throws Exception {
         if (scriptList == null || scriptList.scripts == null) {
-            return new LinkedList<>();
+            return new LinkedList<>()
         }
 
         final boolean prevReusable = reusable
@@ -428,6 +418,7 @@ class QJdbcExecutor implements QExecutor {
         }
     }
 
+    @CompileStatic
     private handleInsertOrExecution(QScriptList scriptList) throws Exception {
         if (scriptList.scripts.size() < 2) {
             throw new NyException('InsertOrLoad query has missing clauses!')
@@ -443,6 +434,7 @@ class QJdbcExecutor implements QExecutor {
         return result
     }
 
+    @CompileStatic
     private handleUpsertExecution(QScriptList scriptList) throws Exception {
         if (scriptList.scripts.size() < 3) {
             throw new NyException('Not defined either select, insert, or update query in UPSERT query!')
@@ -510,6 +502,7 @@ class QJdbcExecutor implements QExecutor {
     @CompileStatic
     @Override
     void close() throws IOException {
+        nyqlConfigs = null
         if (connection != null) {
             connection.close()
         }

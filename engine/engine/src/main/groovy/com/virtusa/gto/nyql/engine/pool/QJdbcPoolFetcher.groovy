@@ -4,7 +4,6 @@ import com.virtusa.gto.nyql.exceptions.NyException
 
 @java.lang.SuppressWarnings('JdbcConnectionReference')
 import java.sql.Connection
-
 /**
  * @author IWEERARATHNA
  */
