@@ -2,12 +2,12 @@ package com.virtusa.gto.nyql.server;
 
 
 import com.google.gson.Gson;
-import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import com.virtusa.gto.nyql.model.QScript;
 import com.virtusa.gto.nyql.model.QScriptResult;
 import com.virtusa.gto.nyql.model.units.AParam;
 import groovy.json.JsonSlurper;
+import javafx.util.Pair;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +16,10 @@ import spark.Response;
 import spark.Spark;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,7 @@ public class NyServer {
     private boolean authEnabled = true;
     private String appToken = null;
 
-    private NyQLInstance nyQLInstance;
+    private final NyInstancePool instancePool = new NyInstancePool();
 
     private NyServer() {
     }
@@ -66,23 +68,110 @@ public class NyServer {
         }
         int port = Integer.parseInt(readEnv("NYSERVER_PORT", confObject.get("port").toString()));
 
-        File nyConfigFile = new File(nyqlJson);
-        nyQLInstance = NyQLInstance.create(nyConfigFile);
+        // load all specified database instances...
+        Pair<String, Map<String, File>> instanceMap = loadDBInstances(confFile, confObject);
+        String defInst = instanceMap.getKey();
+        Map<String, File> map = instanceMap.getValue();
+        if (defInst == null) {
+            throw new IOException("A default database instance is not set! Server cannot start without a default instance!");
+        }
 
-        // register nyql shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(nyQLInstance::shutdown));
+        for (Map.Entry<String, File> entry : map.entrySet()) {
+            instancePool.loadNyQL(entry.getKey(), entry.getValue());
+        }
+        instancePool.setDefaultInstance(defInst);
+
 
         Spark.port(port);
 
         // register spark server stop hook
         Runtime.getRuntime().addShutdownHook(new Thread(Spark::stop));
 
-        // run change logs if necessary
-        new NyChangeLog(nyQLInstance).execute();
+        // initialize all nyql instances
+        instancePool.init();
 
         // register all routes...
         registerRoutes();
         LOGGER.info("Server is running at " + port + "...");
+    }
+
+    @SuppressWarnings("unchecked")
+    private Pair<String, Map<String, File>> loadDBInstances(File serverJson, Map<String, Object> confObject) throws IOException {
+        Map<String, File> configMap = new HashMap<>();
+        String defInst = readEnv("NYSERVER_DEFAULT_INSTANCE", null);
+        boolean loaded = false;
+
+        File wdir = new File(".").getCanonicalFile();
+        File srvDir = serverJson.getParentFile().getCanonicalFile();
+
+        String nyqlJsons = readEnv("NYSERVER_NYJSON_PATHS", null);
+        if (nyqlJsons != null) {
+            LOGGER.debug("Loading multiple instances from environment...");
+
+            // expected format:
+            //    NYSERVER_NYJSON_PATHS=mainDB:./nyql-main.json,secondaryDB:./nyql-sec.json
+            //
+            // load from env
+            String[] items = nyqlJsons.split("[,]");
+            for (String item : items) {
+                int pos = item.indexOf(':');
+                if (pos > 0) {
+                    String instName = item.substring(0, pos).trim();
+                    String loc = item.substring(pos + 1).trim();
+                    configMap.put(instName, existFirst(loc, srvDir, wdir));
+
+                } else {
+                    throw new IOException("Instance name is not defined for one of nyql configuration paths! [" + item + "]");
+                }
+            }
+            loaded = true;
+        }
+
+        String nyqlJson = readEnv("NYSERVER_NYJSON_PATH", null);
+        if (nyqlJson != null) {
+            LOGGER.debug("Loading single instance from environment...");
+
+            defInst = NyInstancePool.DEF_INSTANCE;
+            configMap.put(defInst, existFirst(nyqlJson, srvDir, wdir));
+            loaded = true;
+        }
+
+        if (!loaded) {
+            LOGGER.debug("Loading instances from server.json file...");
+            // load from server.json...
+
+            List<?> instArray = (List) confObject.get("instances");
+            if (instArray != null && instArray.size() > 0) {
+                for (Object item : instArray) {
+                    Map<String, Object> data = (Map<String, Object>) item;
+
+                    String instName = (String) data.get("instanceName");
+                    String path = (String) data.get("configJson");
+                    boolean isDef = (Boolean) data.getOrDefault("default", false);
+
+                    if (instName == null || path == null) {
+                        throw new IOException("Either key 'instanceName' or 'configJson' is missing for one of instance definition!");
+                    }
+
+                    configMap.put(instName, existFirst(path, srvDir, wdir));
+                    if (isDef) {
+                        defInst = instName;
+                    }
+                }
+            }
+        }
+
+        return new Pair<>(defInst, configMap);
+    }
+
+    private static File existFirst(String path, File... dirs) throws IOException {
+        for (File f : dirs) {
+            File tmp = new File(f, path);
+            if (tmp.exists()) {
+                return tmp.getCanonicalFile();
+            }
+        }
+        throw new IOException("Given file " + path + " does not exist in any possible locations!");
     }
 
     private void registerRoutes() {
@@ -122,11 +211,12 @@ public class NyServer {
 
         Map<String, Object> bodyData = (Map<String, Object>) new JsonSlurper().parseText(req.body());
         String scriptId = String.valueOf(bodyData.get("scriptId"));
+        String instance = String.valueOf(bodyData.get("instance"));
         Map<String, Object> data = new HashMap<>();
         if (bodyData.containsKey("data")) {
             data = (Map<String, Object>) bodyData.get("data");
         }
-        QScript result = nyQLInstance.parse(scriptId, data);
+        QScript result = instancePool.getInstance(instance).parse(scriptId, data);
 
         Map<String, Object> r = new HashMap<>();
         if (result instanceof QScriptResult) {
@@ -148,11 +238,12 @@ public class NyServer {
 
         Map<String, Object> bodyData = (Map<String, Object>) new JsonSlurper().parseText(req.body());
         String scriptId = String.valueOf(bodyData.get("scriptId"));
+        String instance = String.valueOf(bodyData.get("instance"));
         Map<String, Object> data = (Map<String, Object>) bodyData.getOrDefault("data", new HashMap<>());
 
         Map<String, Object> r = new HashMap<>();
         try {
-            Object sqlResult = nyQLInstance.execute(scriptId, data);
+            Object sqlResult = instancePool.getInstance(instance).execute(scriptId, data);
             r.put("result", sqlResult);
         } catch (Throwable t) {
             LOGGER.error("Error occurred executing script! " + scriptId, t);
