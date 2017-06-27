@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.FunctionColumn
 import com.virtusa.gto.nyql.model.units.QBoolean
 import com.virtusa.gto.nyql.model.units.QNumber
 import com.virtusa.gto.nyql.model.units.QString
+import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.CompileStatic
 
 /**
@@ -14,6 +15,11 @@ trait DataTypeTraits {
     @CompileStatic
     QString STR(String text) {
         new QString(text: text)
+    }
+
+    @CompileStatic
+    List<QString> STR_LIST(List<String> src) {
+        QUtils.toQStrs(src)
     }
 
     @CompileStatic

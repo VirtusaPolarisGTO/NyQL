@@ -306,4 +306,8 @@ class Postgres extends PostgresFunctions implements QTranslator {
     List<QResultProxy> ___cteQuery(CTE cte) {
         generateCTE(cte)
     }
+    @Override
+    protected String getQuoteChar() {
+        DOUBLE_QUOTE
+    }
 }

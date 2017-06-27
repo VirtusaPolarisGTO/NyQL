@@ -16,6 +16,7 @@ import com.virtusa.gto.nyql.Table;
 import com.virtusa.gto.nyql.Where;
 import com.virtusa.gto.nyql.WithClosure;
 import com.virtusa.gto.nyql.exceptions.NyException;
+import com.virtusa.gto.nyql.model.ValueTable;
 import com.virtusa.gto.nyql.model.DbInfo;
 import com.virtusa.gto.nyql.model.units.AParam;
 import com.virtusa.gto.nyql.utils.QOperator;
@@ -68,11 +69,17 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         return dbInfo == null || dbInfo == DbInfo.UNRESOLVED;
     }
 
+    protected abstract String getQuoteChar();
+
+    private String convertToAlias(String alias, String qChar) {
+        return (keywords.contains(alias.toUpperCase(Locale.getDefault()))
+                ? QUtils.quote(alias, qChar)
+                : QUtils.quoteIfWS(alias, qChar));
+    }
+
     protected String tableAlias(Table table, String qChar) {
         if (table.__aliasDefined()) {
-            return (keywords.contains(table.get__alias().toUpperCase(Locale.getDefault()))
-                    ? QUtils.quote(table.get__alias(), qChar)
-                    : QUtils.quoteIfWS(table.get__alias(), qChar));
+            return convertToAlias(table.get__alias(), qChar);
         } else {
             return EMPTY;
         }
@@ -80,9 +87,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
 
     protected String tableAliasAs(Table table, String qChar) {
         if (table.__aliasDefined()) {
-            return _AS_ + (keywords.contains(table.get__alias().toUpperCase(Locale.getDefault()))
-                            ? QUtils.quote(table.get__alias(), qChar)
-                            : QUtils.quoteIfWS(table.get__alias(), qChar));
+            return _AS_ + convertToAlias(table.get__alias(), qChar);
         } else {
             return EMPTY;
         }
@@ -90,9 +95,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
 
     protected String columnAlias(Column column, String qChar) {
         if (column.__aliasDefined()) {
-            return (keywords.contains(column.get__alias().toUpperCase(Locale.getDefault()))
-                    ? QUtils.quote(column.get__alias(), qChar)
-                    : QUtils.quoteIfWS(column.get__alias(), qChar));
+            return convertToAlias(column.get__alias(), qChar);
         } else {
             return EMPTY;
         }
@@ -100,9 +103,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
 
     protected String columnAliasAs(Column column, String qChar) {
         if (column.__aliasDefined()) {
-            return _AS_ + (keywords.contains(column.get__alias().toUpperCase(Locale.getDefault()))
-                        ? QUtils.quote(column.get__alias(), qChar)
-                        : QUtils.quoteIfWS(column.get__alias(), qChar));
+            return _AS_ + convertToAlias(column.get__alias(), qChar);
         } else {
             return EMPTY;
         }
@@ -374,6 +375,63 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             return createProxy("", queryType, paramList, q.get_dataColumns(), q);
         }
         throw new NyException("Unknown or incomplete re-usable query clause!");
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public QResultProxy ___valueTable(ValueTable valueTable) throws NyException {
+        Object vals = valueTable.getValues();
+        if (vals == null) {
+            throw new NyException("Values cannot be null for creating table out of it!");
+        }
+
+        String col = valueTable.getColumnAlias();
+        List<AParam> params = new LinkedList<>();
+        List<String> qItems = new LinkedList<>();
+        if (vals instanceof Collection) {
+            Collection<?> objVals = (Collection)vals;
+            boolean first = true;
+            for (Object item : objVals) {
+                StringBuilder qi = new StringBuilder();
+                qi.append("SELECT ");
+                if (first) {
+                    first = false;
+                    if (item instanceof Map) {
+                        qi.append(((Map<String, Object>) item).entrySet().stream()
+                                .map(entry -> ___resolve(entry.getValue(), QContextType.FROM, params)
+                                        + _AS_ + convertToAlias(entry.getKey(), getQuoteChar()))
+                                .collect(Collectors.joining(", ")));
+
+                        qItems.add(qi.toString());
+                        continue;
+                    } else if (col != null) {
+                        qi.append(___resolve(item, QContextType.FROM, params))
+                                .append(_AS_)
+                                .append(convertToAlias(col, getQuoteChar()));
+                        qItems.add(qi.toString());
+                        continue;
+                    }
+                }
+
+                if (item instanceof Map) {
+                    qi.append(((Map) item).values().stream()
+                            .map(v -> ___resolve(v, QContextType.FROM, params))
+                            .collect(Collectors.joining(", ")));
+                } else {
+                    qi.append(___resolve(item, QContextType.FROM, params));
+                }
+
+                qItems.add(qi.toString());
+            }
+            QResultProxy proxy = new QResultProxy();
+            proxy.setQuery(String.join(" UNION ALL ", qItems));
+            proxy.setOrderedParameters(params);
+            proxy.setRawObject(valueTable);
+            return proxy;
+
+        } else {
+            throw new NyException("Values must be an instance of list!");
+        }
     }
 
     protected QResultProxy createProxy(String query, QueryType queryType, List<AParam> params,

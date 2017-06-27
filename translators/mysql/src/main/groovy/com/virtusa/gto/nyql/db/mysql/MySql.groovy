@@ -354,6 +354,11 @@ class MySql extends MySqlFunctions implements QTranslator {
         generateCTE(cte)
     }
 
+    @Override
+    protected String getQuoteChar() {
+        BACK_TICK
+    }
+
     /*
     private QResultProxy manipulateIntersect(List<Object> queries) {
         if (queries.size() != 2) {

@@ -13,4 +13,8 @@ public class SelectsTest extends AbstractTest {
         assertQueries(NyQL.parse("selects/basic"));
     }
 
+    public void testValueTables() throws Exception {
+        assertQueries(NyQL.parse("selects/valuetables"));
+    }
+
 }

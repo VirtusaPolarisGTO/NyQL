@@ -334,4 +334,8 @@ class MSSql extends MSSqlFunctions implements QTranslator {
     List<QResultProxy> ___cteQuery(CTE cte) {
         generateCTE(cte)
     }
+    @Override
+    protected String getQuoteChar() {
+        QUOTE
+    }
 }
