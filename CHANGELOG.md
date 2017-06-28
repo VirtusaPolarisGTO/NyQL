@@ -3,7 +3,8 @@
 ### v2
  * Breaking Changes
    * Function `$IMPORT_UNSAFE` has been renamed to `$IMPORT_SAFE`
-
+   * Renamed functions `CURTIME`, `CURDATE`, and `CUREPOCH` to `CURRENT_TIME`, `CURRENT_DATE`, and `CURRENT_EPOCH` respectively.
+   
  * Features & Enhancements
     - Syntactic sugar for upsert and insertOrLoad queries [#18](https://github.com/VirtusaPolarisGTO/NyQL/issues/18)
     - Insert syntax supports `SET {}` clause

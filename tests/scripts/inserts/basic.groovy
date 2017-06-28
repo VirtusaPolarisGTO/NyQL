@@ -44,7 +44,7 @@ def innQP = $DSL.select {
             DATA (
                     "film_id": PARAM("id"),
                     "title": PARAM("title"),
-                    "createdAt": CUREPOCH()
+                    "createdAt": CURRENT_EPOCH()
             )
         },
         [

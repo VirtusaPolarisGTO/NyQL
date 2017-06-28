@@ -101,14 +101,14 @@ Album.rating + 1 AS newRating
 | Function | Details |
 |---|---|
 |CONCAT (_column-1, column-2, ..._ ) |  Concat the set of given columns/strings. **WARN:** `NULL` ignorance is dependent on the running database. |
-|CONCAT_NN (_col-1, col-2, ..._ ) | Concat the set of columns ignoring _NULL_ columns/values automatically. |
-|CONCAT_WS (_separator, col-1, col-2, ..._ ) | Concat the set of columns using given separator |
+|CONCAT_NN (_col-1, col-2, ..._ ) | _(since v2)_ Concat the set of columns ignoring _NULL_ columns/values automatically. |
+|CONCAT_WS (_separator, col-1, col-2, ..._ ) | _(since v2)_ Concat the set of columns using given separator |
 |LCASE (_column_ ) | Converts string to lowercase |
 |LEFT_PAD (_column_, _length_, [_text_]) | Left pad given column to the specified length using given text. If text is undefined, then will be used a space. |
 |LEFT_TRIM (_column_) | Left trim whitespace from column |
 |LEN (_column_ ) |  Length of the string |
 |POSITION (_column, stringToFind_ ) |  Find the position of substring in the given string __(case sensitive)__. If the text is not found, returns 0. Position value is always >= 1.  |
-|POSITION_LAST (_column, stringToFind_ ) |  Find the last occurred position of substring in the given string __(case sensitive)__. If the text is not found, returns 0. Position value is always >= 1.  |
+|POSITION_LAST (_column, stringToFind_ ) | _(since v2)_ Find the last occurred position of substring in the given string __(case sensitive)__. If the text is not found, returns 0. Position value is always >= 1.  |
 |REPEAT (_column_, _noOfTimes_) | Repeats the string given amount of time |
 |REVERSE (_column_) | Reverse a string |
 |RIGHT_PAD (_column_, _length_, [_text_]) | Right pad given column to the specified length using given text. If text is undefined, then will be used a space. |
@@ -125,29 +125,31 @@ Album.rating + 1 AS newRating
 | Function | Details |
 |---|---|
 |ABS (_column_ )  | Gets the absolute value of a real number |
-|ACOS (_value_ )  | Returns the arc cosine for given value. The value must be between -1 and 1. |
-|ASIN (_value_ )  | Returns the arc sine for given value. The value must be between -1 and 1. |
-|ATAN (_value_ )  | Returns the arc tangent for given value. |
-|ATAN2 (_x, y_ )  | Returns the arc tangent of two variables. Equivalent to arc tangent of _x / y_. |
+|ACOS (_value_ )  | _(since v2)_ Returns the arc cosine for given value. The value must be between -1 and 1. |
+|ASIN (_value_ )  | _(since v2)_ Returns the arc sine for given value. The value must be between -1 and 1. |
+|ATAN (_value_ )  | _(since v2)_ Returns the arc tangent for given value. |
+|ATAN2 (_x, y_ )  | _(since v2)_ Returns the arc tangent of two variables. Equivalent to arc tangent of _x / y_. |
 |CEIL (_column_ )  | Gets the ceiling value of decimal number |
-|COS (_radians_ )  | Returns the cosine for given radians value. |
-|COT (_value_ )  | Returns the cotangent for given value. Equivalent, _1 / TAN(x)_. |
+|COS (_radians_ )  | _(since v2)_ Returns the cosine for given radians value. |
+|COT (_value_ )  | _(since v2)_ Returns the cotangent for given value. Equivalent, _1 / TAN(x)_. |
 |DEGREES (_column_ )  | Converts given radian value to degrees |
-|EXP (_power_ )  | Returns value of _**e**_ raised to the given power. |
+|EXP (_power_ )  | _(since v2)_ Returns value of _**e**_ raised to the given power. |
 |FLOOR (_column_ )  | Gets the floor value of decimal number |
-|LOGE (_value_ )  | Returns the natural logarithm of given value. |
-|LOG (_base, value_ )  | Returns logarithm of _value_ to the given _base_.  |
+|LOGE (_value_ )  | _(since v2)_ Returns the natural logarithm of given value. |
+|LOG (_base, value_ )  | _(since v2)_ Returns logarithm of _value_ to the given _base_.  |
 |POWER (_column_, _magnitude_ )  | Raise the given column value to the given magnitude. ( i.e. (column)^(magnitude) ) |
 |RADIANS (_column_ )  | Converts given degree value to radians |
 |ROUND (_column, decimalPlaces_ ) | Round the given number to specified decimal places |
 |SIGN (_column_ )  | Returns the sign value as an integer of the given column value (-1,0,+1) |
-|SIN (_value_ )  | Returns the sine value of given radians. |
+|SIN (_value_ )  | _(since v2)_ Returns the sine value of given radians. |
 |SQRT (_column_ )  | Returns the square root value of the given column |
-|TAN (_value_ )  | Returns the tangent for the given value. |
+|TAN (_value_ )  | _(since v2)_ Returns the tangent for the given value. |
 |TRUNCATE(_column, d_ ) | Truncate the given decimal number to _d_ decimal places. This does not _round_ the number. Negative _d_ values will truncate before the decimal point. |
 
 
 ### Stats Functions
+
+ * All functions introduced _since v2_
 
 | Function | Details |
 |---|---|
@@ -161,9 +163,11 @@ Album.rating + 1 AS newRating
 
 | Function | Details |
 |---|---|
-|CAST_INT (_column ) | Cast given column value to a integer |
-|CAST_STR (_column ) | Cast given column value to a string |
-|CAST_DATE (_column ) | Cast given column value to a date |
+|CAST_BIGINT (_column_ ) | _(since v2)_ Cast given column value to a unsigned integer, which is a big integer |
+|CAST_INT (_column_ ) | Cast given column value to a integer |
+|CAST_STR (_column_ ) | Cast given column value to a string |
+|CAST_STR (_column, length_ ) | _(since v2)_ Cast given column value to a string with specified length. |
+|CAST_DATE (_column_ ) | Cast given column value to a date |
 
 
 ### Date/Time Functions
@@ -210,3 +214,5 @@ Album.rating + 1 AS newRating
 | Function | Details |
 |---|---|
 |COALESCE (_columns_, ...) |  Returns first non-null value |
+|GREATEST (_val1, val2_ ) | _(since v2)_ Returns the highest values from given two values. This is equivalent to `CASE WHEN val1 >= val2 THEN val1 ELSE val2 END`. |
+|LEAST (_val1, val2_ ) | _(since v2)_ Returns the highest values from given two values. This is equivalent to `CASE WHEN val1 <= val2 THEN val1 ELSE val2 END`. |

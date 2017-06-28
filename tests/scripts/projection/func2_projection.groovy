@@ -140,6 +140,16 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
+        FETCH (CAST_BIGINT(ac.birthDay), CAST_STR(ac.level, 64), CAST_STR(ac.level, PARAM("lenOf")))
+    },
+    [
+            mysql: ["SELECT CAST(ac.birthDay AS UNSIGNED INTEGER), CAST(ac.level AS CHAR(64)), " +
+                            "CAST(ac.level AS CHAR(?)) " +
+                    "FROM `Actor` ac", ["lenOf"]]
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
         FETCH (COALESCE(ac.description, ac.details, STR('(none)')),
                 COALESCE(ac.description, PARAM("defVal1"), PARAM("defVal2")))
     },
@@ -147,6 +157,34 @@
             mysql: ["SELECT COALESCE(ac.description, ac.details, \"(none)\"), " +
                     "COALESCE(ac.description, ?, ?) " +
                     "FROM `Actor` ac", ["defVal1", "defVal2"]]
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (GREATEST(ac.salary1, ac.salary2),
+                LEAST(ac.graduate_date, ac.debut_date).alias("firstActingDay"))
+    },
+    [
+            mysql: "SELECT GREATEST(ac.salary1, ac.salary2), " +
+                    "LEAST(ac.graduate_date, ac.debut_date) AS firstActingDay " +
+                    "FROM `Actor` ac",
+            mssql: "SELECT CASE WHEN ac.salary1 >= ac.salary2 THEN ac.salary1 ELSE ac.salary2 END, " +
+                    "CASE WHEN ac.graduate_date <= ac.debut_date THEN ac.graduate_date ELSE ac.debut_date END AS firstActingDay " +
+                    "FROM `Actor` ac"
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH (GREATEST(ac.salary1, PARAM("minSalary")),
+                LEAST(ac.graduate_date, ac.debut_date).alias("firstActingDay"))
+    },
+    [
+            mysql: ["SELECT GREATEST(ac.salary1, ?), " +
+                    "LEAST(ac.graduate_date, ac.debut_date) AS firstActingDay " +
+                    "FROM `Actor` ac", ["minSalary"]],
+            mssql: ["SELECT CASE WHEN ac.salary1 >= ? THEN ac.salary1 ELSE ? END, " +
+                    "CASE WHEN ac.graduate_date <= ac.debut_date THEN ac.graduate_date ELSE ac.debut_date END AS firstActingDay " +
+                    "FROM `Actor` ac", ["minSalary"]]
     ],
 
     $DSL.select {

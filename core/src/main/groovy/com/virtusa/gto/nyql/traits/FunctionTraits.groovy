@@ -3,13 +3,14 @@ package com.virtusa.gto.nyql.traits
 import com.virtusa.gto.nyql.Column
 import com.virtusa.gto.nyql.FunctionColumn
 import groovy.transform.CompileStatic
-
 /**
  * @author IWEERARATHNA
  */
 trait FunctionTraits {
 
     @CompileStatic FunctionColumn COALESCE(Object... cols) { vColumn("coalesce", cols) }
+    @CompileStatic FunctionColumn LEAST(Object v1, Object v2) { vColumn("least", v1, v2) }
+    @CompileStatic FunctionColumn GREATEST(Object v1, Object v2) { vColumn("greatest", v1, v2) }
 
     @CompileStatic FunctionColumn ADD(Object... cols)     { vColumn('op_add', cols) }
     @CompileStatic FunctionColumn MINUS(Object op1, Object op2)     { vColumn('op_minus', op1, op2) }
@@ -92,18 +93,17 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn TRUNCATE(Object column, Object dpoints) { vColumn('truncate', column, dpoints) }
 
     // cast function
+    @CompileStatic FunctionColumn CAST_BIGINT(Object column) { fColumn(column, 'cast_to_bigint') }
     @CompileStatic FunctionColumn CAST_INT(Object column) { fColumn(column, 'cast_to_int') }
     @CompileStatic FunctionColumn CAST_STR(Object column) { fColumn(column, 'cast_to_str') }
+    @CompileStatic FunctionColumn CAST_STR(Object column, Object length) { vColumn('cast_to_str', column, length) }
     @CompileStatic FunctionColumn CAST_DATE(Object column) { fColumn(column, 'cast_to_date') }
 
     /// Date time functions
     @CompileStatic FunctionColumn NOW() { fColumn(null, 'current_timestamp') }
-    @CompileStatic FunctionColumn CURDATE() { fColumn(null, 'current_date') }
-    @CompileStatic FunctionColumn CURRENT_DATE() { CURDATE() }
-    @CompileStatic FunctionColumn CURTIME() { fColumn(null, 'current_time') }
-    @CompileStatic FunctionColumn CURRENT_TIME() { CURTIME() }
-    @CompileStatic FunctionColumn CUREPOCH() { fColumn(null, 'current_epoch') }
-    @CompileStatic FunctionColumn CURRENT_EPOCH() { CUREPOCH() }
+    @CompileStatic FunctionColumn CURRENT_DATE() { fColumn(null, 'current_date') }
+    @CompileStatic FunctionColumn CURRENT_TIME() { fColumn(null, 'current_time') }
+    @CompileStatic FunctionColumn CURRENT_EPOCH() { fColumn(null, 'current_epoch') }
     @CompileStatic FunctionColumn DATE_TRUNC(Column column) { fColumn(column, 'date_trunc') }
 
     @CompileStatic FunctionColumn EPOCH_TO_DATE(Object column)     { fColumn(column, 'epoch_to_date') }

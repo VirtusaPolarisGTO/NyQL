@@ -5,19 +5,17 @@
 [
     $DSL.select {
         TARGET (Actor.alias("ac"))
-        FETCH (NOW(), CURDATE(), CURRENT_DATE())
+        FETCH (NOW(), CURRENT_DATE())
     },
     [
-        mysql: "SELECT NOW(), CURDATE(), CURDATE() FROM `Actor` ac"
+        mysql: "SELECT NOW(), CURDATE() FROM `Actor` ac"
     ],
 
     $DSL.select {
-        FETCH (CURTIME(), CURRENT_TIME(), CURTIME().alias("nowTime"),
-                CUREPOCH(), CURRENT_EPOCH())
+        FETCH (CURRENT_TIME(), CURRENT_TIME().alias("nowTime"), CURRENT_EPOCH())
     },
     [
-        mysql: "SELECT CURTIME(), CURTIME(), CURTIME() AS nowTime, " +
-            "UNIX_TIMESTAMP() * 1000, UNIX_TIMESTAMP() * 1000"
+        mysql: "SELECT CURTIME(), CURTIME() AS nowTime, UNIX_TIMESTAMP() * 1000"
     ],
 
     $DSL.select {
@@ -41,13 +39,13 @@
 
     $DSL.select {
         TARGET (Actor.alias("ac"))
-        FETCH (DATE_DIFF_YEARS(ac.birthDate, CURDATE()))
+        FETCH (DATE_DIFF_YEARS(ac.birthDate, CURRENT_DATE()))
         FETCH (DATE_DIFF_MONTHS(ac.birthDate, ac.updatedAt))
-        FETCH (DATE_DIFF_WEEKS(ac.birthDate, CURDATE()))
+        FETCH (DATE_DIFF_WEEKS(ac.birthDate, CURRENT_DATE()))
         FETCH (DATE_DIFF_DAYS(ac.birthDate, ac.updatedAt))
-        FETCH (DATE_DIFF_HOURS(ac.birthDate, CURDATE()))
+        FETCH (DATE_DIFF_HOURS(ac.birthDate, CURRENT_DATE()))
         FETCH (DATE_DIFF_MINUTES(ac.birthDate, PARAM("otherDate")))
-        FETCH (DATE_DIFF_SECONDS(ac.birthDate, CURDATE()))
+        FETCH (DATE_DIFF_SECONDS(ac.birthDate, CURRENT_DATE()))
     },
     [
         mysql: ["SELECT TIMESTAMPDIFF(YEAR, ac.birthDate, CURDATE()), " +
