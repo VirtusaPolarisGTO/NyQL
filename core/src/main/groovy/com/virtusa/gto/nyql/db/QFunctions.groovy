@@ -612,6 +612,14 @@ trait QFunctions {
     @CompileStatic abstract String cast_to_int(Object col)
 
     /**
+     * Cast the given column to big integer value.
+     *
+     * @param col input column.
+     * @return string representation of cast to bigint.
+     */
+    @CompileStatic abstract String cast_to_bigint(Object col)
+
+    /**
      * Cast the given column to string value.
      *
      * @param col input column.
