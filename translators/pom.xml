@@ -20,6 +20,7 @@
         <module>postgre</module>
         <module>mssql</module>
         <module>maria</module>
+        <module>h2</module>
     </modules>
 
     <dependencies>
