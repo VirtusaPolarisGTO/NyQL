@@ -124,7 +124,7 @@ trait QTranslator implements QDbBootstrappable {
      * @param q delete query model.
      * @return generated query.
      */
-    abstract QResultProxy ___deleteQuery(QueryDelete q)
+    abstract QResultProxy ___deleteQuery(QueryDelete q) throws NyException
 
     /**
      * Generate a truncate query using given query model.
@@ -132,7 +132,7 @@ trait QTranslator implements QDbBootstrappable {
      * @param q truncate query model.
      * @return generated query
      */
-    abstract QResultProxy ___truncateQuery(QueryTruncate q)
+    abstract QResultProxy ___truncateQuery(QueryTruncate q) throws NyException
 
     /**
      * Generate q query composed of several queries with combinators like
@@ -141,7 +141,7 @@ trait QTranslator implements QDbBootstrappable {
      * @param q query model.
      * @return generated query.
      */
-    abstract QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries)
+    abstract QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) throws NyException
 
     /**
      * Generates a select query using given query block instance.
@@ -157,7 +157,7 @@ trait QTranslator implements QDbBootstrappable {
      * @param q insert query model.
      * @return generated query.
      */
-    abstract QResultProxy ___insertQuery(QueryInsert q)
+    abstract QResultProxy ___insertQuery(QueryInsert q) throws NyException
 
     /**
      * Generate a query which can be executed as a stored function in database.
@@ -165,7 +165,7 @@ trait QTranslator implements QDbBootstrappable {
      * @param q stored function model.
      * @return generated query.
      */
-    abstract QResultProxy ___storedFunction(StoredFunction sp)
+    abstract QResultProxy ___storedFunction(StoredFunction sp) throws NyException
 
     /**
      * Generate an update query using given query model.
@@ -173,7 +173,7 @@ trait QTranslator implements QDbBootstrappable {
      * @param q update query model.
      * @return generated query.
      */
-    abstract QResultProxy ___updateQuery(QueryUpdate q)
+    abstract QResultProxy ___updateQuery(QueryUpdate q) throws NyException
 
     /**
      * Generates a db table from given set of values, so join clauses can use them.

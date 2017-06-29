@@ -192,9 +192,25 @@ class H2 extends H2Functions implements QTranslator {
         }
     }
 
+    @CompileStatic
     @Override
-    QResultProxy ___deleteQuery(QueryDelete q) {
-        return null
+    QResultProxy ___deleteQuery(QueryDelete q) throws NyException {
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+        Table mainTable =  q.sourceTbl
+        QContextType delContext = QContextType.DELETE_CONDITIONAL
+
+        query.append('DELETE ')
+        if (q._joiningTable != null) {
+            throw new NyException('H2 database does not support joins in DELETE queries! Please write the query in alternative way.')
+        } else {
+            query.append('FROM ').append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append(NL)
+        }
+
+        if (q.whereObj != null && q.whereObj.__hasClauses()) {
+            query.append(' WHERE ').append(___expandConditions(q.whereObj, paramList, delContext)).append(NL)
+        }
+        new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.DELETE)
     }
 
     @Override
@@ -285,8 +301,26 @@ class H2 extends H2Functions implements QTranslator {
     }
 
     @Override
-    QResultProxy ___updateQuery(QueryUpdate q) {
-        return null
+    QResultProxy ___updateQuery(QueryUpdate q) throws NyException {
+        List<AParam> paramList = new LinkedList<>()
+        StringBuilder query = new StringBuilder()
+
+        if (q._joiningTable != null) {
+            // has joining tables
+            throw new NyException('H2 database does not support joins in UPDATE queries! Please write the query in alternative way.')
+        } else {
+            query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append(' ').append(NL)
+        }
+
+        if (q._assigns != null && q._assigns.__hasAssignments()) {
+            query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(' ').append(NL)
+        }
+
+        if (q.whereObj != null && q.whereObj.__hasClauses()) {
+            query.append('WHERE ').append(___expandConditions(q.whereObj, paramList, QContextType.CONDITIONAL)).append(' ').append(NL)
+        }
+
+        new QResultProxy(query: query.toString(), orderedParameters: paramList, queryType: QueryType.UPDATE)
     }
 
     @Override
