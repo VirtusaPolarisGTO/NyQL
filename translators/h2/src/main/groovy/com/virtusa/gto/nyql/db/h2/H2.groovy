@@ -17,9 +17,13 @@ import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.model.QScript
+import com.virtusa.gto.nyql.model.QScriptList
+import com.virtusa.gto.nyql.model.QSession
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
+import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
 
 /**
@@ -36,6 +40,9 @@ class H2 extends H2Functions implements QTranslator {
     private static final String COMMA = ', '
     static final String OP = '('
     static final String CP = ')'
+
+    private static final String STR_TRUE = 'TRUE'
+    private static final String STR_FALSE = 'FALSE'
 
     H2() {
         super()
@@ -104,7 +111,7 @@ class H2 extends H2Functions implements QTranslator {
     @CompileStatic
     @Override
     String ___convertBool(Boolean value) {
-        value != null && value ? 'TRUE' : 'FALSE'
+        value != null && value ? STR_TRUE : STR_FALSE
     }
 
     @CompileStatic
@@ -192,22 +199,89 @@ class H2 extends H2Functions implements QTranslator {
 
     @Override
     QResultProxy ___combinationQuery(QueryCombineType combineType, List<Object> queries) {
-        return null
+        String qStr
+        if (combineType == QueryCombineType.UNION) {
+            qStr = NL + ' UNION ALL ' + NL
+        } else if (combineType == QueryCombineType.UNION_DISTINCT) {
+            qStr = NL + ' UNION ' + NL
+        } else if (combineType == QueryCombineType.INTERSECT) {
+            qStr = NL + ' INTERSECT ' + NL
+        } else {
+            qStr = '; '
+        }
+
+        List<AParam> paramList = new LinkedList<>()
+        StringJoiner joiner = new StringJoiner(qStr)
+        for (Object q : queries) {
+            if (q instanceof QResultProxy) {
+                if (((QResultProxy)q).orderedParameters != null) {
+                    paramList.addAll(((QResultProxy)q).orderedParameters)
+                }
+                joiner.add(QUtils.parenthesis(___resolve(q, QContextType.UNKNOWN)))
+            } else {
+                joiner.add(___resolve(q, QContextType.UNKNOWN, paramList))
+            }
+        }
+
+        new QResultProxy(query: joiner.toString(), orderedParameters: paramList, queryType: QueryType.SELECT)
     }
 
     @Override
     QResultProxy ___selectQuery(QuerySelect q) throws NyException {
-        return null
+        if (q.get_intoTable() != null) {
+            List<AParam> paramList = new LinkedList<>()
+            StringBuilder query = new StringBuilder()
+            QueryType queryType = QueryType.INSERT
+
+            if (q._intoTemp) {
+                query.append('CREATE TEMPORARY TABLE ').append(___tableName(q.get_intoTable(), QContextType.INTO)).append(' ')
+            } else {
+                query.append('INSERT INTO ').append(___tableName(q.get_intoTable(), QContextType.INTO)).append(' ');
+            }
+
+            // append column names...
+            if (QUtils.notNullNorEmpty(q.get_intoColumns())) {
+                query.append(QUtils.parenthesis(___expandProjection(q.get_intoColumns(), paramList, QContextType.INSERT_PROJECTION)))
+                        .append(' ')
+            }
+
+            if (q._intoTemp) {
+                query.append('AS ')
+            }
+            query.append(NL)
+
+            def px = _generateSelectQFullJoin(q)
+            query.append(px.query)
+            paramList.addAll(px.orderedParameters)
+            return createProxy(query.toString(), queryType, paramList, null, null)
+
+        } else {
+            _generateSelectQFullJoin(q)
+        }
     }
 
+    @CompileStatic
     @Override
     QResultProxy ___insertQuery(QueryInsert q) {
-        return null
+        generateInsertQuery(q, BACK_TICK)
     }
 
+    @CompileStatic
     @Override
     QResultProxy ___storedFunction(StoredFunction sp) {
-        return null
+        StringBuilder query = new StringBuilder()
+        query.append('CALL ').append(sp.name).append(OP)
+        if (QUtils.notNullNorEmpty(sp.paramList)) {
+            List<String> list = new LinkedList<>()
+            for (AParam aParam : sp.paramList) {
+                list.add('?')
+            }
+            query.append(list.join(COMMA))
+        }
+        query.append(CP)
+
+        new QResultProxy(query: query.toString(), orderedParameters: sp.paramList,
+                rawObject: sp, queryType: QueryType.DB_FUNCTION)
     }
 
     @Override
@@ -219,4 +293,21 @@ class H2 extends H2Functions implements QTranslator {
     QDdl ___ddls() {
         DDL
     }
+
+    @Override
+    QScriptList getBootstrapScripts(QSession session) {
+        QScriptList qScriptList = new QScriptList()
+
+        qScriptList.scripts = [new QScript(
+                id: '___alias_reverse',
+                qSession: session,
+                proxy: createProxy('CREATE ALIAS IF NOT EXISTS NYQL_REVERSE AS $$ ' +
+                        'String reverse(String s) {' +
+                        'return new StringBuilder(s).reverse().toString(); ' +
+                        '} $$',
+                        QueryType.INSERT, [], null, null))]
+
+        qScriptList
+    }
+
 }

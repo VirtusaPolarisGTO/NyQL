@@ -3,6 +3,9 @@ package com.virtusa.gto.nyql.db
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.JoinType
+import com.virtusa.gto.nyql.model.QDbBootstrappable
+import com.virtusa.gto.nyql.model.QScriptList
+import com.virtusa.gto.nyql.model.QSession
 import com.virtusa.gto.nyql.model.ValueTable
 import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.utils.QOperator
@@ -12,7 +15,7 @@ import groovy.transform.CompileStatic
 /**
  * @author Isuru Weerarathna
  */
-trait QTranslator {
+trait QTranslator implements QDbBootstrappable {
 
     String NULL() { 'NULL' }
 
@@ -216,4 +219,9 @@ trait QTranslator {
      * @return the DDL translator.
      */
     abstract QDdl ___ddls()
+
+    @Override
+    QScriptList getBootstrapScripts(QSession session) throws NyException {
+        return null
+    }
 }

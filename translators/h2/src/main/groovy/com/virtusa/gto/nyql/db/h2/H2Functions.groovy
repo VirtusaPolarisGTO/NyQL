@@ -23,6 +23,30 @@ abstract class H2Functions extends AbstractSQLTranslator implements QFunctions {
     }
 
     @Override
+    String greatest(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            return 'GREATEST' + ___resolveIn(c, pmx)
+        } else {
+            throw new NySyntaxException('GREATEST function requires at least two or more values!')
+        }
+    }
+
+    @Override
+    String least(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            return 'LEAST' + ___resolveIn(c, pmx)
+        } else {
+            throw new NySyntaxException('LEAST function requires at least two or more values!')
+        }
+    }
+
+    @Override
     String str_replace(Object cx) {
         def c = ___val(cx)
         def pmx = ___pm(cx)
@@ -80,9 +104,15 @@ abstract class H2Functions extends AbstractSQLTranslator implements QFunctions {
         def pmx = ___pm(cx)
         if (c instanceof List) {
             String tmp = ___resolveIn(c.get(0), pmx)
-            return String.format('LENGTH(%s) - LOCATE(%s, REVERSE(%s))', tmp, ___resolveIn(c.get(1), pmx), tmp)
+            return String.format('LENGTH(%s) - LOCATE(%s, NYQL_REVERSE(%s))', tmp, ___resolveIn(c.get(1), pmx), tmp)
         }
         throw new NyException('Insufficient parameters for POSITION function!')
+    }
+
+    @Override
+    String str_reverse(Object c) {
+        // reverse function is using a nyql function embedded into the database.
+        String.format('NYQL_REVERSE(%s)', ___resolveInP(c))
     }
 
     @Override
@@ -105,6 +135,11 @@ abstract class H2Functions extends AbstractSQLTranslator implements QFunctions {
     @Override
     String cast_to_date(Object col) {
         String.format('CAST(%s AS DATE)', ___resolveInP(col))
+    }
+
+    @Override
+    String cast_to_bigint(Object col) {
+        String.format('CAST(%s AS BIGINT)', ___resolveInP(col))
     }
 
     @Override

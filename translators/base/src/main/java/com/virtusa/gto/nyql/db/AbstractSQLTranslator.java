@@ -14,6 +14,7 @@ import com.virtusa.gto.nyql.QueryTruncate;
 import com.virtusa.gto.nyql.Table;
 import com.virtusa.gto.nyql.Where;
 import com.virtusa.gto.nyql.exceptions.NyException;
+import com.virtusa.gto.nyql.model.JoinType;
 import com.virtusa.gto.nyql.model.ValueTable;
 import com.virtusa.gto.nyql.model.units.AParam;
 import com.virtusa.gto.nyql.utils.QOperator;
@@ -245,6 +246,41 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             }
         }
         return query;
+    }
+
+    /**
+     * Generate sql select query if it has full-outer-joins by replacing
+     * them with left/right joins.
+     *
+     * @param q input select query.
+     * @return query result.
+     * @throws NyException any exception thrown while generating.
+     */
+    protected QResultProxy _generateSelectQFullJoin(QuerySelect q) throws NyException {
+        int count;
+        if ((count = SqlMisc.countJoin(q.get_joiningTable(), JoinType.FULL_JOIN)) > 0) {
+            List<String> qs = new LinkedList<>();
+            QResultProxy resultProxy = new QResultProxy();
+            resultProxy.setOrderedParameters(new LinkedList<>());
+
+            for (int i = count; i >= 0; i--) {
+                QuerySelect qt = SqlMisc.cloneQuery(q);
+                SqlMisc.flipNthFullJoin(qt.get_joiningTable(), i, 0);
+
+                StringBuilder qr = generateSelectQueryBody(qt, resultProxy.getOrderedParameters());
+                qs.add(qr.toString());
+            }
+
+            resultProxy.setQueryType(QueryType.SELECT);
+            resultProxy.setQuery(String.join(" UNION ALL ", qs));
+            return resultProxy;
+
+        } else {
+            final List<AParam> paramList = new LinkedList<>();
+            QueryType queryType = QueryType.SELECT;
+
+            return createProxy(generateSelectQueryBody(q, paramList).toString(), queryType, paramList, null, null);
+        }
     }
 
     /**

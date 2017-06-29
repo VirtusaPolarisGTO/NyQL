@@ -5,6 +5,7 @@ import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -33,6 +34,30 @@ class Postgres extends PostgresFunctions implements QTranslator {
 
     Postgres(TranslatorOptions theOptions) {
         super(theOptions)
+    }
+
+    @Override
+    String greatest(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            return 'GREATEST' + ___resolveIn(c, pmx)
+        } else {
+            throw new NySyntaxException('GREATEST function requires at least two or more values!')
+        }
+    }
+
+    @Override
+    String least(Object cx) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            return 'LEAST' + ___resolveIn(c, pmx)
+        } else {
+            throw new NySyntaxException('LEAST function requires at least two or more values!')
+        }
     }
 
     @CompileStatic

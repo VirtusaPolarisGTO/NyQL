@@ -1,5 +1,9 @@
 package com.virtusa.gto.nyql.db;
 
+import com.virtusa.gto.nyql.Join;
+import com.virtusa.gto.nyql.QuerySelect;
+import com.virtusa.gto.nyql.Table;
+import com.virtusa.gto.nyql.model.JoinType;
 import groovy.json.JsonSlurper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,5 +83,95 @@ public class SqlMisc {
         }
         return klist;
     }
+
+    public static int countJoin(Table table, JoinType joinType) {
+        if (table == null) {
+            return 0;
+        }
+
+        if (table instanceof Join) {
+            Join join = (Join)table;
+            if (join.getType() == joinType) {
+                return 1 + countJoin(join.getTable1(), joinType);
+            } else {
+                return countJoin(join.getTable1(), joinType);
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    public static void findJoins(Table table, JoinType joinType, List<Table> fulljoins) {
+        if (table == null) {
+            return;
+        }
+
+        if (table instanceof Join) {
+            Join join = (Join)table;
+            if (join.getType() == joinType) {
+                fulljoins.add(join);
+            }
+            findJoins(join.getTable1(), joinType, fulljoins);
+        }
+    }
+
+    public static QuerySelect cloneQuery(QuerySelect input) {
+        QuerySelect q = new QuerySelect(input.get_ctx());
+        q.set_distinct(input.get_distinct());
+        q.set_intoColumns(input.get_intoColumns());
+        q.set_intoTable(input.get_intoTable());
+        q.set_joiningTable(cloneJoin(input.get_joiningTable()));
+        q.setGroupBy(input.getGroupBy());
+        q.setGroupByRollup(input.getGroupByRollup());
+        q.setGroupHaving(input.getGroupHaving());
+        q.setOffset(input.getOffset());
+        q.setOrderBy(input.getOrderBy());
+        q.setProjection(input.getProjection());
+        q.set_limit(input.get_limit());
+        q.setSourceTbl(input.getSourceTbl());
+        q.setReturnType(input.getReturnType());
+        q.setWhereObj(input.getWhereObj());
+        return q;
+    }
+
+    private static Table cloneJoin(Table org) {
+        if (org == null) {
+            return null;
+        }
+        if (org instanceof Join) {
+            Join join = (Join)org;
+            Join cloned = join.getType() == JoinType.FULL_JOIN ? new SqlFullJoin() : new Join();
+            cloned.setTable1(cloneJoin(join.getTable1()));
+            cloned.setTable2(join.getTable2());
+            cloned.setType(join.getType() == JoinType.FULL_JOIN ? JoinType.RIGHT_JOIN : join.getType());
+            cloned.set_ctx(join.get_ctx());
+            cloned.setOnConditions(join.getOnConditions());
+            cloned.set__alias(join.get__alias());
+            cloned.set__name(join.get__name());
+            cloned.set__resultOf(join.get__resultOf());
+
+            return cloned;
+        } else {
+            return org;
+        }
+    }
+
+    public static Table flipNthFullJoin(Table org, int n, int curr) {
+        if (n == 0 || org == null) {
+            return org;
+        }
+
+        if (org instanceof Join) {
+            if (org instanceof SqlFullJoin) {
+                curr++;
+                if (n >= curr) {
+                    ((SqlFullJoin)org).setType(JoinType.LEFT_JOIN);
+                }
+            }
+            flipNthFullJoin(((Join)org).getTable1(), n, curr);
+        }
+        return org;
+    }
+
 
 }

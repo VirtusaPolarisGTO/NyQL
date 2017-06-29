@@ -71,6 +71,10 @@ trait QFunctions {
         }
     }
 
+    @CompileStatic abstract String greatest(cx)
+
+    @CompileStatic abstract String least(cx)
+
     /**
      * ------------------------------------------------------------
      * Date and Time functions

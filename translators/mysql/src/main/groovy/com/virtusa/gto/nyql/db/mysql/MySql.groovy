@@ -3,8 +3,10 @@ package com.virtusa.gto.nyql.db.mysql
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
+import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.model.JoinType
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -155,6 +157,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         }
     }
 
+    @CompileStatic
     @Override
     QResultProxy ___selectQuery(QuerySelect q) throws NyException {
         if (q.get_intoTable() != null) {
@@ -179,52 +182,13 @@ class MySql extends MySqlFunctions implements QTranslator {
             }
             query.append(NL)
 
-            def px = _generateSelectQ(q)
+            def px = _generateSelectQFullJoin(q)
             query.append(px.query)
             paramList.addAll(px.orderedParameters)
             return createProxy(query.toString(), queryType, paramList, null, null)
 
         } else {
-            _generateSelectQ(q)
-        }
-    }
-
-    private QResultProxy _generateSelectQ(QuerySelect q) throws NyException {
-        int count
-        if ((count = MySqlUtils.countFullJoin(q._joiningTable)) > 0) {
-            //List<QResultProxy> qParts = new LinkedList<>()
-            List<String> qs = new LinkedList<>()
-            QResultProxy resultProxy = new QResultProxy()
-            resultProxy.orderedParameters = new LinkedList<>()
-
-            for (int i = count; i >= 0; i--) {
-                QuerySelect qt = MySqlUtils.cloneQuery(q)
-                MySqlUtils.flipNthFullJoin(qt._joiningTable, i, 0)
-
-                StringBuilder qr = super.generateSelectQueryBody(qt, resultProxy.orderedParameters)
-                qs.add(qr.toString())
-                //qParts.add(qr)
-
-//                if (qr.orderedParameters != null) {
-//                    resultProxy.orderedParameters.addAll(qr.orderedParameters)
-//                }
-//                resultProxy.returnType = qr.returnType
-//                resultProxy.qObject = qr.qObject
-//                resultProxy.queryType = qr.queryType
-//                resultProxy.rawObject = qr.rawObject
-            }
-
-            resultProxy.queryType = QueryType.SELECT
-            resultProxy.query = String.join(' UNION ALL ', qs)
-            return resultProxy
-
-        } else {
-            final List<AParam> paramList = new LinkedList<>()
-            StringBuilder query = new StringBuilder()
-            QueryType queryType = QueryType.SELECT
-
-            query.append(generateSelectQueryBody(q, paramList).toString())
-            return createProxy(query.toString(), queryType, paramList, null, null)
+            _generateSelectQFullJoin(q)
         }
     }
 

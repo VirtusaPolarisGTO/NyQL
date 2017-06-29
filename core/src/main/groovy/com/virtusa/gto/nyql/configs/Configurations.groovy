@@ -3,14 +3,7 @@ package com.virtusa.gto.nyql.configs
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.DbInfo
-import com.virtusa.gto.nyql.model.QDatabaseRegistry
-import com.virtusa.gto.nyql.model.QExecutorFactory
-import com.virtusa.gto.nyql.model.QExecutorRegistry
-import com.virtusa.gto.nyql.model.QProfiling
-import com.virtusa.gto.nyql.model.QRepository
-import com.virtusa.gto.nyql.model.QRepositoryRegistry
-import com.virtusa.gto.nyql.model.QScriptMapper
+import com.virtusa.gto.nyql.model.*
 import com.virtusa.gto.nyql.model.impl.QNoProfiling
 import com.virtusa.gto.nyql.model.impl.QProfExecutorFactory
 import com.virtusa.gto.nyql.model.impl.QProfRepository
@@ -96,7 +89,16 @@ class Configurations {
         DbInfo dbInfo = loadExecutors(activeDb, profileEnabled)
 
         // finally, initialize factory
-        databaseRegistry.getDbFactory(activeDb).init(this, dbInfo)
+        def factory = databaseRegistry.getDbFactory(activeDb)
+        factory.init(this, dbInfo)
+
+        QSession bootSession = QSession.create(this, '__bootstrapscript__')
+        def scripts = factory.createTranslator().getBootstrapScripts(bootSession)
+        if (scripts != null) {
+            LOGGER.debug("Bootstrapping database using initial scripts [" + activeDb + "]...")
+            executorRegistry.defaultExecutorFactory().create().execute(scripts)
+            LOGGER.debug("Bootstrapping completed successfully!")
+        }
     }
 
     private void loadActivatedTranslator(String activeDb) {

@@ -20,6 +20,7 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
         super(theOptions)
     }
 
+    @Override
     String greatest(cx) {
         def c = ___val(cx)
         def pmx = ___pm(cx)
@@ -31,6 +32,7 @@ abstract class MySqlFunctions extends AbstractSQLTranslator implements QFunction
         }
     }
 
+    @Override
     String least(cx) {
         def c = ___val(cx)
         def pmx = ___pm(cx)
