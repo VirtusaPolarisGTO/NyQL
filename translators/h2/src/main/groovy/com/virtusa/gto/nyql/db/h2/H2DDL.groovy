@@ -94,7 +94,6 @@ class H2DDL implements QDdl {
         throw new NyException("Unknown table key type! [${key.type}]")
     }
 
-    @CompileStatic
     private static String _resolveType(DFieldType fieldType, DField field) {
         switch (fieldType) {
             case DFieldType.BOOLEAN:    return 'BOOLEAN'

@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.db.h2
 
+import com.virtusa.gto.nyql.CTE
 import com.virtusa.gto.nyql.Case
 import com.virtusa.gto.nyql.Column
 import com.virtusa.gto.nyql.FunctionColumn
@@ -298,6 +299,11 @@ class H2 extends H2Functions implements QTranslator {
 
         new QResultProxy(query: query.toString(), orderedParameters: sp.paramList,
                 rawObject: sp, queryType: QueryType.DB_FUNCTION)
+    }
+
+    @Override
+    List<QResultProxy> ___cteQuery(CTE cte) {
+        generateCTE(cte)
     }
 
     @Override
