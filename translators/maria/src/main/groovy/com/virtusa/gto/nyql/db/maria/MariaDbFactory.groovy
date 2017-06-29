@@ -29,7 +29,7 @@ class MariaDbFactory implements QDbFactory {
         // load all keywords
         Collection<String> keywords = loadKeywords(nyConfigs)
 
-        mariaSql = new MariaSql(new TranslatorOptions(keywords))
+        mariaSql = new MariaSql(new TranslatorOptions(keywords), dbInfo)
     }
 
     private static Set<String> loadKeywords(Configurations nyConfigs) {

@@ -7,6 +7,10 @@ import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.JoinType
+import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.nyql.model.DbInfo
+import com.virtusa.gto.nyql.model.QScript
+import com.virtusa.gto.nyql.model.QScriptList
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -27,10 +31,13 @@ class MySql extends MySqlFunctions implements QTranslator {
     static final String OP = '('
     static final String CP = ')'
 
+    protected DbInfo dbInfo
+
     MySql() { super() }
 
-    MySql(TranslatorOptions theOptions) {
+    MySql(TranslatorOptions theOptions, DbInfo dbInformation) {
         super(theOptions)
+        dbInfo = dbInformation
     }
 
     @CompileStatic
@@ -257,6 +264,10 @@ class MySql extends MySqlFunctions implements QTranslator {
                     paramList.addAll(((QResultProxy)q).orderedParameters)
                 }
                 joiner.add(QUtils.parenthesis(___resolve(q, QContextType.UNKNOWN)))
+            } else if (q instanceof QuerySelect) {
+                QResultProxy proxy = ___selectQuery((QuerySelect)q)
+                paramList.addAll(proxy.orderedParameters)
+                joiner.add(proxy.query)
             } else {
                 joiner.add(___resolve(q, QContextType.UNKNOWN, paramList))
             }
@@ -299,10 +310,20 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     @Override
+    List<QResultProxy> ___cteQuery(CTE cte) {
+        if (!isUnresolvedVersion(dbInfo) && dbInfo.majorVersion < 8) {
+            throw new NySyntaxException('MySQL does not had support for Common Table Expressions prior to version 8.0!')
+        }
+
+        generateCTE(cte)
+    }
+
+    @Override
     protected String getQuoteChar() {
         BACK_TICK
     }
-/*
+
+    /*
     private QResultProxy manipulateIntersect(List<Object> queries) {
         if (queries.size() != 2) {
             throw new NySyntaxException('MySQL intersect operator exactly requires only two queries!')
