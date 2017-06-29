@@ -1,6 +1,7 @@
 package com.virtusa.gto.nyql.db;
 
 import com.virtusa.gto.nyql.Assign;
+import com.virtusa.gto.nyql.CTE;
 import com.virtusa.gto.nyql.Column;
 import com.virtusa.gto.nyql.FunctionColumn;
 import com.virtusa.gto.nyql.Join;
@@ -13,15 +14,19 @@ import com.virtusa.gto.nyql.QuerySelect;
 import com.virtusa.gto.nyql.QueryTruncate;
 import com.virtusa.gto.nyql.Table;
 import com.virtusa.gto.nyql.Where;
+import com.virtusa.gto.nyql.WithClosure;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import com.virtusa.gto.nyql.model.ValueTable;
+import com.virtusa.gto.nyql.model.DbInfo;
 import com.virtusa.gto.nyql.model.units.AParam;
 import com.virtusa.gto.nyql.utils.QOperator;
 import com.virtusa.gto.nyql.utils.QUtils;
 import com.virtusa.gto.nyql.utils.QueryType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -58,6 +63,10 @@ public abstract class AbstractSQLTranslator implements QTranslator {
 
     protected TranslatorOptions getTranslatorOptions() {
         return translatorOptions;
+    }
+
+    protected boolean isUnresolvedVersion(DbInfo dbInfo) {
+        return dbInfo == null || dbInfo == DbInfo.UNRESOLVED;
     }
 
     protected abstract String getQuoteChar();
@@ -245,6 +254,53 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             }
         }
         return query;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected List<QResultProxy> generateCTE(CTE cte) throws NyException {
+        List<AParam> paramList = new LinkedList<>();
+        List<String> qctes = new LinkedList<>();
+        int recCount = 0;
+        for (Object item : cte.getWiths()) {
+            StringBuilder iqStr = new StringBuilder();
+            Map map = (Map)item;
+            Table tbl = (Table) map.get("table");
+
+            iqStr.append(___tableName(tbl, QContextType.INTO));
+            List<String> cols = (List) map.get("cols");
+            if (QUtils.notNullNorEmpty(cols)) {
+                iqStr.append(" (").append(String.join(", ", cols)).append(')');
+            }
+
+            Object query = map.get("query");
+            if (query instanceof QuerySelect) {
+                QResultProxy proxy = ___selectQuery((QuerySelect) query);
+                iqStr.append(_AS_).append('(').append(proxy.getQuery()).append(')');
+                paramList.addAll(proxy.getOrderedParameters());
+            } else if (query instanceof WithClosure) {
+                WithClosure withClosure = (WithClosure) query;
+                QResultProxy proxy = ___combinationQuery(withClosure.getCombineType(),
+                        Arrays.asList(withClosure.getAnchor(), withClosure.getRecursion()));
+                iqStr.append(_AS_).append('(').append(proxy.getQuery()).append(')');
+                paramList.addAll(proxy.getOrderedParameters());
+                recCount++;
+            }
+
+            qctes.add(iqStr.toString());
+        }
+
+        StringBuilder mq = new StringBuilder();
+        mq.append("WITH ");
+        if (recCount > 0) {
+            mq.append("RECURSIVE ");
+        }
+        mq.append(String.join(", ", qctes));
+
+        QResultProxy proxy = ___selectQuery(cte.getQuerySelect());
+        paramList.addAll(proxy.getOrderedParameters());
+        mq.append(' ').append(proxy.getQuery());
+
+        return Collections.singletonList(createProxy(mq.toString(), QueryType.CTE, paramList, null, null));
     }
 
     /**

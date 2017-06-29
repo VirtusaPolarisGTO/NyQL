@@ -84,6 +84,7 @@ public class AbstractTest {
         List pList = null;
         if (query instanceof List) {
             q2 = ((List) query).get(0).toString().replace("\n", "").trim();
+            Assert.assertEquals(((List) query).size(), 2, "Parameters expected for the query!");
             pList = (List) ((List) query).get(1);
         } else {
             q2 = String.valueOf(query).replace("\n", "").trim();

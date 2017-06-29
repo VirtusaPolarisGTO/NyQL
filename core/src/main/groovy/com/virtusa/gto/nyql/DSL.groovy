@@ -253,6 +253,26 @@ class DSL {
         QContext context = createContext()
         context.translator.___valueTable(vt)
     }
+    Object cte(@DelegatesTo(value = CTE, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QContext qContext = createContext()
+        CTE qcte = new CTE(qContext)
+
+        def code = closure.rehydrate(qcte, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        def queries = qcte._ctx.translator.___cteQuery(qcte)
+        if (queries.size() == 1) {
+            return queries.get(0)
+        } else {
+            QScriptList scriptList = new QScriptList()
+            scriptList.scripts = []
+            for (QResultProxy proxy : queries) {
+                scriptList.scripts.add(new QScript(qSession: session, proxy: proxy))
+            }
+            return scriptList
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////
     ////
