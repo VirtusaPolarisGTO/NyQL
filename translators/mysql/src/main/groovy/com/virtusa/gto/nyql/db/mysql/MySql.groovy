@@ -16,6 +16,9 @@ import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
+
+import java.util.stream.Collectors
+
 /**
  * @author Isuru Weerarathna
  */
@@ -276,7 +279,6 @@ class MySql extends MySqlFunctions implements QTranslator {
         new QResultProxy(query: joiner.toString(), orderedParameters: paramList, queryType: QueryType.SELECT)
     }
 
-    @CompileStatic
     QResultProxy ___deleteQuery(QueryDelete q) {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()

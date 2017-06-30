@@ -16,6 +16,7 @@ import com.virtusa.gto.nyql.Table
 import com.virtusa.gto.nyql.Where
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
+import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.QScript
@@ -26,6 +27,8 @@ import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
+
+import java.util.stream.Collectors
 
 /**
  * @author iweerarathna
@@ -198,14 +201,44 @@ class H2 extends H2Functions implements QTranslator {
     QResultProxy ___deleteQuery(QueryDelete q) throws NyException {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
-        Table mainTable =  q.sourceTbl
+        Table mainTblClone = SqlMisc.cloneTable(q.sourceTbl, null)
         QContextType delContext = QContextType.DELETE_CONDITIONAL
 
         query.append('DELETE ')
         if (q._joiningTable != null) {
-            throw new NyException('H2 database does not support joins in DELETE queries! Please write the query in alternative way.')
+            if (QUtils.notNullNorEmpty(q.uniqueKeys)) {
+                query.append('FROM ').append(___deriveSource(mainTblClone, paramList, QContextType.DELETE_FROM)).append(NL)
+
+                String delCols = q.uniqueKeys.stream().map { it.__name }.collect(Collectors.joining(', '))
+
+                QuerySelect tmpSel = new QuerySelect(q._ctx)
+                String als = q.sourceTbl.__alias ?: q.sourceTbl.__name + '_tmpny'
+                q.sourceTbl.__alias = als
+                tmpSel.sourceTbl = q.sourceTbl
+                tmpSel._joiningTable = q._joiningTable
+                tmpSel.whereObj = q.whereObj
+                String tmpFetch = q.uniqueKeys.stream()
+                        .map { convertToAlias(als, BACK_TICK) + '.' + convertToAlias(it.__name, BACK_TICK) }
+                        .collect(Collectors.joining(','))
+                if (q.uniqueKeys.size() > 1) {
+                    delCols = '(' + delCols + ')'
+                    tmpFetch = '(' + tmpFetch + ')'
+                }
+                tmpSel.FETCH(tmpFetch)
+
+                def querySel = ___selectQuery(tmpSel)
+
+                Where where = new Where(q._ctx)
+                where.IN(delCols, querySel)
+                q.whereObj = where
+
+            } else {
+                throw new NyException('H2 database does not support joins in DELETE queries! ' +
+                        'Please write the query in alternative way, or use ON_UNIQUE_KEYS(...)')
+            }
+
         } else {
-            query.append('FROM ').append(___deriveSource(mainTable, paramList, QContextType.DELETE_FROM)).append(NL)
+            query.append('FROM ').append(___deriveSource(q.sourceTbl, paramList, QContextType.DELETE_FROM)).append(NL)
         }
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {
@@ -313,6 +346,7 @@ class H2 extends H2Functions implements QTranslator {
 
         if (q._joiningTable != null) {
             // has joining tables
+            // https://stackoverflow.com/questions/16309821/update-columns-in-multiple-tables-with-inner-join
             throw new NyException('H2 database does not support joins in UPDATE queries! Please write the query in alternative way.')
         } else {
             query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append(' ').append(NL)

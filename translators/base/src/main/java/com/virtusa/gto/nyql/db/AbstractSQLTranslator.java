@@ -72,7 +72,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
 
     protected abstract String getQuoteChar();
 
-    private String convertToAlias(String alias, String qChar) {
+    protected String convertToAlias(String alias, String qChar) {
         return (keywords.contains(alias.toUpperCase(Locale.getDefault()))
                 ? QUtils.quote(alias, qChar)
                 : QUtils.quoteIfWS(alias, qChar));

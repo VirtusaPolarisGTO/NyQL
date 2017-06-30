@@ -13,7 +13,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author IWEERARATHNA
@@ -173,5 +178,13 @@ public class SqlMisc {
         return org;
     }
 
+    public static Table cloneTable(Table table, String newAlias) {
+        Table t = new Table();
+        t.set__name(table.get__name());
+        if (newAlias != null) {
+            t.set__alias(newAlias);
+        }
+        return t;
+    }
 
 }
