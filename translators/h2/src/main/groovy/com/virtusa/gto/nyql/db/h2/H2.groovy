@@ -231,6 +231,7 @@ class H2 extends H2Functions implements QTranslator {
                 Where where = new Where(q._ctx)
                 where.IN(delCols, querySel)
                 q.whereObj = where
+                delContext = QContextType.CONDITIONAL
 
             } else {
                 throw new NyException('H2 database does not support joins in DELETE queries! ' +
