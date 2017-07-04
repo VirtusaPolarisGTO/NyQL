@@ -5,6 +5,7 @@ import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -27,11 +28,14 @@ class MSSql extends MSSqlFunctions implements QTranslator {
 
     private static final String NL = '\n'
 
+    private DbInfo dbInfo
+
     MSSql() {
     }
 
-    MSSql(TranslatorOptions theOptions) {
+    MSSql(TranslatorOptions theOptions, DbInfo theDbInfo) {
         super(theOptions)
+        this.dbInfo = theDbInfo
     }
 
     @CompileStatic

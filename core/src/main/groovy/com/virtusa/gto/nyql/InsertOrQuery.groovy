@@ -18,28 +18,28 @@ class InsertOrQuery extends UpsertQuery {
 
     @Override
     UpsertQuery RETURN_NONE() {
-        throw new NyException('Not allowed to specify return type of a InsertOrLoad query!')
+        throw new NyException('Not allowed to specify return type within a InsertOrLoad query!')
     }
 
     @Override
     UpsertQuery RETURN_BEFORE() {
-        throw new NyException('Not allowed to specify return type of a InsertOrLoad query!')
+        throw new NyException('Not allowed to specify return type within a InsertOrLoad query!')
     }
 
     @Override
     UpsertQuery RETURN_AFTER() {
-        throw new NyException('Not allowed to specify return type of a InsertOrLoad query!')
+        throw new NyException('Not allowed to specify return type within a InsertOrLoad query!')
     }
 
     @Override
     UpsertQuery RETURN_COLUMNS(Object... columns) {
-        throw new NyException('Not allowed to specify return type of a InsertOrLoad query!')
+        throw new NyException('Not allowed to specify return type within a InsertOrLoad query!')
     }
 
     @Override
     QScriptList createScripts(QContext qContext, QSession qSession) throws Exception {
         if (whereObj == null || !whereObj.__hasClauses()) {
-            throw new NyException('WHERE clause is mandatory for upsert queries!')
+            throw new NyException('WHERE clause is mandatory for InsertOr queries!')
         }
         final QScript scriptSelect = createSelectQuery(qContext, qSession)
         final QScript scriptInsert = createInsertQuery(qContext, qSession)

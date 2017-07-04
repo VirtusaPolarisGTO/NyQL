@@ -25,7 +25,7 @@ class MSSqlFactory implements QDbFactory {
         // load mssql keywords
         Collection<String> keywords = loadKeywords(nyConfigs)
 
-        msSql = new MSSql(new TranslatorOptions(keywords))
+        msSql = new MSSql(new TranslatorOptions(keywords), dbInfo)
     }
 
     private static Set<String> loadKeywords(Configurations nyConfigs) {
