@@ -10,6 +10,9 @@ The importance of this `UPSERT` query would be it is __cacheable__ unlike the sc
 
 **Note:** Both `SET` and `WHERE` clauses are mandatory in a upsert query.
 
+**WARN:** Never use the upserts as bulk/batch inserts or updates since a single upsert query generates about 3 or 4 queries and can lead 
+to very inefficient execution.
+
 #### Execution Steps:
  * First based on the database, it will search whether there is any native supported query for upsert.
  * If such native query exist, then it will be generated and executed.
