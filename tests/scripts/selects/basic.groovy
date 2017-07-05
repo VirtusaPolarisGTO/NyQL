@@ -11,6 +11,14 @@
         ],
 
         $DSL.select {
+            TARGET (TABLE("MovieManager", "Film").alias("f"))
+            DISTINCT_FETCH (f.title)
+        },
+        [
+                mysql: "SELECT DISTINCT f.title FROM `MovieManager`.`Film` f"
+        ],
+
+        $DSL.select {
             TARGET (Film.alias("f"))
             DISTINCT_FETCH (f.title, f.description)
         },

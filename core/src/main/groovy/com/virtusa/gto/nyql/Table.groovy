@@ -12,6 +12,7 @@ class Table {
 
     QContext _ctx = null
 
+    String __schema = null
     String __name = ''
     String __alias = null
 
