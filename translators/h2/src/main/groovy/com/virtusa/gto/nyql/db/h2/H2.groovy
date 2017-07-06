@@ -196,7 +196,6 @@ class H2 extends H2Functions implements QTranslator {
         }
     }
 
-    @CompileStatic
     @Override
     QResultProxy ___deleteQuery(QueryDelete q) throws NyException {
         List<AParam> paramList = new LinkedList<>()
