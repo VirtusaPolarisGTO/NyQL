@@ -39,7 +39,7 @@ class InsertOrQuery extends UpsertQuery {
     @Override
     QScriptList createScripts(QContext qContext, QSession qSession) throws Exception {
         if (whereObj == null || !whereObj.__hasClauses()) {
-            throw new NyException('WHERE clause is mandatory for InsertOr queries!')
+            whereObj = convertAssignToWhere(_assigns)
         }
         final QScript scriptSelect = createSelectQuery(qContext, qSession)
         final QScript scriptInsert = createInsertQuery(qContext, qSession)
@@ -50,4 +50,29 @@ class InsertOrQuery extends UpsertQuery {
         scriptList.type = QScriptListType.INSERT_OR_LOAD
         scriptList
     }
+
+    @CompileStatic
+    static Where convertAssignToWhere(Assign assign) {
+        Where where = new Where(assign._ctx)
+        boolean andFlag = false
+        for (Object item : assign.assignments) {
+            if (andFlag) {
+                where.AND()
+            }
+
+            if (item instanceof Assign.AnAssign) {
+                Assign.AnAssign anAssign = (Assign.AnAssign)item
+                if (anAssign.rightOp instanceof Table || anAssign.rightOp instanceof QResultProxy) {
+                    where.IN(anAssign.leftOp, anAssign.rightOp)
+                } else {
+                    where.EQ(anAssign.leftOp, anAssign.rightOp)
+                }
+            } else {
+                where.RAW(item)
+            }
+            andFlag = true
+        }
+        where
+    }
+
 }

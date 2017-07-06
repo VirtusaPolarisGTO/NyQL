@@ -664,9 +664,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         List<Object> clauses = assign.getAssignments();
         List<String> derived = new ArrayList<>();
         for (Object c : clauses) {
-            if (c instanceof String) {
-                derived.add((String)c);
-            } else if (c instanceof Assign.AnAssign) {
+            if (c instanceof Assign.AnAssign) {
                 Assign.AnAssign anAssign = (Assign.AnAssign)c;
                 if (anAssign.getLeftOp() instanceof AParam) {
                     paramOrder.add((AParam)anAssign.getLeftOp());
@@ -677,6 +675,8 @@ public abstract class AbstractSQLTranslator implements QTranslator {
                         ' ' + ___convertOperator(anAssign.getOp()) + ' ' +
                         ___resolve(anAssign.getRightOp(), contextType, paramOrder);
                 derived.add(val);
+            } else {
+                derived.add(___resolve(c, contextType, paramOrder));
             }
         }
 

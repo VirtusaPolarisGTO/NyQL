@@ -99,3 +99,16 @@ $DSL.insertOrLoad {
 }
 ```
 
+If you write the query without `WHERE` clause, the conditions of `SET` clause will be converted 
+to a WHERE clause combining with `AND`.
+
+```groovy
+$DSL.insertOrLoad {
+    TARGET (Film.alias("f"))
+    SET {
+        EQ (f.film_id, 1234)
+        EQ (f.title, PARAM("title"))
+        SET_NULL (f.language_id)
+    }
+}
+```

@@ -182,7 +182,7 @@ trait QTranslator implements QDbBootstrappable {
      * @param cte cte query model
      * @return returns a list of queries needed to execute this.
      */
-    abstract List<QResultProxy> ___cteQuery(CTE cte)
+    abstract List<QResultProxy> ___cteQuery(CTE cte) throws NyException
 
     /**
      * Generates a db table from given set of values, so join clauses can use them.

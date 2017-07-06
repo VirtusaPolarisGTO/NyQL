@@ -87,6 +87,8 @@ class QJdbcExecutor implements QExecutor {
     def execute(QScript script) throws Exception {
         if (script instanceof QScriptResult) {
             return ((QScriptResult)script).scriptResult
+        } else if (script instanceof QScriptList) {
+            return this.execute((QScriptList)script)
         }
 
         PreparedStatement statement = null

@@ -68,6 +68,24 @@ def innQP = $DSL.select {
         $DSL.insert {
             TARGET (Film.alias("f"))
             DATA (
+                    "film_id": QUERY {
+                        TARGET (Film.alias("f"))
+                        WHERE {
+                            EQ (f.film_id, NUM(1))
+                        }
+                    },
+                    "title": PARAM("title")
+            )
+            RETURN_KEYS()
+        },
+        [
+                mysql:  ["INSERT INTO `Film` (`film_id`, `title`) VALUES ((SELECT * FROM `Film` f WHERE f.film_id = 1), ?)",
+                         ["title"]]
+        ],
+
+        $DSL.insert {
+            TARGET (Film.alias("f"))
+            DATA (
                     "film_id": innQ,
                     "title": PARAM("title")
             )

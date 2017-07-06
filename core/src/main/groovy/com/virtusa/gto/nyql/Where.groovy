@@ -227,6 +227,9 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             QUtils.expandToList(list, cs)
             if (list.size() == 0) {
                 list.add(null)
+            } else if (list.size() == 1 && list.get(0) instanceof Table) {
+                ON(c1, QOperator.IN, list.get(0))
+                return this
             }
             ON(c1, QOperator.IN, list)
         }
@@ -246,6 +249,9 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
             QUtils.expandToList(list, cs)
             if (list.isEmpty()) {
                 list.add(null)
+            } else if (list.size() == 1 && list.get(0) instanceof Table) {
+                ON(c1, QOperator.NOT_IN, list.get(0))
+                return this
             }
             ON(c1, QOperator.NOT_IN, list)
         }

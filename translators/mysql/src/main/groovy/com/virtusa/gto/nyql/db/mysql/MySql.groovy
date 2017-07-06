@@ -312,7 +312,7 @@ class MySql extends MySqlFunctions implements QTranslator {
     }
 
     @Override
-    List<QResultProxy> ___cteQuery(CTE cte) {
+    List<QResultProxy> ___cteQuery(CTE cte) throws NyException {
         if (!isUnresolvedVersion(dbInfo) && dbInfo.majorVersion < 8) {
             throw new NySyntaxException('MySQL does not had support for Common Table Expressions prior to version 8.0!')
         }
