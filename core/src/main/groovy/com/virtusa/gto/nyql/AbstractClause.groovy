@@ -93,6 +93,13 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
     }
 
     @CompileStatic
+    Table TABLE(String schema, String tblName) {
+        Table table = TABLE(tblName)
+        table.__schema = schema
+        table
+    }
+
+    @CompileStatic
     TableProxy OTHER() {
         TableProxy tableProxy = new TableProxy(__name: String.valueOf(System.currentTimeMillis()), _ctx: _ctx)
         _ctx.tables.putIfAbsent(tableProxy.__name, tableProxy)

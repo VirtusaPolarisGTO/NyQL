@@ -94,14 +94,14 @@ class MySql extends MySqlFunctions implements QTranslator {
     String ___tableName(final Table table, final QContextType contextType) {
         if (contextType == QContextType.INTO || contextType == QContextType.TRUNCATE
             || contextType == QContextType.DELETE_FROM) {
-            return QUtils.quote(table.__name)
+            return tableSchema(table, BACK_TICK) + QUtils.quote(table.__name)
         } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
                 || contextType == QContextType.DELETE_JOIN || contextType == QContextType.CONDITIONAL) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
                 return QUtils.parenthesis(proxy.query.trim()) + (table.__aliasDefined() ? ' ' + tableAlias(table, BACK_TICK) : '')
             }
-            return QUtils.quote(table.__name, BACK_TICK) + (table.__aliasDefined() ? ' ' + tableAlias(table, BACK_TICK) : '')
+            return tableSchema(table, BACK_TICK) + QUtils.quote(table.__name, BACK_TICK) + (table.__aliasDefined() ? ' ' + tableAlias(table, BACK_TICK) : '')
         } else if (contextType == QContextType.SELECT || contextType == QContextType.INSERT_DATA || contextType == QContextType.UPDATE_SET) {
             if (table.__isResultOf()) {
                 QResultProxy proxy = table.__resultOf as QResultProxy
@@ -114,7 +114,7 @@ class MySql extends MySqlFunctions implements QTranslator {
         if (table.__aliasDefined()) {
             return tableAlias(table, BACK_TICK)
         } else {
-            return QUtils.quote(table.__name, BACK_TICK)
+            return tableSchema(table, BACK_TICK) + QUtils.quote(table.__name, BACK_TICK)
         }
     }
 

@@ -25,7 +25,7 @@ class PostgreFactory implements QDbFactory {
         // load postgre keyword list
         Collection<String> keywords = loadKeywords(nyConfigs)
 
-        postgres = new Postgres(new TranslatorOptions(keywords))
+        postgres = new Postgres(new TranslatorOptions(keywords), dbInfo)
     }
 
     private static Set<String> loadKeywords(Configurations nyConfigs) {

@@ -78,6 +78,14 @@ public abstract class AbstractSQLTranslator implements QTranslator {
                 : QUtils.quoteIfWS(alias, qChar));
     }
 
+    protected String tableSchema(Table table, String qChar) {
+        if (table.get__schema() != null) {
+            return QUtils.quote(table.get__schema(), qChar) + ".";
+        } else {
+            return EMPTY;
+        }
+    }
+
     protected String tableAlias(Table table, String qChar) {
         if (table.__aliasDefined()) {
             return convertToAlias(table.get__alias(), qChar);

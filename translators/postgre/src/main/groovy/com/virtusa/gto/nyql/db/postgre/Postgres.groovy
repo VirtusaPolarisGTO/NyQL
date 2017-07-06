@@ -6,6 +6,7 @@ import com.virtusa.gto.nyql.db.QTranslator
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
@@ -30,10 +31,13 @@ class Postgres extends PostgresFunctions implements QTranslator {
     private static String TRUE_STR = 't'
     private static String FALSE_STR = 'f'
 
+    private DbInfo dbInfo
+
     Postgres() { super() }
 
-    Postgres(TranslatorOptions theOptions) {
+    Postgres(TranslatorOptions theOptions, DbInfo theDbInfo) {
         super(theOptions)
+        dbInfo = theDbInfo
     }
 
     @Override
@@ -331,6 +335,7 @@ class Postgres extends PostgresFunctions implements QTranslator {
     List<QResultProxy> ___cteQuery(CTE cte) {
         generateCTE(cte)
     }
+
     @Override
     protected String getQuoteChar() {
         DOUBLE_QUOTE

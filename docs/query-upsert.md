@@ -1,22 +1,31 @@
 ### Upsert Queries
 Upsert query is a set of queries which executes sequentially to create/update a record if it does not already exist in databases.
-This is a syntactic sugar, because currently no database exist supporting a single syntax to upsert a record to a table.
+This is a syntactic sugar, because currently some databases are not supporting a syntax to upsert a record to a table natively.
+Closest thing databases have is the `MERGE` syntax.
 
-Previously you have to write a `script` to handle _create-if-not-exist-or-update-if-exist_ query type.
+Previously you have to write a `script` to handle _create-if-not-exist-or-update-otherwise_ query type.
 Now you can convert a `UPDATE` query to UPSERT query in an instant, by changing only query type to `upsert` from `update`.
+
+The importance of this `UPSERT` query would be it is __cacheable__ unlike the script.
 
 **Note:** Both `SET` and `WHERE` clauses are mandatory in a upsert query.
 
+**WARN:** Never use the upserts as bulk/batch inserts or updates since a single upsert query generates about 3 or 4 queries and can lead 
+to very inefficient execution.
+
 #### Execution Steps:
- * The `WHERE` clause will be used to first select the record from database.
-   * `TARGET` and `JOIN` clauses will be used too.
-   * Executed query will return only __at most__ one record.
- * If there are any records exist, NyQL will automatically execute the update query.
- * If no records exist, NyQL will execute an insert query to add a record to the main table as specifed in `TARGET` table.
-   * NyQL uses `SET` clause to set column values for the new record.
-   * Does not use tables in `JOIN` clauses at all.
- * Based on return type specified by user, NyQL will return either record before updating, record after updating,
- or custom projected record.
+ * First based on the database, it will search whether there is any native supported query for upsert.
+ * If such native query exist, then it will be generated and executed.
+ * Otherwise, behind the script, NyQL will generate a set of queries which will be run sequentially, as shown in below.
+     * The `WHERE` clause will be used to first select the record from database.
+       * `TARGET` and `JOIN` clauses will be used too.
+       * Executed query will return only __at most__ one record.
+     * If there are any records exist, NyQL will automatically execute the update query.
+     * If no records exist, NyQL will execute an insert query to add a record to the main table as specifed in `TARGET` table.
+       * NyQL uses `SET` clause to set column values for the new record.
+       * Does not use tables in `JOIN` clauses at all.
+     * Based on return type specified by user, NyQL will return either record before updating, record after updating,
+     or custom projected record.
 
 #### Returning Types
 There are four returning types you can specify in the query itself to say what you want as a result after the execution.

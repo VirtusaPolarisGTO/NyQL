@@ -1,14 +1,38 @@
 ## NyQL Changelog
 
 ### v2
- * Breaking Changes
+ * __Breaking Changes__
    * Function `$IMPORT_UNSAFE` has been renamed to `$IMPORT_SAFE`
    * Renamed functions `CURTIME`, `CURDATE`, and `CUREPOCH` to `CURRENT_TIME`, `CURRENT_DATE`, and `CURRENT_EPOCH` respectively.
+   * Recommended to change db-inconsistent `CONCAT` functions to `CONCAT_NN` for null-ignoring concatenation.
+   
+ * New database supports
+   * MariaDB [#28](https://github.com/VirtusaPolarisGTO/NyQL/issues/28)
+   * H2 [#33](https://github.com/VirtusaPolarisGTO/NyQL/issues/33)
    
  * Features & Enhancements
     - Syntactic sugar for upsert and insertOrLoad queries [#18](https://github.com/VirtusaPolarisGTO/NyQL/issues/18)
-    - Insert syntax supports `SET {}` clause
+    - Simulate FULL OUTER JOIN in unsupported databases [#24](https://github.com/VirtusaPolarisGTO/NyQL/issues/24)
+    - Ability to recompile a script without having to restart JVM [#29](https://github.com/VirtusaPolarisGTO/NyQL/issues/29)
+    - Provide loading scripts from multiple directories [#36](https://github.com/VirtusaPolarisGTO/NyQL/issues/36)
+    - Convert given list of values to a table [#34](https://github.com/VirtusaPolarisGTO/NyQL/issues/34)
+    - Provide syntactic sugar to create temp tables on the fly with selected data from another table [#25](https://github.com/VirtusaPolarisGTO/NyQL/issues/25)
+    - Query level logging enhancements [#35](https://github.com/VirtusaPolarisGTO/NyQL/issues/35)
+    - Insert syntax supports for `SET {}` instead of `DATA([])` clause
+    - Ability to specify length when casting [#41](https://github.com/VirtusaPolarisGTO/NyQL/issues/41)
+    - Support statistical functions [#21](https://github.com/VirtusaPolarisGTO/NyQL/issues/21)
+    - Simulate java's lastIndexOf functionality in SQL queries [#20](https://github.com/VirtusaPolarisGTO/NyQL/issues/20)
+    - Dev mode new script addition should be able to detect automatically [#10](https://github.com/VirtusaPolarisGTO/NyQL/issues/10)
+    - Change the model to support execution of multiple parsed queries at once in executor [#19](https://github.com/VirtusaPolarisGTO/NyQL/issues/19)
+    - Database version aware translators [#27](https://github.com/VirtusaPolarisGTO/NyQL/issues/27)
     
+ * Bug fixes
+   - Inconsistency behavior of CONCAT functions in difference databases [#30](https://github.com/VirtusaPolarisGTO/NyQL/issues/30)
+   - Should not have alias when already aliased column is used inside a CASE statement [#31](https://github.com/VirtusaPolarisGTO/NyQL/issues/31)
+   - PARAM() is missing when it is inside LCASE() [#38](https://github.com/VirtusaPolarisGTO/NyQL/issues/38)
+   - PARAM() is missing when it is inside a THEN clause [#39](https://github.com/VirtusaPolarisGTO/NyQL/issues/39)
+   - Cannot use $IMPORT_UNSAFE outside queries [#37](https://github.com/VirtusaPolarisGTO/NyQL/issues/37)
+   
 ### v1.1.3
  * Features & Enhancements
    - Relative script paths [#13](https://github.com/VirtusaPolarisGTO/NyQL/issues/13)
