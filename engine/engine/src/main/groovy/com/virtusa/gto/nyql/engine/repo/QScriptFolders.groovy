@@ -69,6 +69,9 @@ class QScriptFolders implements QScriptMapper {
                 throw new NyConfigurationException('Unknown argument type received specifying multiple script directories!')
             }
 
+            String incl = list.get(1) ?: ''
+            String excl = list.get(2) ?: ''
+
             String path = (String)list.get(0)
             File dir = new File(path)
             if (!dir.exists()) {
@@ -76,11 +79,13 @@ class QScriptFolders implements QScriptMapper {
                 if (configFilePath != null) {
                     File activeDir = new File(configFilePath).getCanonicalFile().getParentFile()
                     if (activeDir.exists() && !dir.isAbsolute()) {
-                        folders << [activeDir.toPath().resolve(path).toFile(), list.get(1), list.get(2)]
+                        folders << [activeDir.toPath().resolve(path).toFile(), incl, excl]
                         continue
                     }
                 }
                 throw new NyConfigurationException("One of script folder does not exist! $path")
+            } else {
+                folders << [dir, incl, excl]
             }
         }
         new QScriptFolders(folders)
