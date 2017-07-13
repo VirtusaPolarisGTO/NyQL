@@ -144,12 +144,12 @@ class ConfigBuilder {
      *
      * @return this config builder instance.
      */
-    ConfigBuilder doCacheGeneratedQueries() {
+    ConfigBuilder doCacheGeneratedQueries(boolean status = true) {
         assertNotInitialized()
         if (!props[ConfigKeys.CACHING]) {
             props[ConfigKeys.CACHING] = [:]
         }
-        props[ConfigKeys.CACHING].generatedQueries = true
+        props[ConfigKeys.CACHING].generatedQueries = status
         this
     }
 
@@ -158,12 +158,26 @@ class ConfigBuilder {
      *
      * @return this config builder instance.
      */
-    ConfigBuilder doCacheCompiledScripts() {
+    ConfigBuilder doCacheCompiledScripts(boolean status = true) {
         assertNotInitialized()
         if (!props[ConfigKeys.CACHING]) {
             props[ConfigKeys.CACHING] = [:]
         }
-        props[ConfigKeys.CACHING].compiledScripts = true
+        props[ConfigKeys.CACHING].compiledScripts = status
+        this
+    }
+
+    /**
+     * Enables caching of compiled scripts.
+     *
+     * @return this config builder instance.
+     */
+    ConfigBuilder doCacheAllowRecompilation(boolean status = false) {
+        assertNotInitialized()
+        if (!props[ConfigKeys.CACHING]) {
+            props[ConfigKeys.CACHING] = [:]
+        }
+        props[ConfigKeys.CACHING].allowRecompilation = status
         this
     }
 

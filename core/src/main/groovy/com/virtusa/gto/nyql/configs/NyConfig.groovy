@@ -18,6 +18,7 @@
 package com.virtusa.gto.nyql.configs
 
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
+import com.virtusa.gto.nyql.model.QScriptMapper
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
@@ -34,6 +35,28 @@ final class NyConfig {
     private static final String DEF_CONFIG_PATH = 'com/virtusa/gto/nyql/configs/default-config.json'
 
     private final ConfigBuilder configBuilder
+
+    private boolean mapperAdded = false
+    private final Map executor = [
+            name: 'jdbc',
+            factory: 'com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory',
+            url: '',
+            username: '',
+            password: '',
+            jdbcDriverClass: null,
+            jdbcDataSourceClass: null,
+
+            pooling: [
+                    impl: 'com.virtusa.gto.nyql.engine.pool.impl.QHikariPool',
+                    maximumPoolSize: 1,
+                    prepStmtCacheSize: 300,
+                    prepStmtCacheSqlLimit: 2048,
+                    useServerPrepStmts: true,
+                    connectionTimeout: 30000,
+                    idleTimeout: 0,
+                    maxLifetime: 0
+            ]
+    ]
 
     private NyConfig(ConfigBuilder configBuilder) {
         this.configBuilder = configBuilder
@@ -64,21 +87,93 @@ final class NyConfig {
     }
 
     /**
+     * Setup caching options. When not specified, below values will be applied.
+     *     - compileScripts: true
+     *     - generatedQueries: true
+     *     - allowRecompile: false
+     *
+     * @param compileScripts to compile scripts at initialization. (default: true)
+     * @param generatedQueries to cache generated queries if specified in script. (default: true)
+     * @param allowRecompile allow to recompile a script without restarting NyQL. (default: false)
+     * @return this config instance.
+     */
+    NyConfig withCaching(boolean compileScripts = true, boolean generatedQueries = true, boolean allowRecompile = false) {
+        configBuilder.doCacheCompiledScripts(compileScripts)
+            .doCacheGeneratedQueries(generatedQueries)
+            .doCacheAllowRecompilation(allowRecompile)
+        this
+    }
+
+    /**
      * Sets the folder containing all the available scripts for NyQL.
      *
      * @param folder folder instance. This must be exist.
+     * @param exclusions all exclusion patterns as comma separated string.
+     * @param inclusions all inclusion patterns as comma separated string.
      * @return this config instance.
      */
-    NyConfig scriptFolder(File folder) {
+    NyConfig scriptFolder(File folder, String exclusions = null, String inclusions = null) throws NyConfigurationException {
+        assertMapperSetup()
+
         configBuilder.addRepository([
                 name: 'default',
                 repo: 'com.virtusa.gto.nyql.engine.repo.QRepositoryImpl',
                 mapper: 'com.virtusa.gto.nyql.engine.repo.QScriptsFolder',
                 mapperArgs: [
-                    baseDir: folder.getAbsolutePath()
+                    baseDir: folder.getAbsolutePath(),
+                    inclusions: inclusions,
+                    exclusions: exclusions
                 ]
         ])
         configBuilder.havingDefaultRepository('default')
+        mapperAdded = true
+        this
+    }
+
+    /**
+     * Sets the folders containing all the available scripts for NyQL.
+     *
+     * @param folders folder instances. These must be exist.
+     * @return this config instance.
+     */
+    NyConfig scriptFolders(Collection<File> folders) throws NyConfigurationException {
+        assertMapperSetup()
+
+        List<String> fpaths = new LinkedList<>()
+        for (File file : folders) {
+            fpaths.add(file.getAbsolutePath())
+        }
+        configBuilder.addRepository([
+                name: 'default',
+                repo: 'com.virtusa.gto.nyql.engine.repo.QRepositoryImpl',
+                mapper: 'com.virtusa.gto.nyql.engine.repo.QScriptFolders',
+                mapperArgs: [
+                    baseDirs: fpaths
+                ]
+        ])
+        configBuilder.havingDefaultRepository('default')
+        mapperAdded = true
+        this
+    }
+
+    /**
+     * Configure script loading mapper with custom class and configs.
+     *
+     * @param mapperClz mapper class.
+     * @param configs configs for mapper.
+     * @return this config instance.
+     */
+    NyConfig withCustomScriptMapper(Class<? extends QScriptMapper> mapperClz, Map configs) {
+        assertMapperSetup()
+
+        configBuilder.addRepository([
+                name: 'default',
+                repo: 'com.virtusa.gto.nyql.engine.repo.QRepositoryImpl',
+                mapper: mapperClz.name,
+                mapperArgs: configs
+        ])
+        configBuilder.havingDefaultRepository('default')
+        mapperAdded = true
         this
     }
 
@@ -119,26 +214,48 @@ final class NyConfig {
      */
     NyConfig jdbcOptions(String jdbcUrl, String jdbcUserName, String jdbcPassword,
                          String jdbcDriverClz, String jdbcDataSourceClz) {
-        configBuilder.addExecutor([
-                name: 'jdbc',
-                factory: 'com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory',
-                url: jdbcUrl,
-                username: jdbcUserName,
-                password: jdbcPassword,
-                jdbcDriverClass: jdbcDriverClz,
-                jdbcDataSourceClass: jdbcDataSourceClz,
+        executor.url = jdbcUrl
+        executor.username = jdbcUserName
+        executor.password = jdbcPassword
+        executor.jdbcDriverClass = jdbcDriverClz
+        executor.jdbcDataSourceClass = jdbcDataSourceClz
+        this
+    }
 
-                pooling: [
-                    impl: 'com.virtusa.gto.nyql.engine.pool.impl.QHikariPool',
-                    maximumPoolSize: 1,
-                    prepStmtCacheSize: 300,
-                    prepStmtCacheSqlLimit: 2048,
-                    useServerPrepStmts: true,
-                    connectionTimeout: 30000,
-                    idleTimeout: 0,
-                    maxLifetime: 0
-                ]
-        ])
+    /**
+     * Setup jdbc pool configurations using most important parameters.
+     *
+     * Refer Hikari JDBC pool configurations for parameter descriptions.
+     *
+     * @param maxPoolSize maximum pool size.
+     * @param connectionTimeOut connection time out in milliseconds.
+     * @param idleTimeOut idle time out in milliseconds.
+     * @param maxLifeTime maximum life time in milliseconds.
+     * @return this config instance.
+     */
+    NyConfig jdbcPooling(int maxPoolSize, long connectionTimeOut = 30000, long idleTimeOut = 0, long maxLifeTime = 0) {
+        Map pool = (Map) executor.pooling
+
+        pool.maximumPoolSize = maxPoolSize
+        pool.connectionTimeout = connectionTimeOut
+        pool.idleTimeout = idleTimeOut
+        pool.maxLifetime = maxLifeTime
+        this
+    }
+
+    /**
+     * Setup jdbc pool configurations using custom pool parameters.
+     *
+     * Refer Hikari JDBC pool configurations before submitting parameters and use those
+     * parameter names exactly as the map keys.
+     *
+     * @param hikariPoolConfigs pool configs as map
+     * @return this config instance.
+     */
+    NyConfig jdbcPooling(Map hikariPoolConfigs) {
+        Map temp = new HashMap(hikariPoolConfigs)
+        temp.impl = 'com.virtusa.gto.nyql.engine.pool.impl.QHikariPool'
+        executor.pooling = temp
         this
     }
 
@@ -147,7 +264,8 @@ final class NyConfig {
      *
      * @return built configuration instance.
      */
-    Configurations build() {
+    Configurations build() throws NyConfigurationException {
+        configBuilder.addExecutor(executor)
         configBuilder.build()
     }
 
@@ -165,6 +283,12 @@ final class NyConfig {
             return new NyConfig(cb)
         }
         throw new NyConfigurationException('No default configuration file found in classpath!')
+    }
+
+    private void assertMapperSetup() throws NyConfigurationException {
+        if (mapperAdded) {
+            throw new NyConfigurationException("Cannot add more than one script mapper to configurations!")
+        }
     }
 
 }

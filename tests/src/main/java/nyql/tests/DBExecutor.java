@@ -9,7 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author IWEERARATHNA
@@ -19,10 +24,16 @@ public class DBExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBExecutor.class);
 
     public static void main(String[] args) throws Exception {
+        List<File> folders = new ArrayList<>();
+        folders.add(new File("./tests/scripts/inserts"));
+        folders.add(new File("./tests/scripts/joins"));
+
         Configurations configurations = NyConfig.withDefaults()
                 .forDatabase("mysql")
-                .scriptFolder(new File("./examples"))
-                .jdbcOptions("jdbc:mysql://localhost/sakila", "root", "root", "com.mysql.cj.jdbc.Driver")
+                .jdbcOptions("jdbc:mysql://localhost/sakila", "root", "root")
+                .jdbcPooling(10)
+                .withCaching()
+                .scriptFolders(folders)
                 .build();
 
         NyQLInstance nyQLInstance = null;
