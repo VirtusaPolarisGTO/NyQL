@@ -219,6 +219,8 @@ final class NyConfig {
         executor.password = jdbcPassword
         executor.jdbcDriverClass = jdbcDriverClz
         executor.jdbcDataSourceClass = jdbcDataSourceClz
+
+        configBuilder.havingDefaultExecutor(executor.name)
         this
     }
 
