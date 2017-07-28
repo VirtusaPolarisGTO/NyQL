@@ -426,14 +426,22 @@ class QJdbcExecutor implements QExecutor {
             throw new NyException('InsertOrLoad query has missing clauses!')
         }
 
-        NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
-        if (result.isEmpty()) {
-            // insert
-            execute(scriptList.scripts[1])
-            result = execute(scriptList.scripts[0]) as NyQLResult // get the latest value
-        }
+        try {
+            this.startTransaction()
 
-        return result
+            NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
+            if (result.isEmpty()) {
+                // insert
+                execute(scriptList.scripts[1])
+                result = execute(scriptList.scripts[0]) as NyQLResult // get the latest value
+            }
+
+            this.commit()
+            return result
+
+        } finally {
+            this.done()
+        }
     }
 
     @CompileStatic
@@ -442,27 +450,38 @@ class QJdbcExecutor implements QExecutor {
             throw new NyException('Not defined either select, insert, or update query in UPSERT query!')
         }
 
-        UpsertQuery upsertQuery = (UpsertQuery)scriptList.baseQuery
+        try {
+            this.startTransaction()
 
-        NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
-        if (result.isEmpty()) {
-            // insert
-            execute(scriptList.scripts[1])
-        } else {
-            // records exist... update
-            execute(scriptList.scripts[2])
-        }
+            UpsertQuery upsertQuery = (UpsertQuery) scriptList.baseQuery
 
-        if (upsertQuery.returningType == UpsertQuery.ReturnType.NONE) {
-            return new NyQLResult()
-        } else if (upsertQuery.returningType == UpsertQuery.ReturnType.RECORD_BEFORE) {
-            return result
-        } else {
-            if (scriptList.scripts.size() < 4) {
-                throw new NyException('Query correspond to returning upsert result is not found!')
+            NyQLResult result = execute(scriptList.scripts[0]) as NyQLResult
+            if (result.isEmpty()) {
+                // insert
+                execute(scriptList.scripts[1])
             } else {
-                return execute(scriptList.scripts[3])
+                // records exist... update
+                execute(scriptList.scripts[2])
             }
+
+            def finalRes
+            if (upsertQuery.returningType == UpsertQuery.ReturnType.NONE) {
+                finalRes = new NyQLResult()
+            } else if (upsertQuery.returningType == UpsertQuery.ReturnType.RECORD_BEFORE) {
+                finalRes = result
+            } else {
+                if (scriptList.scripts.size() < 4) {
+                    throw new NyException('Query correspond to returning upsert result is not found!')
+                } else {
+                    finalRes = execute(scriptList.scripts[3])
+                }
+            }
+
+            this.commit()
+            return finalRes
+
+        } finally {
+            this.done()
         }
     }
 

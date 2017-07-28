@@ -8,6 +8,8 @@ Now you can convert a `UPDATE` query to UPSERT query in an instant, by changing 
 
 The importance of this `UPSERT` query would be it is __cacheable__ unlike the script.
 
+**Note:** All upsert and insertOr queries are running inside a transaction implicitly.
+
 **Note:** Both `SET` and `WHERE` clauses are mandatory in a upsert query.
 
 **WARN:** Never use the upserts as bulk/batch inserts or updates since a single upsert query generates about 3 or 4 queries and can lead 
