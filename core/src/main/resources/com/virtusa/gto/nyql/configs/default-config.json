@@ -21,7 +21,7 @@
     "com.virtusa.gto.nyql.model.units.AParam.ParamScope"
   ],
 
-  "defaultExecutor": "dummy",
+  "defaultExecutor": "jdbc",
   "executors": [
     {
       "name": "dummy",
