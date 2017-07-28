@@ -17,10 +17,12 @@ import spark.Spark;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -276,7 +278,7 @@ public class NyServer {
     }
 
     private static void printLogo() {
-        String ver = readEnv("com.virtusa.gto.nyql.version", "1.1");
+        String ver = readEnv("com.virtusa.gto.nyql.version", readVersion());
         System.out.println("\t  _  _        ___                          \n" +
                 "\t | \\| | _  _ / __| ___  _ _ __ __ ___  _ _ \n" +
                 "\t | .` || || |\\__ \\/ -_)| '_|\\ V // -_)| '_|\n" +
@@ -284,6 +286,18 @@ public class NyServer {
                 "\t        |__/                               ");
         System.out.println("                                     - NyQL v" + ver);
         System.out.println();
+    }
+
+    private static String readVersion() {
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("nyql_buildinfo.properties")) {
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            return properties.getProperty("nyql.version", "[UNKNOWN]");
+
+        } catch (IOException ex) {
+            LOGGER.error("Unable to determine NyQL version!", ex);
+            return "[UNKNOWN]";
+        }
     }
 
     static String readEnv(String key, String defValue) {

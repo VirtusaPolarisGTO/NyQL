@@ -33,6 +33,7 @@ class NyQL {
     private static final String TRUE_STR = 'true'
     private static final String FALSE_STR = 'false'
     private static final String JSON_CONFIG_FILENAME = 'nyql.json'
+    private static final String NY_UNKNOWN_VERSION = '[UNKNOWN]'
 
     private static NyQLInstance nyQLInstance
 
@@ -47,6 +48,9 @@ class NyQL {
                 return
             }
 
+            LOGGER.debug(' >>> Running NyQL version: ' + readVersion() + ' <<<')
+            LOGGER.debug(' ' * STAR_LEN)
+
             configure()
 
             if (Boolean.parseBoolean(QUtils.readEnv(AUTO_SHUTDOWN_KEY, FALSE_STR))) {
@@ -60,6 +64,25 @@ class NyQL {
         } catch (Exception ex) {
             LOGGER.error('Error occurred while initializing NyQL!', ex)
             throw ex
+        }
+    }
+
+    @CompileStatic
+    private static String readVersion() {
+        InputStream inputStream
+        try {
+            inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("nyql_buildinfo.properties")
+            Properties properties = new Properties()
+            properties.load(inputStream)
+            return properties.getProperty("nyql.version", NY_UNKNOWN_VERSION)
+
+        } catch (IOException ex) {
+            LOGGER.error('Unable to determine NyQL version!', ex)
+            return NY_UNKNOWN_VERSION
+        } finally {
+            if (inputStream != null) {
+                inputStream.close()
+            }
         }
     }
 
