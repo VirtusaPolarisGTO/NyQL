@@ -98,7 +98,9 @@ class QJdbcExecutor implements QExecutor {
             if (script.proxy != null && script.proxy.queryType == QueryType.DB_FUNCTION) {
                 return executeCall(script)
             }
-            if (script.proxy.queryType == QueryType.BULK_INSERT || script.proxy.queryType == QueryType.BULK_UPDATE) {
+            if (script.proxy.queryType == QueryType.BULK_INSERT
+                    || script.proxy.queryType == QueryType.BULK_UPDATE
+                    || script.proxy.queryType == QueryType.BULK_DELETE) {
                 return batchExecute(script)
             }
 

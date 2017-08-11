@@ -16,4 +16,8 @@ public class BulksTest extends AbstractTest {
     public void testBulkUpdate() throws Exception {
         assertQueries(NyQL.parse("bulks/bulkUpdates"));
     }
+
+    public void testBulkDelete() throws Exception {
+        assertQueries(NyQL.parse("bulks/bulkDeletes"));
+    }
 }

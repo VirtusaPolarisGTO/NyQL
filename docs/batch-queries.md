@@ -18,6 +18,13 @@ $DSL.bulkUpdate {
 }
 ```
 
+For deletes:
+```groovy
+$DSL.bulkDelete {
+  // ... all delete syntax supported within here
+}
+```
+
 At runtime it expects a variable containing java list of hashmaps, which a record is equivalent to a single map. 
 Each entry in the map will contain a parameter name and value.
 

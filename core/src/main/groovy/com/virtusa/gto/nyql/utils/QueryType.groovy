@@ -29,6 +29,11 @@ enum QueryType {
     BULK_UPDATE,
 
     /**
+     * Bulk delete query.
+     */
+    BULK_DELETE,
+
+    /**
      * Update query.
      */
     UPDATE,

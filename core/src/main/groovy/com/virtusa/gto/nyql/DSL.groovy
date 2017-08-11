@@ -168,7 +168,7 @@ class DSL {
         proxy
     }
 
-    QResultProxy bulkUpdate(@DelegatesTo(value = QueryInsert, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+    QResultProxy bulkUpdate(@DelegatesTo(value = QueryUpdate, strategy = Closure.DELEGATE_ONLY) Closure closure) {
         QueryUpdate qs = new QueryUpdate(createContext())
 
         def code = closure.rehydrate(qs, this, this)
@@ -177,6 +177,18 @@ class DSL {
 
         QResultProxy proxy = qs._ctx.translator.___updateQuery(qs)
         proxy.setQueryType(QueryType.BULK_UPDATE)
+        proxy
+    }
+
+    QResultProxy bulkDelete(@DelegatesTo(value = QueryDelete, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        QueryDelete qd = new QueryDelete(createContext())
+
+        def code = closure.rehydrate(qd, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        QResultProxy proxy = qd._ctx.translator.___deleteQuery(qd)
+        proxy.setQueryType(QueryType.BULK_DELETE)
         proxy
     }
 

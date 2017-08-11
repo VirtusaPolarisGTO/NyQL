@@ -51,7 +51,9 @@ class QDummyExecutor implements QExecutor {
             } else {
                 new NyQLResult().appendCount(1)
             }
-        } else if (script.proxy.queryType == QueryType.BULK_INSERT || script.proxy.queryType == QueryType.BULK_UPDATE) {
+        } else if (script.proxy.queryType == QueryType.BULK_INSERT
+                || script.proxy.queryType == QueryType.BULK_UPDATE
+                || script.proxy.queryType == QueryType.BULK_DELETE) {
             int[] res = [1, 0, 1]
             new NyQLResult().appendCounts(res)
         } else {
