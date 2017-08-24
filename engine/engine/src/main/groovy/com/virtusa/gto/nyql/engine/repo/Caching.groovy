@@ -2,22 +2,15 @@ package com.virtusa.gto.nyql.engine.repo
 
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.NyBaseScript
-import com.virtusa.gto.nyql.model.QScript
-import com.virtusa.gto.nyql.model.QScriptMapper
-import com.virtusa.gto.nyql.model.QSession
-import com.virtusa.gto.nyql.model.QSource
+import com.virtusa.gto.nyql.model.*
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
 import org.codehaus.groovy.control.customizers.ImportCustomizer
-import org.codehaus.groovy.control.customizers.SourceAwareCustomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.util.concurrent.ConcurrentHashMap
-
 /**
  * @author IWEERARATHNA
  */
@@ -137,7 +130,7 @@ class Caching implements Closeable {
             }
         } else {
             GroovyShell shell = new GroovyShell(Thread.currentThread().contextClassLoader, binding, makeCompilerConfigs())
-            Script parsedScript = sourceScript.parseIn(shell)
+            NyBaseScript parsedScript = sourceScript.parseIn(shell)
             parsedScript.setSession(session)
             parsedScript
         }
@@ -183,13 +176,8 @@ class Caching implements Closeable {
             return compilerConfigurations
         }
 
-        compilerConfigurations = new CompilerConfiguration()
-
+        CompilerConfiguration compilerConfigurations = new CompilerConfiguration()
         compilerConfigurations.scriptBaseClass = NyBaseScript.name
-        ASTTransformationCustomizer astStatic = new ASTTransformationCustomizer(CompileStatic)
-        SourceAwareCustomizer sac = new SourceAwareCustomizer(astStatic)
-        sac.extensionValidator = { ext -> ext == 'sgroovy' }
-        compilerConfigurations.addCompilationCustomizers(sac)
 
         String[] defImports = configurations.defaultImports()
         if (defImports != null) {
@@ -207,6 +195,8 @@ class Caching implements Closeable {
             LOGGER.warn('-'*100)
         }
         compilerConfigurations.setRecompileGroovySource(doRecompile)
+
+        this.compilerConfigurations = compilerConfigurations
         compilerConfigurations
     }
 
