@@ -17,6 +17,8 @@
     - Provide loading scripts from multiple directories [#36](https://github.com/VirtusaPolarisGTO/NyQL/issues/36)
     - Convert given list of values to a table [#34](https://github.com/VirtusaPolarisGTO/NyQL/issues/34)
     - Provide syntactic sugar to create temp tables on the fly with selected data from another table [#25](https://github.com/VirtusaPolarisGTO/NyQL/issues/25)
+    - Application level pagination for SELECT queries [#46](https://github.com/VirtusaPolarisGTO/NyQL/issues/46)
+    - Application level transaction handling [#47](https://github.com/VirtusaPolarisGTO/NyQL/issues/47)
     - Query level logging enhancements [#35](https://github.com/VirtusaPolarisGTO/NyQL/issues/35)
     - Insert syntax supports for `SET {}` instead of `DATA([])` clause
     - Ability to specify length when casting [#41](https://github.com/VirtusaPolarisGTO/NyQL/issues/41)

@@ -5,6 +5,7 @@ import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.engine.exceptions.NyParamNotFoundException
 import com.virtusa.gto.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.nyql.engine.pool.QJdbcPoolFetcher
+import com.virtusa.gto.nyql.engine.transform.IterableJdbcTransformer
 import com.virtusa.gto.nyql.engine.transform.JdbcCallResultTransformer
 import com.virtusa.gto.nyql.engine.transform.JdbcCallTransformInput
 import com.virtusa.gto.nyql.engine.transform.JdbcResultTransformer
@@ -91,6 +92,7 @@ class QJdbcExecutor implements QExecutor {
             return this.execute((QScriptList)script)
         }
 
+        boolean isPaged = script instanceof QPagedScript
         PreparedStatement statement = null
         try {
             JdbcHelperUtils.logScript(script, logLevel)
@@ -112,6 +114,11 @@ class QJdbcExecutor implements QExecutor {
                 if (returnRaw) {
                     LOGGER.debug('Returning raw result')
                     return statement.executeQuery()
+
+                } else if (isPaged) {
+                    statement.setFetchSize(((QPagedScript)script).pageSize)
+                    return new IterableJdbcTransformer(this, (QPagedScript)script).apply(statement.executeQuery())
+
                 } else {
                     //LOGGER.trace('Transforming result set using {}', transformer.class.name)
                     return transformer.apply(statement.executeQuery())
@@ -269,7 +276,7 @@ class QJdbcExecutor implements QExecutor {
      * Closes the connection if reusable is not specified.
      */
     @CompileStatic
-    private void closeConnection() {
+    void closeConnection() {
         if (connection == null || reusable) {
             return
         }

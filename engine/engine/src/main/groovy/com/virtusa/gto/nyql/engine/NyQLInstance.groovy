@@ -4,7 +4,9 @@ import com.virtusa.gto.nyql.configs.ConfigBuilder
 import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.configs.ConfigParser
 import com.virtusa.gto.nyql.configs.Configurations
+import com.virtusa.gto.nyql.engine.impl.NyQLResult
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.model.QPagedScript
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QSession
 import groovy.json.JsonOutput
@@ -157,6 +159,32 @@ class NyQLInstance {
                 script.free()
             }
         }
+    }
+
+    /**
+     * Executes the given <code>select</code> query and fetches subset of result each has rows size of
+     * <code>pageSize</code>. This query will run only once in the server and the result rows are
+     * paginated.
+     * 
+     * <p>
+     *     <b>Caution:</b> This execution is NOT equivalent to the db cursors, but this is
+     *     a JDBC level pagination which makes easier for developers to iterate subset of
+     *     results efficiently from code rather not loading all result rows into the application
+     *     memory at once.
+     * </p>
+     *
+     * @param scriptName name of the script to run.
+     * @param pageSize number of rows per page to return in each block.
+     * @param data set of variables to be passed to the script run.
+     * @return an iterable list of pages (blocks) of rows. The last page may not have <code>pageSize</code> rows,
+     *          but at least one.
+     * @throws NyException any exception thrown while executing for pagination. This may cause the provided
+     *          script has none-other than SELECT query type.
+     */
+    @CompileStatic
+    Iterable<NyQLResult> paginate(String scriptName, int pageSize, Map<String, Object> data) throws NyException {
+        QScript script = new QPagedScript(parse(scriptName, data), pageSize)
+        (Iterable<NyQLResult>) configurations.executorRegistry.defaultExecutorFactory().create().execute(script)
     }
 
     /**
