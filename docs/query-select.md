@@ -50,6 +50,29 @@ FETCH (...[column | constant | parameter | function])
 
 There can have special cases when fetching columns. See below for some of scenarios and how you can handle it.
 
+#### Fetching all columns of a table
+Sometimes you need to fetch all columns in a particular table (defined with an alias) whenever there
+are multiple tables have been defined inside the query. To have those columns you must
+specify `ALL()` for the table alias. See below example.
+
+```groovy
+$DSL.select {
+    TARGET (Film.alias('f'))
+    
+    JOIN {
+        INNER_JOIN (Actor.alias('ac')) ON f.film_id, ac.film_id
+        INNER_JOIN (Role.alias('r')) ON r.role_id, ac.role_id
+    }
+    
+    // call ALL for the table alias to get all columns of that table
+    // Here we are getting all columns of Film table
+    FETCH (f.ALL(), ac.actor_id, r.role_id)
+}
+```
+
+
+
+
 #### Fetching the same column with different aliases
 For some reasons, you may want to fetch same column in two different aliases. Prior to NyQL v2.0, you must do it like below.
 

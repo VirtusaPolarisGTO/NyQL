@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class Table {
 
-    private Map<String, Column> __allColumns = [:]
+    protected Map<String, Column> __allColumns = [:]
 
     QContext _ctx = null
 
@@ -17,6 +17,17 @@ class Table {
     String __alias = null
 
     def __resultOf
+
+    TableAll ALL() {
+        TableAll tableAll = new TableAll()
+        tableAll.__alias = this.__alias
+        tableAll.__name = this.__name
+        tableAll.__schema = this.__schema
+        tableAll.__resultOf = this.__resultOf
+        tableAll._ctx = this._ctx
+        tableAll.__allColumns = this.__allColumns
+        tableAll
+    }
 
     Table alias(String newName) {
         __alias = newName

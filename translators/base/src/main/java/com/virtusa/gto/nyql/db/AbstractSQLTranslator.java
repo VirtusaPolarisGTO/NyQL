@@ -13,6 +13,7 @@ import com.virtusa.gto.nyql.QueryPart;
 import com.virtusa.gto.nyql.QuerySelect;
 import com.virtusa.gto.nyql.QueryTruncate;
 import com.virtusa.gto.nyql.Table;
+import com.virtusa.gto.nyql.TableAll;
 import com.virtusa.gto.nyql.Where;
 import com.virtusa.gto.nyql.WithClosure;
 import com.virtusa.gto.nyql.exceptions.NyException;
@@ -511,9 +512,13 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         }
 
         for (Object c : finalCols) {
-            ___scanForParameters(c, paramList);
+            if (!(c instanceof TableAll)) {
+                ___scanForParameters(c, paramList);
+            }
 
-            if (c instanceof Table) {
+            if (c instanceof TableAll) {
+                cols.add(((TableAll) c).get__alias() + ".*");
+            } else if (c instanceof Table) {
                 //appendParamsFromTable((Table)c, paramList)
                 String tbName = ___tableName((Table)c, contextType);
                 if (((Table)c).__isResultOf()) {

@@ -20,6 +20,14 @@ def innQ = $DSL.select {
     ],
 
     $DSL.select {
+        TARGET (TABLE(innQ).alias("ac"))
+        FETCH (ac.ALL())
+    },
+    [
+            mysql: ["SELECT ac.* FROM (SELECT f.id, f.year FROM `Film` f WHERE f.film_id = ?) ac", ["filmId"]]
+    ],
+
+    $DSL.select {
         TARGET (TABLE($IMPORT("innerquery/other_query")).alias("iq"))
     },
     [
