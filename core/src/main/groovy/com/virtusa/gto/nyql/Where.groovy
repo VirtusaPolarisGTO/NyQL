@@ -2,6 +2,7 @@ package com.virtusa.gto.nyql
 
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
+import com.virtusa.gto.nyql.model.QRaw
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.model.units.ParamBinary
@@ -334,6 +335,14 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
     @CompileStatic
     Where RAW(Object val) {
         clauses.add(val)
+        this
+    }
+
+    @CompileStatic
+    Where RAW(Object val, AParam... params) {
+        List<AParam> paramList = QUtils.toList(params)
+        QRaw qRaw = new QRaw(query: val, params: paramList)
+        clauses.add(new QUnaryCondition(rightOp: qRaw, op: QOperator.UNKNOWN))
         this
     }
 

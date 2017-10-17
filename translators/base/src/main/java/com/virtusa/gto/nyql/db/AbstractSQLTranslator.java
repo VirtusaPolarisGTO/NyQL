@@ -628,7 +628,8 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         boolean parenthesis = (c.getRightOp() instanceof QResultProxy);
 
         if (c instanceof Where.QUnaryCondition) {
-            return ___convertOperator(c.getOp()) + ' ' +
+            QOperator op = c.getOp();
+            return ___convertOperator(op) + (op != QOperator.UNKNOWN ? " " : "") +
                     (parenthesis ?
                             QUtils.parenthesis(___resolve(((Where.QUnaryCondition) c).chooseOp(), contextType, paramOrder))
                             : ___resolve(((Where.QUnaryCondition) c).chooseOp(), contextType, paramOrder));

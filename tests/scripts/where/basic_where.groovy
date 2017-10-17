@@ -188,6 +188,32 @@ def innQAny = $DSL.select {
         TARGET (Film.alias("f"))
         FETCH ()
         WHERE {
+            EQ (f.language_id, null)
+            AND
+            RAW ("f.title = 'Dragon'")
+        }
+    },
+    [
+            mysql: "SELECT * FROM `Film` f WHERE f.language_id IS NULL AND f.title = 'Dragon'"
+    ],
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            EQ (f.language_id, null)
+            AND
+            RAW ("f.title = ?", PARAM('dragon'))
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f WHERE f.language_id IS NULL AND f.title = ?", ['dragon']]
+    ],
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
             NEQ (f.title, STR("ACE GOLDFINDER"))
             AND
             IN (f.release_year, $SESSION.emptyList)

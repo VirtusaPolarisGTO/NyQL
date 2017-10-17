@@ -3,6 +3,7 @@ package com.virtusa.gto.nyql.db
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.JoinType
+import com.virtusa.gto.nyql.model.QRaw
 import com.virtusa.gto.nyql.model.QScriptList
 import com.virtusa.gto.nyql.model.QDbBootstrappable
 import com.virtusa.gto.nyql.model.QScriptList
@@ -57,6 +58,11 @@ trait QTranslator implements QDbBootstrappable {
         } else if (obj instanceof List) {
             return QUtils.join((List)obj, { ___resolve(it, contextType, paramOrder) }, ', ', '(', ')')
             //return obj.stream().map { (String) }.collect(Collectors.joining(', ', '(', ')'))
+        } else if (obj instanceof QRaw) {
+            for (AParam aParam : ((QRaw)obj).params) {
+                paramOrder.add(aParam)
+            }
+            return String.valueOf(((QRaw)obj).query)
         } else {
             throw new NyException('Unsupported data object to convert! [' + obj + ', type: ' + obj.class + ']')
         }

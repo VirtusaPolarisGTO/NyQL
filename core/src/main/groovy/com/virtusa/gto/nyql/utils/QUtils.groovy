@@ -27,6 +27,14 @@ final class QUtils {
     private static final String OP = '('
     private static final String CP = ')'
 
+    static <T> List<T> toList(T... items) {
+        List<T> list = new LinkedList<>()
+        for (T it : items) {
+            list.add(it)
+        }
+        list
+    }
+
     static List<QString> toQStrs(Collection<String> src) {
         src.stream().map({s -> new QString(text: (String)s)}).collect(Collectors.toList())
     }
