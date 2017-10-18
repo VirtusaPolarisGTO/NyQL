@@ -36,6 +36,22 @@
 
         $DSL.select {
             TARGET (Film.alias("f"))
+            FETCH (RAW("SUBSTRING_INDEX('Isuru', 'u', -1)"))
+        },
+        [
+                mysql: "SELECT SUBSTRING_INDEX('Isuru', 'u', -1) FROM `Film` f"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            FETCH (RAW("SUBSTRING_INDEX(?, ?)", PARAM("p1"), PARAM("p2")) )
+        },
+        [
+                mysql: ["SELECT SUBSTRING_INDEX(?, ?) FROM `Film` f", ["p1", "p2"]]
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
             FETCH (f.title.alias("title"), f.title.alias("title2"))
         },
         [

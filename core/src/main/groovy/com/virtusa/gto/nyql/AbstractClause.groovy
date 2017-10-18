@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.ValueTable
+import com.virtusa.gto.nyql.model.QRaw
 import com.virtusa.gto.nyql.model.units.*
 import com.virtusa.gto.nyql.traits.DataTypeTraits
 import com.virtusa.gto.nyql.traits.FunctionTraits
@@ -190,6 +191,12 @@ abstract class AbstractClause implements FunctionTraits, DataTypeTraits, ScriptT
 
     FunctionColumn EXISTS(QResultProxy innerQuery) {
         new FunctionColumn(_ctx: _ctx, _setOfCols: true, _func: 'exists', _columns: [innerQuery])
+    }
+
+    @CompileStatic
+    QRaw RAW(Object query, AParam... params) {
+        List<AParam> paramList = QUtils.toList(params)
+        new QRaw(query: query, params: paramList)
     }
 
     String ALL = '*'

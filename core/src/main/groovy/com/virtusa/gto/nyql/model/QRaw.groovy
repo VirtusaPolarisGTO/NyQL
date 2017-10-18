@@ -5,7 +5,7 @@ import com.virtusa.gto.nyql.model.units.AParam
 /**
  * @author iweerarathna
  */
-class QRaw {
+public class QRaw {
 
     Object query
     List<AParam> params
