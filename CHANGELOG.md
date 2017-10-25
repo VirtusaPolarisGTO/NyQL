@@ -19,6 +19,7 @@
     - Provide syntactic sugar to create temp tables on the fly with selected data from another table [#25](https://github.com/VirtusaPolarisGTO/NyQL/issues/25)
     - Application level pagination for SELECT queries [#46](https://github.com/VirtusaPolarisGTO/NyQL/issues/46)
     - Application level transaction handling [#47](https://github.com/VirtusaPolarisGTO/NyQL/issues/47)
+    - Raw query parts can be written with parameters [#49](https://github.com/VirtusaPolarisGTO/NyQL/issues/49)
     - Query level logging enhancements [#35](https://github.com/VirtusaPolarisGTO/NyQL/issues/35)
     - Insert syntax supports for `SET {}` instead of `DATA([])` clause
     - Ability to specify length when casting [#41](https://github.com/VirtusaPolarisGTO/NyQL/issues/41)
