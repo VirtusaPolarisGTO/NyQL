@@ -23,6 +23,19 @@ abstract class H2Functions extends AbstractSQLTranslator implements QFunctions {
     }
 
     @Override
+    String date_format(Object pms) {
+        def c = ___val(pms)
+        def pmx = ___pm(pms)
+
+        if (c instanceof List) {
+            return String.format('FORMATDATETIME(%s, %s)', ___resolveIn(c[0], pmx), ___resolveIn(c[1], pmx))
+        } else {
+            throw new NySyntaxException('DATE_FORMAT function requires at least two parameters!')
+        }
+    }
+
+
+    @Override
     String greatest(Object cx) {
         def c = ___val(cx)
         def pmx = ___pm(cx)

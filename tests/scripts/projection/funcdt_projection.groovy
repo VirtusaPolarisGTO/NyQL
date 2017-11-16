@@ -12,6 +12,23 @@
     ],
 
     $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH ( DATE_FORMAT(NOW(), STR('%yyyy %m %d')), DATE_FORMAT(NOW(), STR('%yyyy %m %d')).alias('wals') )
+    },
+    [
+            mysql: 'SELECT DATE_FORMAT(NOW(), "%yyyy %m %d"), DATE_FORMAT(NOW(), "%yyyy %m %d") AS wals FROM `Actor` ac'
+    ],
+
+    $DSL.select {
+        TARGET (Actor.alias("ac"))
+        FETCH ( DATE_FORMAT(ac.birthDate, PARAM('dfparam1')), DATE_FORMAT(NOW(), PARAM('dfparam2')).alias('wals') )
+    },
+    [
+            mysql: ['SELECT DATE_FORMAT(ac.birthDate, ?), DATE_FORMAT(NOW(), ?) AS wals FROM `Actor` ac',
+                    ['dfparam1', 'dfparam2']]
+    ],
+
+    $DSL.select {
         FETCH (CURRENT_TIME(), CURRENT_TIME().alias("nowTime"), CURRENT_EPOCH())
     },
     [
