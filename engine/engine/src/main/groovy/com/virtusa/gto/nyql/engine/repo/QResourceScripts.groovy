@@ -30,7 +30,11 @@ class QResourceScripts implements QScriptMapper {
             throw new NyConfigurationException('To create a new QResourceScripts requires at least one parameter with specifying a resource directory!')
         }
 
+        // FIX for issue #52
         String path = args.resourceRoot ?: ''
+        if (path.startsWith('/')) {
+            path = path.substring(1);
+        }
         new QResourceScripts(path)
     }
 
