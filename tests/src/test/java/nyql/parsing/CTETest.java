@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import org.testng.annotations.Test;
 
 /**
@@ -9,10 +8,10 @@ import org.testng.annotations.Test;
 @Test(groups = {"parsing"})
 public class CTETest extends AbstractTest {
     public void testCteBasic() throws Exception {
-        assertQueries(NyQL.parse("cte/withq"));
+        assertQueries(nyql().parse("cte/withq"));
     }
 
     public void testCteRecursive() throws Exception {
-        assertQueries(NyQL.parse("cte/withrq"));
+        assertQueries(nyql().parse("cte/withrq"));
     }
 }

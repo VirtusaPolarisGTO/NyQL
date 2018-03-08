@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -18,11 +17,11 @@ public class UpdateTest extends AbstractTest {
         //data.put("singleList", Arrays.asList(1));
         //data.put("doubleList", Arrays.asList(1, 2));
 
-        assertQueries(NyQL.parse("updates/basic", data));
+        assertQueries(nyql().parse("updates/basic", data));
     }
 
     public void testSpecials() throws Exception {
-        assertQueries(NyQL.parse("updates/specials"));
+        assertQueries(nyql().parse("updates/specials"));
     }
 
 }

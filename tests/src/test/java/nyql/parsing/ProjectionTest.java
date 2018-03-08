@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import org.testng.annotations.Test;
 
@@ -19,26 +18,26 @@ public class ProjectionTest extends AbstractTest {
         data.put("trueCondition", true);
         data.put("abc", "Hello");
 
-        assertQueries(NyQL.parse("projection/basic_projection", data));
+        assertQueries(nyql().parse("projection/basic_projection", data));
     }
 
     public void testImports() throws NyException {
-        assertQueries(NyQL.parse("projection/import_projection"));
+        assertQueries(nyql().parse("projection/import_projection"));
     }
 
     public void testFuncs() throws NyException {
         Map<String, Object> data = new HashMap<>();
         data.put("listOfInt", Arrays.asList(1, 2, 3));
 
-        assertQueries(NyQL.parse("projection/func_projection", data));
+        assertQueries(nyql().parse("projection/func_projection", data));
     }
 
     public void testFuncs2() throws NyException {
-        assertQueries(NyQL.parse("projection/func2_projection"));
+        assertQueries(nyql().parse("projection/func2_projection"));
     }
 
     public void testFuncsDates() throws NyException {
-        assertQueries(NyQL.parse("projection/funcdt_projection"));
+        assertQueries(nyql().parse("projection/funcdt_projection"));
     }
 
 }

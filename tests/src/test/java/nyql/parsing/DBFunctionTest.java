@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import org.testng.annotations.Test;
 
 /**
@@ -10,7 +9,7 @@ import org.testng.annotations.Test;
 public class DBFunctionTest extends AbstractTest {
 
     public void testFunctions() throws Exception {
-        assertQueries(NyQL.parse("dbfunctions/simple"));
+        assertQueries(nyql().parse("dbfunctions/simple"));
     }
 
 }

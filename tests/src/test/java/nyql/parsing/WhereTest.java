@@ -1,10 +1,13 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import org.testng.annotations.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author IWEERARATHNA
@@ -18,7 +21,7 @@ public class WhereTest extends AbstractTest {
         data.put("singleList", Collections.singletonList(1));
         data.put("doubleList", Arrays.asList(1, 2));
 
-        assertQueries(NyQL.parse("where/basic_where", data));
+        assertQueries(nyql().parse("where/basic_where", data));
     }
 
     public void testImport() throws NyException {
@@ -27,6 +30,6 @@ public class WhereTest extends AbstractTest {
 //        data.put("singleList", Arrays.asList(1));
 //        data.put("doubleList", Arrays.asList(1, 2));
 
-        assertQueries(NyQL.parse("where/where_import"));
+        assertQueries(nyql().parse("where/where_import"));
     }
 }

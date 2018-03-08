@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import org.testng.annotations.Test;
 
@@ -11,14 +10,14 @@ import org.testng.annotations.Test;
 public class DeleteTest extends AbstractTest {
 
     public void testDelete() throws NyException {
-        assertQueries(NyQL.parse("delete/basic"));
+        assertQueries(nyql().parse("delete/basic"));
     }
 
     public void testJoins() throws NyException {
-        assertQueries(NyQL.parse("delete/joins"));
+        assertQueries(nyql().parse("delete/joins"));
     }
 
     public void testTruncate() throws NyException {
-        assertQueries(NyQL.parse("delete/truncate"));
+        assertQueries(nyql().parse("delete/truncate"));
     }
 }

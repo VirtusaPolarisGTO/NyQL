@@ -105,22 +105,60 @@ To disable logging, use slf4j Nop logger.
 </dependency>
 ```
 
+#### Quick Start
+  After you have added above dependencies, you can create a `NyQLInstance` to
+  run queries like below.
+  
+```java 
+     public class Main {
+         
+         public static void main(String[] args) throws Exception {
+             // create a new nyql instance using minimum but
+             // mandatory parameters.
+             NyQLInstance nyInstance = NyQLInstance.create(new File(fileLocation));
+             
+             // use this retrieved instance to execute queries...
+             NyQLResult result = nyInstance.execute('script-id', data);
+         
+            // when your application closes, call shutdown
+            nyInstance.shutdown();
+         }
+     }
+ ```
+ 
+ Or, you can configure it without a configuration json file like below.  
+  
+```java 
+     public class Main {
+         
+         public static void main(String[] args) throws Exception {
+             // create a new nyql instance using minimum but
+             // mandatory parameters.
+             Configurations nyConfigs = NyConfig.withDefaults()
+                                    .forDatabase("mysql")
+                                    .scriptFolder(new File("./scripts"))
+                                    .jdbcOptions("jdbc:mysql://localhost/sampledb", "username", "password")
+                                    .build();
+             NyQLInstance nyInstance = NyQLInstance.create(nyConfigs);
+             
+             // use this retrieved instance to execute queries...
+         
+            // when your application closes, call shutdown
+            nyInstance.shutdown();
+         }
+     }
+ ```
+
 #### Note
 
-* By default, NyQL will try to configure itself automatically if classpath contains a nyql configuration file. 
-If you want to turn it off, add a system property `com.virtusa.gto.nyql.autoBootstrap` value set as `false`. 
-  * __Eg:__ your application may start with below jvm argument.
-   `-Dcom.virtusa.gto.nyql.autoBootstrap=false`
-
-* Also NyQL will __not__ automatically shutdown when your application closes, but if you specified jvm property
-`com.virtusa.gto.nyql.addShutdownHook=true`, then NyQL will automatically add a shutdown hook for your application.
-
-* NyQL will first search for a configuration file in its classpath, if not found, then it will search in current working directory.
+* NyQL will __not__ automatically shutdown when your application closes, but if you specified jvm property
+`com.virtusa.gto.nyql.addShutdownHook=true`, then NyQL will automatically add a shutdown hook for your 
+initialized instance.
 
 #### Configuration JSON
 
 * NyQL uses a configuration json file in the classpath to configure automatically. See a sample [nyql.json](nyql.json). It has below properties.
-    * **translators**: an array of fully qualified class names of db factories. These will be loaded at the beginning and will throw exception if not found. So make sure you specify only you needed.
+    * **version**: `2` This property must be in all configuration files when using v2 or above.
     * **activate**: the active database implementation name. This must be equal to a name returned by any translator.
     * **caching**: 
       * **compiledScripts**: Whether to cache the groovy compiled scripts or not. Recommended to set this `true`.
@@ -150,92 +188,7 @@ expecting to execute in cloud environments or secure environments. Below shows t
   * **NYQL_JDBC_PASSWORD**: database password in plaintext.
   * **NYQL_JDBC_PASSWORD_ENC**: base64 encoded database password.
   * **NYQL_JDBC_DRIVER**: driver class name of the jdbc driver.
-
-3. There are three ways of configuring and running NyQL from a java application.
-  * __Per-process configuration__: Use this method if you are absolutely sure that you use only one instance of NyQL in the 
-   application process. Here you should be able to use static methods provided by `NyQL` class. See below example code.
-   
-   ```java 
-   public class Main {
-       
-       public static void main(String[] args) throws Exception {
-           // configure NyQL somewhere in starting point
-           // of your application lifecycle.
-           NyQL.configure(jsonFile);
-           
-           try {
-               // your session variables or parameter values...
-               Map<String, Object> data = new HashMap<>();
-               
-               // to parse and see the query
-               NyQL.parse("<script-name>", data);
-               
-               // to execute and get results
-               NyQL.execute("<script-name>", data);
-               
-           } finally {
-               // call shutdown at the end of your application.
-               NyQL.shutdown();
-           }
-       }
-   }
-   ```
-
-   
-  * __Multi-instances per-process configuration__: In this method, you may initialize several instances of NyQL in your application
-  process and use them separately. This is applicable if your application has several components and each component
-  may need to use separate executors with different configurations (specially JDBC pools). __Note:__ NyQL never store the 
-  created NyQL instance in its configuration space, and application should take responsibility of storing returned nyql instance.
-
-    ```java 
-       public class Main {
-           
-           public static void main(String[] args) throws Exception {
-               // create a new nyql instance from input configuration file.
-               // save this instance somewhere in your application, and 
-               // this does never stored by NyQL internally.
-               NyQLInstance nyInstance = NyQLInstance.create(jsonFile);
-               
-               try {
-                   // your session variables or parameter values...
-                   Map<String, Object> data = new HashMap<>();
-                   
-                   // use the instance to parse and see the query
-                   nyInstance.parse("<script-name>", data);
-                   
-                   // use the instance to execute and get results
-                   nyInstance.execute("<script-name>", data);
-                   
-               } finally {
-                   // call shutdown at the end of your application.
-                   nyInstance.shutdown();
-               }
-           }
-       }
-       ```
-       
-  * __Quick and short configuration__ : Here you can programmatically configure NyQL for quick
-  java applications like shown in below using `NyConfig` class. Only you need to say is which database to
-  activate, where is your scripts folder, and jdbc parameters.
-  
-    ```java 
-         public class Main {
-             
-             public static void main(String[] args) throws Exception {
-                 // create a new nyql instance using minimum but
-                 // mandatory parameters.
-                 Configurations nyConfigs = NyConfig.withDefaults()
-                                        .forDatabase("mysql")
-                                        .scriptFolder(new File("./scripts"))
-                                        .jdbcOptions("jdbc:mysql://localhost/sampledb", "username", "password")
-                                        .build();
-                 NyQLInstance nyInstance = NyQLInstance.create(nyConfigs);
-                 
-                 // use this retrieved instance to execute queries...
-             }
-         }
-     ```
-     
+ 
 ## Links     
     
  * [For issues or feature request, use github issue tracker](https://github.com/VirtusaPolarisGTO/NyQL/issues).

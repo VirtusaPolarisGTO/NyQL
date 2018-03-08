@@ -9,6 +9,7 @@ import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.utils.QUtils
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
+import groovy.transform.PackageScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -17,8 +18,11 @@ import java.nio.charset.StandardCharsets
  * Main interface to interact with NyQL queries.
  *
  * @author IWEERARATHNA
+ *
  */
 @SuppressWarnings('CatchException')
+@Deprecated
+@PackageScope
 class NyQL {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NyQL)

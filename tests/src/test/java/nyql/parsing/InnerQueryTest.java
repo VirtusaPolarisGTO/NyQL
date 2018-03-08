@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import org.testng.annotations.Test;
 
@@ -11,15 +10,15 @@ import org.testng.annotations.Test;
 public class InnerQueryTest extends AbstractTest {
 
     public void testTargetTable() throws NyException {
-        assertQueries(NyQL.parse("innerquery/target_iq"));
+        assertQueries(nyql().parse("innerquery/target_iq"));
     }
 
     public void testProjection() throws NyException {
-        assertQueries(NyQL.parse("innerquery/projection_innerq"));
+        assertQueries(nyql().parse("innerquery/projection_innerq"));
     }
 
     public void testInnerQuery() throws NyException {
-        assertQueries(NyQL.parse("innerquery/inner_query"));
+        assertQueries(nyql().parse("innerquery/inner_query"));
     }
 
 }

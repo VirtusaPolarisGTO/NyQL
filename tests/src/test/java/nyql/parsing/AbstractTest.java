@@ -1,7 +1,7 @@
 package nyql.parsing;
 
 import com.virtusa.gto.nyql.QResultProxy;
-import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.model.QScript;
 import com.virtusa.gto.nyql.model.QScriptList;
 import com.virtusa.gto.nyql.model.QScriptResult;
@@ -23,8 +23,14 @@ public class AbstractTest {
 
     private String activeDb;
 
+    private static NyQLInstance nyQLInstance;
+
+    protected static NyQLInstance nyql() {
+        return nyQLInstance;
+    }
+
     public void assertQueries(Object objects) {
-        activeDb = NyQL.getConfigurations().getActivatedDb();
+        activeDb = nyql().getConfigurations().getActivatedDb();
 
         Object val = objects;
         if (objects instanceof QScriptResult) {
@@ -136,13 +142,13 @@ public class AbstractTest {
     public static void setupTests() {
         //if (NyQL.hasConfigured()) {
             //System.setProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true");
-            NyQL.configure(new File("./configs/nyql.json"));
+            nyQLInstance = NyQLInstance.create(new File("./configs/nyql.json"));
         //}
     }
 
     @AfterSuite
     public static void tearDownTests() {
         System.out.println("Shutting down test.");
-        NyQL.shutdown();
+        nyql().shutdown();
     }
 }

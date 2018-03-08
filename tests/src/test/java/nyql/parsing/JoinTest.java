@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import org.testng.annotations.Test;
 
@@ -11,10 +10,10 @@ import org.testng.annotations.Test;
 public class JoinTest extends AbstractTest {
 
     public void testBasic() throws NyException {
-        assertQueries(NyQL.parse("joins/simple"));
+        assertQueries(nyql().parse("joins/simple"));
     }
 
     public void testImports() throws NyException {
-        assertQueries(NyQL.parse("joins/import_test"));
+        assertQueries(nyql().parse("joins/import_test"));
     }
 }

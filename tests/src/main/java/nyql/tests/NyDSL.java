@@ -1,11 +1,13 @@
 package nyql.tests;
 
-import com.virtusa.gto.nyql.engine.NyQL;
+import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import com.virtusa.gto.nyql.model.QScript;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -26,14 +28,17 @@ public class NyDSL {
     }
 
     public static void main(String[] args) throws NyException {
+        NyQLInstance nyQLInstance = null;
         try {
-            NyQL.configure(new File("./configs/nyql.json"));
+            nyQLInstance = NyQLInstance.create(new File("./configs/nyql.json"));
 
-            QScript aaa = NyQL.parse("aaa", new HashMap<>());
+            QScript aaa = nyQLInstance.parse("aaa", new HashMap<>());
             System.out.println(aaa);
 
         } finally {
-            NyQL.shutdown();
+            if (nyQLInstance != null) {
+                nyQLInstance.shutdown();
+            }
         }
     }
 

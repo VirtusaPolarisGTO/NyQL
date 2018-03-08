@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.engine.impl.NyQLResult;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import org.testng.Assert;
@@ -16,7 +15,7 @@ import java.util.List;
 public class ResultTest extends AbstractTest {
 
     public void testResults() throws NyException {
-        NyQLResult result = NyQL.execute("scripts/aselect");
+        NyQLResult result = nyql().execute("scripts/aselect");
         result.mutateToInt("id");
         result.mutateToBool("aboolCol");
         result.mutateToDouble("price");
@@ -62,7 +61,7 @@ public class ResultTest extends AbstractTest {
     }
 
     public void testInsertResults() throws NyException {
-        NyQLResult result = NyQL.execute("scripts/ainsert");
+        NyQLResult result = nyql().execute("scripts/ainsert");
         Assert.assertEquals(result.affectedCount(), 1);
         try {
             result.affectedKeys();
@@ -78,7 +77,7 @@ public class ResultTest extends AbstractTest {
             // exception expected
         }
 
-        NyQLResult result2 = NyQL.execute("scripts/ainsert_keys");
+        NyQLResult result2 = nyql().execute("scripts/ainsert_keys");
         Assert.assertEquals(result2.affectedCount(), 2);
         List<Integer> items = new ArrayList<>();
         items.add(10);
@@ -87,7 +86,7 @@ public class ResultTest extends AbstractTest {
     }
 
     public void testBulkInserts() throws NyException {
-        NyQLResult result = NyQL.execute("scripts/abulkinsert");
+        NyQLResult result = nyql().execute("scripts/abulkinsert");
         List<Integer> items = new ArrayList<>();
         items.add(1);
         items.add(0);

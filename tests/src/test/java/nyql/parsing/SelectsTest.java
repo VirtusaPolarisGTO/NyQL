@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import org.testng.annotations.Test;
 
 /**
@@ -10,11 +9,11 @@ import org.testng.annotations.Test;
 public class SelectsTest extends AbstractTest {
 
     public void testBasic() throws Exception {
-        assertQueries(NyQL.parse("selects/basic"));
+        assertQueries(nyql().parse("selects/basic"));
     }
 
     public void testValueTables() throws Exception {
-        assertQueries(NyQL.parse("selects/valuetables"));
+        assertQueries(nyql().parse("selects/valuetables"));
     }
 
 }

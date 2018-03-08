@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import org.testng.annotations.Test;
 
@@ -11,11 +10,11 @@ import org.testng.annotations.Test;
 public class DDLTest extends AbstractTest {
 
     public void testTempTable() throws NyException {
-        assertQueries(NyQL.parse("ddl/temp_tables"));
+        assertQueries(nyql().parse("ddl/temp_tables"));
     }
 
     public void testNormalTable() throws NyException {
-        assertQueries(NyQL.parse("ddl/normal_tables"));
+        assertQueries(nyql().parse("ddl/normal_tables"));
     }
 
 }

@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -18,14 +17,14 @@ public class UpsertsTest extends AbstractTest {
         //data.put("singleList", Arrays.asList(1));
         //data.put("doubleList", Arrays.asList(1, 2));
 
-        assertQueries(NyQL.parse("upserts/upserts", data));
+        assertQueries(nyql().parse("upserts/upserts", data));
     }
 
     public void testInsertOrLoad() throws Exception {
         Map<String, Object> data = new HashMap<>();
         data.put("title", "Yeah");
 
-        assertQueries(NyQL.parse("upserts/insertOr", data));
+        assertQueries(nyql().parse("upserts/insertOr", data));
     }
 
 

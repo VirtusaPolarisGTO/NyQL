@@ -2,7 +2,6 @@ package nyql.tests;
 
 import com.virtusa.gto.nyql.configs.Configurations;
 import com.virtusa.gto.nyql.configs.NyConfig;
-import com.virtusa.gto.nyql.engine.NyQL;
 import com.virtusa.gto.nyql.engine.NyQLInstance;
 import com.virtusa.gto.nyql.model.QScript;
 import org.slf4j.Logger;
@@ -76,7 +75,7 @@ public class DBExecutor {
         //parse();
     }
 
-    private static void parse() throws Exception {
+    private static void parse(NyQLInstance nyQLInstance) throws Exception {
         Map<String, Object> data = new HashMap<>();
         List<Integer> teams = asList(1410, 1411);
         List<Integer> modules = asList(97389, 97390, 97391);
@@ -85,17 +84,17 @@ public class DBExecutor {
         data.put("moduleIDs", modules);
         data.put("filmId", 250);
 
-        QScript result = NyQL.parse("select", data);
+        QScript result = nyQLInstance.parse("select", data);
         System.out.println(result);
     }
 
-    private static void execute() throws Exception {
+    private static void execute(NyQLInstance nyQLInstance) throws Exception {
         Map<String, Object> data = new HashMap<>();
         data.put("minRentals", 25);
         data.put("customerId", 2);
         data.put("filmId", 250);
 
-        Object result = NyQL.execute("top_customers", data);
+        Object result = nyQLInstance.execute("top_customers", data);
         if (result instanceof List) {
             for (Object row : (List)result) {
                 LOGGER.debug(row.toString());

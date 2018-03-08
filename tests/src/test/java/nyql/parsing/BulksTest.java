@@ -1,6 +1,5 @@
 package nyql.parsing;
 
-import com.virtusa.gto.nyql.engine.NyQL;
 import org.testng.annotations.Test;
 
 /**
@@ -10,14 +9,14 @@ import org.testng.annotations.Test;
 public class BulksTest extends AbstractTest {
 
     public void testBulkInsert() throws Exception {
-        assertQueries(NyQL.parse("bulks/bulkInserts"));
+        assertQueries(nyql().parse("bulks/bulkInserts"));
     }
 
     public void testBulkUpdate() throws Exception {
-        assertQueries(NyQL.parse("bulks/bulkUpdates"));
+        assertQueries(nyql().parse("bulks/bulkUpdates"));
     }
 
     public void testBulkDelete() throws Exception {
-        assertQueries(NyQL.parse("bulks/bulkDeletes"));
+        assertQueries(nyql().parse("bulks/bulkDeletes"));
     }
 }
