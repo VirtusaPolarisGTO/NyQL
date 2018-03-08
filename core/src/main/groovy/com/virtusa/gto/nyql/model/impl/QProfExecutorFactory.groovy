@@ -25,6 +25,11 @@ class QProfExecutorFactory implements QExecutorFactory {
     }
 
     @Override
+    String getName() {
+        qExecutorFactory.getName()
+    }
+
+    @Override
     DbInfo init(Map options, Configurations configs) {
         qExecutorFactory.init(options, configs)
     }

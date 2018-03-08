@@ -25,10 +25,13 @@ class ConfigBuilder {
     ConfigBuilder(String name = null) {
         String theName = name
         if (theName == null) {
-            LOGGER.warn("Configuration instance must have a unique name to identify itself! Generating a random UUID...")
-            LOGGER.warn("  - This might cause identifying harder each time the runtime is restarted.")
-            theName = UUID.randomUUID().toString()
+            def uuid = UUID.randomUUID().toString()
+            LOGGER.warn('Configuration instance must have a unique name to identify itself! Generating a random UUID...')
+            LOGGER.warn('  - This might cause identifying harder each time the runtime is restarted.')
+            theName = uuid
         }
+
+        LOGGER.info("NyQL Instance Id: ${theName}")
         props.name = theName
     }
 

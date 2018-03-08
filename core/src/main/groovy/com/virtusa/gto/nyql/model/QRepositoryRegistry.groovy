@@ -44,6 +44,10 @@ final class QRepositoryRegistry {
         defRepo
     }
 
+    Set<String> listAll() {
+        factories.keySet()
+    }
+
     QRepositoryFactory getRepositoryFactory(String name) {
         if (factories.containsKey(name)) {
             return factories.get(name)

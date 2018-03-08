@@ -13,6 +13,11 @@ class QDummyExecFactory implements QExecutorFactory {
     private Configurations nyqlConfigs
 
     @Override
+    String getName() {
+        'dummy'
+    }
+
+    @Override
     DbInfo init(Map options, Configurations configurations) {
         nyqlConfigs = configurations
         DbInfo.UNRESOLVED

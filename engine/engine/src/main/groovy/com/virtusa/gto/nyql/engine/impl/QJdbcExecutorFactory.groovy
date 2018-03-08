@@ -23,6 +23,11 @@ class QJdbcExecutorFactory implements QExecutorFactory {
     private Configurations nyqlConfigs
 
     @Override
+    String getName() {
+        'jdbc'
+    }
+
+    @Override
     DbInfo init(Map options, Configurations configurations) throws NyConfigurationException {
         nyqlConfigs = configurations
         if (options.pooling) {

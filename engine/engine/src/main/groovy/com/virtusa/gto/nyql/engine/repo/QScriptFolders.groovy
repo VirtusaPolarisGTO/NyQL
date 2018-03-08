@@ -2,7 +2,6 @@ package com.virtusa.gto.nyql.engine.repo
 
 import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
-import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.model.QScriptMapper
 import com.virtusa.gto.nyql.model.QSource
@@ -47,48 +46,6 @@ class QScriptFolders implements QScriptMapper {
         }
         scriptsFolderList << impl
         this
-    }
-
-    @SuppressWarnings("UnnecessaryGetter")
-    static QScriptFolders createNew(Map args) throws NyException {
-        if (args == null || args.size() == 0 || !args.baseDirs) {
-            throw new NyConfigurationException('To create a new QScriptsFolder requires at least ' +
-                    'one parameter with specifying one or many directories!')
-        }
-
-        List<Object> paths = (List<Object>) args.baseDirs
-        List<List<?>> folders = []
-        for (Object item : paths) {
-            List<?> list
-            if (item instanceof String) {
-                list = [(String)item, null, null]
-            } else if (item instanceof Map) {
-                Map tmp = (Map)item
-                list = [(String)tmp['baseDir'], (String)tmp[QScriptsFolder.KEY_INCLUSIONS], (String)tmp[QScriptsFolder.KEY_EXCLUSIONS]]
-            } else {
-                throw new NyConfigurationException('Unknown argument type received specifying multiple script directories!')
-            }
-
-            String incl = list.get(1) ?: ''
-            String excl = list.get(2) ?: ''
-
-            String path = (String)list.get(0)
-            File dir = new File(path)
-            if (!dir.exists()) {
-                String configFilePath = args._location
-                if (configFilePath != null) {
-                    File activeDir = new File(configFilePath).getCanonicalFile().getParentFile()
-                    if (activeDir.exists() && !dir.isAbsolute()) {
-                        folders << [activeDir.toPath().resolve(path).toFile(), incl, excl]
-                        continue
-                    }
-                }
-                throw new NyConfigurationException("One of script folder does not exist! $path")
-            } else {
-                folders << [dir, incl, excl]
-            }
-        }
-        new QScriptFolders(folders)
     }
 
     @Override

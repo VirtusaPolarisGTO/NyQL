@@ -1,13 +1,10 @@
 package com.virtusa.gto.nyql.engine.repo
 
 import com.virtusa.gto.nyql.configs.ConfigKeys
-import com.virtusa.gto.nyql.exceptions.NyConfigurationException
-import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.model.QFileSource
 import com.virtusa.gto.nyql.model.QScriptMapper
 import com.virtusa.gto.nyql.model.QSource
-import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -82,33 +79,6 @@ class QScriptsFolder implements QScriptMapper {
             return path.substring(0, lp)
         }
         path
-    }
-
-    @SuppressWarnings('UnnecessaryGetter')
-    static QScriptsFolder createNew(Map args) throws NyException {
-        if (args == null || args.size() == 0 || !args.baseDir) {
-            throw new NyConfigurationException('To create a new QScriptsFolder requires at least one parameter with specifying base directory!')
-        }
-
-        String path = QUtils.readEnv(ConfigKeys.SYS_SCRIPT_DIR, String.valueOf(args.baseDir))
-        File dir = new File(path)
-        if (!dir.exists()) {
-            String configFilePath = args._location
-            if (configFilePath != null) {
-                File activeDir = new File(configFilePath).getCanonicalFile()
-                if (activeDir.exists() && !dir.isAbsolute()) {
-                    QScriptsFolder qScriptsFolder = new QScriptsFolder(activeDir.toPath().resolve(path).toFile())
-                    qScriptsFolder.inclusionPatterns = args[KEY_INCLUSIONS] ?: ''
-                    qScriptsFolder.exclusionPatterns = args[KEY_EXCLUSIONS] ?: ''
-                    return qScriptsFolder.scanDir()
-                }
-            }
-            throw new NyConfigurationException('Given script folder does not exist! [' + path + ']')
-        }
-        QScriptsFolder qScriptsFolder = new QScriptsFolder(dir)
-        qScriptsFolder.inclusionPatterns = args[KEY_INCLUSIONS] ?: ''
-        qScriptsFolder.exclusionPatterns = args[KEY_EXCLUSIONS] ?: ''
-        qScriptsFolder.scanDir()
     }
 
     @Override

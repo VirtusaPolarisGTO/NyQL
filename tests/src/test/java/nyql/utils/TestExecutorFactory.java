@@ -26,6 +26,11 @@ public class TestExecutorFactory implements QExecutorFactory {
 //    }
 
     @Override
+    public String getName() {
+        return "test";
+    }
+
+    @Override
     public DbInfo init(Map options, Configurations configurations) {
         nyConfigs = configurations;
         if (options.containsKey("max")) {

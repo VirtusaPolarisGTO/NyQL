@@ -25,6 +25,11 @@ class QExternalJdbcFactory implements QExecutorFactory {
     }
 
     @Override
+    String getName() {
+        'jdbc-external'
+    }
+
+    @Override
     DbInfo init(Map options, Configurations configurations) {
         nyqlConfigs = configurations
         DbInfo.deriveFromConnection(connection)

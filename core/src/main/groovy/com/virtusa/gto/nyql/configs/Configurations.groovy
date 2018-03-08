@@ -53,6 +53,7 @@ class Configurations {
     protected QDatabaseRegistry databaseRegistry
     protected QExecutorRegistry executorRegistry
     protected QRepositoryRegistry repositoryRegistry
+    protected QMapperRegistry mapperRegistry
 
     @PackageScope Configurations() {}
 
@@ -77,6 +78,7 @@ class Configurations {
         databaseRegistry = QDatabaseRegistry.newInstance()
         executorRegistry = QExecutorRegistry.newInstance()
         repositoryRegistry = QRepositoryRegistry.newInstance()
+        mapperRegistry = QMapperRegistry.newInstance().discover(this.classLoader)
 
         // load query related configurations
         loadQueryInfo(properties.queries as Map)
@@ -167,7 +169,7 @@ class Configurations {
         }
     }
 
-    private boolean loadProfiler() throws NyConfigurationException {
+    protected boolean loadProfiler() throws NyConfigurationException {
         def profiling = properties[ConfigKeys.PROFILING]
         if (profiling?.enabled) {
             def prof = profiling.profiler
@@ -194,15 +196,14 @@ class Configurations {
         List repos = properties.repositories ?: []
         for (Map r : repos) {
             Map args = r.mapperArgs ?: [:]
-            args.put('_location', properties._location)
+            args.put(ConfigKeys.LOCATION_KEY, properties._location)
 
             boolean thisDef = r.name == defRepo
-            //QScriptMapper scriptMapper = classLoader.loadClass(String.valueOf(r.mapper)).createNew(args)
-            QScriptMapper scriptMapper = ReflectUtils.callStaticMethod(String.valueOf(r.mapper), classLoader, args)
-            QRepository qRepository = ReflectUtils.newInstance(String.valueOf(r.repo), classLoader,
-                    this, scriptMapper)
-            //QRepository qRepository = (QRepository) classLoader.loadClass(String.valueOf(r.repo))
-            //        .newInstance([this, scriptMapper].toArray())
+            String mapper = String.valueOf(r.mapper)
+
+            QMapperFactory mapperFactory = mapperRegistry.getMapperFactory(mapper)
+            QScriptMapper scriptMapper = mapperFactory.create(mapper, args, this)
+            QRepository qRepository = ReflectUtils.newInstance(String.valueOf(r.repo), classLoader, this, scriptMapper)
 
             if (profEnabled) {
                 qRepository = new QProfRepository(this, qRepository)

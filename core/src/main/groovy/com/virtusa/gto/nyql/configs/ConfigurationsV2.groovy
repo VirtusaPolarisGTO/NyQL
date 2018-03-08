@@ -7,7 +7,6 @@ import com.virtusa.gto.nyql.model.*
 import com.virtusa.gto.nyql.model.impl.QProfExecutorFactory
 import com.virtusa.gto.nyql.model.impl.QProfRepository
 import com.virtusa.gto.nyql.utils.Constants
-import com.virtusa.gto.nyql.utils.ReflectUtils
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,8 +25,15 @@ class ConfigurationsV2 extends Configurations {
     protected void doConfig() throws NyException {
         ClassLoader classLoader = super.classLoader
         databaseRegistry = QDatabaseRegistry.newInstance().discover(classLoader)
-        executorRegistry = QExecutorRegistry.newInstance()
+        executorRegistry = QExecutorRegistry.newInstance().discover(classLoader)
         repositoryRegistry = QRepositoryRegistry.newInstance().discover(classLoader)
+        mapperRegistry = QMapperRegistry.newInstance().discover(classLoader)
+
+        // validations before executions
+        validateTranslators()
+        validateExecutors()
+        validateRepositories()
+        validateMappers()
 
         // load query related configurations
         loadQueryInfo(getQueryConfigs())
@@ -37,7 +43,6 @@ class ConfigurationsV2 extends Configurations {
         // mark active database
         String activeDb = getActivatedDb()
         LOGGER.info("Activated: ${activeDb}")
-        checkTranslators(activeDb)
 
         // load repositories
         loadRepos(profileEnabled)
@@ -50,13 +55,41 @@ class ConfigurationsV2 extends Configurations {
         factory.init(this, dbInfo)
     }
 
-    protected void checkTranslators(String activeDb) {
-        if (activeDb == null) {
-            throw new NyConfigurationException('No database has been specified to be activated!')
-        }
+    @CompileStatic
+    void validateMappers() {
+        def allMaps = mapperRegistry.listAll()
+        LOGGER.info("Found mapper implementations in classpath: [ ${allMaps.join(', ')} ]")
 
+        if (allMaps.isEmpty()) {
+            throw new NyConfigurationException('No mapper implementations has been found in classpath!')
+        }
+    }
+
+    void validateRepositories() {
+        def allRepos = repositoryRegistry.listAll()
+        LOGGER.info("Found repository implementations in classpath: [ ${allRepos.join(', ')} ]")
+
+        if (allRepos.isEmpty()) {
+            throw new NyConfigurationException('No repository implementations has been found in classpath!')
+        }
+    }
+
+    void validateTranslators() {
         def allDbs = databaseRegistry.listAll()
         LOGGER.info("Found database implementations in classpath: [ ${allDbs.join(', ')} ]")
+
+        if (allDbs.isEmpty()) {
+            throw new NyConfigurationException('No database implementations has been found in classpath!')
+        }
+    }
+
+    void validateExecutors() {
+        def allExecs = executorRegistry.listAll()
+        LOGGER.info("Found executor implementations in classpath: [ ${allExecs.join(', ')} ]")
+
+        if (allExecs.isEmpty()) {
+            throw new NyConfigurationException('No executor implementations has been found in classpath!')
+        }
     }
 
     @CompileStatic
@@ -68,17 +101,18 @@ class ConfigurationsV2 extends Configurations {
         String execName = executor.get('name')
         String execImpl = executor.get('impl')
 
+        // set default as specified one...
+        executorRegistry.makeDefault(execImpl)
+
         executor.putIfAbsent(ConfigKeys.JDBC_DRIVER_CLASS_KEY, activeFactory.driverClassName())
         executor.putIfAbsent(ConfigKeys.JDBC_DATASOURCE_CLASS_KEY, activeFactory.dataSourceClassName())
 
-        QExecutorFactory executorFactory = (QExecutorFactory) ReflectUtils.newInstance(execImpl, classLoader, executor)
+        QExecutorFactory executorFactory = executorRegistry.getExecutorFactory(execImpl)
 
         if (profEnabled) {
             executorFactory = new QProfExecutorFactory(this, executorFactory)
         }
         DbInfo activeDbInfo = executorFactory.init(executor, this)
-        executorRegistry.register(execName, executorFactory)
-
         activeDbInfo
     }
 
@@ -95,8 +129,9 @@ class ConfigurationsV2 extends Configurations {
         Map args = (repository.get('mapperArgs') ?: [:]) as Map
         args.put(ConfigKeys.LOCATION_KEY, properties._location)
 
-        // @TODO call from mapper factory
-        QScriptMapper scriptMapper = (QScriptMapper) ReflectUtils.callStaticMethod(mapper, classLoader, args)
+        // call from mapper factory
+        def mapperFactory = mapperRegistry.getMapperFactory(mapper)
+        QScriptMapper scriptMapper = mapperFactory.create(mapper, args, this)
 
         def factory = repositoryRegistry.getRepositoryFactory(repoImpl)
         QRepository qRepository = factory.create(this, scriptMapper)

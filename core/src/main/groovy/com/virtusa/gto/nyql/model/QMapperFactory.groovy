@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 interface QMapperFactory {
 
-    QScriptMapper create(Map args, Configurations configurations)
+    String[] supportedMappers()
+
+    QScriptMapper create(String implName, Map args, Configurations configurations)
 
 }

@@ -30,9 +30,5 @@
     "mapperArgs": {
       "baseDir": "./scripts"
     }
-  },
-
-  "profiling": {
-    "enabled": false
   }
 }

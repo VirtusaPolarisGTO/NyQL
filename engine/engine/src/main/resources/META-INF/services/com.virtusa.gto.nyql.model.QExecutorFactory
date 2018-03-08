@@ -1,0 +1,2 @@
+com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory
+com.virtusa.gto.nyql.engine.impl.QDummyExecFactory

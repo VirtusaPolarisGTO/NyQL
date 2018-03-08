@@ -1,7 +1,6 @@
 package com.virtusa.gto.nyql.engine.repo
 
 import com.virtusa.gto.nyql.configs.ConfigKeys
-import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyScriptNotFoundException
 import com.virtusa.gto.nyql.model.QScriptMapper
@@ -23,15 +22,6 @@ class QResourceScripts implements QScriptMapper {
 
     QResourceScripts(String theRootDir) {
         rootRes = theRootDir
-    }
-
-    static QResourceScripts createNew(Map args) throws NyException {
-        if (args == null || args.size() == 0 || !args.resourceRoot) {
-            throw new NyConfigurationException('To create a new QResourceScripts requires at least one parameter with specifying a resource directory!')
-        }
-
-        String path = args.resourceRoot ?: ''
-        new QResourceScripts(path)
     }
 
     @Override

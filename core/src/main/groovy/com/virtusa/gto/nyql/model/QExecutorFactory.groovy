@@ -8,6 +8,8 @@ import com.virtusa.gto.nyql.exceptions.NyConfigurationException
  */
 interface QExecutorFactory {
 
+    String getName()
+
     DbInfo init(Map options, Configurations configurations) throws NyConfigurationException
 
     QExecutor create()
