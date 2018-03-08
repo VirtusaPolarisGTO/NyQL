@@ -20,4 +20,6 @@ final class Constants {
     static final String DEFAULT_REPOSITORY_IMPL = 'default'
 
     static final String DEFAULT_EXECUTOR_NAME = 'jdbc'
+
+    static final String PROFILING_REPO_NAME = 'profiling'
 }

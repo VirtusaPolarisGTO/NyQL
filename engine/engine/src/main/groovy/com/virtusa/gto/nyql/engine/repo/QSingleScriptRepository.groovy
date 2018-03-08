@@ -22,6 +22,11 @@ class QSingleScriptRepository extends QRepositoryImpl {
     }
 
     @Override
+    String getName() {
+        'single'
+    }
+
+    @Override
     QScript parse(String scriptId, QSession session) throws NyException {
         QSource qSource = mapper.map(scriptId)
         if (qSource.codeSource == null) {

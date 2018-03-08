@@ -3,13 +3,7 @@ package com.virtusa.gto.nyql.configs
 import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.DbInfo
-import com.virtusa.gto.nyql.model.QDatabaseRegistry
-import com.virtusa.gto.nyql.model.QExecutorFactory
-import com.virtusa.gto.nyql.model.QExecutorRegistry
-import com.virtusa.gto.nyql.model.QRepository
-import com.virtusa.gto.nyql.model.QRepositoryRegistry
-import com.virtusa.gto.nyql.model.QScriptMapper
+import com.virtusa.gto.nyql.model.*
 import com.virtusa.gto.nyql.model.impl.QProfExecutorFactory
 import com.virtusa.gto.nyql.model.impl.QProfRepository
 import com.virtusa.gto.nyql.utils.Constants
@@ -30,9 +24,10 @@ class ConfigurationsV2 extends Configurations {
 
     @Override
     protected void doConfig() throws NyException {
-        databaseRegistry = QDatabaseRegistry.newInstance().discover(super.classLoader)
+        ClassLoader classLoader = super.classLoader
+        databaseRegistry = QDatabaseRegistry.newInstance().discover(classLoader)
         executorRegistry = QExecutorRegistry.newInstance()
-        repositoryRegistry = QRepositoryRegistry.newInstance()
+        repositoryRegistry = QRepositoryRegistry.newInstance().discover(classLoader)
 
         // load query related configurations
         loadQueryInfo(getQueryConfigs())
@@ -102,7 +97,9 @@ class ConfigurationsV2 extends Configurations {
 
         // @TODO call from mapper factory
         QScriptMapper scriptMapper = (QScriptMapper) ReflectUtils.callStaticMethod(mapper, classLoader, args)
-        QRepository qRepository = (QRepository) ReflectUtils.newInstance(repoImpl, classLoader, this, scriptMapper)
+
+        def factory = repositoryRegistry.getRepositoryFactory(repoImpl)
+        QRepository qRepository = factory.create(this, scriptMapper)
 
         if (profEnabled) {
             qRepository = new QProfRepository(this, qRepository)

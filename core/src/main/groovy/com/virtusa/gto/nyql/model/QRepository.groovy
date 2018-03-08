@@ -12,6 +12,13 @@ import com.virtusa.gto.nyql.exceptions.NyException
 trait QRepository implements Closeable {
 
     /**
+     * Returns unique name of this repository.
+     *
+     * @return unique name
+     */
+    abstract String getName()
+
+    /**
      * Clears the cache.
      *
      * @param level which level to clear.

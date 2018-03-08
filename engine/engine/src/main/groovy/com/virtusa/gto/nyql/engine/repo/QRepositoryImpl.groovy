@@ -6,6 +6,7 @@ import com.virtusa.gto.nyql.engine.exceptions.NyScriptExecutionException
 import com.virtusa.gto.nyql.engine.exceptions.NyScriptParseException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.*
+import com.virtusa.gto.nyql.utils.Constants
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.control.CompilationFailedException
 import org.slf4j.Logger
@@ -39,6 +40,11 @@ class QRepositoryImpl implements QRepository {
         if (mapper.canCacheAtStartup()) {
             caching.compileAllScripts(mapper.allSources())
         }
+    }
+
+    @Override
+    String getName() {
+        Constants.DEFAULT_REPOSITORY_IMPL
     }
 
     void clearCache(int level) {

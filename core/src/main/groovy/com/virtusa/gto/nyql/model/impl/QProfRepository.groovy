@@ -23,6 +23,11 @@ class QProfRepository implements QRepository {
     }
 
     @Override
+    String getName() {
+        repository.getName()
+    }
+
+    @Override
     void clearCache(int level) {
         repository.clearCache(level)
     }

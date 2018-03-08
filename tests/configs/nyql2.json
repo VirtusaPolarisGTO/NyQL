@@ -28,7 +28,7 @@
   "repository": {
     "mapper": "com.virtusa.gto.nyql.engine.repo.QScriptsFolder",
     "mapperArgs": {
-      "baseDir": "C:\\Projects\\work\\V6\\database\\scripts"
+      "baseDir": "./scripts"
     }
   },
 

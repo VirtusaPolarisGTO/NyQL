@@ -24,6 +24,18 @@ class Configurations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurations)
 
+    private static final String[] DEF_IMPORTS = [
+            "groovy.transform.Field",
+            "com.virtusa.gto.nyql.ddl.DKeyIndexType",
+            "com.virtusa.gto.nyql.ddl.DFieldType",
+            "com.virtusa.gto.nyql.ddl.DReferenceOption",
+            "com.virtusa.gto.nyql.utils.QueryType",
+            "java.sql.JDBCType",
+            "java.sql.Types",
+            "com.virtusa.gto.nyql.model.units.AParam.ParamScope"
+    ]
+    private static final String[] NO_DEF_IMPORTS = []
+
     private static final Map Q_LOGGING_LEVELS = [trace: 1, debug: 2, info: 3, warn: 4, error: 5].asImmutable()
 
     protected DateTimeFormatter timestampFormatter = DateTimeFormatter.ISO_INSTANT
@@ -299,7 +311,18 @@ class Configurations {
     }
 
     String[] defaultImports() {
-        properties.defaultImports
+        Object defImports = properties.defaultImports
+        if (defImports == null) {
+            DEF_IMPORTS
+        } else if (Boolean.isAssignableFrom(defImports.class)) {
+            if ((boolean) defImports) {
+                DEF_IMPORTS
+            } else {
+                null
+            }
+        } else {
+            (String[]) defImports
+        }
     }
 
     String getActivatedDb() {
