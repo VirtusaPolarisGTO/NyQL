@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets
 @SuppressWarnings('CatchException')
 @Deprecated
 @PackageScope
+@CompileStatic
 class NyQL {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NyQL)
@@ -71,7 +72,6 @@ class NyQL {
         }
     }
 
-    @CompileStatic
     private static String readVersion() {
         InputStream inputStream
         try {
@@ -97,9 +97,10 @@ class NyQL {
      * @param inputJson input json file.
      * @param force if specified true, then configurations will be reloaded.
      */
+    @CompileStatic
     static void configure(File inputJson=null, boolean force=false) {
         boolean serverMode = QUtils.readEnv(MODE_KEY, "").equalsIgnoreCase("server")
-        if (!Configurations.instance().isConfigured() || force) {
+        //// if (!Configurations.instance().isConfigured() || force) {
             LOGGER.warn('NyQL is going to configure with default configurations using classpath...')
             if (!configFromSystemProperty() && !configFromClasspath()) {
                 File nyConfig = inputJson ?: new File(JSON_CONFIG_FILENAME)
@@ -121,9 +122,9 @@ class NyQL {
                 }
             }
 
-        } else {
-            LOGGER.warn('NyQL has already been configured!')
-        }
+        //// } else {
+        ////    LOGGER.warn('NyQL has already been configured!')
+        //// }
     }
 
     /**

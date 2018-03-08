@@ -6,6 +6,7 @@ import com.virtusa.gto.nyql.configs.ConfigParser
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.engine.impl.NyQLResult
 import com.virtusa.gto.nyql.exceptions.NyException
+import com.virtusa.gto.nyql.model.NyQLMXBean
 import com.virtusa.gto.nyql.model.QPagedScript
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QSession
@@ -17,7 +18,7 @@ import java.util.function.BiFunction
  * @author IWEERARATHNA
  */
 @CompileStatic
-class NyQLInstance {
+class NyQLInstance implements NyQLMXBean {
     
     private static final Map<String, Object> EMPTY_MAP = [:]
 
@@ -256,5 +257,14 @@ class NyQLInstance {
         } finally {
             qSession.executor.done()
         }
+    }
+
+    // *******************************************************************
+    //          JMX Methods
+    // *******************************************************************
+
+    @Override
+    Object executeScript(String scriptName, Map<String, Object> data) throws NyException {
+        return execute(scriptName, data)
     }
 }

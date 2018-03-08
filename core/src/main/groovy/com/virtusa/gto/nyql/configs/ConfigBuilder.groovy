@@ -5,11 +5,15 @@ import com.virtusa.gto.nyql.model.QProfiling
 import com.virtusa.gto.nyql.model.QRepository
 import com.virtusa.gto.nyql.model.QScriptMapper
 import groovy.transform.PackageScope
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * @author IWEERARATHNA
  */
 class ConfigBuilder {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ConfigBuilder)
 
     private boolean hasInitialized = false
     private final Object lock = new Object()
@@ -18,7 +22,15 @@ class ConfigBuilder {
     private Map<String, QScriptMapper> scriptMapper = [:]
 
     @PackageScope
-    ConfigBuilder() {}
+    ConfigBuilder(String name = null) {
+        String theName = name
+        if (theName == null) {
+            LOGGER.warn("Configuration instance must have a unique name to identify itself! Generating a random UUID...")
+            LOGGER.warn("  - This might cause identifying harder each time the runtime is restarted.")
+            theName = UUID.randomUUID().toString()
+        }
+        props.name = theName
+    }
 
     /**
      * Enable profiler in nyql. Profiler will passively run and notifies
@@ -289,7 +301,7 @@ class ConfigBuilder {
         synchronized (lock) {
             hasInitialized = true
         }
-        new Configurations().configure(props)
+        ConfigFactory.create(props).configure(props)
     }
 
     /**
@@ -305,15 +317,6 @@ class ConfigBuilder {
         synchronized (lock) {
             hasInitialized = false
         }
-    }
-
-    private static class Holder {
-        /**
-         * Suppressing unused private field because this is being used by owner class
-         * as a singleton instance.
-         */
-        @SuppressWarnings('UnusedPrivateField')
-        private static final ConfigBuilder INSTANCE = new ConfigBuilder()
     }
 
 }

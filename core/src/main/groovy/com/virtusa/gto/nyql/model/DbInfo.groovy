@@ -28,7 +28,7 @@ class DbInfo {
             dbInfo.setMinorVersion(connection.getMetaData().databaseMinorVersion)
             dbInfo.setVendor(connection.getMetaData().databaseProductName)
         } catch (Exception ex) {
-            throw new NyConfigurationException("Error occurred while retreiving database information!", ex)
+            throw new NyConfigurationException("Error occurred while retrieving database information!", ex)
         } finally {
             if (connection != null) {
                 connection.close()

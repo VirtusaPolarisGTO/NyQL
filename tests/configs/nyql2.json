@@ -1,0 +1,38 @@
+{
+  "version": 2,
+
+  "activate": "mysql",
+
+  "caching": {
+    "compiledScripts": true,
+    "generatedQueries": true,
+    "allowRecompilation": true
+  },
+
+  "executor": {
+    "name": "default",
+    "impl": "jdbc",
+
+    "url": "",
+    "urlParams": {
+
+    },
+    "username": "",
+    "password": "",
+
+    "pooling": {
+      "impl": ""
+    }
+  },
+
+  "repository": {
+    "mapper": "com.virtusa.gto.nyql.engine.repo.QScriptsFolder",
+    "mapperArgs": {
+      "baseDir": "C:\\Projects\\work\\V6\\database\\scripts"
+    }
+  },
+
+  "profiling": {
+    "enabled": false
+  }
+}

@@ -9,6 +9,7 @@ import com.virtusa.gto.nyql.model.impl.QProfExecutorFactory
 import com.virtusa.gto.nyql.model.impl.QProfRepository
 import com.virtusa.gto.nyql.utils.Constants
 import com.virtusa.gto.nyql.utils.QUtils
+import com.virtusa.gto.nyql.utils.ReflectUtils
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 import org.slf4j.Logger
@@ -23,22 +24,23 @@ class Configurations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurations)
 
-    private static final Map Q_LOGGING_LEVELS = [trace: 1, debug: 2, info: 3, warn: 4, error: 5]
+    private static final Map Q_LOGGING_LEVELS = [trace: 1, debug: 2, info: 3, warn: 4, error: 5].asImmutable()
 
-    private DateTimeFormatter timestampFormatter = DateTimeFormatter.ISO_INSTANT
+    protected DateTimeFormatter timestampFormatter = DateTimeFormatter.ISO_INSTANT
 
-    private Map properties = [:]
+    protected Map properties = [:]
 
-    private int qLogLevel = -1
-    private String cacheVarName
-    private final Object lock = new Object()
-    private boolean configured = false
-    private ClassLoader classLoader
-    private QProfiling profiler
+    protected String name
+    protected int qLogLevel = -1
+    protected String cacheVarName
+    protected final Object lock = new Object()
+    protected boolean configured = false
+    protected ClassLoader classLoader
+    protected QProfiling profiler
 
-    private QDatabaseRegistry databaseRegistry
-    private QExecutorRegistry executorRegistry
-    private QRepositoryRegistry repositoryRegistry
+    protected QDatabaseRegistry databaseRegistry
+    protected QExecutorRegistry executorRegistry
+    protected QRepositoryRegistry repositoryRegistry
 
     @PackageScope Configurations() {}
 
@@ -59,7 +61,7 @@ class Configurations {
         }
     }
 
-    private void doConfig() throws NyException {
+    protected void doConfig() throws NyException {
         databaseRegistry = QDatabaseRegistry.newInstance()
         executorRegistry = QExecutorRegistry.newInstance()
         repositoryRegistry = QRepositoryRegistry.newInstance()
@@ -67,15 +69,7 @@ class Configurations {
         // load query related configurations
         loadQueryInfo(properties.queries as Map)
 
-        boolean profileEnabled = loadProfiler()
-        if (!profileEnabled) {
-            LOGGER.warn('Query profiling has been disabled! You might not be able to figure out timing of executions.')
-        } else {
-            LOGGER.debug("Query profiling enabled with ${profiler.getClass().simpleName}!")
-            Map profOptions = properties.profiling?.options ?: [:]
-            profOptions['isCached'] = properties.caching.compiledScripts
-            profiler.start(profOptions)
-        }
+        boolean profileEnabled = startProfiler()
 
         // mark active database
         String activeDb = getActivatedDb()
@@ -92,8 +86,26 @@ class Configurations {
         def factory = databaseRegistry.getDbFactory(activeDb)
         factory.init(this, dbInfo)
 
+        runBootstrapScript(activeDb, factory)
+    }
+
+    protected boolean startProfiler() {
+        boolean profileEnabled = loadProfiler()
+        if (!profileEnabled) {
+            LOGGER.warn('Query profiling has been disabled! You might not be able to figure out timing of executions.')
+        } else {
+            LOGGER.debug("Query profiling enabled with ${profiler.getClass().simpleName}!")
+            Map profOptions = properties.profiling?.options ?: [:]
+            profOptions['isCached'] = properties.caching.compiledScripts
+            profiler.start(profOptions)
+        }
+        profileEnabled
+    }
+
+    @CompileStatic
+    private void runBootstrapScript(String activeDb, QDbFactory dbFactory) {
         QSession bootSession = QSession.create(this, '__bootstrapscript__')
-        def scripts = factory.createTranslator().getBootstrapScripts(bootSession)
+        def scripts = dbFactory.createTranslator().getBootstrapScripts(bootSession)
         if (scripts != null) {
             LOGGER.debug("Bootstrapping database using initial scripts [" + activeDb + "]...")
             executorRegistry.defaultExecutorFactory().create().execute(scripts)
@@ -127,7 +139,7 @@ class Configurations {
     }
 
     @CompileStatic
-    private void loadQueryInfo(Map options) {
+    protected void loadQueryInfo(Map options) {
         if (options != null && options.parameters) {
             Map paramConfig = options.parameters as Map
             String tsFormat = paramConfig[ConfigKeys.QUERY_TIMESTAMP_FORMAT]
@@ -164,7 +176,7 @@ class Configurations {
         }
     }
 
-    private void loadRepos(boolean profEnabled=false) {
+    protected void loadRepos(boolean profEnabled=false) {
         int added = 0
         String defRepo = properties.defaultRepository ?: Constants.DEFAULT_REPOSITORY_NAME
         List repos = properties.repositories ?: []
@@ -173,9 +185,12 @@ class Configurations {
             args.put('_location', properties._location)
 
             boolean thisDef = r.name == defRepo
-            QScriptMapper scriptMapper = classLoader.loadClass(String.valueOf(r.mapper)).createNew(args)
-            QRepository qRepository = (QRepository) classLoader.loadClass(String.valueOf(r.repo))
-                    .newInstance([this, scriptMapper].toArray())
+            //QScriptMapper scriptMapper = classLoader.loadClass(String.valueOf(r.mapper)).createNew(args)
+            QScriptMapper scriptMapper = ReflectUtils.callStaticMethod(String.valueOf(r.mapper), classLoader, args)
+            QRepository qRepository = ReflectUtils.newInstance(String.valueOf(r.repo), classLoader,
+                    this, scriptMapper)
+            //QRepository qRepository = (QRepository) classLoader.loadClass(String.valueOf(r.repo))
+            //        .newInstance([this, scriptMapper].toArray())
 
             if (profEnabled) {
                 qRepository = new QProfRepository(this, qRepository)
@@ -194,7 +209,7 @@ class Configurations {
         }
     }
 
-    private DbInfo loadExecutors(String activeDb, boolean profEnabled=false) {
+    protected DbInfo loadExecutors(String activeDb, boolean profEnabled=false) {
         QDbFactory activeFactory = databaseRegistry.getDbFactory(activeDb)
         boolean loadDefOnly = properties.loadDefaultExecutorOnly ?: false
         String defExec = properties.defaultExecutor ?: Constants.DEFAULT_EXECUTOR_NAME
@@ -345,6 +360,10 @@ class Configurations {
         databaseRegistry.getDbFactory(getActivatedDb())
     }
 
+    Map getQueryConfigs() {
+        properties.queries as Map
+    }
+
     /**
      * Returns query logging level. By default is is set to 'trace'.
      *
@@ -357,14 +376,6 @@ class Configurations {
             qLogLevel = (int) Q_LOGGING_LEVELS.getOrDefault(properties.queryLoggingLevel ?: 'trace', 1)
             qLogLevel
         }
-    }
-
-    static Configurations instance() {
-        Holder.INSTANCE
-    }
-
-    private static class Holder {
-        private static final Configurations INSTANCE = new Configurations()
     }
 
 }
