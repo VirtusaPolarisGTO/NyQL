@@ -98,7 +98,7 @@ class ConfigurationsV2 extends Configurations {
         QDbFactory activeFactory = databaseRegistry.getDbFactory(activeDb)
         Map executor = properties.get(ConfigKeys.EXECUTOR) as Map
 
-        String execName = executor.get('name')
+        // String execName = executor.get('name')
         String execImpl = executor.get('impl')
 
         // set default as specified one...

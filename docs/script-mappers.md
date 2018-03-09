@@ -1,21 +1,25 @@
 # Script Mappers
 
-By design, NyQL is expecting all your script (query) files are accessible as files. At runtime, it uses a mapper to fetch relevant script content  from the given script id. These mappers provide below functionality to the NyQL.
+By design, NyQL is expecting all your script (query) files are accessible as files. 
+At runtime, it uses a mapper to fetch relevant script content  from the given script id. These mappers provide below functionality to the NyQL.
   * __Script referencing:__ for a given script id, it returns corresponding script source loading from anywhere you like.
   * __Caching:__ you may use your own caching mechanism to load scripts, or even watch script changes and act accordingly.
 
 
-By default, NyQL provides three types of mapper implementations. Detailed descriptions are shown below.
+By default, NyQL provides three types of mapper implementations. 
+Since v2, rather than specifying the full qualified classnames, it uses an unique id
+to access a mapper implementation. Detailed descriptions are shown below.
 
-| Name | Details | Compilable-At-Startup | Reloadable |
-|---|---| --- | --- |
-|QScriptsFolder |  Recursively load all scripts under a directory. | yes | yes
-|QScriptFolders |  Read several directories and load all scripts on those directories. | yes | yes
-|QResourceScripts |  Read scripts dynamically at runtime which are under a single resource path (inside a jar). | no | no
+| id | Name | Details | Compilable-At-Startup | Reloadable |
+|---| ---|---| --- | --- |
+|folder|QScriptsFolder |  Recursively load all scripts under a directory. | yes | yes
+|folders|QScriptFolders |  Read several directories and load all scripts on those directories. | yes | yes
+|resources|QResourceScripts |  Read scripts dynamically at runtime which are under a single resource path (inside a jar). | no | no
  
 
 #### Loading Scripts from a Single Directory
  * Use _QScriptsFolder_ mapper implementation. 
+ * Impl id: ___folder___
  * Impl class: _com.virtusa.gto.nyql.engine.repo.QScriptsFolder_
  * Script Id = relative path from the base directory.
  * Options:
@@ -27,7 +31,7 @@ By default, NyQL provides three types of mapper implementations. Detailed descri
  
  ```json
  {
-  "mapper": "com.virtusa.gto.nyql.engine.repo.QScriptsFolder",
+  "mapper": "folder",
   "mapperArgs": {
     "baseDir": "./examples",
     
@@ -39,6 +43,7 @@ By default, NyQL provides three types of mapper implementations. Detailed descri
 
 #### Loading Scripts from Multiple Directories
  * Use _QScriptFolders_ mapper.
+ * Impl id: ___folders___
  * Impl class: _com.virtusa.gto.nyql.engine.repo.QScriptFolders_
  * Script Id = relative path from the correspondent base directory which script has loaded from.
  * Options:
@@ -47,7 +52,7 @@ By default, NyQL provides three types of mapper implementations. Detailed descri
  
 ```json
 {
-"mapper": "com.virtusa.gto.nyql.engine.repo.QScriptFolders",
+"mapper": "folders",
 "mapperArgs": {
   "baseDirs": ["./scripts-dir-1", "./scripts-dir-2"]
 }
@@ -58,7 +63,7 @@ loading from single directory with same properties. See below example.
 
 ```json
 {
-"mapper": "com.virtusa.gto.nyql.engine.repo.QScriptFolders",
+"mapper": "folders",
 "mapperArgs": {
   "baseDirs": [ "./scripts-dir-1", 
                {
@@ -72,8 +77,9 @@ loading from single directory with same properties. See below example.
 As you can see you may use directory name, or, directory name + exclusions interchangeably within the same array.
 
 
-#### Loading Scripts from Classpath (inside a jar)
+#### Loading Scripts from Classpath
 * Use _QResourceScripts_ mapper.
+* Impl id: ___resources___
 * Impl class: _com.virtusa.gto.nyql.engine.repo.QResourceScripts_
 * Script Id = relative path from specified classpath base location
 * Options:
@@ -83,7 +89,7 @@ Hence scripts will be compiled on demand whenever the script is being referenced
 
 ```json
 {
-"mapper": "com.virtusa.gto.nyql.engine.repo.QResourceScripts",
+"mapper": "resources",
 "mapperArgs": {
   "resourceRoot": "/com/nyql/scripts"
 }
@@ -94,7 +100,8 @@ You can also write your own mapper class and load scripts from desired location(
 
 You are feel free to contribute to NyQL by writing such useful mappers.
 
-Say that you want to implement a mapper to load scripts from a network location at runtime. For that you need to implement a new mapper implementation and register it with NyQL through its configurations.
+Say that you want to implement a mapper to load scripts from a network location at runtime. 
+For that you need to implement a new mapper implementation and register it with NyQL through its configurations.
 
 * Create a class implementing interface `QScriptMapper`.
 
@@ -110,27 +117,44 @@ public class NetworkScripts implements QScriptMapper {
    * __canCacheAtStartup()__ : Returns the status of ability to cache sources returned by this mapper interface.
    * __reload(id)__ : Returns the most recent version of given script loading again. If the implementation cannot or does not allow to reload, return the same already loaded `QScript` instance.
    
-* Additionally you must implement a static method accepting an input Map as a parameter in the class having name of `createNew`. Here this method will act as your factory method and should return the same instance as its implemented class. The input parameter map contains all the configuration keys specified in the nyql.json file under `mapperArgs`. See below example. 
-
+* Also you must create a factory class `QMapperFactory` to provide instances of your mapper class.
+In the factory implementation, you should override two methods, namely, `supportedMappers` and `create`.
+  * `supportedMappers` will return unique ids of supporting implementation of mappers from this factory.
+  * `create` will have the specified mapper id (one of supported mapper ids), the argument map as specified
+  in `mapperArgs` in _nyql.json_, and the configuration instance as inputs. This method should return a new instance
+  of mapper implementation by using received parameters.
+  
 ```java
-public class NetworkScripts implements QScriptMapper {
+public class NetworkScriptsMapperFactory implements QMapperFactory {
     // ...
 
-    public static NetworkScripts createNew(Map inputConf) throws NyException {
-        // ...
+    public String[] supportedMappers() {
+        return new String[] { "network" };
+    }
+
+    public QScriptMapper create(String implName, Map args, Configurations configurations) throws NyException {
+        // ... create instance of NetworkScripts here
     }
 }
 ```
 
-* Register the mapper along with the repository in `nyql.json` file.
+* Then create a service file inside `META-INF/services` directory having filename as the base service name, 
+i.e. `com.virtusa.gto.nyql.model.QMapperFactory`. And inside the file place a line of fully qualified classname of 
+the actual mapper factory implementation class.
+
+_META-INF/services/com.virtusa.gto.nyql.model.QMapperFactory_
+```text
+com.xxx.xxx.xxx.NetworkScriptsMapperFactory
+```
+
+Replace _xxx_ s with your package name. Then your factory class will be automatically pickedup when it is in the classpath.
+
+* Register the mapper factory along with the repository in `nyql.json` file.
 
 ```json
-"repositories": [
+"repository": [
     {
-        "name": "default",
-        "repo": "com.virtusa.gto.nyql.engine.repo.QRepositoryImpl",
-        "mapper": "<full-class-name-to-your-new-mapper>",
-
+        "mapper": "network",
         "mapperArgs": {
                ...
         }
