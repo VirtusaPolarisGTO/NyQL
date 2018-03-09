@@ -1,7 +1,10 @@
 package com.virtusa.gto.nyql.engine.pool.impl
 
 import com.virtusa.gto.nyql.configs.ConfigKeys
+import com.virtusa.gto.nyql.configs.Configurations
+import com.virtusa.gto.nyql.configs.ConfigurationsV2
 import com.virtusa.gto.nyql.engine.pool.QJdbcPool
+import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.exceptions.NyInitializationException
 import com.virtusa.gto.nyql.utils.QUtils
@@ -22,7 +25,7 @@ import java.sql.Connection
  */
 class QHikariPool implements QJdbcPool {
 
-    private static final String DEF_POOL_NAME = 'NyPool'
+    private static final String DEF_POOL_SUFFIX = '-Pool'
 
     private static final Logger LOGGER =  LoggerFactory.getLogger(QHikariPool)
     private HikariDataSource hikari = null
@@ -35,14 +38,17 @@ class QHikariPool implements QJdbcPool {
     }
 
     @Override
-    void init(Map options) throws NyException {
+    String getName() {
+        'hikari'
+    }
+
+    @Override
+    void init(Map options, Configurations configurations) throws NyException {
         HikariConfig config = new HikariConfig();
         //config.setDataSourceClassName(String.valueOf(options.dataSourceClassName))
         String jdbcDriverClass = QUtils.readEnv(ConfigKeys.SYS_JDBC_DRIVER)
         String jdbcUrl = QUtils.readEnv(ConfigKeys.SYS_JDBC_URL, String.valueOf(options.url))
         String jdbcUserName = QUtils.readEnv(ConfigKeys.SYS_JDBC_USERNAME, String.valueOf(options.username))
-        String jdbcPassword = QUtils.readEnv(ConfigKeys.SYS_JDBC_PASSWORD)
-        int retryCount = Integer.parseInt(QUtils.readEnv(ConfigKeys.SYS_CONNECT_RETRY_COUNT, "5"))
 
         if (jdbcDriverClass != null) {
             config.setDriverClassName(jdbcDriverClass)
@@ -51,23 +57,10 @@ class QHikariPool implements QJdbcPool {
         }
         config.setJdbcUrl(jdbcUrl)
         config.setUsername(jdbcUserName)
+        config.setPassword(derivePassword(options, configurations))
 
-        // read password correctly
-        String passEnc = QUtils.readEnv(ConfigKeys.SYS_JDBC_PASSWORD_ENC)
-        if (passEnc != null) {
-            config.setPassword(new String(Base64.decoder.decode(passEnc), StandardCharsets.UTF_8))
-        } else if (jdbcPassword != null) {
-            config.setPassword(jdbcPassword)
-        } else if (options.passwordEnc) {
-            config.setPassword(new String(Base64.decoder.decode(String.valueOf(options.passwordEnc)), StandardCharsets.UTF_8))
-        } else {
-            config.setPassword(String.valueOf(options.password))
-        }
-
-        config.setPoolName(DEF_POOL_NAME)
-
-        LOGGER.debug('JDBC Hikari Pool Configurations:')
-        LOGGER.debug('  - JDBC ' + config.getJdbcUrl() + ', @user: ' + config.getUsername())
+        String poolName = configurations.getName() + DEF_POOL_SUFFIX
+        config.setPoolName(poolName)
 
         if (options.pooling) {
             Map poolingConfigs = options.pooling as Map
@@ -84,12 +77,46 @@ class QHikariPool implements QJdbcPool {
             config.setDataSourceProperties(properties)
         }
 
-        initHikariPool(config, retryCount)
+        Integer retryCount = (Integer) options.getOrDefault('retryCount', 5)
+        Integer retryInterval = (Integer) options.getOrDefault('retryInterval', 5000)
+        initHikariPool(config, retryCount, retryInterval)
     }
 
     @CompileStatic
-    private void initHikariPool(HikariConfig config, int retryCount) {
-        int retryInterval = Integer.parseInt(QUtils.readEnv(ConfigKeys.SYS_CONNECT_RETRY_INTERVAL, "2000"))
+    private static String derivePassword(Map options, Configurations configurations) throws NyConfigurationException {
+        String passEnc = QUtils.readEnv(ConfigKeys.SYS_JDBC_PASSWORD_ENC)
+        String jdbcPassword = QUtils.readEnv(ConfigKeys.SYS_JDBC_PASSWORD)
+        boolean isV2 = configurations instanceof ConfigurationsV2
+
+        try {
+            if (passEnc != null) {
+                return new String(Base64.decoder.decode(passEnc), StandardCharsets.UTF_8)
+            } else if (jdbcPassword != null) {
+                return jdbcPassword
+            } else if (options.passwordEnc) {
+                return new String(Base64.decoder.decode(String.valueOf(options.passwordEnc)), StandardCharsets.UTF_8)
+            } else {
+                if (isV2) {
+                    // in version 2, it is mandatory to specify password base64 encoded
+                    return new String(Base64.decoder.decode(String.valueOf(options.password)), StandardCharsets.UTF_8)
+                } else {
+                    return String.valueOf(options.password)
+                }
+            }
+        } catch (Exception ex) {
+            if (isV2) {
+                throw new NyConfigurationException('In NyQL v2, it is mandatory to specify password in base64 encoded format!', ex)
+            } else {
+                throw new NyConfigurationException('Failed to decode password as given in configuration!', ex)
+            }
+        }
+    }
+
+    @CompileStatic
+    private void initHikariPool(HikariConfig config, int defRetryCount, int defRetryInterval) {
+        int retryInterval = Integer.parseInt(QUtils.readEnv(ConfigKeys.SYS_CONNECT_RETRY_INTERVAL, String.valueOf(defRetryInterval)))
+        int retryCount = Integer.parseInt(QUtils.readEnv(ConfigKeys.SYS_CONNECT_RETRY_COUNT, String.valueOf(defRetryCount)))
+
         synchronized (hikariLock) {
             int count = 0
             while (true) {

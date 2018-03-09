@@ -27,6 +27,10 @@ final class QUtils {
     private static final String OP = '('
     private static final String CP = ')'
 
+    static String genId() {
+        UUID.randomUUID().toString().replace('-', '')
+    }
+
     static <T> List<T> toList(T... items) {
         List<T> list = new LinkedList<>()
         for (T it : items) {

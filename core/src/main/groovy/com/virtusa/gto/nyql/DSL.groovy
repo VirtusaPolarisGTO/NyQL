@@ -424,7 +424,7 @@ class DSL {
     }
 
     DSL $LOG(String message) {
-        LOGGER.debug('[@ ' + session.currentActiveScript() + ' @]' + message)
+        LOGGER.debug('[' + session.configurations.getName() + '@' + session.currentActiveScript() + ']' + message)
         this
     }
 

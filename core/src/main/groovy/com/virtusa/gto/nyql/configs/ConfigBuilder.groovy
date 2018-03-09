@@ -4,6 +4,7 @@ import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.model.QProfiling
 import com.virtusa.gto.nyql.model.QRepository
 import com.virtusa.gto.nyql.model.QScriptMapper
+import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.PackageScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +26,7 @@ class ConfigBuilder {
     ConfigBuilder(String name = null) {
         String theName = name
         if (theName == null) {
-            def uuid = UUID.randomUUID().toString()
+            def uuid = QUtils.genId()
             LOGGER.warn('Configuration instance must have a unique name to identify itself! Generating a random UUID...')
             LOGGER.warn('  - This might cause identifying harder each time the runtime is restarted.')
             theName = uuid

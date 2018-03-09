@@ -6,6 +6,7 @@ import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.model.DbInfo
 import com.virtusa.gto.nyql.model.QExecutor
 import com.virtusa.gto.nyql.model.QExecutorFactory
+import com.virtusa.gto.nyql.utils.ReflectUtils
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,24 +30,40 @@ class QJdbcExecutorFactory implements QExecutorFactory {
 
     @Override
     DbInfo init(Map options, Configurations configurations) throws NyConfigurationException {
+        LOGGER.info("Initializing database connection...")
         nyqlConfigs = configurations
         if (options.pooling) {
             String implClz = String.valueOf(options.pooling['impl'] ?: '')
             if (!implClz.isEmpty()) {
-                try {
-                    LOGGER.debug('Initializing pool implementation: [' + implClz + ']')
-                    jdbcPool = (QJdbcPool) Thread.currentThread().contextClassLoader.loadClass(implClz).newInstance()
-                } catch (ClassNotFoundException ex) {
-                    throw new NyConfigurationException('JDBC pool implementation not found! ' + implClz, ex)
-                }
+                jdbcPool = loadPool(implClz)
             } else {
-                throw new NyConfigurationException('JDBC pooling class has not been specified!')
+                throw new NyConfigurationException("JDBC pooling implementation has not been specified under key 'impl'!")
             }
-            jdbcPool.init(options)
+            jdbcPool.init(options, configurations)
             return getDatabaseInfo()
         } else {
             throw new NyConfigurationException(this.class.name + ' is for producing pooled jdbc executors. ' +
-                    'If you want to use non-pooled jdbc executor use another implementation!')
+                    'If you want to use non-pooled jdbc executor use different implementation!')
+        }
+    }
+
+    private static QJdbcPool loadPool(String implName) {
+        ClassLoader classLoader = Thread.currentThread().contextClassLoader
+        def services = ReflectUtils.findServices(QJdbcPool, classLoader)
+        for (QJdbcPool pool : services) {
+            LOGGER.info("Found pool implementation: ${pool.getName()}")
+            if (pool.getName() == implName) {
+                return pool
+            }
+        }
+
+        LOGGER.warn("No matching pool implementation found for '${implName}'!")
+        // try loading class from classpath
+        try {
+            LOGGER.warn('Trying to initialize pool implementation: [' + implName + '] using classpath... Use pool id instead next time.')
+            return (QJdbcPool) classLoader.loadClass(implName).newInstance()
+        } catch (ClassNotFoundException ex) {
+            throw new NyConfigurationException('JDBC pool implementation not found! ' + implName, ex)
         }
     }
 
@@ -56,7 +73,7 @@ class QJdbcExecutorFactory implements QExecutorFactory {
         } catch (NyConfigurationException ex) {
             throw ex
         } catch (Exception ex) {
-            throw new NyConfigurationException("Error occurred while retreiving database information!", ex)
+            throw new NyConfigurationException("Error occurred while retrieving database information!", ex)
         }
     }
 

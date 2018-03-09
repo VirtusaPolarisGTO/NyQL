@@ -10,18 +10,17 @@
   },
 
   "executor": {
-    "name": "default",
     "impl": "jdbc",
 
-    "url": "",
+    "url": "jdbc:mysql://localhost/sakila",
     "urlParams": {
 
     },
-    "username": "",
-    "password": "",
+    "username": "gtobuild",
+    "password": "1234qwer$",
 
     "pooling": {
-      "impl": ""
+      "impl": "hikari"
     }
   },
 

@@ -24,6 +24,8 @@ class ConfigurationsV2 extends Configurations {
     @Override
     protected void doConfig() throws NyException {
         ClassLoader classLoader = super.classLoader
+        setName()
+
         databaseRegistry = QDatabaseRegistry.newInstance().discover(classLoader)
         executorRegistry = QExecutorRegistry.newInstance().discover(classLoader)
         repositoryRegistry = QRepositoryRegistry.newInstance().discover(classLoader)
@@ -44,11 +46,11 @@ class ConfigurationsV2 extends Configurations {
         String activeDb = getActivatedDb()
         LOGGER.info("Activated: ${activeDb}")
 
-        // load repositories
-        loadRepos(profileEnabled)
-
         // load executors
         DbInfo dbInfo = loadExecutors(activeDb, profileEnabled)
+
+        // load repositories
+        loadRepos(profileEnabled)
 
         // finally, initialize factory
         def factory = databaseRegistry.getDbFactory(activeDb)

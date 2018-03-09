@@ -53,6 +53,7 @@ class Caching implements Closeable {
                     }
                 }
                 LOGGER.info('Compilation successful!')
+                LOGGER.info('-'*80)
             }
         }
     }

@@ -5,6 +5,7 @@
    * NyQL static class access `NyQL` has been removed. Migrate all parses and executions to
   a `NyQLInstance`, and bind it to your application lifecycle.
    * NyQL configuration file is different and simplified. Migrate to new v2 configuration file for convenience.
+   * All passwords must be base64 encoded. No plain passwords allow anymore.
    * Function `$IMPORT_UNSAFE` has been renamed to `$IMPORT_SAFE`
    * Renamed functions `CURTIME`, `CURDATE`, and `CUREPOCH` to `CURRENT_TIME`, `CURRENT_DATE`, and `CURRENT_EPOCH` respectively.
    * Recommended to change db-inconsistent `CONCAT` functions to `CONCAT_NN` for null-ignoring concatenation.

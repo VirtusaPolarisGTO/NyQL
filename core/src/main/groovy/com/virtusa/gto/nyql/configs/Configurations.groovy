@@ -74,7 +74,16 @@ class Configurations {
         }
     }
 
+    protected void setName() {
+        name = properties.name
+        if (name == null) {
+            name = QUtils.genId()
+        }
+    }
+
     protected void doConfig() throws NyException {
+        setName()
+
         databaseRegistry = QDatabaseRegistry.newInstance()
         executorRegistry = QExecutorRegistry.newInstance()
         repositoryRegistry = QRepositoryRegistry.newInstance()
@@ -386,6 +395,10 @@ class Configurations {
 
     Map getQueryConfigs() {
         properties.queries as Map
+    }
+
+    String getName() {
+        name
     }
 
     /**
