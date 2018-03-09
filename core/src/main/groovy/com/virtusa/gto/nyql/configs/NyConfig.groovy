@@ -63,6 +63,17 @@ final class NyConfig {
     }
 
     /**
+     * Sets a unique name for the building Configuration instance which is being used in <code>NyQLInstance</code>.
+     *
+     * @param name unique name
+     * @return this config instance.
+     */
+    NyConfig havingName(String name) {
+        configBuilder.havingName(name)
+        this
+    }
+
+    /**
      * Sets the active database for query parsing and execution.
      *
      * @param dbName database name. (either mysql, pg, or mssql)

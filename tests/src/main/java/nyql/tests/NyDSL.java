@@ -30,7 +30,7 @@ public class NyDSL {
     public static void main(String[] args) throws NyException {
         NyQLInstance nyQLInstance = null;
         try {
-            nyQLInstance = NyQLInstance.create(new File("./configs/nyql.json"));
+            nyQLInstance = NyQLInstance.create("nydsl", new File("./configs/nyql.json"));
 
             QScript aaa = nyQLInstance.parse("aaa", new HashMap<>());
             System.out.println(aaa);

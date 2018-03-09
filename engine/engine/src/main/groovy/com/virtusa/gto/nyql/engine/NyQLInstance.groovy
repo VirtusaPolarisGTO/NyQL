@@ -5,8 +5,9 @@ import com.virtusa.gto.nyql.configs.ConfigKeys
 import com.virtusa.gto.nyql.configs.ConfigParser
 import com.virtusa.gto.nyql.configs.Configurations
 import com.virtusa.gto.nyql.engine.impl.NyQLResult
+import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.NyQLMXBean
+import com.virtusa.gto.nyql.model.NyQLMBean
 import com.virtusa.gto.nyql.model.QPagedScript
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QSession
@@ -18,7 +19,7 @@ import java.util.function.BiFunction
  * @author IWEERARATHNA
  */
 @CompileStatic
-class NyQLInstance implements NyQLMXBean {
+class NyQLInstance implements NyQLMBean {
     
     private static final Map<String, Object> EMPTY_MAP = [:]
 
@@ -28,17 +29,44 @@ class NyQLInstance implements NyQLMXBean {
         this.configurations = theConfigInstance
     }
 
+    static NyQLInstance createFromResource(String name, String resourcePath, ClassLoader classLoader = null) throws NyException {
+        ClassLoader cl = classLoader ?: Thread.currentThread().contextClassLoader
+        InputStream inputStream = null
+        try {
+            inputStream = cl.getResourceAsStream(resourcePath)
+            create(name, inputStream)
+        } catch (NyException ex) {
+            throw ex
+        } catch (Exception ex) {
+            throw new NyConfigurationException("Failed to read resource '${resourcePath}'!", ex)
+        } finally {
+            if (inputStream != null) {
+                inputStream.close()
+            }
+        }
+    }
+
+    @Deprecated
     static NyQLInstance create(InputStream inputStream) {
-        create(ConfigParser.parseAndResolve(inputStream))
+        create(null, inputStream)
     }
 
+    static NyQLInstance create(String name, InputStream inputStream) {
+        create(name, ConfigParser.parseAndResolve(inputStream))
+    }
+
+    @Deprecated
     static NyQLInstance create(File configFile) {
-        create(ConfigParser.parseAndResolve(configFile))
+        create(null, configFile)
     }
 
-    static NyQLInstance create(Map configData) {
+    static NyQLInstance create(String name, File configFile) {
+        create(name, ConfigParser.parseAndResolve(configFile))
+    }
+
+    static NyQLInstance create(String name, Map configData) {
         configData.put(ConfigKeys.LOCATION_KEY, new File('.').canonicalPath)
-        Configurations configInst = ConfigBuilder.instance().setupFrom(configData).build()
+        Configurations configInst = ConfigBuilder.instance(name).setupFrom(configData).build()
         create(configInst)
     }
 

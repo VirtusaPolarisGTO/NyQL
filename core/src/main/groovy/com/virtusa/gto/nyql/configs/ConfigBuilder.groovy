@@ -8,7 +8,6 @@ import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.PackageScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * @author IWEERARATHNA
  */
@@ -24,16 +23,19 @@ class ConfigBuilder {
 
     @PackageScope
     ConfigBuilder(String name = null) {
-        String theName = name
-        if (theName == null) {
-            def uuid = QUtils.genId()
-            LOGGER.warn('Configuration instance must have a unique name to identify itself! Generating a random UUID...')
-            LOGGER.warn('  - This might cause identifying harder each time the runtime is restarted.')
-            theName = uuid
-        }
-
-        LOGGER.info("NyQL Instance Id: ${theName}")
+        String theName = name ?: props.name
         props.name = theName
+    }
+
+    /**
+     * Sets a unique name for the building Configuration instance which is being used in <code>NyQLInstance</code>.
+     *
+     * @param name unique name
+     * @return this config instance.
+     */
+    ConfigBuilder havingName(String name) {
+        props.name = name
+        this
     }
 
     /**
@@ -302,6 +304,17 @@ class ConfigBuilder {
         props[ConfigKeys.REPO_MAP] = repositoryMap
         props[ConfigKeys.SCRIPT_MAP] = scriptMapper
 
+        String theName = props.name
+        if (theName == null) {
+            def uuid = QUtils.genId()
+            LOGGER.warn('Configuration instance must have a unique name to identify itself! Generating a random UUID...')
+            LOGGER.warn('  - This might cause identifying harder each time the runtime is restarted.')
+            theName = uuid
+        }
+
+        LOGGER.info("NyQL Instance Id: ${theName}")
+        props.name = theName
+
         synchronized (lock) {
             hasInitialized = true
         }
@@ -309,12 +322,12 @@ class ConfigBuilder {
     }
 
     /**
-     * Returns the unique instance of config builder.
-     *
-     * @return an instance of config builder.
-     */
-    static ConfigBuilder instance() {
-        new ConfigBuilder()
+    * Returns the unique instance of config builder.
+    *
+    * @return an instance of config builder.
+    */
+    static ConfigBuilder instance(String name = null) {
+        new ConfigBuilder(name)
     }
 
     @PackageScope void reset() {

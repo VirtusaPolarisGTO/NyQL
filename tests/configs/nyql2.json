@@ -9,25 +9,22 @@
     "allowRecompilation": true
   },
 
-  "executor": {
-    "impl": "jdbc",
-
-    "url": "jdbc:mysql://localhost/sakila",
-    "urlParams": {
-
-    },
-    "username": "gtobuild",
-    "password": "1234qwer$",
-
-    "pooling": {
-      "impl": "hikari"
-    }
-  },
-
   "repository": {
     "mapper": "folder",
     "mapperArgs": {
       "baseDir": "./scripts"
+    }
+  },
+
+  "executor": {
+    "impl": "dummy",
+
+    "url": "jdbc:mysql://localhost/sakila",
+    "username": "gtobuild",
+    "password": "MTIzNHF3ZXIk",
+
+    "pooling": {
+      "impl": "hikari"
     }
   }
 }

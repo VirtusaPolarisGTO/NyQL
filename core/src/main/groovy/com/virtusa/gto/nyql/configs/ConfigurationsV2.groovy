@@ -23,6 +23,8 @@ class ConfigurationsV2 extends Configurations {
 
     @Override
     protected void doConfig() throws NyException {
+        validateProperties()
+
         ClassLoader classLoader = super.classLoader
         setName()
 
@@ -55,43 +57,6 @@ class ConfigurationsV2 extends Configurations {
         // finally, initialize factory
         def factory = databaseRegistry.getDbFactory(activeDb)
         factory.init(this, dbInfo)
-    }
-
-    @CompileStatic
-    void validateMappers() {
-        def allMaps = mapperRegistry.listAll()
-        LOGGER.info("Found mapper implementations in classpath: [ ${allMaps.join(', ')} ]")
-
-        if (allMaps.isEmpty()) {
-            throw new NyConfigurationException('No mapper implementations has been found in classpath!')
-        }
-    }
-
-    void validateRepositories() {
-        def allRepos = repositoryRegistry.listAll()
-        LOGGER.info("Found repository implementations in classpath: [ ${allRepos.join(', ')} ]")
-
-        if (allRepos.isEmpty()) {
-            throw new NyConfigurationException('No repository implementations has been found in classpath!')
-        }
-    }
-
-    void validateTranslators() {
-        def allDbs = databaseRegistry.listAll()
-        LOGGER.info("Found database implementations in classpath: [ ${allDbs.join(', ')} ]")
-
-        if (allDbs.isEmpty()) {
-            throw new NyConfigurationException('No database implementations has been found in classpath!')
-        }
-    }
-
-    void validateExecutors() {
-        def allExecs = executorRegistry.listAll()
-        LOGGER.info("Found executor implementations in classpath: [ ${allExecs.join(', ')} ]")
-
-        if (allExecs.isEmpty()) {
-            throw new NyConfigurationException('No executor implementations has been found in classpath!')
-        }
     }
 
     @CompileStatic
@@ -155,6 +120,73 @@ class ConfigurationsV2 extends Configurations {
     private static void checkRepository(Map repo) {
         if (!repo.mapper) {
             throw new NyException('Mandatory field "mapper" is not specified!')
+        }
+    }
+
+
+    @CompileStatic
+    void validateMappers() {
+        def allMaps = mapperRegistry.listAll()
+        LOGGER.info("Found mapper implementations in classpath: [ ${allMaps.join(', ')} ]")
+
+        if (allMaps.isEmpty()) {
+            throw new NyConfigurationException('No mapper implementations has been found in classpath!')
+        }
+    }
+
+    void validateRepositories() {
+        def allRepos = repositoryRegistry.listAll()
+        LOGGER.info("Found repository implementations in classpath: [ ${allRepos.join(', ')} ]")
+
+        if (allRepos.isEmpty()) {
+            throw new NyConfigurationException('No repository implementations has been found in classpath!')
+        }
+    }
+
+    void validateTranslators() {
+        def allDbs = databaseRegistry.listAll()
+        LOGGER.info("Found database implementations in classpath: [ ${allDbs.join(', ')} ]")
+
+        if (allDbs.isEmpty()) {
+            throw new NyConfigurationException('No database implementations has been found in classpath!')
+        }
+    }
+
+    void validateExecutors() {
+        def allExecs = executorRegistry.listAll()
+        LOGGER.info("Found executor implementations in classpath: [ ${allExecs.join(', ')} ]")
+
+        if (allExecs.isEmpty()) {
+            throw new NyConfigurationException('No executor implementations has been found in classpath!')
+        }
+    }
+
+    void validateProperties() throws NyConfigurationException {
+        def properties = super.properties
+
+        assertTruth(properties.version == 2, "Version value must be 2! Received ${properties.version}")
+        assertNonNull(properties.activate, "Mandatory parameter 'activate' is missing!")
+
+        assertNonNull(properties.executor, 'Executor has not been specified!')
+        assertNonNull(properties.repository, 'Repository has not been specified!')
+        assertTruth(properties.executors == null, "Field 'executors' has been deprecated! NyQL v2 can have only one executor!")
+    }
+
+    static void assertNonNull(Object value, String msg) throws NyConfigurationException {
+        if (value == null) {
+            throw new NyConfigurationException(msg)
+        }
+    }
+
+    static void assertIfNot(Object value, Class<?> type, String msg) throws NyConfigurationException {
+        if (!type.isAssignableFrom(value.class)) {
+            throw new NyConfigurationException(msg)
+        }
+    }
+
+    static void assertTruth(boolean truth, String msg) throws NyConfigurationException {
+        if (!truth) {
+            throw new NyConfigurationException(msg)
         }
     }
 }

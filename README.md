@@ -115,7 +115,7 @@ To disable logging, use slf4j Nop logger.
          public static void main(String[] args) throws Exception {
              // create a new nyql instance using minimum but
              // mandatory parameters.
-             NyQLInstance nyInstance = NyQLInstance.create(new File(fileLocation));
+             NyQLInstance nyInstance = NyQLInstance.create("myAppInstance", new File(fileLocation));
              
              // use this retrieved instance to execute queries...
              NyQLResult result = nyInstance.execute('script-id', data);
@@ -126,6 +126,9 @@ To disable logging, use slf4j Nop logger.
      }
  ```
  
+ The first parameters is the unique name to identify the created `NyQLInstance`.
+ It will be used for JMX beans.
+ 
  Or, you can configure it without a configuration json file like below.  
   
 ```java 
@@ -135,6 +138,7 @@ To disable logging, use slf4j Nop logger.
              // create a new nyql instance using minimum but
              // mandatory parameters.
              Configurations nyConfigs = NyConfig.withDefaults()
+                                    .havingName("myAppInstance")
                                     .forDatabase("mysql")
                                     .scriptFolder(new File("./scripts"))
                                     .jdbcOptions("jdbc:mysql://localhost/sampledb", "username", "password")

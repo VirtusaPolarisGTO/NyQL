@@ -5,7 +5,7 @@ import com.virtusa.gto.nyql.exceptions.NyException
 /**
  * @author iweerarathna
  */
-interface NyQLMXBean {
+interface NyQLMBean {
 
     String executeToJSON(String scriptName, Map<String, Object> data) throws NyException
 
