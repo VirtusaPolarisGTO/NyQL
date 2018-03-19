@@ -9,7 +9,7 @@ import groovy.transform.ToString
  */
 @CompileStatic
 @ToString(excludes = ["qSession"])
-class QScript {
+class QScript implements Serializable {
 
     String id
     QResultProxy proxy

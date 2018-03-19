@@ -142,7 +142,7 @@ public class AbstractTest {
     public static void setupTests() {
         //if (NyQL.hasConfigured()) {
             //System.setProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true");
-            nyQLInstance = NyQLInstance.create(new File("./configs/nyql2.json"));
+            nyQLInstance = NyQLInstance.create("test", new File("./configs/nyql2.json"));
         //}
     }
 

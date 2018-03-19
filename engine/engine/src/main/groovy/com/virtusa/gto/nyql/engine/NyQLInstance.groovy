@@ -1,17 +1,15 @@
 package com.virtusa.gto.nyql.engine
 
-import com.virtusa.gto.nyql.configs.ConfigBuilder
-import com.virtusa.gto.nyql.configs.ConfigKeys
-import com.virtusa.gto.nyql.configs.ConfigParser
-import com.virtusa.gto.nyql.configs.Configurations
+import com.virtusa.gto.nyql.configs.*
 import com.virtusa.gto.nyql.engine.impl.NyQLResult
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.NyQLMBean
+import com.virtusa.gto.nyql.model.NyQLInstanceMXBean
 import com.virtusa.gto.nyql.model.QPagedScript
 import com.virtusa.gto.nyql.model.QScript
 import com.virtusa.gto.nyql.model.QSession
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
 import java.util.function.BiFunction
@@ -19,7 +17,7 @@ import java.util.function.BiFunction
  * @author IWEERARATHNA
  */
 @CompileStatic
-class NyQLInstance implements NyQLMBean {
+class NyQLInstance implements NyQLInstanceMXBean {
     
     private static final Map<String, Object> EMPTY_MAP = [:]
 
@@ -71,7 +69,11 @@ class NyQLInstance implements NyQLMBean {
     }
 
     static NyQLInstance create(Configurations configInst) {
-        new NyQLInstance(configInst)
+        NyQLInstance nyQLInstance = new NyQLInstance(configInst)
+        if (configInst.isRegisterMXBeans()) {
+            JmxConfigurator.get().registerMXBean(nyQLInstance)
+        }
+        nyQLInstance
     }
 
     Configurations getConfigurations() {
@@ -292,7 +294,20 @@ class NyQLInstance implements NyQLMBean {
     // *******************************************************************
 
     @Override
-    Object executeScript(String scriptName, Map<String, Object> data) throws NyException {
-        return execute(scriptName, data)
+    String getName() {
+        return configurations.getName()
+    }
+
+    @Override
+    String executeToJSON(String scriptName, String dataJson) {
+        Map<String, Object> jsonMap = (Map<String, Object>) new JsonSlurper().parseText(dataJson)
+        executeToJSON(scriptName, jsonMap)
+    }
+
+    @Override
+    String parseScript(String scriptName, String dataJson) {
+        Map<String, Object> jsonMap = (Map<String, Object>) new JsonSlurper().parseText(dataJson)
+        def script = parse(scriptName, jsonMap)
+        return script.toString()
     }
 }

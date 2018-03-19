@@ -62,6 +62,7 @@ class QHikariPool implements QJdbcPool {
         String poolName = configurations.getName() + DEF_POOL_SUFFIX
         config.setPoolName(poolName)
 
+        boolean mbeans = configurations.isRegisterMXBeans()
         if (options.pooling) {
             Map poolingConfigs = options.pooling as Map
             Properties properties = new Properties()
@@ -75,7 +76,15 @@ class QHikariPool implements QJdbcPool {
             }
 
             config.setDataSourceProperties(properties)
+
+            if (properties.hasProperty("registerMbeans")) {
+                mbeans = properties.getOrDefault("registerMbeans", configurations.isRegisterMXBeans())
+            }
         }
+
+        // enable hikari beans
+        LOGGER.info("Hikari mbeans registration: " + mbeans)
+        config.setRegisterMbeans(mbeans)
 
         Integer retryCount = (Integer) options.getOrDefault('retryCount', 5)
         Integer retryInterval = (Integer) options.getOrDefault('retryInterval', 5000)

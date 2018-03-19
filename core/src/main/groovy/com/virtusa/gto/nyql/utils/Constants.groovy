@@ -10,6 +10,8 @@ import groovy.transform.Immutable
 @Immutable
 final class Constants {
 
+    static final String MBEAN_OBJECT_NAME = "com.virtusa.gto.nyql"
+
     static final String DSL_ENTRY_WORD = '$DSL'
 
     static final String DSL_SESSION_WORD = '$SESSION'

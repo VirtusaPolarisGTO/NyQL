@@ -34,7 +34,6 @@ class Configurations {
             "java.sql.Types",
             "com.virtusa.gto.nyql.model.units.AParam.ParamScope"
     ]
-    private static final String[] NO_DEF_IMPORTS = []
 
     private static final Map Q_LOGGING_LEVELS = [trace: 1, debug: 2, info: 3, warn: 4, error: 5].asImmutable()
 
@@ -399,6 +398,10 @@ class Configurations {
 
     String getName() {
         name
+    }
+
+    boolean isRegisterMXBeans() {
+        (boolean) properties.getOrDefault("registerMXBeans", true);
     }
 
     /**
