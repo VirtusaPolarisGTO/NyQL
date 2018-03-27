@@ -8,7 +8,7 @@ interface NyQLInstanceMXBean {
 
     String executeToJSON(String scriptName, String dataJson)
 
-    void recompileScript(String scriptName)
+    void recompile(String scriptName)
 
     String parseScript(String scriptName, String dataJson)
 

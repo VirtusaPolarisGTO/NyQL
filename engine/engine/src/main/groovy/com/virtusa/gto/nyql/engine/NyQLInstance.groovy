@@ -310,4 +310,9 @@ class NyQLInstance implements NyQLInstanceMXBean {
         def script = parse(scriptName, jsonMap)
         return script.toString()
     }
+
+    @Override
+    void recompile(String scriptName) {
+        recompileScript(scriptName)
+    }
 }
