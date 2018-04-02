@@ -32,6 +32,7 @@ class DSL {
     public DSL(QSession theSession) {
         session = theSession
         set$SESSION(session.sessionVariables)
+        set$DB(session.dbFactory.dbName())
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -452,5 +453,7 @@ class DSL {
     DSL $DSL = this
 
     Map $SESSION
+
+    String $DB
 
 }

@@ -6,6 +6,11 @@ $DSL.script {
 
     $SESSION.manProperty = 1
 
+    println $DB
+    if ($DB == 'mysql') {
+        println('xxx - mysql')
+    }
+
     def innQ = $DSL.select {
         TARGET (Film.alias("f"))
 
