@@ -24,6 +24,18 @@ abstract class MSSqlFunctions extends AbstractSQLTranslator implements QFunction
         super(theOptions)
     }
 
+    @Override
+    String date_format(Object pms) {
+        def c = ___val(cx)
+        def pmx = ___pm(cx)
+
+        if (c instanceof List) {
+            return String.format('FORMAT(%s, %s)', ___resolveIn(c[0], pmx), ___resolveIn(c[1], pmx))
+        } else {
+            throw new NySyntaxException('GREATEST function requires at least two or more values!')
+        }
+    }
+
     String greatest(cx) {
         def c = ___val(cx)
         def pmx = ___pm(cx)

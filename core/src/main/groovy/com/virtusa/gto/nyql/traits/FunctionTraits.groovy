@@ -105,6 +105,7 @@ trait FunctionTraits {
     @CompileStatic FunctionColumn CURRENT_TIME() { fColumn(null, 'current_time') }
     @CompileStatic FunctionColumn CURRENT_EPOCH() { fColumn(null, 'current_epoch') }
     @CompileStatic FunctionColumn DATE_TRUNC(Column column) { fColumn(column, 'date_trunc') }
+    @CompileStatic FunctionColumn DATE_FORMAT(Object column, Object fmt) { vColumn('date_format', column, fmt) }
 
     @CompileStatic FunctionColumn EPOCH_TO_DATE(Object column)     { fColumn(column, 'epoch_to_date') }
     @CompileStatic FunctionColumn EPOCH_TO_DATETIME(Object column)     { fColumn(column, 'epoch_to_datetime') }

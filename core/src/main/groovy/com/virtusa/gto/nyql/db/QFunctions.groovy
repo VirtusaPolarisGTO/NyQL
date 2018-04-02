@@ -102,6 +102,8 @@ trait QFunctions {
      */
     @CompileStatic String current_time(pms) { 'CURTIME()' }
 
+    abstract String date_format(Object pms)
+
     abstract String current_epoch()
     abstract String epoch_to_date(Object col)
     abstract String epoch_to_datetime(Object col)

@@ -26,6 +26,18 @@ abstract class PostgresFunctions extends AbstractSQLTranslator implements QFunct
     }
 
     @Override
+    String date_format(Object pms) {
+        def c = ___val(pms)
+        def pmx = ___pm(pms)
+
+        if (c instanceof List) {
+            return String.format('to_char(%s, %s)', ___resolveIn(c[0], pmx), ___resolveIn(c[1], pmx))
+        } else {
+            throw new NySyntaxException('DATE_FORMAT function requires at least two parameters!')
+        }
+    }
+
+    @Override
     String truncate(Object cx) {
         def c = ___val(cx)
         def pmx = ___pm(cx)
