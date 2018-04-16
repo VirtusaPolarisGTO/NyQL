@@ -29,7 +29,8 @@ class QResourceScripts implements QScriptMapper {
         if (resMap.containsKey(id)) {
             resMap[id]
         } else {
-            String content = readAll(rootRes + id + ConfigKeys.GROOVY_EXT)
+            String content = readAll(rootRes + id + ConfigKeys.GROOVY_EXT,
+                                    rootRes + id + ConfigKeys.NYQL_EXT)
             GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, id, GroovyShell.DEFAULT_CODE_BASE)
             groovyCodeSource.setCachable(true)
 
@@ -40,19 +41,21 @@ class QResourceScripts implements QScriptMapper {
     }
 
     @CompileStatic
-    private static String readAll(String subPath) throws NyScriptNotFoundException {
-        URL url = Thread.currentThread().contextClassLoader.getResource(subPath)
-        InputStream stream = openSafe(url)
-        if (stream != null) {
-            try {
-                return stream.readLines(StandardCharsets.UTF_8.name()).join('\n')
-            } finally {
-                if (stream != null) {
-                    stream.close()
+    private static String readAll(String... subPaths) throws NyScriptNotFoundException {
+        for (String subPath : subPaths) {
+            URL url = Thread.currentThread().contextClassLoader.getResource(subPath)
+            InputStream stream = openSafe(url)
+            if (stream != null) {
+                try {
+                    return stream.readLines(StandardCharsets.UTF_8.name()).join('\n')
+                } finally {
+                    if (stream != null) {
+                        stream.close()
+                    }
                 }
             }
         }
-        throw new NyScriptNotFoundException("There is no resource exist in $subPath!")
+        throw new NyScriptNotFoundException("There is no resource exist in ${subPaths[0]}!")
     }
 
     @CompileStatic

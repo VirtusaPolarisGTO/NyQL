@@ -90,7 +90,13 @@ class QScriptsFolder implements QScriptMapper {
                 LOGGER.debug('Loading a fresh script from ' + id + '...')
                 source = processScript(scriptFresh)
             } else {
-                throw new NyScriptNotFoundException(id)
+                scriptFresh = baseDir.toPath().resolve(id + ConfigKeys.NYQL_EXT).toFile();
+                if (scriptFresh.exists()) {
+                    LOGGER.debug('Loading a fresh script from ' + id + '...')
+                    source = processScript(scriptFresh)
+                } else {
+                    throw new NyScriptNotFoundException(id)
+                }
             }
         }
         if (!source.isValid()) {
@@ -165,7 +171,8 @@ class QScriptsFolder implements QScriptMapper {
 
         @Override
         FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            if (!attrs.directory && !isEndsWithAny(file.getFileName().toString().toLowerCase(), ConfigKeys.GROOVY_EXT)) {
+            if (!attrs.directory &&
+                    !isEndsWithAny(file.getFileName().toString().toLowerCase(), ConfigKeys.GROOVY_EXT, ConfigKeys.NYQL_EXT)) {
                 return FileVisitResult.SKIP_SUBTREE
             }
 

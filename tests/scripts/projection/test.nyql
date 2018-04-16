@@ -1,0 +1,9 @@
+[
+        $DSL.select {
+            TARGET (Actor.alias("ac"))
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `Actor` ac"
+        ]
+]

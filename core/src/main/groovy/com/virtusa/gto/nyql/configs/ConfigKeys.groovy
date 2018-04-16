@@ -11,6 +11,7 @@ import groovy.transform.Immutable
 final class ConfigKeys {
 
     static final String GROOVY_EXT = '.groovy'
+    static final String NYQL_EXT = '.nyql'
 
     static final String REPO_MAP = '__repoMap'
     static final String SCRIPT_MAP = '__scriptMapper'

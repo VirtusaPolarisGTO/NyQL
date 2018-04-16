@@ -72,6 +72,9 @@ class QScriptFolders implements QScriptMapper {
 
         File baseDir = folderOfFile.baseDir
         File sFile = new File(baseDir, id + ConfigKeys.GROOVY_EXT)
+        if (!sFile.exists()) {
+            sFile = new File(baseDir, id + ConfigKeys.NYQL_EXT)
+        }
         def script = QScriptsFolder.createSourceScript(sFile, baseDir)
 
         fileMap.put(id, script)

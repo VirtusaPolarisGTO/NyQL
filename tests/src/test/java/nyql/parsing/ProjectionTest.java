@@ -40,4 +40,8 @@ public class ProjectionTest extends AbstractTest {
         assertQueries(nyql().parse("projection/funcdt_projection"));
     }
 
+    public void testNyqlExtension() throws NyException {
+        assertQueries(nyql().parse("projection/test"));
+    }
+
 }

@@ -10,6 +10,10 @@ trait ScriptTraits {
 
     abstract AParam PARAM(String name, AParam.ParamScope scope, String mappingName)
 
+    AParam PARAM_LIST(String name) {
+        PARAMLIST(name)
+    }
+
     abstract AParam PARAMLIST(String name)
 
     abstract AParam PARAM_DATE(String name)
