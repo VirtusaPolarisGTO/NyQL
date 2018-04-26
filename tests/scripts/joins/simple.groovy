@@ -41,13 +41,54 @@
         $DSL.select {
             TARGET (Film.alias("f"))
             JOIN (TARGET()) {
-                FULL_JOIN (Film_Actor.alias("fa"))
+                FULL_JOIN (Film_Actor.alias("fa")) ON f.film_id, fa.film_id
             }
             FETCH ()
         },
         [
-                mysql: "SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa UNION ALL " +
-                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa"
+                mysql: "SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa ON f.film_id = fa.film_id " +
+                        "UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id WHERE f.film_id IS NULL"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                FULL_JOIN (Film_Actor.alias("fa")) ON f.film_id, fa.film_id
+            }
+            FETCH ()
+            WHERE {
+                EQ (f.title, PARAM('title'))
+            }
+        },
+        [
+                mysql: ["SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa ON f.film_id = fa.film_id WHERE f.title = ? " +
+                        "UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id WHERE f.film_id IS NULL AND f.title = ?",
+                        ["title", "title"]]
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                FULL_JOIN (Film_Actor.alias("fa")) ON {
+                    EQ (f.film_id, fa.film_id)
+                    AND
+                    EQ (f.film_id2, fa.film_id2)
+                }
+            }
+            FETCH ()
+            WHERE {
+                EQ (f.title, PARAM('title'))
+            }
+        },
+        [
+                mysql: ["SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id2 = fa.film_id2 " +
+                                "WHERE f.title = ? " +
+                                "UNION ALL " +
+                                "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id2 = fa.film_id2 " +
+                                "WHERE f.film_id IS NULL AND f.film_id2 IS NULL AND f.title = ?",
+                        ["title", "title"]]
         ],
 
         $DSL.select {
@@ -62,6 +103,115 @@
                 mysql: "SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa LEFT JOIN `Film_Character` fc UNION ALL " +
                         "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa LEFT JOIN `Film_Character` fc UNION ALL " +
                         "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa RIGHT JOIN `Film_Character` fc"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                FULL_JOIN (Film_Actor.alias("fa")) ON f.film_id, fa.film_id
+                FULL_JOIN (Film_Character.alias("fc")) ON fc.film_id, fa.film_id
+            }
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa ON f.film_id = fa.film_id LEFT JOIN `Film_Character` fc ON fc.film_id = fa.film_id" +
+                        " UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id LEFT JOIN `Film_Character` fc ON fc.film_id = fa.film_id " +
+                        "WHERE f.film_id IS NULL" +
+                        " UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id RIGHT JOIN `Film_Character` fc ON fc.film_id = fa.film_id " +
+                        "WHERE fa.film_id IS NULL"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                FULL_JOIN (Film_Actor.alias("fa")) ON {
+                    EQ (f.film_id, fa.film_id)
+                }
+                FULL_JOIN (Film_Character.alias("fc")) ON {
+                    EQ (fc.film_id, fa.film_id)
+                }
+            }
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `Film` f LEFT JOIN `Film_Actor` fa ON f.film_id = fa.film_id LEFT JOIN `Film_Character` fc ON fc.film_id = fa.film_id" +
+                        " UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id LEFT JOIN `Film_Character` fc ON fc.film_id = fa.film_id " +
+                        "WHERE f.film_id IS NULL" +
+                        " UNION ALL " +
+                        "SELECT * FROM `Film` f RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id RIGHT JOIN `Film_Character` fc ON fc.film_id = fa.film_id " +
+                        "WHERE fa.film_id IS NULL"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                FULL_JOIN (Film_Actor.alias("fa")) ON {
+                    EQ (f.film_id, fa.film_id)
+                    AND
+                    EQ (f.film_id2, fa.film_id2)
+                }
+                FULL_JOIN (Film_Character.alias("fc")) ON {
+                    EQ (fc.film_id, fa.film_id)
+                    AND
+                    EQ (fc.film_id2, fa.film_id2)
+                }
+            }
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `Film` f " +
+                        "LEFT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id2 = fa.film_id2 " +
+                        "LEFT JOIN `Film_Character` fc ON fc.film_id = fa.film_id AND fc.film_id2 = fa.film_id2 " +
+                        "UNION ALL " +
+                        "SELECT * FROM `Film` f " +
+                        "RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id2 = fa.film_id2 " +
+                        "LEFT JOIN `Film_Character` fc ON fc.film_id = fa.film_id AND fc.film_id2 = fa.film_id2 " +
+                        "WHERE f.film_id IS NULL AND f.film_id2 IS NULL " +
+                        "UNION ALL " +
+                        "SELECT * FROM `Film` f " +
+                        "RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id2 = fa.film_id2 " +
+                        "RIGHT JOIN `Film_Character` fc ON fc.film_id = fa.film_id AND fc.film_id2 = fa.film_id2 " +
+                        "WHERE fa.film_id IS NULL AND fa.film_id2 IS NULL"
+        ],
+
+        $DSL.select {
+            TARGET (Film.alias("f"))
+            JOIN (TARGET()) {
+                FULL_JOIN (Film_Actor.alias("fa")) ON {
+                    EQ (f.film_id, fa.film_id)
+                    AND
+                    EQ (f.film_id2, fa.film_id2)
+                }
+                FULL_JOIN (Film_Character.alias("fc")) ON {
+                    EQ (fc.film_id, fa.film_id)
+                    AND
+                    EQ (fc.film_id2, fa.film_id2)
+                }
+            }
+            FETCH ()
+            WHERE {
+                EQ (f.title, PARAM('title'))
+            }
+        },
+        [
+                mysql: ["SELECT * FROM `Film` f " +
+                        "LEFT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id2 = fa.film_id2 " +
+                        "LEFT JOIN `Film_Character` fc ON fc.film_id = fa.film_id AND fc.film_id2 = fa.film_id2 " +
+                        "WHERE f.title = ? " +
+                        "UNION ALL " +
+                        "SELECT * FROM `Film` f " +
+                        "RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id2 = fa.film_id2 " +
+                        "LEFT JOIN `Film_Character` fc ON fc.film_id = fa.film_id AND fc.film_id2 = fa.film_id2 " +
+                        "WHERE f.film_id IS NULL AND f.film_id2 IS NULL AND f.title = ? " +
+                        "UNION ALL " +
+                        "SELECT * FROM `Film` f " +
+                        "RIGHT JOIN `Film_Actor` fa ON f.film_id = fa.film_id AND f.film_id2 = fa.film_id2 " +
+                        "RIGHT JOIN `Film_Character` fc ON fc.film_id = fa.film_id AND fc.film_id2 = fa.film_id2 " +
+                        "WHERE fa.film_id IS NULL AND fa.film_id2 IS NULL AND f.title = ? ",
+                        ["title", "title", "title"]]
         ],
 
         $DSL.select {

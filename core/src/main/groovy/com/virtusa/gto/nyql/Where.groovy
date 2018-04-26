@@ -165,8 +165,13 @@ class Where implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     @CompileStatic
     Where ISNULL(Object c) {
-        clauses.add(new QCondition(leftOp: c, rightOp: null, op: QOperator.IS))
+        clauses.add(__getIsNullClause(c))
         this
+    }
+
+    @CompileStatic
+    static QCondition __getIsNullClause(Object c) {
+        new QCondition(leftOp: c, rightOp: null, op: QOperator.IS)
     }
 
     @CompileStatic

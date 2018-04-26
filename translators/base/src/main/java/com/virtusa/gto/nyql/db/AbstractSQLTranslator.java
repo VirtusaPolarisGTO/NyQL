@@ -331,6 +331,7 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             for (int i = count; i >= 0; i--) {
                 QuerySelect qt = SqlMisc.cloneQuery(q);
                 SqlMisc.flipNthFullJoin(qt.get_joiningTable(), i, 0);
+                SqlMisc.appendNullableConstraints(qt,count - i - 1);
 
                 StringBuilder qr = generateSelectQueryBody(qt, resultProxy.getOrderedParameters());
                 qs.add(qr.toString());
