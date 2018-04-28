@@ -139,6 +139,9 @@ class NyQLInstance implements NyQLInstanceMXBean {
      * This should be called only when your application exits.
      */
     void shutdown() {
+        if (configurations.isRegisterMXBeans()) {
+            JmxConfigurator.get().removeMXBean(this)
+        }
         configurations.shutdown()
     }
 
