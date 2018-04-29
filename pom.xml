@@ -38,8 +38,7 @@
         <module>engine</module>
         <module>translators</module>
         <module>tests</module>
-        <module>profilers</module>
-        <module>server</module>
+        <!--<module>server</module>-->
     </modules>
 
     <dependencies>
