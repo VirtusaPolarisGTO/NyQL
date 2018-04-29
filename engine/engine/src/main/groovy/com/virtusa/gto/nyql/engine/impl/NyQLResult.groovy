@@ -22,6 +22,12 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
     private static final String PG_T = 't'
     private static final String YES = 'yes'
 
+    private List<String> _columns = null
+
+    void setFetchedColumns(Collection<String> columns) {
+        _columns = new ArrayList<>(columns)
+    }
+
     /**
      * Returns total number of affected rows by an insert/update/delete query.
      *
@@ -84,6 +90,25 @@ class NyQLResult extends LinkedList<Map<String, Object>> {
                 'May be you are not executing a insert/update statement? (Not supported for bulk insert/update in JDBC yet)',
                 'Or, you are not specifying explicitly to return keys from the statement (using RETURN_KEYS())',
                 'Or, even JDBC driver might not returning it for you. Consider a different strategy instead.'))
+    }
+
+    /**
+     * Returns all column list returned from this query result.
+     *
+     * @return list of columns
+     */
+    List<String> fetchedColumns() {
+        if (_columns != null && !_columns.isEmpty()) {
+            return _columns
+        }
+
+        if (!isEmpty()) {
+            Map<String, Object> record = get(FIRST)
+            if (record != null) {
+                return new ArrayList<String>(record.keySet())
+            }
+        }
+        return new ArrayList<String>()
     }
 
     /**

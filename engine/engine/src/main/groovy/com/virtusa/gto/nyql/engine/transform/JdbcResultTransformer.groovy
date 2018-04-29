@@ -16,12 +16,13 @@ class JdbcResultTransformer implements QJdbcResultTransformer<List<Map<String, O
         try {
             ResultSetMetaData metaData = resultSet.getMetaData()
             int cc = metaData.columnCount
-            Map<Integer, String> cols = [:]
+            Map<Integer, String> cols = [:] as LinkedHashMap
             for (int i = 1; i <= cc; i++) {
                 cols.put(i, metaData.getColumnLabel(i))
             }
 
             NyQLResult nyQLResult = new NyQLResult()
+            nyQLResult.setFetchedColumns(cols.values());
             while (resultSet.next()) {
                 Map<String, Object> row = [:]
                 for (int i = 1; i <= cc; i++) {
