@@ -91,7 +91,7 @@ class Configurations {
         // load query related configurations
         loadQueryInfo(properties.queries as Map)
 
-        boolean profileEnabled = startProfiler()
+        boolean profileEnabled = startProfiler(this)
 
         // mark active database
         String activeDb = getActivatedDb()

@@ -45,6 +45,7 @@ class ConfigBuilder {
      * @param profilingImpl the profiler instance to be used when nyql running.
      * @return this config builder instance.
      */
+    @Deprecated
     ConfigBuilder enableProfiler(QProfiling profilingImpl) {
         if (!props[ConfigKeys.PROFILING]) {
             props[ConfigKeys.PROFILING] = [:]

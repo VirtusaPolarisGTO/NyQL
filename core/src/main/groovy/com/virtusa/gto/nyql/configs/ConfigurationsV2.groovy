@@ -4,7 +4,6 @@ import com.virtusa.gto.nyql.db.QDbFactory
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException
 import com.virtusa.gto.nyql.exceptions.NyException
 import com.virtusa.gto.nyql.model.*
-import com.virtusa.gto.nyql.model.impl.QProfExecutorFactory
 import com.virtusa.gto.nyql.model.impl.QProfRepository
 import com.virtusa.gto.nyql.utils.Constants
 import groovy.transform.CompileStatic
@@ -43,17 +42,15 @@ class ConfigurationsV2 extends Configurations {
         // load query related configurations
         loadQueryInfo(getQueryConfigs())
 
-        boolean profileEnabled = startProfiler(this)
-
         // mark active database
         String activeDb = getActivatedDb()
         LOGGER.info("Activated: ${activeDb}")
 
         // load executors
-        DbInfo dbInfo = loadExecutors(activeDb, profileEnabled)
+        DbInfo dbInfo = loadExecutors(activeDb, false)
 
         // load repositories
-        loadRepos(profileEnabled)
+        loadRepos(false)
 
         // finally, initialize factory
         def factory = databaseRegistry.getDbFactory(activeDb)
@@ -79,9 +76,6 @@ class ConfigurationsV2 extends Configurations {
 
         QExecutorFactory executorFactory = executorRegistry.getExecutorFactory(execImpl)
 
-        if (profEnabled) {
-            executorFactory = new QProfExecutorFactory(this, executorFactory)
-        }
         DbInfo activeDbInfo = executorFactory.init(executor, this)
         activeDbInfo
     }
@@ -89,7 +83,7 @@ class ConfigurationsV2 extends Configurations {
     @Override
     @CompileStatic
     protected void loadRepos(boolean profEnabled) {
-        Map repository;
+        Map repository
         if (!properties.containsKey(ConfigKeys.REPOSITORY)
             && properties.containsKey(ConfigKeys.REPOSITORIES)) {
             def list = properties.get(ConfigKeys.REPOSITORIES) as List
@@ -113,9 +107,6 @@ class ConfigurationsV2 extends Configurations {
         def factory = repositoryRegistry.getRepositoryFactory(repoImpl)
         QRepository qRepository = factory.create(this, scriptMapper)
 
-        if (profEnabled) {
-            qRepository = new QProfRepository(this, qRepository)
-        }
         repositoryRegistry.register(repoName, qRepository)
 
         if (properties[ConfigKeys.REPO_MAP]) {
