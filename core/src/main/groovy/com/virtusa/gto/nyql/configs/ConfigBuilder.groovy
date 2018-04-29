@@ -131,6 +131,18 @@ class ConfigBuilder {
     }
 
     /**
+     * Sets the repository for v2 configurations.
+     *
+     * @param repositoryConfig repository options as map
+     * @return this config builder instance.
+     */
+    ConfigBuilder setTheRepository(Map repositoryConfig) {
+        assertNotInitialized()
+        props[ConfigKeys.REPOSITORY] << repositoryConfig
+        this
+    }
+
+    /**
      * Sets the default executor instance for this nyql configuration.
      *
      * @param executorName executor name to make it as default.
@@ -154,6 +166,18 @@ class ConfigBuilder {
             props[ConfigKeys.EXECUTORS] = []
         }
         props[ConfigKeys.EXECUTORS] << executorConfigs
+        this
+    }
+
+    /**
+     * Adds a new executor instance to the nyql v2.
+     *
+     * @param executorConfigs nyql executor as a map.
+     * @return this config builder instance.
+     */
+    ConfigBuilder setTheExecutor(Map executorConfigs) {
+        assertNotInitialized()
+        props[ConfigKeys.EXECUTOR] << executorConfigs
         this
     }
 

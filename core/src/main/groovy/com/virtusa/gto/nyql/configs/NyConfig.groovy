@@ -30,13 +30,14 @@ import java.nio.charset.StandardCharsets
  * @author IWEERARATHNA
  */
 @CompileStatic
-final class NyConfig {
+class NyConfig {
 
     private static final String DEF_CONFIG_PATH = 'com/virtusa/gto/nyql/configs/default-config.json'
+    private static final String DEF_CONFIG_PATH_V2 = 'com/virtusa/gto/nyql/configs/default-config-v2.json'
 
-    private final ConfigBuilder configBuilder
+    protected final ConfigBuilder configBuilder
 
-    private boolean mapperAdded = false
+    protected boolean mapperAdded = false
     private final Map executor = [
             name: 'jdbc',
             factory: 'com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory',
@@ -58,7 +59,7 @@ final class NyConfig {
             ]
     ]
 
-    private NyConfig(ConfigBuilder configBuilder) {
+    protected NyConfig(ConfigBuilder configBuilder) {
         this.configBuilder = configBuilder
     }
 
@@ -297,7 +298,23 @@ final class NyConfig {
         throw new NyConfigurationException('No default configuration file found in classpath!')
     }
 
-    private void assertMapperSetup() throws NyConfigurationException {
+    /**
+     * Creates an easy v2 configuration instance with default but minimum options.
+     *
+     * @return a new v2 configuration instance.
+     * @throws NyConfigurationException if no default configuration file is found in classpath.
+     */
+    static NyConfigV2 withV2Defaults() throws NyConfigurationException {
+        InputStream baseConf = Thread.currentThread().contextClassLoader.getResourceAsStream(DEF_CONFIG_PATH_V2)
+        if (baseConf != null) {
+            Map defData = new JsonSlurper().parse(baseConf, StandardCharsets.UTF_8.name()) as Map
+            ConfigBuilder cb = new ConfigBuilder().setupFrom(defData)
+            return new NyConfigV2(cb)
+        }
+        throw new NyConfigurationException('No default configuration v2 file found in classpath!')
+    }
+
+    protected void assertMapperSetup() throws NyConfigurationException {
         if (mapperAdded) {
             throw new NyConfigurationException("Cannot add more than one script mapper to configurations!")
         }

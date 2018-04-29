@@ -111,10 +111,12 @@ class Configurations {
         runBootstrapScript(activeDb, factory)
     }
 
-    protected boolean startProfiler() {
+    protected boolean startProfiler(Configurations configurations) {
         boolean profileEnabled = loadProfiler()
         if (!profileEnabled) {
-            LOGGER.warn('Query profiling has been disabled! You might not be able to figure out timing of executions.')
+            if (!(configurations instanceof ConfigurationsV2)) {
+                LOGGER.warn('Query profiling has been disabled! You might not be able to figure out timing of executions.')
+            }
         } else {
             LOGGER.debug("Query profiling enabled with ${profiler.getClass().simpleName}!")
             Map profOptions = properties.profiling?.options ?: [:]

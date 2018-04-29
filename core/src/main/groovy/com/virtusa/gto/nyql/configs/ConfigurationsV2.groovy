@@ -21,6 +21,7 @@ class ConfigurationsV2 extends Configurations {
         super()
     }
 
+    @CompileStatic
     @Override
     protected void doConfig() throws NyException {
         validateProperties()
@@ -42,7 +43,7 @@ class ConfigurationsV2 extends Configurations {
         // load query related configurations
         loadQueryInfo(getQueryConfigs())
 
-        boolean profileEnabled = startProfiler()
+        boolean profileEnabled = startProfiler(this)
 
         // mark active database
         String activeDb = getActivatedDb()
@@ -57,6 +58,8 @@ class ConfigurationsV2 extends Configurations {
         // finally, initialize factory
         def factory = databaseRegistry.getDbFactory(activeDb)
         factory.init(this, dbInfo)
+
+        LOGGER.debug('Default executor factory: ' + executorRegistry.defaultExecutorFactory().name)
     }
 
     @CompileStatic
@@ -86,7 +89,14 @@ class ConfigurationsV2 extends Configurations {
     @Override
     @CompileStatic
     protected void loadRepos(boolean profEnabled) {
-        Map repository = properties.get(ConfigKeys.REPOSITORY) as Map
+        Map repository;
+        if (!properties.containsKey(ConfigKeys.REPOSITORY)
+            && properties.containsKey(ConfigKeys.REPOSITORIES)) {
+            def list = properties.get(ConfigKeys.REPOSITORIES) as List
+            repository = list[0] as Map
+        } else {
+            repository = properties.get(ConfigKeys.REPOSITORY) as Map
+        }
         checkRepository(repository)
 
         String repoName = repository.get('name') ?: Constants.DEFAULT_REPOSITORY_NAME

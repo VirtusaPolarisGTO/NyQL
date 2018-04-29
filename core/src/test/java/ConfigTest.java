@@ -2,7 +2,6 @@ import com.virtusa.gto.nyql.QContextType;
 import com.virtusa.gto.nyql.configs.ConfigBuilder;
 import com.virtusa.gto.nyql.ddl.DKeyIndexType;
 import com.virtusa.gto.nyql.ddl.DKeyType;
-import com.virtusa.gto.nyql.model.impl.QLogProfiler;
 
 import java.util.Collections;
 
@@ -20,8 +19,7 @@ public class ConfigTest {
                 .doCacheCompiledScripts()
                 .doCacheGeneratedQueries()
                 .addTranslator("com.virtusa.gto.insight.nyql.db.mysql.MySql")
-                .addTranslators(Collections.singletonList("com.virtusa.gto.insight.nyql.db.pg.Postgre"))
-                .enableProfiler(QLogProfiler.getINSTANCE());
+                .addTranslators(Collections.singletonList("com.virtusa.gto.insight.nyql.db.pg.Postgre"));
 
 
 

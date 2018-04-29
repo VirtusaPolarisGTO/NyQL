@@ -1,0 +1,29 @@
+{
+  "version": 2,
+
+  "caching": {
+    "compiledScripts": true,
+    "generatedQueries": true,
+    "allowRecompilation": true
+  },
+
+  "repository": {
+    "mapper": "folder",
+    "mapperArgs": {
+      "baseDir": "./scripts"
+    }
+  },
+
+  "executor": {
+    "impl": "dummy",
+
+    "url": "jdbc:mysql://localhost/sakila",
+    "username": "gtobuild",
+    "password": "MTIzNHF3ZXIk",
+
+    "pooling": {
+      "impl": "hikari"
+    }
+  }
+
+}
