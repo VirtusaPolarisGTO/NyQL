@@ -29,6 +29,9 @@ class JmxConfigurator {
         ObjectName name = getName(nyQLMXBean)
 
         try {
+            if (mBeanServer.isRegistered(name)) {
+                mBeanServer.unregisterMBean(name);
+            }
             mBeanServer.registerMBean(nyQLMXBean, name)
             LOGGER.info("Successfully registered MXBean: " + name.getCanonicalName())
         } catch (Exception ex) {
