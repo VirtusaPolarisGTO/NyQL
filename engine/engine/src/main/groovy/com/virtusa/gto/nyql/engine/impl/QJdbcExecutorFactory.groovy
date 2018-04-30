@@ -42,7 +42,7 @@ class QJdbcExecutorFactory implements QExecutorFactory {
             jdbcPool.init(options, configurations)
             return getDatabaseInfo()
         } else {
-            throw new NyConfigurationException(this.class.name + ' is for producing pooled jdbc executors. ' +
+            throw new NyConfigurationException(this.class.getName() + ' is for producing pooled jdbc executors. ' +
                     'If you want to use non-pooled jdbc executor use different implementation!')
         }
     }

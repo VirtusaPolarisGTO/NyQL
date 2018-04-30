@@ -607,6 +607,30 @@ public abstract class AbstractSQLTranslator implements QTranslator {
     protected String ___expandConditions(Where where, List<AParam> paramOrder, QContextType contextType) {
         StringBuilder builder = new StringBuilder();
         List<Object> clauses = where.getClauses();
+        int ccount = 0;
+        for (Object c : clauses) {
+            if (c instanceof QOperator) {
+                ccount++;
+            } else if (c instanceof String) {
+                String expr = String.valueOf(c).trim();
+                if (expr.equals("AND") || expr.equals("OR")) {
+                    ccount++;
+                }
+            }
+        }
+
+        if (ccount == 0 && clauses.size() > 1) {
+            // add AND between them
+            List<Object> tmp = new LinkedList<>();
+            boolean add = false;
+            for (Object c : where.getClauses()) {
+                if (add) tmp.add(QOperator.AND);
+                tmp.add(c);
+                add = true;
+            }
+            clauses = tmp;
+        }
+
         for (Object c : clauses) {
             if (c instanceof String) {
                 builder.append(c);

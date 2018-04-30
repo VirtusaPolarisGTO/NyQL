@@ -34,6 +34,54 @@ def innQAny = $DSL.select {
                 ["langId"]]
     ],
 
+        // implicit AND
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            EQ (f.film_id, 123)
+            NEQ (f.title, STR("ACE GOLDFINDER"))
+            IN (f.release_year, 2006)
+            IN (f.language_id, PARAM("langId"))
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f " +
+                            "WHERE f.film_id = 123 AND f.title <> \"ACE GOLDFINDER\" AND f.release_year IN (2006) AND f.language_id IN (?)",
+                    ["langId"]]
+    ],
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            IN (f.language_id, PARAM("langId"))
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f WHERE f.language_id IN (?)",
+                    ["langId"]]
+    ],
+
+    $DSL.select {
+        TARGET (Film.alias("f"))
+        FETCH ()
+        WHERE {
+            EQ (f.film_id, 123)
+            NEQ (f.title, STR("ACE GOLDFINDER"))
+            ALL {
+                IN(f.release_year, 2006)
+                IN(f.language_id, PARAM("langId"))
+            }
+        }
+    },
+    [
+            mysql: ["SELECT * FROM `Film` f " +
+                            "WHERE f.film_id = 123 AND f.title <> \"ACE GOLDFINDER\" AND (f.release_year IN (2006) AND f.language_id IN (?))",
+                    ["langId"]]
+    ],
+
+
     $DSL.select {
         TARGET (Film.alias("f"))
         FETCH ()
