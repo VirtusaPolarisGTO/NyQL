@@ -296,7 +296,11 @@ class Configurations {
         LOGGER.debug('Shutting down nyql...')
         safeClose('Executors') { executorRegistry.shutdown() }
         safeClose('Repositories') { repositoryRegistry.shutdown() }
-        safeClose('Profiler') { profiler.close() }
+        safeClose('Profiler') {
+            if (profiler != null) {
+                profiler.close()
+            }
+        }
         synchronized (lock) {
             configured = false
         }
