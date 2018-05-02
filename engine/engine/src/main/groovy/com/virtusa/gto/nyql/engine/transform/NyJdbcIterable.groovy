@@ -20,6 +20,7 @@ class NyJdbcIterable implements Iterable<NyQLResult>, Iterator<NyQLResult>, Clos
 
     private int cc = 0
     private Map<Integer, String> cols = [:]
+    private boolean started = false
 
     @PackageScope
     NyJdbcIterable(ResultSet resultSet, QJdbcExecutor parent, QPagedScript pagedScript) {
@@ -61,10 +62,15 @@ class NyJdbcIterable implements Iterable<NyQLResult>, Iterator<NyQLResult>, Clos
 
     @Override
     synchronized NyQLResult next() {
+        if (!started) {
+            start()
+        }
+
         int ps = script.pageSize
         int curr = 0
 
         NyQLResult nyQLResult = new NyQLResult()
+        nyQLResult.setFetchedColumns(cols.values())
         while (resultSet.next()) {
             Map<String, Object> row = [:]
             for (int i = 1; i <= cc; i++) {
@@ -85,11 +91,11 @@ class NyJdbcIterable implements Iterable<NyQLResult>, Iterator<NyQLResult>, Clos
         if (cc == 0) {
             ResultSetMetaData metaData = resultSet.getMetaData()
             int cc = metaData.columnCount
-            Map<Integer, String> cols = [:]
             for (int i = 1; i <= cc; i++) {
                 cols.put(i, metaData.getColumnLabel(i))
             }
         }
+        started = true
         return this
     }
 }
