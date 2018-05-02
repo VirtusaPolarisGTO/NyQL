@@ -139,7 +139,7 @@ public class AbstractTest {
     }
 
     @BeforeSuite
-    public static void setupTests() {
+    public static void setupTests() throws Exception {
         //if (NyQL.hasConfigured()) {
             //System.setProperty("com.virtusa.gto.insight.nyql.autoBootstrap", "true");
             nyQLInstance = NyQLInstance.create("test", new File("./configs/nyql2.json"));

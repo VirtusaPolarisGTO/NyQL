@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
  * @author IWEERARATHNA
  */
 @CompileStatic
-class QSession {
+class QSession implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QSession)
 
@@ -23,13 +23,13 @@ class QSession {
     /**
      * Stack of scripts which are running.
      */
-    final Stack<String> scriptStack = [] as Stack
+    private Stack<String> scriptStack = [] as Stack
     private final Object stackLock = new Object()
 
     /**
      * session variable set given by user.
      */
-    Map<String, Object> sessionVariables = Collections.synchronizedMap([:])
+    Map<String, Object> sessionVariables = Collections.synchronizedMap(new HashMap<String, Object>())
 
     /**
      * active script repository.
@@ -185,5 +185,14 @@ class QSession {
     @Override
     String toString() {
         'QSession@' + Integer.toHexString(hashCode())
+    }
+
+    @Override
+    void close() throws Exception {
+        scriptStack.clear()
+        sessionVariables.clear()
+
+        scriptStack = null
+        sessionVariables = null
     }
 }

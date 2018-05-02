@@ -13,18 +13,18 @@ class ConfigParser {
     private static final String BASE_CONF_KEY = '$baseConfiguration'
     private static final String REF_KEY = '$ref'
 
-    static Map parseAndResolve(final File inputFile) {
+    static Map<String, Object> parseAndResolve(final File inputFile) {
         Map result = parse(inputFile)
         resolve(result, result) as Map
     }
 
-    static Map parseAndResolve(final InputStream stream) {
+    static Map<String, Object> parseAndResolve(final InputStream stream) {
         Map result = parse(stream)
         resolve(result, result) as Map
     }
 
     @CompileStatic
-    static Map parse(InputStream inputConfigStream) {
+    static Map<String, Object> parse(InputStream inputConfigStream) {
         Map thisConf = directParse(inputConfigStream)
         String baseConfRef = (String) thisConf[BASE_CONF_KEY]
         if (baseConfRef == null || baseConfRef.isEmpty()) {
@@ -47,7 +47,7 @@ class ConfigParser {
     }
 
     @CompileStatic
-    static Map parse(final File inputFile) {
+    static Map<String, Object> parse(final File inputFile) {
         File resolvedInputFile = inputFile.getCanonicalFile()
         Map thisConf = directParse(resolvedInputFile)
         if (!thisConf.containsKey(ConfigKeys.LOCATION_KEY)) {
@@ -70,12 +70,12 @@ class ConfigParser {
     }
 
     @CompileStatic
-    private static Map directParse(InputStream inputStream) {
+    private static Map<String, Object> directParse(InputStream inputStream) {
         new JsonSlurper().parse(inputStream, StandardCharsets.UTF_8.name()) as Map
     }
 
     @CompileStatic
-    private static Map directParse(File inputFile) {
+    private static Map<String, Object> directParse(File inputFile) {
         new JsonSlurper().parse(inputFile, StandardCharsets.UTF_8.name()) as Map
     }
 

@@ -32,7 +32,7 @@ final class ConfigKeys {
     static final String QUERIES_KEYWORDS = 'keywordsPath'
     static final String QUERIES_MAPPINGS = 'nameMappingPath'
 
-    static final String LOCATION_KEY = '_location'
+    public static final String LOCATION_KEY = '_location'
 
     static final JDBC_DRIVER_CLASS_KEY = 'jdbcDriverClass'
     static final JDBC_DATASOURCE_CLASS_KEY = 'jdbcDataSourceClass'
