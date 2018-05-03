@@ -5,6 +5,8 @@ import com.virtusa.gto.nyql.engine.impl.QJdbcExecutor
 import com.virtusa.gto.nyql.model.QPagedScript
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
@@ -14,13 +16,16 @@ import java.sql.ResultSetMetaData
 @CompileStatic
 class NyJdbcIterable implements Iterable<NyQLResult>, Iterator<NyQLResult>, Closeable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NyJdbcIterable)
+
     private QJdbcExecutor jdbcExecutor
     private ResultSet resultSet
     private QPagedScript script
 
-    private int cc = 0
+    private int columnCount = 0
     private Map<Integer, String> cols = [:]
     private boolean started = false
+    private boolean closed = false
 
     @PackageScope
     NyJdbcIterable(ResultSet resultSet, QJdbcExecutor parent, QPagedScript pagedScript) {
@@ -36,6 +41,9 @@ class NyJdbcIterable implements Iterable<NyQLResult>, Iterator<NyQLResult>, Clos
 
     @Override
     void close() throws IOException {
+        LOGGER.debug('Closing jdbc pagination iterator.')
+        QJdbcExecutor.onCloseInvoke(script, resultSet.statement)
+
         if (!resultSet.isClosed()) {
             resultSet.close()
         }
@@ -49,15 +57,12 @@ class NyJdbcIterable implements Iterable<NyQLResult>, Iterator<NyQLResult>, Clos
         jdbcExecutor = null
         script = null
         resultSet = null
+        closed = true
     }
 
     @Override
     synchronized boolean hasNext() {
-        boolean avail = resultSet.next()
-        if (!avail) {
-            close()
-        }
-        avail
+        return !closed
     }
 
     @Override
@@ -71,9 +76,11 @@ class NyJdbcIterable implements Iterable<NyQLResult>, Iterator<NyQLResult>, Clos
 
         NyQLResult nyQLResult = new NyQLResult()
         nyQLResult.setFetchedColumns(cols.values())
+        boolean limitReached = false
+
         while (resultSet.next()) {
             Map<String, Object> row = [:]
-            for (int i = 1; i <= cc; i++) {
+            for (int i = 1; i <= columnCount; i++) {
                 row.put(cols[i], resultSet.getObject(i))
             }
             nyQLResult.add(row)
@@ -81,19 +88,26 @@ class NyJdbcIterable implements Iterable<NyQLResult>, Iterator<NyQLResult>, Clos
 
             // return only maximum of specified rows
             if (curr >= ps) {
+                limitReached = true
                 break
             }
+        }
+
+        if (!limitReached) {
+            // we have read all records
+            this.close()
         }
         return nyQLResult
     }
 
     private NyJdbcIterable start() {
-        if (cc == 0) {
+        if (columnCount == 0) {
             ResultSetMetaData metaData = resultSet.getMetaData()
-            int cc = metaData.columnCount
-            for (int i = 1; i <= cc; i++) {
+            columnCount = metaData.columnCount
+            for (int i = 1; i <= columnCount; i++) {
                 cols.put(i, metaData.getColumnLabel(i))
             }
+
         }
         started = true
         return this

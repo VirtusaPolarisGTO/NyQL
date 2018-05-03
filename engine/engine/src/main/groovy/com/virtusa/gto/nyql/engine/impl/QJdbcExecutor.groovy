@@ -109,6 +109,7 @@ class QJdbcExecutor implements QExecutor {
             Map<String, Object> data = script.qSession.sessionVariables
             List<AParam> parameters = script.proxy.orderedParameters
             statement = prepareStatement(script, parameters, data)
+            onBeforeInvoke(script, statement)
 
             if (script.proxy.queryType == QueryType.SELECT) {
                 if (returnRaw) {
@@ -148,10 +149,14 @@ class QJdbcExecutor implements QExecutor {
             throw new NyScriptExecutionException(ex.getMessage(), ex)
 
         } finally {
-            if (statement != null) {
-                statement.close()
+            if (!isPaged) {
+                onCloseInvoke(script, statement)
+
+                if (statement != null) {
+                    statement.close()
+                }
+                closeConnection()
             }
-            closeConnection()
         }
     }
 
@@ -536,6 +541,16 @@ class QJdbcExecutor implements QExecutor {
         if (connection != null) {
             connection.close()
         }
+    }
+
+    @CompileStatic
+    static void onCloseInvoke(QScript script, Statement statement) {
+        JdbcHelperUtils.invokeOnClose(script, statement)
+    }
+
+    @CompileStatic
+    static void onBeforeInvoke(QScript script, Statement statement) {
+        JdbcHelperUtils.invokeOnBeforeExec(script, statement)
     }
 
     @CompileStatic

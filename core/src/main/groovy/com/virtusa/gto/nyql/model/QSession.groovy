@@ -57,6 +57,12 @@ class QSession implements AutoCloseable {
     Configurations configurations
 
     /**
+     * Execution listener which allows external users to listen for execution events.
+     * Can be used to cancel execution.
+     */
+    QExecutionListener executionListener
+
+    /**
      * current execution depth.
      */
     private int execDepth = 0

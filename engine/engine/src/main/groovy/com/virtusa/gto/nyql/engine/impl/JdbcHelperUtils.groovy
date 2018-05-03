@@ -10,6 +10,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.sql.Date
+import java.sql.Statement
 import java.sql.Timestamp
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -22,6 +23,20 @@ import java.time.format.DateTimeFormatter
 class JdbcHelperUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcHelperUtils)
+
+    @CompileStatic
+    static void invokeOnBeforeExec(QScript script, Statement statement) {
+        if (script.qSession != null && script.qSession.executionListener != null) {
+            script.qSession.executionListener.onBeforeExecution(statement)
+        }
+    }
+
+    @CompileStatic
+    static void invokeOnClose(QScript script, Statement statement) {
+        if (script.qSession != null && script.qSession.executionListener != null) {
+            script.qSession.executionListener.onBeforeClosing(statement)
+        }
+    }
 
     /**
      * Given parameter value will be converted into jdbc compatible timestamp.
