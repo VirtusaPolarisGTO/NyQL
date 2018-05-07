@@ -121,7 +121,7 @@ class Assign implements DataTypeTraits, FunctionTraits, ScriptTraits {
 
     @CompileStatic
     Assign SET_NULL(Column c1) {
-        assignments.add(new AnAssign(leftOp: c1, rightOp: null))
+        assignments.add(new AnAssign(leftOp: c1, rightOp: null, setNull: true))
         this
     }
 
@@ -172,6 +172,7 @@ class Assign implements DataTypeTraits, FunctionTraits, ScriptTraits {
     static class AnAssign {
         def leftOp
         def rightOp
+        boolean setNull = false
         QOperator op = QOperator.EQUAL
     }
 }

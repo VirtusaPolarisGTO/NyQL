@@ -62,7 +62,9 @@ class InsertOrQuery extends UpsertQuery {
 
             if (item instanceof Assign.AnAssign) {
                 Assign.AnAssign anAssign = (Assign.AnAssign)item
-                if (anAssign.rightOp instanceof Table || anAssign.rightOp instanceof QResultProxy) {
+                if (anAssign.setNull) {
+                    where.ISNULL(anAssign.leftOp)
+                } else if (anAssign.rightOp instanceof Table || anAssign.rightOp instanceof QResultProxy) {
                     where.IN(anAssign.leftOp, anAssign.rightOp)
                 } else {
                     where.EQ(anAssign.leftOp, anAssign.rightOp)
