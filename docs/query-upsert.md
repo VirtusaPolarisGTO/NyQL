@@ -23,6 +23,8 @@ to very inefficient execution.
        * `TARGET` and `JOIN` clauses will be used too.
        * Executed query will return only __at most__ one record.
      * If there are any records exist, NyQL will automatically execute the update query.
+       * If `UPDATE_SET {...}` clause is available, _only_ it will be used to set column values.
+       * Otherwise, NyQL uses `SET {...}` clause.
      * If no records exist, NyQL will execute an insert query to add a record to the main table as specifed in `TARGET` table.
        * NyQL uses `SET` clause to set column values for the new record.
        * Does not use tables in `JOIN` clauses at all.
@@ -78,6 +80,27 @@ $DSL.upsert {
 }
 ```
 
+If you want to set only some columns when the record is updating, you can use, `UPDATE_SET` clause.
+Here, we want to update only title value when updating the existing record.
+Eg-03:
+```groovy
+$DSL.upsert {
+    TARGET (Film.alias("f"))
+    SET {
+        EQ (f.film_id, 1234)
+        EQ (f.title, PARAM("title"))
+        SET_NULL (f.language_id)
+    }
+    UPDATE_SET {
+        EQ (f.title, PARAM("title"))
+    }
+    WHERE {
+        GT (f.year, 2010)
+    }
+
+    RETURN_COLUMNS (f.film_id, f.title)
+}
+```
 
 ### InsertOrLoad Query
 Very similar to upsert query, but this **does not** perform an update in case a record already exist in the database.

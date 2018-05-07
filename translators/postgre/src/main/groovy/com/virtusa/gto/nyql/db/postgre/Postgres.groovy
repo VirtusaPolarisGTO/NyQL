@@ -294,8 +294,13 @@ class Postgres extends PostgresFunctions implements QTranslator {
         List<AParam> paramList = new LinkedList<>()
         StringBuilder query = new StringBuilder()
         query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append(" \n")
-        if (q._assigns.__hasAssignments()) {
-            query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(" \n")
+
+        Assign assign = q._assigns
+        if (q instanceof UpsertQuery && q._updateSet != null && q._updateSet.__hasAssignments()) {
+            assign = q._updateSet
+        }
+        if (assign != null && assign.__hasAssignments()) {
+            query.append('SET ').append(___expandAssignments(assign, paramList, QContextType.UPDATE_SET)).append(" \n")
         }
 
         if (q._joiningTable != null) {

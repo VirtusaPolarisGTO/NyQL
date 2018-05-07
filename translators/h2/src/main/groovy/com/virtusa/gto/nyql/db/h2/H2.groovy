@@ -1,5 +1,6 @@
 package com.virtusa.gto.nyql.db.h2
 
+import com.virtusa.gto.nyql.Assign
 import com.virtusa.gto.nyql.CTE
 import com.virtusa.gto.nyql.Case
 import com.virtusa.gto.nyql.Column
@@ -13,6 +14,7 @@ import com.virtusa.gto.nyql.QuerySelect
 import com.virtusa.gto.nyql.QueryUpdate
 import com.virtusa.gto.nyql.StoredFunction
 import com.virtusa.gto.nyql.Table
+import com.virtusa.gto.nyql.UpsertQuery
 import com.virtusa.gto.nyql.Where
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
@@ -352,8 +354,13 @@ class H2 extends H2Functions implements QTranslator {
             query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append(' ').append(NL)
         }
 
-        if (q._assigns != null && q._assigns.__hasAssignments()) {
-            query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(' ').append(NL)
+        Assign assign = q._assigns
+        if (q instanceof UpsertQuery && q._updateSet != null && q._updateSet.__hasAssignments()) {
+            assign = q._updateSet
+        }
+
+        if (assign != null && assign.__hasAssignments()) {
+            query.append('SET ').append(___expandAssignments(assign, paramList, QContextType.UPDATE_SET)).append(' ').append(NL)
         }
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {

@@ -3,22 +3,15 @@ package com.virtusa.gto.nyql.db.mysql
 import com.virtusa.gto.nyql.*
 import com.virtusa.gto.nyql.db.QDdl
 import com.virtusa.gto.nyql.db.QTranslator
-import com.virtusa.gto.nyql.db.SqlMisc
 import com.virtusa.gto.nyql.db.TranslatorOptions
 import com.virtusa.gto.nyql.exceptions.NyException
-import com.virtusa.gto.nyql.model.JoinType
 import com.virtusa.gto.nyql.exceptions.NySyntaxException
 import com.virtusa.gto.nyql.model.DbInfo
-import com.virtusa.gto.nyql.model.QScript
-import com.virtusa.gto.nyql.model.QScriptList
 import com.virtusa.gto.nyql.model.units.AParam
 import com.virtusa.gto.nyql.utils.QUtils
 import com.virtusa.gto.nyql.utils.QueryCombineType
 import com.virtusa.gto.nyql.utils.QueryType
 import groovy.transform.CompileStatic
-
-import java.util.stream.Collectors
-
 /**
  * @author Isuru Weerarathna
  */
@@ -215,8 +208,13 @@ class MySql extends MySqlFunctions implements QTranslator {
             query.append('UPDATE ').append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM)).append(' ').append(NL)
         }
 
-        if (q._assigns != null && q._assigns.__hasAssignments()) {
-            query.append('SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(' ').append(NL)
+        Assign assign = q._assigns
+        if (q instanceof UpsertQuery && q._updateSet != null && q._updateSet.__hasAssignments()) {
+            assign = q._updateSet
+        }
+
+        if (assign != null && assign.__hasAssignments()) {
+            query.append('SET ').append(___expandAssignments(assign, paramList, QContextType.UPDATE_SET)).append(' ').append(NL)
         }
 
         if (q.whereObj != null && q.whereObj.__hasClauses()) {

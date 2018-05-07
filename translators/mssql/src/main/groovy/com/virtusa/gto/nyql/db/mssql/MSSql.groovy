@@ -235,8 +235,13 @@ class MSSql extends MSSqlFunctions implements QTranslator {
             query.append(___deriveSource(q.sourceTbl, paramList, QContextType.UPDATE_FROM))
         }
 
-        if (q._assigns != null && q._assigns.__hasAssignments()) {
-            query.append(' SET ').append(___expandAssignments(q._assigns, paramList, QContextType.UPDATE_SET)).append(NL)
+        Assign assign = q._assigns
+        if (q instanceof UpsertQuery && q._updateSet != null && q._updateSet.__hasAssignments()) {
+            assign = q._updateSet
+        }
+
+        if (assign != null && assign.__hasAssignments()) {
+            query.append(' SET ').append(___expandAssignments(assign, paramList, QContextType.UPDATE_SET)).append(NL)
         }
 
         if (q._joiningTable != null) {

@@ -14,6 +14,7 @@ import groovy.transform.CompileStatic;
 class UpsertQuery extends QueryUpdate implements MultiQuery {
 
     ReturnType returningType = ReturnType.NONE
+    Assign _updateSet;
     List<Object> returningColumns
 
     UpsertQuery(QContext contextParam) {
@@ -41,6 +42,17 @@ class UpsertQuery extends QueryUpdate implements MultiQuery {
         }
         returningType = ReturnType.CUSTOM
         returningColumns.addAll(columns)
+        this
+    }
+
+    UpsertQuery UPDATE_SET(@DelegatesTo(value = Assign, strategy = Closure.DELEGATE_ONLY) Closure closure) {
+        Assign ass = new Assign(_ctx, this)
+
+        def code = closure.rehydrate(ass, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+
+        _updateSet = ass
         this
     }
 
