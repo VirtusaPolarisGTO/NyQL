@@ -25,7 +25,6 @@ class DSL {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSL)
 
     final QSession session
-    //final DSLContext dslContext
 
     private boolean currentTransactionAutoCommit = false
 

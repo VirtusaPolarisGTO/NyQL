@@ -15,6 +15,10 @@ class QScript implements Serializable {
     QResultProxy proxy
     QSession qSession
 
+    QScript spawn(QSession session) {
+        new QScript(id: id, qSession: session, proxy: proxy)
+    }
+
     QScript spawn() {
         QScript script = new QScript(id: id, qSession: (QSession)null)
         QResultProxy resultProxy = proxy

@@ -2,8 +2,6 @@ package com.virtusa.gto.nyql.model
 
 import com.virtusa.gto.nyql.Query
 import groovy.transform.ToString
-
-import java.util.stream.Collectors
 /**
  * @author IWEERARATHNA
  */
@@ -15,11 +13,11 @@ class QScriptList extends QScript {
     Query baseQuery
 
     @Override
-    QScript spawn() {
-        QScriptList scriptList = new QScriptList(id: id, qSession: (QSession)null)
+    QScript spawn(QSession session) {
+        QScriptList scriptList = new QScriptList(id: id, qSession: session)
         if (scripts != null) {
             for (QScript script : scripts) {
-                scriptList.scripts.add(script.spawn())
+                scriptList.scripts.add(script.spawn(session))
             }
         }
         if (baseQuery != null) {
@@ -31,6 +29,11 @@ class QScriptList extends QScript {
     }
 
     @Override
+    QScript spawn() {
+        spawn(null)
+    }
+
+    @Override
     void free() {
         super.free()
         if (scripts != null) {
@@ -39,10 +42,4 @@ class QScriptList extends QScript {
         }
     }
 
-    @Override
-    public String toString() {
-        'QScriptList{' +
-                'scripts=\n' + scripts.stream().map {it.toString()}.collect(Collectors.joining(',\n')) +
-                '}';
-    }
 }
