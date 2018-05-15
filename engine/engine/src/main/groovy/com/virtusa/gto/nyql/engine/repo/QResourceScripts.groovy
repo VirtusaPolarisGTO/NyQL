@@ -29,25 +29,29 @@ class QResourceScripts implements QScriptMapper {
         if (resMap.containsKey(id)) {
             resMap[id]
         } else {
-            String content = readAll(rootRes + id + ConfigKeys.GROOVY_EXT,
+            UriInfo uriInfo = readAll(rootRes + id + ConfigKeys.GROOVY_EXT,
                                     rootRes + id + ConfigKeys.NYQL_EXT)
-            GroovyCodeSource groovyCodeSource = new GroovyCodeSource(content, id, GroovyShell.DEFAULT_CODE_BASE)
+            GroovyCodeSource groovyCodeSource = new GroovyCodeSource(uriInfo.content, id, GroovyShell.DEFAULT_CODE_BASE)
             groovyCodeSource.setCachable(true)
 
-            def qSrc = new QUriSource(id, null, groovyCodeSource)
+            def qSrc = new QUriSource(id, uriInfo.url.toURI(), groovyCodeSource)
             resMap[id] = qSrc
             qSrc
         }
     }
 
     @CompileStatic
-    private static String readAll(String... subPaths) throws NyScriptNotFoundException {
+    private static UriInfo readAll(String... subPaths) throws NyScriptNotFoundException {
         for (String subPath : subPaths) {
             URL url = Thread.currentThread().contextClassLoader.getResource(subPath)
             InputStream stream = openSafe(url)
             if (stream != null) {
                 try {
-                    return stream.readLines(StandardCharsets.UTF_8.name()).join('\n')
+                    String content = stream.readLines(StandardCharsets.UTF_8.name()).join('\n')
+                    UriInfo uriInfo = new UriInfo()
+                    uriInfo.content = content
+                    uriInfo.url = url
+                    return uriInfo
                 } finally {
                     if (stream != null) {
                         stream.close()
@@ -81,5 +85,10 @@ class QResourceScripts implements QScriptMapper {
     @Override
     QSource reload(String id) throws NyScriptNotFoundException {
         map(id)
+    }
+
+    private static class UriInfo {
+        private URL url;
+        private String content;
     }
 }
