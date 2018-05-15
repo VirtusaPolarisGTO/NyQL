@@ -120,12 +120,17 @@ class H2 extends H2Functions implements QTranslator {
         value != null && value ? STR_TRUE : STR_FALSE
     }
 
+    @Override
+    protected String convertToAlias(String alias, String qChar) {
+        return QUtils.quote(alias, qChar);
+    }
+
     @CompileStatic
     @Override
     String ___tableName(Table table, QContextType contextType) {
         if (contextType == QContextType.INTO || contextType == QContextType.TRUNCATE
                 || contextType == QContextType.DELETE_FROM) {
-            return QUtils.quote(table.__name)
+            return QUtils.quote(table.__name, BACK_TICK)
         } else if (contextType == QContextType.FROM || contextType == QContextType.UPDATE_FROM
                 || contextType == QContextType.DELETE_JOIN || contextType == QContextType.CONDITIONAL) {
             if (table.__isResultOf()) {
@@ -175,11 +180,11 @@ class H2 extends H2Functions implements QTranslator {
 
         if (contextType == QContextType.DELETE_CONDITIONAL_JOIN) {
             if (column._owner.__aliasDefined()) {
-                return tableAlias(column._owner, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
+                return tableAlias(column._owner, BACK_TICK) + "." + QUtils.quote(column.__name, BACK_TICK)
             }
-            return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
+            return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quote(column.__name, BACK_TICK)
         } else if (contextType == QContextType.DELETE_CONDITIONAL) {
-            return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quoteIfWS(column.__name, BACK_TICK)
+            return QUtils.quote(column._owner.__name, BACK_TICK) + "." + QUtils.quote(column.__name, BACK_TICK)
         }
 
         if (column instanceof FunctionColumn) {
@@ -189,10 +194,10 @@ class H2 extends H2Functions implements QTranslator {
         } else {
             boolean tableHasAlias = column._owner != null && column._owner.__aliasDefined()
             if (tableHasAlias) {
-                return tableAlias(column._owner, BACK_TICK) + "." + column.__name +
+                return tableAlias(column._owner, BACK_TICK) + "." + QUtils.quote(column.__name, BACK_TICK) +
                         (column.__aliasDefined() && contextType == QContextType.SELECT ? columnAliasAs(column, BACK_TICK) : '')
             } else {
-                return QUtils.quoteIfWS(column.__name, BACK_TICK) +
+                return QUtils.quote(column.__name, BACK_TICK) +
                         (column.__aliasDefined() && contextType == QContextType.SELECT ? columnAliasAs(column, BACK_TICK) : '')
             }
         }
