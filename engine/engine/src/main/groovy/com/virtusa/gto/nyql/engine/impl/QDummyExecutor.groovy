@@ -33,6 +33,8 @@ class QDummyExecutor implements QExecutor {
     def execute(QScript script) throws Exception {
         if (script instanceof QScriptResult) {
             return script.scriptResult
+        } else if (script instanceof QScriptList) {
+            return execute((QScriptList)script)
         }
         LOGGER.debug('=====================================================================')
         LOGGER.debug('Executing query:')
