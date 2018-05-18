@@ -6,14 +6,14 @@
   "caching": {
     "compiledScripts": true,
     "generatedQueries": true,
-    "allowRecompilation": false,
+    "allowRecompilation": true,
     "checkCacheValidations": true
   },
 
   "repository": {
     "mapper": "folder",
     "mapperArgs": {
-      "baseDir": "./scripts"
+      "baseDir": "./scripts/scripts"
     }
   },
 
@@ -21,13 +21,11 @@
     "impl": "dummy",
 
     "url": "jdbc:mysql://localhost/sakila",
-    "username": "sa",
-    "password": "c2E=",
+    "username": "gtobuild",
+    "password": "MTIzNHF3ZXIk",
 
     "pooling": {
       "impl": "hikari"
     }
-  },
-
-  "registerMXBeans": false
+  }
 }

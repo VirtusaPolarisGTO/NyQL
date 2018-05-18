@@ -7,6 +7,10 @@ package com.virtusa.gto.nyql.exceptions
  */
 class NyInitializationException extends NyException {
 
+    NyInitializationException(String message) {
+        super(message)
+    }
+
     NyInitializationException(String message, Throwable cause) {
         super(message, cause)
     }

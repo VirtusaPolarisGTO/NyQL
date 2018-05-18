@@ -307,11 +307,15 @@ class NyConfig {
     static NyConfigV2 withV2Defaults() throws NyConfigurationException {
         InputStream baseConf = Thread.currentThread().contextClassLoader.getResourceAsStream(DEF_CONFIG_PATH_V2)
         if (baseConf != null) {
-            Map defData = new JsonSlurper().parse(baseConf, StandardCharsets.UTF_8.name()) as Map
-            ConfigBuilder cb = new ConfigBuilder().setupFrom(defData)
-            return new NyConfigV2(cb)
+            return with(baseConf)
         }
         throw new NyConfigurationException('No default configuration v2 file found in classpath!')
+    }
+
+    static NyConfigV2 with(InputStream inputStream) throws NyConfigurationException {
+        Map defData = new JsonSlurper().parse(inputStream, StandardCharsets.UTF_8.name()) as Map
+        ConfigBuilder cb = new ConfigBuilder().setupFrom(defData)
+        return new NyConfigV2(cb)
     }
 
     protected void assertMapperSetup() throws NyConfigurationException {

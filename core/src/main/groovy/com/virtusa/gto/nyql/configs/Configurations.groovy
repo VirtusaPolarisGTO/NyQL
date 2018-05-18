@@ -344,6 +344,10 @@ class Configurations {
         (String) QUtils.readEnv(ConfigKeys.SYS_ACTIVE_DB, properties.activate)
     }
 
+    boolean isCheckCacheValidations() {
+        (boolean) (properties.caching.checkCacheValidations ?: true)
+    }
+
     boolean cacheRawScripts() {
         String cacheStatus = QUtils.readEnv(ConfigKeys.SYS_CACHE_RAW_ENABLED, null)
         if (cacheStatus == null) {

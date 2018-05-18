@@ -26,10 +26,12 @@ class Caching implements Closeable {
     private final Configurations configurations
     private final QScriptMapper mapper
     private final Object clzLoaderLock = new Object()
+    private ScriptCacheValidator cacheValidator
 
     Caching(Configurations theConfigs, QScriptMapper scriptMapper) {
         configurations = theConfigs
         mapper = scriptMapper
+        cacheValidator = new ScriptCacheValidator(theConfigs)
 
         gcl = new NyGroovyClassLoader(Thread.currentThread().contextClassLoader, makeCompilerConfigs())
     }
@@ -37,6 +39,11 @@ class Caching implements Closeable {
     void compileAllScripts(Collection<QSource> sources) throws NyException {
         if (configurations.cacheRawScripts()) {
             synchronized (clzLoaderLock) {
+                // check for caching issues in scripts
+                if (configurations.isCheckCacheValidations()) {
+                    doCheckScripts(sources)
+                }
+
                 int n = sources.size()
                 int len = String.valueOf(n).length()
                 int curr = 1
@@ -55,6 +62,15 @@ class Caching implements Closeable {
                 LOGGER.info('Compilation successful!')
                 LOGGER.info('-'*80)
             }
+        }
+    }
+
+    @CompileStatic
+    private void doCheckScripts(Collection<QSource> sources) throws NyException {
+        try {
+            cacheValidator.check(sources)
+        } finally {
+            LOGGER.debug('-'*80)
         }
     }
 

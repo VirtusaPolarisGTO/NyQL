@@ -1,0 +1,8 @@
+@Field do_cache = true
+
+$DSL.select {
+
+    TARGET (TABLE($IMPORT('asimpletable')).alias('ast'))
+    FETCH ()
+
+}

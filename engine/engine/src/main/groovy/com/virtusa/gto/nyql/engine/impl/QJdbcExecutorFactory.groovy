@@ -89,7 +89,9 @@ class QJdbcExecutorFactory implements QExecutorFactory {
 
     @Override
     void shutdown() {
-        jdbcPool.shutdown()
+        if (jdbcPool != null) {
+            jdbcPool.shutdown()
+        }
     }
 
     /**

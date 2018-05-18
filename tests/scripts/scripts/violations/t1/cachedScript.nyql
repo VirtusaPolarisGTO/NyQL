@@ -1,0 +1,6 @@
+@Field do_cache = true
+
+$DSL.script {
+    RUN ('ainsert')
+
+}

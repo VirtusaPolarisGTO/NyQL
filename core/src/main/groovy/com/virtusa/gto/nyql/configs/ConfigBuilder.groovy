@@ -8,6 +8,9 @@ import com.virtusa.gto.nyql.utils.QUtils
 import groovy.transform.PackageScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import java.util.function.Function
+
 /**
  * @author IWEERARATHNA
  */
@@ -98,6 +101,23 @@ class ConfigBuilder {
      */
     QRepository getRepository(String name) {
         repositoryMap[name]
+    }
+
+    ConfigBuilder setTheScriptFolder(File scriptFolder) {
+        Map repo = (Map) props.computeIfAbsent(ConfigKeys.REPOSITORY, new Function<Object, Map>() {
+            @Override
+            Map apply(Object o) {
+                return new HashMap()
+            }
+        })
+        Map mapperArgs = (Map) repo.computeIfAbsent("mapperArgs", new Function() {
+            @Override
+            Object apply(Object o) {
+                return new HashMap()
+            }
+        })
+        mapperArgs.put("baseDir", scriptFolder)
+        this
     }
 
     /**
@@ -221,6 +241,20 @@ class ConfigBuilder {
             props[ConfigKeys.CACHING] = [:]
         }
         props[ConfigKeys.CACHING].allowRecompilation = status
+        this
+    }
+
+    /**
+     * Enables cache validation of scripts.
+     *
+     * @return this config builder instance.
+     */
+    ConfigBuilder doCheckCacheValidation(boolean status = false) {
+        assertNotInitialized()
+        if (!props[ConfigKeys.CACHING]) {
+            props[ConfigKeys.CACHING] = [:]
+        }
+        props[ConfigKeys.CACHING].checkCacheValidations = status
         this
     }
 

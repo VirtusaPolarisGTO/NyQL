@@ -9,6 +9,7 @@ import com.virtusa.gto.nyql.engine.exceptions.NyScriptExecutionException;
 import com.virtusa.gto.nyql.engine.impl.NyQLResult;
 import com.virtusa.gto.nyql.exceptions.NyConfigurationException;
 import com.virtusa.gto.nyql.exceptions.NyException;
+import com.virtusa.gto.nyql.exceptions.NyRuntimeException;
 import com.virtusa.gto.nyql.model.NyQLInstanceMXBean;
 import com.virtusa.gto.nyql.model.QExecutor;
 import com.virtusa.gto.nyql.model.QPagedScript;
@@ -41,53 +42,57 @@ public class NyQLInstance implements NyQLInstanceMXBean, AutoCloseable {
         this.configurations = theConfigInstance;
     }
 
-    public static NyQLInstance createFromResource(String name, String resourcePath) throws NyException {
+    public static NyQLInstance createFromResource(String name, String resourcePath) throws NyRuntimeException {
         return createFromResource(name, resourcePath, null);
     }
 
-    public static NyQLInstance createFromResource(String name, String resourcePath, ClassLoader classLoader) throws NyException {
+    public static NyQLInstance createFromResource(String name, String resourcePath, ClassLoader classLoader) throws NyRuntimeException {
         ClassLoader cl = classLoader != null ? classLoader : Thread.currentThread().getContextClassLoader();
         try (InputStream inputStream = cl.getResourceAsStream(resourcePath)) {
             return create(name, inputStream);
         } catch (Exception ex) {
-            throw new NyConfigurationException("Failed to read resource '${resourcePath}'!", ex);
+            throw new NyRuntimeException("Failed to read resource '${resourcePath}'!", ex);
         }
     }
 
     @Deprecated
-    public static NyQLInstance create(InputStream inputStream) throws NyConfigurationException {
+    public static NyQLInstance create(InputStream inputStream) throws NyRuntimeException {
         return create(null, inputStream);
     }
 
-    public static NyQLInstance create(String name, InputStream inputStream) throws NyConfigurationException {
+    public static NyQLInstance create(String name, InputStream inputStream) throws NyRuntimeException {
         return create(name, ConfigParser.parseAndResolve(inputStream));
     }
 
     @Deprecated
-    public static NyQLInstance create(File configFile) throws NyConfigurationException {
+    public static NyQLInstance create(File configFile) throws NyRuntimeException {
         return create(null, configFile);
     }
 
-    public static NyQLInstance create(String name, File configFile) throws NyConfigurationException {
+    public static NyQLInstance create(String name, File configFile) throws NyRuntimeException {
         return create(name, ConfigParser.parseAndResolve(configFile));
     }
 
-    public static NyQLInstance create(String name, Map<String, Object> configData) throws NyConfigurationException {
+    public static NyQLInstance create(String name, Map<String, Object> configData) throws NyRuntimeException {
         try {
             configData.put(ConfigKeys.LOCATION_KEY, new File(".").getCanonicalPath());
             Configurations configInst = ConfigBuilder.instance(name).setupFrom(configData).build();
             return create(configInst);
         } catch (IOException e) {
-            throw new NyConfigurationException("Failed to identify current working directory for app!", e);
+            throw new NyRuntimeException("Failed to identify current working directory for app!", e);
         }
     }
 
-    public static NyQLInstance create(Configurations configInst) throws NyConfigurationException {
-        NyQLInstance nyQLInstance = new NyQLInstance(configInst);
-        if (configInst.isRegisterMXBeans()) {
-            JmxConfigurator.get().registerMXBean(nyQLInstance);
+    public static NyQLInstance create(Configurations configInst) throws NyRuntimeException {
+        try {
+            NyQLInstance nyQLInstance = new NyQLInstance(configInst);
+            if (configInst.isRegisterMXBeans()) {
+                JmxConfigurator.get().registerMXBean(nyQLInstance);
+            }
+            return nyQLInstance;
+        } catch (NyConfigurationException e) {
+            throw new NyRuntimeException(e.getMessage(), e);
         }
-        return nyQLInstance;
     }
 
     public Configurations getConfigurations() {
