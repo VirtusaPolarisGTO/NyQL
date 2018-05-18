@@ -1,67 +1,32 @@
 {
-  "activate": "mysql",
+  "version": 2,
 
-  "translators": [
-    "com.virtusa.gto.nyql.db.mysql.MySqlFactory"
-  ],
+  "activate": "mysql",
 
   "caching": {
     "compiledScripts": true,
     "generatedQueries": true,
-    "allowRecompilation": false
+    "allowRecompilation": true
   },
 
-  "defaultImports": [
-    "groovy.transform.Field",
-    "com.virtusa.gto.nyql.ddl.DKeyIndexType",
-    "com.virtusa.gto.nyql.ddl.DFieldType",
-    "com.virtusa.gto.nyql.ddl.DReferenceOption",
-    "com.virtusa.gto.nyql.utils.QueryType",
-    "java.sql.JDBCType",
-    "java.sql.Types",
-    "com.virtusa.gto.nyql.model.units.AParam.ParamScope"
-  ],
-
-  "defaultExecutor": "jdbc",
-  "executors": [
-    {
-      "name": "jdbc",
-      "factory": "com.virtusa.gto.nyql.engine.impl.QJdbcExecutorFactory",
-
-      "url": "jdbc:mysql://localhost/sakila",
-      "username": "root",
-      "password": "",
-      "passwordEnc": "",
-
-      "pooling": {
-        "impl": "com.virtusa.gto.nyql.engine.pool.impl.QHikariPool",
-
-        "maximumPoolSize": 1,
-        "prepStmtCacheSize": 300,
-        "prepStmtCacheSqlLimit": 2048,
-        "useServerPrepStmts": true,
-
-        "connectionTimeout": 30000,
-        "idleTimeout": 0,
-        "maxLifetime": 0
-      }
+  "repository": {
+    "mapper": "folder",
+    "mapperArgs": {
+      "baseDir": "./scripts"
     }
-  ],
+  },
 
-  "defaultRepository": "default",
-  "repositories": [
-    {
-      "name": "default",
-      "repo": "com.virtusa.gto.nyql.engine.repo.QRepositoryImpl",
-      "mapper": "com.virtusa.gto.nyql.engine.repo.QScriptsFolder",
-      "mapperArgs": {
-        "baseDir": "./examples"
-      }
+  "executor": {
+    "impl": "dummy",
+
+    "url": "jdbc:mysql://localhost/sakila",
+    "username": "sa",
+    "password": "c2E=",
+
+    "pooling": {
+      "impl": "hikari"
     }
-  ],
+  },
 
-  "profiling": {
-    "enabled": false,
-    "profiler": "com.virtusa.gto.nyql.model.impl.QLogProfiler"
-  }
+  "registerMXBeans": false
 }
