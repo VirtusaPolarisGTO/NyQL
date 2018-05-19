@@ -107,12 +107,15 @@ class NyConfig {
      * @param compileScripts to compile scripts at initialization. (default: true)
      * @param generatedQueries to cache generated queries if specified in script. (default: true)
      * @param allowRecompile allow to recompile a script without restarting NyQL. (default: false)
+     * @param checkCacheViolations check for invalid do_cache fields in NyQL scripts when bootstrapping. (default: true)
      * @return this config instance.
      */
-    NyConfig withCaching(boolean compileScripts = true, boolean generatedQueries = true, boolean allowRecompile = false) {
+    NyConfig withCaching(boolean compileScripts = true, boolean generatedQueries = true,
+                         boolean allowRecompile = false, boolean checkCacheViolations = true) {
         configBuilder.doCacheCompiledScripts(compileScripts)
             .doCacheGeneratedQueries(generatedQueries)
             .doCacheAllowRecompilation(allowRecompile)
+            .doCheckCacheValidation(checkCacheViolations)
         this
     }
 
