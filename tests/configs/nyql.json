@@ -59,17 +59,6 @@
 
   "queryLoggingLevel": "warn",
 
-  "profiling": {
-    "enabled": true,
-    "profiler": "com.virtusa.gto.nyql.model.impl.QLogProfiler",
-    "options": {
-      "url": "http://ct-insightv4db:5000/nyql",
-      "port": 9009,
-      "writeIntervalMS": 10000,
-      "autoWriteOnClose": true
-    }
-  },
-
   "definitions": {
     "database": {
       "url": "jdbc:mysql://localhost/sakila",

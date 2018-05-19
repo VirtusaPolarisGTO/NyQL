@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.virtusa.gto.nyql</groupId>
         <artifactId>nyql-parent</artifactId>
-        <version>2.0-rc4-SNAPSHOT</version>
+        <version>2.0-rc4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -23,11 +23,6 @@
             <groupId>org.gitective</groupId>
             <artifactId>gitective-core</artifactId>
             <version>0.9.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.virtusa.gto.nyql</groupId>
-            <artifactId>nyql-impl-profilers</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

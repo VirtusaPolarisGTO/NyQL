@@ -6,7 +6,7 @@
 
     <groupId>com.virtusa.gto.nyql</groupId>
     <artifactId>nyql-parent</artifactId>
-    <version>2.0-rc4-SNAPSHOT</version>
+    <version>2.0-rc4</version>
     <packaging>pom</packaging>
 
     <name>NyQL</name>

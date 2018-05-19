@@ -55,16 +55,6 @@
     }
   ],
 
-  "profiling": {
-    "enabled": true,
-    "profiler": "com.virtusa.gto.nyql.profilers.QAverageProfiler",
-    "options": {
-      "port": 9009,
-      "writeIntervalMS": 10000,
-      "autoWriteOnClose": true
-    }
-  },
-
   "definitions": {
     "pooling-extra": {
       "maximumPoolSize": 100,
