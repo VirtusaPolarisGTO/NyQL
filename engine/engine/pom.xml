@@ -29,6 +29,7 @@
                         <configuration>
                             <sources>
                                 <source>src/main/java</source>
+                                <source>src/main/groovy</source>
                             </sources>
                         </configuration>
                     </execution>

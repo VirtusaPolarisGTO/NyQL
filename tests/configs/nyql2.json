@@ -12,7 +12,8 @@
   "repository": {
     "mapper": "folder",
     "mapperArgs": {
-      "baseDir": "./scripts"
+      "baseDir": "./scripts",
+      "exclusions": "scripts/violations/**"
     }
   },
 

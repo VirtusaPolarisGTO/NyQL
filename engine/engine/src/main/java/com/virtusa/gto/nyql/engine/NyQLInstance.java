@@ -194,7 +194,7 @@ public class NyQLInstance implements NyQLInstanceMXBean, AutoCloseable {
      * This method will automatically parse the script and execute using internally
      * configured executor.
      * </p>
-     * <b>Note:</b><br/>
+     * <b>Note:</b>
      * You should pass all parameter values required for the query execution.
      *
      * @param scriptName name of the script to be run.
