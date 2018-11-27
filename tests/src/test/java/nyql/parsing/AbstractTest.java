@@ -32,6 +32,12 @@ public class AbstractTest {
     public void assertQueries(Object objects) {
         activeDb = nyql().getConfigurations().getActivatedDb();
 
+        assertQueries(objects, activeDb);
+    }
+
+    public void assertQueries(Object objects, String activeDb) {
+        this.activeDb = activeDb;
+
         Object val = objects;
         if (objects instanceof QScriptResult) {
             val = ((QScriptResult) objects).getScriptResult();

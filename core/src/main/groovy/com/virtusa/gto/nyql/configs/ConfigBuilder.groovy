@@ -42,6 +42,18 @@ class ConfigBuilder {
     }
 
     /**
+     * Sets the default schema. Do not specify, when you are not using
+     * multiple schemas.
+     *
+     * @param defSchema default schema for the queries.
+     * @return this config instance.
+     */
+    ConfigBuilder havingDefSchema(String defSchema) {
+        props.put(ConfigKeys.DEF_SCHEMA, defSchema)
+        this
+    }
+
+    /**
      * Enable profiler in nyql. Profiler will passively run and notifies
      * about parsing time or running time of each query.
      *

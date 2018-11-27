@@ -1,0 +1,32 @@
+{
+  "version": 2,
+
+  "activate": "mysql",
+
+  "caching": {
+    "compiledScripts": true,
+    "generatedQueries": true,
+    "allowRecompilation": true
+  },
+
+  "repository": {
+    "mapper": "folder",
+    "mapperArgs": {
+      "baseDir": "./scripts/schema"
+    }
+  },
+
+  "executor": {
+    "impl": "dummy",
+
+    "url": "jdbc:mysql://localhost/sakila",
+    "username": "gtobuild",
+    "password": "MTIzNHF3ZXIk",
+
+    "pooling": {
+      "impl": "hikari"
+    }
+  },
+
+  "defaultSchema": "MyDefSchema"
+}

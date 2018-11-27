@@ -27,6 +27,7 @@ final class ConfigKeys {
     static final String DEFAULT_IMPORTS = 'defaultImports'
     static final String TRANSLATORS = 'translators'
     static final String ACTIVATE_DB = 'activate'
+    static final String DEF_SCHEMA = 'defaultSchema'
 
     static final String QUERIES_ROOT = 'queries'
     static final String QUERIES_KEYWORDS = 'keywordsPath'

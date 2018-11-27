@@ -1,0 +1,17 @@
+[
+        $DSL.select {
+            TARGET (Actor.alias("ac"))
+            FETCH ()
+        },
+        [
+                mysql: "SELECT * FROM `MyDefSchema`.`Actor` ac"
+        ],
+
+        $DSL.select {
+            TARGET (TABLE("MovieManager", "Film").alias("f"))
+            DISTINCT_FETCH (f.title)
+        },
+        [
+                mysql: "SELECT DISTINCT f.title FROM `MovieManager`.`Film` f"
+        ],
+]

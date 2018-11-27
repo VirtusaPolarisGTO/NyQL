@@ -50,6 +50,11 @@ class NyConfigV2 extends NyConfig {
         this
     }
 
+    NyConfig havingDefaultSchema(String defSchemaName) {
+        configBuilder.havingDefSchema(defSchemaName)
+        this
+    }
+
     @Override
     NyConfig scriptFolder(File folder) throws NyConfigurationException {
         return super.scriptFolder(folder)

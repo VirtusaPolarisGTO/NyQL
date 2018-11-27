@@ -370,6 +370,10 @@ class Configurations {
         }
     }
 
+    String getDefaultSchema() {
+        properties.get(ConfigKeys.DEF_SCHEMA)
+    }
+
     List getAvailableTranslators() {
         properties.translators
     }

@@ -31,6 +31,7 @@ class H2Factory implements QDbFactory {
         Collection<String> keywords = loadKeywords(nyConfigs)
 
         h2 = new H2(new TranslatorOptions(keywords))
+        h2.setConfigs(nyConfigs)
     }
 
     private static Set<String> loadKeywords(Configurations nyConfigs) {

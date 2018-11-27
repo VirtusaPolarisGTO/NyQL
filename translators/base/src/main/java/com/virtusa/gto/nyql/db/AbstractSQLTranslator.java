@@ -16,6 +16,7 @@ import com.virtusa.gto.nyql.Table;
 import com.virtusa.gto.nyql.TableAll;
 import com.virtusa.gto.nyql.Where;
 import com.virtusa.gto.nyql.WithClosure;
+import com.virtusa.gto.nyql.configs.Configurations;
 import com.virtusa.gto.nyql.exceptions.NyException;
 import com.virtusa.gto.nyql.model.JoinType;
 import com.virtusa.gto.nyql.model.ValueTable;
@@ -45,6 +46,8 @@ public abstract class AbstractSQLTranslator implements QTranslator {
     private final TranslatorOptions translatorOptions;
     private final Collection<String> keywords;
 
+    private Configurations configs;
+
     private static final String NL = "\n";
     private static final String _AS_ = " AS ";
     private static final String COMMA = ", ";
@@ -61,6 +64,10 @@ public abstract class AbstractSQLTranslator implements QTranslator {
             translatorOptions = TranslatorOptions.empty();
         }
         keywords = translatorOptions.getKeywords();
+    }
+
+    public void setConfigs(Configurations configs) {
+        this.configs = configs;
     }
 
     protected TranslatorOptions getTranslatorOptions() {
@@ -83,7 +90,11 @@ public abstract class AbstractSQLTranslator implements QTranslator {
         if (table.get__schema() != null) {
             return QUtils.quote(table.get__schema(), qChar) + ".";
         } else {
-            return EMPTY;
+            if (configs != null && configs.getDefaultSchema() != null && !configs.getDefaultSchema().trim().isEmpty()) {
+                return QUtils.quote(configs.getDefaultSchema(), qChar) + ".";
+            } else {
+                return EMPTY;
+            }
         }
     }
 

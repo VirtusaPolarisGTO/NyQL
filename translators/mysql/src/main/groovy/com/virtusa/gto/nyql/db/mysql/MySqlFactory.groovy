@@ -33,8 +33,8 @@ class MySqlFactory implements QDbFactory {
         Collection<String> keywords = loadKeywords(nyConfigs)
 
         mySql = new MySql(new TranslatorOptions(keywords), dbInfo)
+        mySql.setConfigs(nyConfigs)
     }
-
 
     private static Set<String> loadKeywords(Configurations nyConfigs) {
         Map props = nyConfigs.getAllProperties()
